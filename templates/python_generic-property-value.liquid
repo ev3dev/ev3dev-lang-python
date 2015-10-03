@@ -1,0 +1,10 @@
+{% for prop in currentClass.propertyValues %}{%
+  assign className = currentClass.friendlyName | downcase | underscore_spaces %}{%
+  assign propName = prop.propertyName | downcase | underscore_spaces %}
+
+    __propval_{{propName}} = { {%
+  for value in prop.values %} 
+      '{{value.name}}':'{{value.description}}' ,{%
+  endfor %}
+          }{%
+endfor %}
