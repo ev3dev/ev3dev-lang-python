@@ -1,14 +1,13 @@
 {% assign class_name = currentClass.friendlyName | camel_case | capitalize %}
 {% assign device_name_convention = currentClass.systemDeviceNameConvention | replace: '\{0\}', '*' %} 
-class {{ class_name }}(Ev3Device):
+class {{ class_name }}(Device):
 
     """{% for line in currentClass.description %}
-    {{ line }}{%
-endfor %}
+    {{ line }}{% endfor %}
     """
 
     SYSTEM_CLASS_NAME = '{{ currentClass.systemClassName }}'
     SYSTEM_DEVICE_NAME_CONVENTION = '{{ device_name_convention }}'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Ev3Device( {{ class_name }}.SYSTEM_CLASS_NAME, port, name )
+        self._device = Device( {{ class_name }}.SYSTEM_CLASS_NAME, port, name )

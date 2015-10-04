@@ -20,8 +20,8 @@
 # THE SOFTWARE.
 # -----------------------------------------------------------------------------
 
-#~autogen autogen-header 'py'>commentStyle -->
-    # Sections of the following code were auto-generated based on spec v0.9.3-pre, rev 1. 
+#~autogen autogen-header -->
+# Sections of the following code were auto-generated based on spec v0.9.3-pre, rev 2
 
 #~autogen
 
@@ -35,8 +35,8 @@ import numbers
 __EV3_MODULE_connected = {} 
 __EV3_MODULE_filehandle_cache = {}
 
-class Ev3Device(object):
-    """The ev3dev base class"""
+class Device(object):
+    """The ev3dev device base class"""
 
     DEVICE_ROOT_PATH = '/sys/class'
 
@@ -44,7 +44,7 @@ class Ev3Device(object):
         """Spin through the Linux sysfs class for the device type and find
            the first unconnected device"""
            
-        self._classpath = os.path.abspath( Ev3Device.DEVICE_ROOT_PATH + '/' + class_name )
+        self._classpath = os.path.abspath( Device.DEVICE_ROOT_PATH + '/' + class_name )
         
         for file in os.listdir( self._classpath ):
             if 'auto' == port:
@@ -147,7 +147,7 @@ class Ev3Device(object):
                 return v
         return ""
 
-#~autogen ../python/templates/python_generic-class classes.motor>currentClass
+#~autogen "python_generic-class" classes.motor>currentClass
 
  
 class Motor(Ev3Device):
@@ -167,7 +167,7 @@ class Motor(Ev3Device):
 
 #~autogen
 
-#~autogen ../python/templates/python_generic-get-set classes.motor>currentClass
+#~autogen python_generic-get-set classes.motor>currentClass
 
 
     def __set_command(self, value):
@@ -500,7 +500,7 @@ class Motor(Ev3Device):
 
 
 #~autogen
-#~autogen ../python/templates/python_generic-property-value classes.motor>currentClass
+#~autogen python_generic-property-value classes.motor>currentClass
 
 
     __propval_command = {  
@@ -535,10 +535,10 @@ class Motor(Ev3Device):
           }
 
 #~autogen
-#~autogen ../python/templates/python_generic-class classes.dcMotor>currentClass
+#~autogen python_generic-class classes.dcMotor>currentClass
 
  
-class DcMotor(Ev3Device):
+class DcMotor(Device):
 
     """
     The DC motor class provides a uniform interface for using regular DC motors
@@ -550,10 +550,10 @@ class DcMotor(Ev3Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Ev3Device( DcMotor.SYSTEM_CLASS_NAME, port, name )
+        self._device = Device( DcMotor.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
-#~autogen ../python/templates/python_generic-get-set classes.dcMotor>currentClass
+#~autogen python_generic-get-set classes.dcMotor>currentClass
 
 
     def __set_command(self, value):
@@ -680,12 +680,13 @@ class DcMotor(Ev3Device):
 
 
 #~autogen
-#~autogen ../python/templates/python_generic-property-value classes.dcMotor>currentClass
+#~autogen python_generic-property-value classes.dcMotor>currentClass
 
 
     __propval_command = {  
       'run-forever':'Run the motor until another command is sent.' , 
       'run-timed':'Run the motor for the amount of time specified in `time_sp`and then stop the motor using the command specified by `stop_command`.' , 
+      'run-direct':'Run the motor at the duty cycle specified by `duty_cycle_sp`.Unlike other run commands, changing `duty_cycle_sp` while running *will*take effect immediately.' , 
       'stop':'Stop any of the run commands before they are complete using thecommand specified by `stop_command`.' ,
           }
 
@@ -700,10 +701,10 @@ class DcMotor(Ev3Device):
           }
 
 #~autogen
-#~autogen ../python/templates/python_generic-class classes.servoMotor>currentClass
+#~autogen python_generic-class classes.servoMotor>currentClass
 
  
-class ServoMotor(Ev3Device):
+class ServoMotor(Device):
 
     """
     The servo motor class provides a uniform interface for using hobby type
@@ -714,10 +715,10 @@ class ServoMotor(Ev3Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Ev3Device( ServoMotor.SYSTEM_CLASS_NAME, port, name )
+        self._device = Device( ServoMotor.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
-#~autogen ../python/templates/python_generic-get-set classes.servoMotor>currentClass
+#~autogen python_generic-get-set classes.servoMotor>currentClass
 
 
     def __set_command(self, value):
@@ -847,7 +848,7 @@ class ServoMotor(Ev3Device):
 
 
 #~autogen
-#~autogen ../python/templates/python_generic-property-value classes.servoMotor>currentClass
+#~autogen python_generic-property-value classes.servoMotor>currentClass
 
 
     __propval_command = {  
@@ -861,10 +862,10 @@ class ServoMotor(Ev3Device):
           }
 
 #~autogen
-#~autogen ../python/templates/python_generic-class classes.sensor>currentClass
+#~autogen python_generic-class classes.sensor>currentClass
 
  
-class Sensor(Ev3Device):
+class Sensor(Device):
 
     """
     The sensor class provides a uniform interface for using most of the
@@ -887,10 +888,10 @@ class Sensor(Ev3Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Ev3Device( Sensor.SYSTEM_CLASS_NAME, port, name )
+        self._device = Device( Sensor.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
-#~autogen ../python/templates/python_generic-get-set classes.sensor>currentClass
+#~autogen python_generic-get-set classes.sensor>currentClass
 
 
     def __set_command(self, value):
@@ -989,10 +990,10 @@ class Sensor(Ev3Device):
         else:
             return 0
 
-#~autogen ../python/templates/python_generic-class classes.i2cSensor>currentClass
+#~autogen python_generic-class classes.i2cSensor>currentClass
 
  
-class I2cSensor(Ev3Device):
+class I2cSensor(Device):
 
     """
     A generic interface to control I2C-type EV3 sensors.
@@ -1002,10 +1003,10 @@ class I2cSensor(Ev3Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Ev3Device( I2cSensor.SYSTEM_CLASS_NAME, port, name )
+        self._device = Device( I2cSensor.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
-#~autogen ../python/templates/python_generic-get-set classes.i2cSensor>currentClass
+#~autogen python_generic-get-set classes.i2cSensor>currentClass
 
 
     def __get_fw_version(self):
@@ -1033,10 +1034,10 @@ class I2cSensor(Ev3Device):
 
 
 #~autogen
-#~autogen ../python/templates/python_generic-class classes.colorSensor>currentClass
+#~autogen python_generic-class classes.colorSensor>currentClass
 
  
-class ColorSensor(Ev3Device):
+class ColorSensor(Device):
 
     """
     LEGO EV3 color sensor.
@@ -1046,10 +1047,10 @@ class ColorSensor(Ev3Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Ev3Device( ColorSensor.SYSTEM_CLASS_NAME, port, name )
+        self._device = Device( ColorSensor.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
-#~autogen ../python/templates/python_generic-property-value classes.colorSensor>currentClass
+#~autogen python_generic-property-value classes.colorSensor>currentClass
 
 
     __propval_mode = {  
@@ -1061,10 +1062,10 @@ class ColorSensor(Ev3Device):
           }
 
 #~autogen
-#~autogen ../python/templates/python_generic-class classes.ultrasonicSensor>currentClass
+#~autogen python_generic-class classes.ultrasonicSensor>currentClass
 
  
-class UltrasonicSensor(Ev3Device):
+class UltrasonicSensor(Device):
 
     """
     LEGO EV3 ultrasonic sensor.
@@ -1074,10 +1075,10 @@ class UltrasonicSensor(Ev3Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Ev3Device( UltrasonicSensor.SYSTEM_CLASS_NAME, port, name )
+        self._device = Device( UltrasonicSensor.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
-#~autogen ../python/templates/python_generic-property-value classes.ultrasonicSensor>currentClass
+#~autogen python_generic-property-value classes.ultrasonicSensor>currentClass
 
 
     __propval_mode = {  
@@ -1089,10 +1090,10 @@ class UltrasonicSensor(Ev3Device):
           }
 
 #~autogen
-#~autogen ../python/templates/python_generic-class classes.gyroSensor>currentClass
+#~autogen python_generic-class classes.gyroSensor>currentClass
 
  
-class GyroSensor(Ev3Device):
+class GyroSensor(Device):
 
     """
     LEGO EV3 gyro sensor.
@@ -1102,10 +1103,10 @@ class GyroSensor(Ev3Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Ev3Device( GyroSensor.SYSTEM_CLASS_NAME, port, name )
+        self._device = Device( GyroSensor.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
-#~autogen ../python/templates/python_generic-property-value classes.gyroSensor>currentClass
+#~autogen python_generic-property-value classes.gyroSensor>currentClass
 
 
     __propval_mode = {  
@@ -1117,10 +1118,10 @@ class GyroSensor(Ev3Device):
           }
 
 #~autogen
-#~autogen ../python/templates/python_generic-class classes.infraredSensor>currentClass
+#~autogen python_generic-class classes.infraredSensor>currentClass
 
  
-class InfraredSensor(Ev3Device):
+class InfraredSensor(Device):
 
     """
     LEGO EV3 infrared sensor.
@@ -1130,10 +1131,10 @@ class InfraredSensor(Ev3Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Ev3Device( InfraredSensor.SYSTEM_CLASS_NAME, port, name )
+        self._device = Device( InfraredSensor.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
-#~autogen ../python/templates/python_generic-property-value classes.infraredSensor>currentClass
+#~autogen python_generic-property-value classes.infraredSensor>currentClass
 
 
     __propval_mode = {  
@@ -1147,10 +1148,10 @@ class InfraredSensor(Ev3Device):
 #~autogen
 
  
-#~autogen ../python/templates/python_generic-class classes.soundSensor>currentClass
+#~autogen python_generic-class classes.soundSensor>currentClass
 
  
-class SoundSensor(Ev3Device):
+class SoundSensor(Device):
 
     """
     LEGO NXT Sound Sensor
@@ -1160,10 +1161,10 @@ class SoundSensor(Ev3Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Ev3Device( SoundSensor.SYSTEM_CLASS_NAME, port, name )
+        self._device = Device( SoundSensor.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
-#~autogen ../python/templates/python_generic-property-value classes.soundSensor>currentClass
+#~autogen python_generic-property-value classes.soundSensor>currentClass
 
 
     __propval_mode = {  
@@ -1172,10 +1173,10 @@ class SoundSensor(Ev3Device):
           }
 
 #~autogen
-#~autogen ../python/templates/python_generic-class classes.lightSensor>currentClass
+#~autogen python_generic-class classes.lightSensor>currentClass
 
  
-class LightSensor(Ev3Device):
+class LightSensor(Device):
 
     """
     LEGO NXT Light Sensor
@@ -1185,10 +1186,10 @@ class LightSensor(Ev3Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Ev3Device( LightSensor.SYSTEM_CLASS_NAME, port, name )
+        self._device = Device( LightSensor.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
-#~autogen ../python/templates/python_generic-property-value classes.lightSensor>currentClass
+#~autogen python_generic-property-value classes.lightSensor>currentClass
 
 
     __propval_mode = {  
@@ -1197,10 +1198,10 @@ class LightSensor(Ev3Device):
           }
 
 #~autogen
-#~autogen ../python/templates/python_generic-class classes.led>currentClass
+#~autogen python_generic-class classes.led>currentClass
 
  
-class Led(Ev3Device):
+class Led(Device):
 
     """
     Any device controlled by the generic LED driver.
@@ -1212,10 +1213,10 @@ class Led(Ev3Device):
     SYSTEM_DEVICE_NAME_CONVENTION = ''
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Ev3Device( Led.SYSTEM_CLASS_NAME, port, name )
+        self._device = Device( Led.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
-#~autogen ../python/templates/python_generic-get-set classes.led>currentClass
+#~autogen python_generic-get-set classes.led>currentClass
 
 
     def __get_max_brightness(self):
@@ -1297,10 +1298,10 @@ class Led(Ev3Device):
 
 
 #~autogen
-#~autogen ../python/templates/python_generic-class classes.powerSupply>currentClass
+#~autogen python_generic-class classes.powerSupply>currentClass
 
  
-class PowerSupply(Ev3Device):
+class PowerSupply(Device):
 
     """
     A generic interface to read data from the system's power_supply class.
@@ -1311,10 +1312,10 @@ class PowerSupply(Ev3Device):
     SYSTEM_DEVICE_NAME_CONVENTION = ''
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Ev3Device( PowerSupply.SYSTEM_CLASS_NAME, port, name )
+        self._device = Device( PowerSupply.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
-#~autogen ../python/templates/python_generic-get-set classes.powerSupply>currentClass
+#~autogen python_generic-get-set classes.powerSupply>currentClass
 
 
     def __get_measured_current(self):
@@ -1363,10 +1364,10 @@ class PowerSupply(Ev3Device):
 
 
 #~autogen
-#~autogen ../python/templates/python_generic-class classes.legoPort>currentClass
+#~autogen python_generic-class classes.legoPort>currentClass
 
  
-class LegoPort(Ev3Device):
+class LegoPort(Device):
 
     """
     The `lego-port` class provides an interface for working with input and
@@ -1400,10 +1401,10 @@ class LegoPort(Ev3Device):
     SYSTEM_DEVICE_NAME_CONVENTION = ''
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Ev3Device( LegoPort.SYSTEM_CLASS_NAME, port, name )
+        self._device = Device( LegoPort.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
-#~autogen ../python/templates/python_generic-get-set classes.legoPort>currentClass
+#~autogen python_generic-get-set classes.legoPort>currentClass
 
 
     def __get_driver_name(self):
