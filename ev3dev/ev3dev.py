@@ -494,11 +494,13 @@ class Motor(Device):
 
     time_sp = property( __get_time_sp, __set_time_sp, None, __doc_time_sp )
 
-    def run_timed(self,time):
-        self.__set_time_sp(time)
+    def run_timed(self,time_sp, duty_cycle_sp):
+        self.__set_time_sp(time_sp)
+        self.__set_duty_cycle_sp(duty_cycle_sp)
         self.__set_command("run-timed")
 
-    def run_forever(self):
+    def run_forever(self,duty_cycle_sp=75):
+        self.__set_duty_cycle_sp(duty_cycle_sp)
         self.__set_command("run-forever")
 
     def stop(self):
