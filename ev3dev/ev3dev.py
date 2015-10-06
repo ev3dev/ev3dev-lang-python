@@ -32,7 +32,6 @@ import numbers
 #------------------------------------------------------------------------------ 
 # Define the base class from which all other ev3dev classes are defined.
 
-__EV3_MODULE_connected = {} 
 __EV3_MODULE_filehandle_cache = {}
 
 class Device(object):
@@ -62,10 +61,6 @@ class Device(object):
                     print 'Got a port match ' + port_name + ' <-> ' + port
                     self._path = os.path.abspath( self._classpath + '/' + file )
                     break
-
-        if self._path not in __EV3_MODULE_connected:
-            __EV3_MODULE_connected[self._path] = True
-            print self._path
 
     def __exit__(self, exc_type, exc_value, traceback):
         print "Well, this is embarassing...."
