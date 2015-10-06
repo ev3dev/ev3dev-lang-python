@@ -145,7 +145,7 @@ class Device(object):
 #~autogen "python_generic-class" classes.motor>currentClass
 
  
-class Motor(Ev3Device):
+class Motor(Device):
 
     """
     The motor class provides a uniform interface for using motors with
@@ -158,7 +158,7 @@ class Motor(Ev3Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Ev3Device( Motor.SYSTEM_CLASS_NAME, port, name )
+        self._device = Device( Motor.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 
