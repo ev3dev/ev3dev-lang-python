@@ -165,6 +165,7 @@ class Motor(Device):
 #~autogen python_generic-get-set classes.motor>currentClass
 
 
+
     def __set_command(self, value):
         self._device._set_string_attribute( 'command', 'command', value )
 
@@ -493,6 +494,15 @@ class Motor(Device):
 
     time_sp = property( __get_time_sp, __set_time_sp, None, __doc_time_sp )
 
+    def run_timed(self,time):
+        self.__set_time_sp(time)
+        self.__set_command("run-timed")
+
+    def run_forever(self):
+        self.__set_command("run-forever")
+
+    def stop(self):
+        self.__set_command("stop")
 
 #~autogen
 #~autogen python_generic-property-value classes.motor>currentClass
@@ -528,6 +538,7 @@ class Motor(Device):
       'brake':'Power will be removed from the motor and a passive electrical load willbe placed on the motor. This is usually done by shorting the motor terminalstogether. This load will absorb the energy from the rotation of the motors andcause the motor to stop more quickly than coasting.' , 
       'hold':'Does not remove power from the motor. Instead it actively try to hold the motorat the current position. If an external force tries to turn the motor, the motorwill ``push back`` to maintain its position.' ,
           }
+
 
 #~autogen
 #~autogen python_generic-class classes.dcMotor>currentClass
