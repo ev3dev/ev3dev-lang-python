@@ -32,7 +32,6 @@ import numbers
 #------------------------------------------------------------------------------ 
 # Define the base class from which all other ev3dev classes are defined.
 
-__EV3_MODULE_filehandle_cache = {}
 
 class Device(object):
     """The ev3dev device base class"""
@@ -44,6 +43,7 @@ class Device(object):
            the first unconnected device"""
            
         self._classpath = os.path.abspath( Device.DEVICE_ROOT_PATH + '/' + class_name )
+        self.filehandle_cache = {}
         
         for file in os.listdir( self._classpath ):
             if 'auto' == port:
@@ -64,7 +64,7 @@ class Device(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         print "Well, this is embarassing...."
-        for f in __EV3_MODULE_filehandle_cache:
+        for f in self.filehandle_cache:
             print f
             f.close()
             
@@ -73,15 +73,15 @@ class Device(object):
 
         attribute_name = os.path.abspath( self._path + '/' + sys_attribute )
 
-        if attribute_name not in __EV3_MODULE_filehandle_cache:
+        if attribute_name not in self.filehandle_cache:
             f = open( attribute_name, mode )
-            __EV3_MODULE_filehandle_cache[attribute_name] = f
+            self.filehandle_cache[attribute_name] = f
         elif reopen == True:
-            __EV3_MODULE_filehandle_cache[attribute_name].close()
+            self.filehandle_cache[attribute_name].close()
             f = open( attribute_name, mode )
-            __EV3_MODULE_filehandle_cache[attribute_name] = f
+            self.filehandle_cache[attribute_name] = f
         else:
-            f = __EV3_MODULE_filehandle_cache[attribute_name]
+            f = self.filehandle_cache[attribute_name]
         return f
 
     def _get_attribute( self, attribute, sys_attribute ):
