@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------ 
-# Copyright (c) 2015 Ralph Hempel
+# Copyright (c) 2015 Ralph Hempel & Anton Vanhoucke
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -158,7 +158,7 @@ class Motor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Device( Motor.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 
@@ -167,16 +167,15 @@ class Motor(Device):
 
 
     def __set_command(self, value):
-        self._device._set_string_attribute( 'command', 'command', value )
+        self._set_string_attribute( 'command', 'command', value )
 
-    __doc_command = (
-        "Sends a command to the motor controller. See `commands` for a list of\n"
-        "possible values.\n"        )
+    __doc_command = """Sends a command to the motor controller. See `commands` for a list of
+                        possible values."""
 
     command = property( None, __set_command, None, __doc_command )
 
     def __get_commands(self):
-        return self._device._get_string_array_attribute( 'commands', 'commands' )
+        return self._get_string_array_attribute( 'commands', 'commands' )
 
     __doc_commands = (
         "Returns a list of commands that are supported by the motor\n"
@@ -201,7 +200,7 @@ class Motor(Device):
     commands = property( __get_commands, None, None, __doc_commands )
 
     def __get_count_per_rot(self):
-        return self._device._get_int_attribute( 'count_per_rot', 'count_per_rot' )
+        return self._get_int_attribute( 'count_per_rot', 'count_per_rot' )
 
     __doc_count_per_rot = (
         "Returns the number of tacho counts in one rotation of the motor. Tacho counts\n"
@@ -212,7 +211,7 @@ class Motor(Device):
     count_per_rot = property( __get_count_per_rot, None, None, __doc_count_per_rot )
 
     def __get_driver_name(self):
-        return self._device._get_string_attribute( 'driver_name', 'driver_name' )
+        return self._get_string_attribute( 'driver_name', 'driver_name' )
 
     __doc_driver_name = (
         "Returns the name of the driver that provides this tacho motor device.\n"        )
@@ -220,7 +219,7 @@ class Motor(Device):
     driver_name = property( __get_driver_name, None, None, __doc_driver_name )
 
     def __get_duty_cycle(self):
-        return self._device._get_int_attribute( 'duty_cycle', 'duty_cycle' )
+        return self._get_int_attribute( 'duty_cycle', 'duty_cycle' )
 
     __doc_duty_cycle = (
         "Returns the current duty cycle of the motor. Units are percent. Values\n"
@@ -229,10 +228,10 @@ class Motor(Device):
     duty_cycle = property( __get_duty_cycle, None, None, __doc_duty_cycle )
 
     def __get_duty_cycle_sp(self):
-        return self._device._get_int_attribute( 'duty_cycle_sp', 'duty_cycle_sp' )
+        return self._get_int_attribute( 'duty_cycle_sp', 'duty_cycle_sp' )
 
     def __set_duty_cycle_sp(self, value):
-        self._device._set_int_attribute( 'duty_cycle_sp', 'duty_cycle_sp', value )
+        self._set_int_attribute( 'duty_cycle_sp', 'duty_cycle_sp', value )
 
     __doc_duty_cycle_sp = (
         "Writing sets the duty cycle setpoint. Reading returns the current value.\n"
@@ -243,10 +242,10 @@ class Motor(Device):
     duty_cycle_sp = property( __get_duty_cycle_sp, __set_duty_cycle_sp, None, __doc_duty_cycle_sp )
 
     def __get_encoder_polarity(self):
-        return self._device._get_string_attribute( 'encoder_polarity', 'encoder_polarity' )
+        return self._get_string_attribute( 'encoder_polarity', 'encoder_polarity' )
 
     def __set_encoder_polarity(self, value):
-        self._device._set_string_attribute( 'encoder_polarity', 'encoder_polarity', value )
+        self._set_string_attribute( 'encoder_polarity', 'encoder_polarity', value )
 
     __doc_encoder_polarity = (
         "Sets the polarity of the rotary encoder. This is an advanced feature to all\n"
@@ -258,10 +257,10 @@ class Motor(Device):
     encoder_polarity = property( __get_encoder_polarity, __set_encoder_polarity, None, __doc_encoder_polarity )
 
     def __get_polarity(self):
-        return self._device._get_string_attribute( 'polarity', 'polarity' )
+        return self._get_string_attribute( 'polarity', 'polarity' )
 
     def __set_polarity(self, value):
-        self._device._set_string_attribute( 'polarity', 'polarity', value )
+        self._set_string_attribute( 'polarity', 'polarity', value )
 
     __doc_polarity = (
         "Sets the polarity of the motor. With `normal` polarity, a positive duty\n"
@@ -272,7 +271,7 @@ class Motor(Device):
     polarity = property( __get_polarity, __set_polarity, None, __doc_polarity )
 
     def __get_port_name(self):
-        return self._device._get_string_attribute( 'port_name', 'port_name' )
+        return self._get_string_attribute( 'port_name', 'port_name' )
 
     __doc_port_name = (
         "Returns the name of the port that the motor is connected to.\n"        )
@@ -280,10 +279,10 @@ class Motor(Device):
     port_name = property( __get_port_name, None, None, __doc_port_name )
 
     def __get_position(self):
-        return self._device._get_int_attribute( 'position', 'position' )
+        return self._get_int_attribute( 'position', 'position' )
 
     def __set_position(self, value):
-        self._device._set_int_attribute( 'position', 'position', value )
+        self._set_int_attribute( 'position', 'position', value )
 
     __doc_position = (
         "Returns the current position of the motor in pulses of the rotary\n"
@@ -294,10 +293,10 @@ class Motor(Device):
     position = property( __get_position, __set_position, None, __doc_position )
 
     def __get_position_p(self):
-        return self._device._get_int_attribute( 'position_p', 'hold_pid/Kp' )
+        return self._get_int_attribute( 'position_p', 'hold_pid/Kp' )
 
     def __set_position_p(self, value):
-        self._device._set_int_attribute( 'position_p', 'hold_pid/Kp', value )
+        self._set_int_attribute( 'position_p', 'hold_pid/Kp', value )
 
     __doc_position_p = (
         "The proportional constant for the position PID.\n"        )
@@ -305,10 +304,10 @@ class Motor(Device):
     position_p = property( __get_position_p, __set_position_p, None, __doc_position_p )
 
     def __get_position_i(self):
-        return self._device._get_int_attribute( 'position_i', 'hold_pid/Ki' )
+        return self._get_int_attribute( 'position_i', 'hold_pid/Ki' )
 
     def __set_position_i(self, value):
-        self._device._set_int_attribute( 'position_i', 'hold_pid/Ki', value )
+        self._set_int_attribute( 'position_i', 'hold_pid/Ki', value )
 
     __doc_position_i = (
         "The integral constant for the position PID.\n"        )
@@ -316,10 +315,10 @@ class Motor(Device):
     position_i = property( __get_position_i, __set_position_i, None, __doc_position_i )
 
     def __get_position_d(self):
-        return self._device._get_int_attribute( 'position_d', 'hold_pid/Kd' )
+        return self._get_int_attribute( 'position_d', 'hold_pid/Kd' )
 
     def __set_position_d(self, value):
-        self._device._set_int_attribute( 'position_d', 'hold_pid/Kd', value )
+        self._set_int_attribute( 'position_d', 'hold_pid/Kd', value )
 
     __doc_position_d = (
         "The derivative constant for the position PID.\n"        )
@@ -327,10 +326,10 @@ class Motor(Device):
     position_d = property( __get_position_d, __set_position_d, None, __doc_position_d )
 
     def __get_position_sp(self):
-        return self._device._get_int_attribute( 'position_sp', 'position_sp' )
+        return self._get_int_attribute( 'position_sp', 'position_sp' )
 
     def __set_position_sp(self, value):
-        self._device._set_int_attribute( 'position_sp', 'position_sp', value )
+        self._set_int_attribute( 'position_sp', 'position_sp', value )
 
     __doc_position_sp = (
         "Writing specifies the target position for the `run-to-abs-pos` and `run-to-rel-pos`\n"
@@ -341,7 +340,7 @@ class Motor(Device):
     position_sp = property( __get_position_sp, __set_position_sp, None, __doc_position_sp )
 
     def __get_speed(self):
-        return self._device._get_int_attribute( 'speed', 'speed' )
+        return self._get_int_attribute( 'speed', 'speed' )
 
     __doc_speed = (
         "Returns the current motor speed in tacho counts per second. Not, this is\n"
@@ -351,10 +350,10 @@ class Motor(Device):
     speed = property( __get_speed, None, None, __doc_speed )
 
     def __get_speed_sp(self):
-        return self._device._get_int_attribute( 'speed_sp', 'speed_sp' )
+        return self._get_int_attribute( 'speed_sp', 'speed_sp' )
 
     def __set_speed_sp(self, value):
-        self._device._set_int_attribute( 'speed_sp', 'speed_sp', value )
+        self._set_int_attribute( 'speed_sp', 'speed_sp', value )
 
     __doc_speed_sp = (
         "Writing sets the target speed in tacho counts per second used when `speed_regulation`\n"
@@ -364,10 +363,10 @@ class Motor(Device):
     speed_sp = property( __get_speed_sp, __set_speed_sp, None, __doc_speed_sp )
 
     def __get_ramp_up_sp(self):
-        return self._device._get_int_attribute( 'ramp_up_sp', 'ramp_up_sp' )
+        return self._get_int_attribute( 'ramp_up_sp', 'ramp_up_sp' )
 
     def __set_ramp_up_sp(self, value):
-        self._device._set_int_attribute( 'ramp_up_sp', 'ramp_up_sp', value )
+        self._set_int_attribute( 'ramp_up_sp', 'ramp_up_sp', value )
 
     __doc_ramp_up_sp = (
         "Writing sets the ramp up setpoint. Reading returns the current value. Units\n"
@@ -379,10 +378,10 @@ class Motor(Device):
     ramp_up_sp = property( __get_ramp_up_sp, __set_ramp_up_sp, None, __doc_ramp_up_sp )
 
     def __get_ramp_down_sp(self):
-        return self._device._get_int_attribute( 'ramp_down_sp', 'ramp_down_sp' )
+        return self._get_int_attribute( 'ramp_down_sp', 'ramp_down_sp' )
 
     def __set_ramp_down_sp(self, value):
-        self._device._set_int_attribute( 'ramp_down_sp', 'ramp_down_sp', value )
+        self._set_int_attribute( 'ramp_down_sp', 'ramp_down_sp', value )
 
     __doc_ramp_down_sp = (
         "Writing sets the ramp down setpoint. Reading returns the current value. Units\n"
@@ -394,10 +393,10 @@ class Motor(Device):
     ramp_down_sp = property( __get_ramp_down_sp, __set_ramp_down_sp, None, __doc_ramp_down_sp )
 
     def __get_speed_regulation_enabled(self):
-        return self._device._get_string_attribute( 'speed_regulation_enabled', 'speed_regulation' )
+        return self._get_string_attribute( 'speed_regulation_enabled', 'speed_regulation' )
 
     def __set_speed_regulation_enabled(self, value):
-        self._device._set_string_attribute( 'speed_regulation_enabled', 'speed_regulation', value )
+        self._set_string_attribute( 'speed_regulation_enabled', 'speed_regulation', value )
 
     __doc_speed_regulation_enabled = (
         "Turns speed regulation on or off. If speed regulation is on, the motor\n"
@@ -409,10 +408,10 @@ class Motor(Device):
     speed_regulation_enabled = property( __get_speed_regulation_enabled, __set_speed_regulation_enabled, None, __doc_speed_regulation_enabled )
 
     def __get_speed_regulation_p(self):
-        return self._device._get_int_attribute( 'speed_regulation_p', 'speed_pid/Kp' )
+        return self._get_int_attribute( 'speed_regulation_p', 'speed_pid/Kp' )
 
     def __set_speed_regulation_p(self, value):
-        self._device._set_int_attribute( 'speed_regulation_p', 'speed_pid/Kp', value )
+        self._set_int_attribute( 'speed_regulation_p', 'speed_pid/Kp', value )
 
     __doc_speed_regulation_p = (
         "The proportional constant for the speed regulation PID.\n"        )
@@ -420,10 +419,10 @@ class Motor(Device):
     speed_regulation_p = property( __get_speed_regulation_p, __set_speed_regulation_p, None, __doc_speed_regulation_p )
 
     def __get_speed_regulation_i(self):
-        return self._device._get_int_attribute( 'speed_regulation_i', 'speed_pid/Ki' )
+        return self._get_int_attribute( 'speed_regulation_i', 'speed_pid/Ki' )
 
     def __set_speed_regulation_i(self, value):
-        self._device._set_int_attribute( 'speed_regulation_i', 'speed_pid/Ki', value )
+        self._set_int_attribute( 'speed_regulation_i', 'speed_pid/Ki', value )
 
     __doc_speed_regulation_i = (
         "The integral constant for the speed regulation PID.\n"        )
@@ -431,10 +430,10 @@ class Motor(Device):
     speed_regulation_i = property( __get_speed_regulation_i, __set_speed_regulation_i, None, __doc_speed_regulation_i )
 
     def __get_speed_regulation_d(self):
-        return self._device._get_int_attribute( 'speed_regulation_d', 'speed_pid/Kd' )
+        return self._get_int_attribute( 'speed_regulation_d', 'speed_pid/Kd' )
 
     def __set_speed_regulation_d(self, value):
-        self._device._set_int_attribute( 'speed_regulation_d', 'speed_pid/Kd', value )
+        self._set_int_attribute( 'speed_regulation_d', 'speed_pid/Kd', value )
 
     __doc_speed_regulation_d = (
         "The derivative constant for the speed regulation PID.\n"        )
@@ -442,7 +441,7 @@ class Motor(Device):
     speed_regulation_d = property( __get_speed_regulation_d, __set_speed_regulation_d, None, __doc_speed_regulation_d )
 
     def __get_state(self):
-        return self._device._get_string_array_attribute( 'state', 'state' )
+        return self._get_string_array_attribute( 'state', 'state' )
 
     __doc_state = (
         "Reading returns a list of state flags. Possible flags are\n"
@@ -451,10 +450,10 @@ class Motor(Device):
     state = property( __get_state, None, None, __doc_state )
 
     def __get_stop_command(self):
-        return self._device._get_string_attribute( 'stop_command', 'stop_command' )
+        return self._get_string_attribute( 'stop_command', 'stop_command' )
 
     def __set_stop_command(self, value):
-        self._device._set_string_attribute( 'stop_command', 'stop_command', value )
+        self._set_string_attribute( 'stop_command', 'stop_command', value )
 
     __doc_stop_command = (
         "Reading returns the current stop command. Writing sets the stop command.\n"
@@ -465,7 +464,7 @@ class Motor(Device):
     stop_command = property( __get_stop_command, __set_stop_command, None, __doc_stop_command )
 
     def __get_stop_commands(self):
-        return self._device._get_string_array_attribute( 'stop_commands', 'stop_commands' )
+        return self._get_string_array_attribute( 'stop_commands', 'stop_commands' )
 
     __doc_stop_commands = (
         "Returns a list of stop modes supported by the motor controller.\n"
@@ -482,10 +481,10 @@ class Motor(Device):
     stop_commands = property( __get_stop_commands, None, None, __doc_stop_commands )
 
     def __get_time_sp(self):
-        return self._device._get_int_attribute( 'time_sp', 'time_sp' )
+        return self._get_int_attribute( 'time_sp', 'time_sp' )
 
     def __set_time_sp(self, value):
-        self._device._set_int_attribute( 'time_sp', 'time_sp', value )
+        self._set_int_attribute( 'time_sp', 'time_sp', value )
 
     __doc_time_sp = (
         "Writing specifies the amount of time the motor will run when using the\n"
@@ -558,14 +557,14 @@ class DcMotor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Device( DcMotor.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__(self, DcMotor.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-get-set classes.dcMotor>currentClass
 
 
     def __set_command(self, value):
-        self._device._set_string_attribute( 'command', 'command', value )
+        self._set_string_attribute( 'command', 'command', value )
 
     __doc_command = (
         "Sets the command for the motor. Possible values are `run-forever`, `run-timed` and\n"
@@ -575,7 +574,7 @@ class DcMotor(Device):
     command = property( None, __set_command, None, __doc_command )
 
     def __get_commands(self):
-        return self._device._get_string_array_attribute( 'commands', 'commands' )
+        return self._get_string_array_attribute( 'commands', 'commands' )
 
     __doc_commands = (
         "Returns a list of commands supported by the motor\n"
@@ -584,7 +583,7 @@ class DcMotor(Device):
     commands = property( __get_commands, None, None, __doc_commands )
 
     def __get_driver_name(self):
-        return self._device._get_string_attribute( 'driver_name', 'driver_name' )
+        return self._get_string_attribute( 'driver_name', 'driver_name' )
 
     __doc_driver_name = (
         "Returns the name of the motor driver that loaded this device. See the list\n"
@@ -593,7 +592,7 @@ class DcMotor(Device):
     driver_name = property( __get_driver_name, None, None, __doc_driver_name )
 
     def __get_duty_cycle(self):
-        return self._device._get_int_attribute( 'duty_cycle', 'duty_cycle' )
+        return self._get_int_attribute( 'duty_cycle', 'duty_cycle' )
 
     __doc_duty_cycle = (
         "Shows the current duty cycle of the PWM signal sent to the motor. Values\n"
@@ -602,10 +601,10 @@ class DcMotor(Device):
     duty_cycle = property( __get_duty_cycle, None, None, __doc_duty_cycle )
 
     def __get_duty_cycle_sp(self):
-        return self._device._get_int_attribute( 'duty_cycle_sp', 'duty_cycle_sp' )
+        return self._get_int_attribute( 'duty_cycle_sp', 'duty_cycle_sp' )
 
     def __set_duty_cycle_sp(self, value):
-        self._device._set_int_attribute( 'duty_cycle_sp', 'duty_cycle_sp', value )
+        self._set_int_attribute( 'duty_cycle_sp', 'duty_cycle_sp', value )
 
     __doc_duty_cycle_sp = (
         "Writing sets the duty cycle setpoint of the PWM signal sent to the motor.\n"
@@ -615,10 +614,10 @@ class DcMotor(Device):
     duty_cycle_sp = property( __get_duty_cycle_sp, __set_duty_cycle_sp, None, __doc_duty_cycle_sp )
 
     def __get_polarity(self):
-        return self._device._get_string_attribute( 'polarity', 'polarity' )
+        return self._get_string_attribute( 'polarity', 'polarity' )
 
     def __set_polarity(self, value):
-        self._device._set_string_attribute( 'polarity', 'polarity', value )
+        self._set_string_attribute( 'polarity', 'polarity', value )
 
     __doc_polarity = (
         "Sets the polarity of the motor. Valid values are `normal` and `inversed`.\n"        )
@@ -626,7 +625,7 @@ class DcMotor(Device):
     polarity = property( __get_polarity, __set_polarity, None, __doc_polarity )
 
     def __get_port_name(self):
-        return self._device._get_string_attribute( 'port_name', 'port_name' )
+        return self._get_string_attribute( 'port_name', 'port_name' )
 
     __doc_port_name = (
         "Returns the name of the port that the motor is connected to.\n"        )
@@ -634,10 +633,10 @@ class DcMotor(Device):
     port_name = property( __get_port_name, None, None, __doc_port_name )
 
     def __get_ramp_down_sp(self):
-        return self._device._get_int_attribute( 'ramp_down_sp', 'ramp_down_sp' )
+        return self._get_int_attribute( 'ramp_down_sp', 'ramp_down_sp' )
 
     def __set_ramp_down_sp(self, value):
-        self._device._set_int_attribute( 'ramp_down_sp', 'ramp_down_sp', value )
+        self._set_int_attribute( 'ramp_down_sp', 'ramp_down_sp', value )
 
     __doc_ramp_down_sp = (
         "Sets the time in milliseconds that it take the motor to ramp down from 100%\n"
@@ -646,10 +645,10 @@ class DcMotor(Device):
     ramp_down_sp = property( __get_ramp_down_sp, __set_ramp_down_sp, None, __doc_ramp_down_sp )
 
     def __get_ramp_up_sp(self):
-        return self._device._get_int_attribute( 'ramp_up_sp', 'ramp_up_sp' )
+        return self._get_int_attribute( 'ramp_up_sp', 'ramp_up_sp' )
 
     def __set_ramp_up_sp(self, value):
-        self._device._set_int_attribute( 'ramp_up_sp', 'ramp_up_sp', value )
+        self._set_int_attribute( 'ramp_up_sp', 'ramp_up_sp', value )
 
     __doc_ramp_up_sp = (
         "Sets the time in milliseconds that it take the motor to up ramp from 0% to\n"
@@ -658,7 +657,7 @@ class DcMotor(Device):
     ramp_up_sp = property( __get_ramp_up_sp, __set_ramp_up_sp, None, __doc_ramp_up_sp )
 
     def __get_state(self):
-        return self._device._get_string_array_attribute( 'state', 'state' )
+        return self._get_string_array_attribute( 'state', 'state' )
 
     __doc_state = (
         "Gets a list of flags indicating the motor status. Possible\n"
@@ -669,7 +668,7 @@ class DcMotor(Device):
     state = property( __get_state, None, None, __doc_state )
 
     def __set_stop_command(self, value):
-        self._device._set_string_attribute( 'stop_command', 'stop_command', value )
+        self._set_string_attribute( 'stop_command', 'stop_command', value )
 
     __doc_stop_command = (
         "Sets the stop command that will be used when the motor stops. Read\n"
@@ -678,7 +677,7 @@ class DcMotor(Device):
     stop_command = property( None, __set_stop_command, None, __doc_stop_command )
 
     def __get_stop_commands(self):
-        return self._device._get_string_array_attribute( 'stop_commands', 'stop_commands' )
+        return self._get_string_array_attribute( 'stop_commands', 'stop_commands' )
 
     __doc_stop_commands = (
         "Gets a list of stop commands. Valid values are `coast`\n"
@@ -723,14 +722,14 @@ class ServoMotor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Device( ServoMotor.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__(self, ServoMotor.SYSTEM_CLASS_NAME, port, name)
 
 #~autogen
 #~autogen python_generic-get-set classes.servoMotor>currentClass
 
 
     def __set_command(self, value):
-        self._device._set_string_attribute( 'command', 'command', value )
+        self._set_string_attribute( 'command', 'command', value )
 
     __doc_command = (
         "Sets the command for the servo. Valid values are `run` and `float`. Setting\n"
@@ -740,7 +739,7 @@ class ServoMotor(Device):
     command = property( None, __set_command, None, __doc_command )
 
     def __get_driver_name(self):
-        return self._device._get_string_attribute( 'driver_name', 'driver_name' )
+        return self._get_string_attribute( 'driver_name', 'driver_name' )
 
     __doc_driver_name = (
         "Returns the name of the motor driver that loaded this device. See the list\n"
@@ -749,10 +748,10 @@ class ServoMotor(Device):
     driver_name = property( __get_driver_name, None, None, __doc_driver_name )
 
     def __get_max_pulse_sp(self):
-        return self._device._get_int_attribute( 'max_pulse_sp', 'max_pulse_sp' )
+        return self._get_int_attribute( 'max_pulse_sp', 'max_pulse_sp' )
 
     def __set_max_pulse_sp(self, value):
-        self._device._set_int_attribute( 'max_pulse_sp', 'max_pulse_sp', value )
+        self._set_int_attribute( 'max_pulse_sp', 'max_pulse_sp', value )
 
     __doc_max_pulse_sp = (
         "Used to set the pulse size in milliseconds for the signal that tells the\n"
@@ -763,10 +762,10 @@ class ServoMotor(Device):
     max_pulse_sp = property( __get_max_pulse_sp, __set_max_pulse_sp, None, __doc_max_pulse_sp )
 
     def __get_mid_pulse_sp(self):
-        return self._device._get_int_attribute( 'mid_pulse_sp', 'mid_pulse_sp' )
+        return self._get_int_attribute( 'mid_pulse_sp', 'mid_pulse_sp' )
 
     def __set_mid_pulse_sp(self, value):
-        self._device._set_int_attribute( 'mid_pulse_sp', 'mid_pulse_sp', value )
+        self._set_int_attribute( 'mid_pulse_sp', 'mid_pulse_sp', value )
 
     __doc_mid_pulse_sp = (
         "Used to set the pulse size in milliseconds for the signal that tells the\n"
@@ -779,10 +778,10 @@ class ServoMotor(Device):
     mid_pulse_sp = property( __get_mid_pulse_sp, __set_mid_pulse_sp, None, __doc_mid_pulse_sp )
 
     def __get_min_pulse_sp(self):
-        return self._device._get_int_attribute( 'min_pulse_sp', 'min_pulse_sp' )
+        return self._get_int_attribute( 'min_pulse_sp', 'min_pulse_sp' )
 
     def __set_min_pulse_sp(self, value):
-        self._device._set_int_attribute( 'min_pulse_sp', 'min_pulse_sp', value )
+        self._set_int_attribute( 'min_pulse_sp', 'min_pulse_sp', value )
 
     __doc_min_pulse_sp = (
         "Used to set the pulse size in milliseconds for the signal that tells the\n"
@@ -793,10 +792,10 @@ class ServoMotor(Device):
     min_pulse_sp = property( __get_min_pulse_sp, __set_min_pulse_sp, None, __doc_min_pulse_sp )
 
     def __get_polarity(self):
-        return self._device._get_string_attribute( 'polarity', 'polarity' )
+        return self._get_string_attribute( 'polarity', 'polarity' )
 
     def __set_polarity(self, value):
-        self._device._set_string_attribute( 'polarity', 'polarity', value )
+        self._set_string_attribute( 'polarity', 'polarity', value )
 
     __doc_polarity = (
         "Sets the polarity of the servo. Valid values are `normal` and `inversed`.\n"
@@ -807,7 +806,7 @@ class ServoMotor(Device):
     polarity = property( __get_polarity, __set_polarity, None, __doc_polarity )
 
     def __get_port_name(self):
-        return self._device._get_string_attribute( 'port_name', 'port_name' )
+        return self._get_string_attribute( 'port_name', 'port_name' )
 
     __doc_port_name = (
         "Returns the name of the port that the motor is connected to.\n"        )
@@ -815,10 +814,10 @@ class ServoMotor(Device):
     port_name = property( __get_port_name, None, None, __doc_port_name )
 
     def __get_position_sp(self):
-        return self._device._get_int_attribute( 'position_sp', 'position_sp' )
+        return self._get_int_attribute( 'position_sp', 'position_sp' )
 
     def __set_position_sp(self, value):
-        self._device._set_int_attribute( 'position_sp', 'position_sp', value )
+        self._set_int_attribute( 'position_sp', 'position_sp', value )
 
     __doc_position_sp = (
         "Reading returns the current position_sp of the servo. Writing instructs the\n"
@@ -829,10 +828,10 @@ class ServoMotor(Device):
     position_sp = property( __get_position_sp, __set_position_sp, None, __doc_position_sp )
 
     def __get_rate_sp(self):
-        return self._device._get_int_attribute( 'rate_sp', 'rate_sp' )
+        return self._get_int_attribute( 'rate_sp', 'rate_sp' )
 
     def __set_rate_sp(self, value):
-        self._device._set_int_attribute( 'rate_sp', 'rate_sp', value )
+        self._set_int_attribute( 'rate_sp', 'rate_sp', value )
 
     __doc_rate_sp = (
         "Sets the rate_sp at which the servo travels from 0 to 100.0% (half of the full\n"
@@ -845,7 +844,7 @@ class ServoMotor(Device):
     rate_sp = property( __get_rate_sp, __set_rate_sp, None, __doc_rate_sp )
 
     def __get_state(self):
-        return self._device._get_string_array_attribute( 'state', 'state' )
+        return self._get_string_array_attribute( 'state', 'state' )
 
     __doc_state = (
         "Returns a list of flags indicating the state of the servo.\n"
@@ -896,14 +895,14 @@ class Sensor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Device( Sensor.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__(self, Sensor.SYSTEM_CLASS_NAME, port, name)
 
 #~autogen
 #~autogen python_generic-get-set classes.sensor>currentClass
 
 
     def __set_command(self, value):
-        self._device._set_string_attribute( 'command', 'command', value )
+        self._set_string_attribute( 'command', 'command', value )
 
     __doc_command = (
         "Sends a command to the sensor.\n"        )
@@ -911,7 +910,7 @@ class Sensor(Device):
     command = property( None, __set_command, None, __doc_command )
 
     def __get_commands(self):
-        return self._device._get_string_array_attribute( 'commands', 'commands' )
+        return self._get_string_array_attribute( 'commands', 'commands' )
 
     __doc_commands = (
         "Returns a list of the valid commands for the sensor.\n"
@@ -920,7 +919,7 @@ class Sensor(Device):
     commands = property( __get_commands, None, None, __doc_commands )
 
     def __get_decimals(self):
-        return self._device._get_int_attribute( 'decimals', 'decimals' )
+        return self._get_int_attribute( 'decimals', 'decimals' )
 
     __doc_decimals = (
         "Returns the number of decimal places for the values in the `value<N>`\n"
@@ -929,7 +928,7 @@ class Sensor(Device):
     decimals = property( __get_decimals, None, None, __doc_decimals )
 
     def __get_driver_name(self):
-        return self._device._get_string_attribute( 'driver_name', 'driver_name' )
+        return self._get_string_attribute( 'driver_name', 'driver_name' )
 
     __doc_driver_name = (
         "Returns the name of the sensor device/driver. See the list of [supported\n"
@@ -938,10 +937,10 @@ class Sensor(Device):
     driver_name = property( __get_driver_name, None, None, __doc_driver_name )
 
     def __get_mode(self):
-        return self._device._get_string_attribute( 'mode', 'mode' )
+        return self._get_string_attribute( 'mode', 'mode' )
 
     def __set_mode(self, value):
-        self._device._set_string_attribute( 'mode', 'mode', value )
+        self._set_string_attribute( 'mode', 'mode', value )
 
     __doc_mode = (
         "Returns the current mode. Writing one of the values returned by `modes`\n"
@@ -950,7 +949,7 @@ class Sensor(Device):
     mode = property( __get_mode, __set_mode, None, __doc_mode )
 
     def __get_modes(self):
-        return self._device._get_string_array_attribute( 'modes', 'modes' )
+        return self._get_string_array_attribute( 'modes', 'modes' )
 
     __doc_modes = (
         "Returns a list of the valid modes for the sensor.\n"        )
@@ -958,7 +957,7 @@ class Sensor(Device):
     modes = property( __get_modes, None, None, __doc_modes )
 
     def __get_num_values(self):
-        return self._device._get_int_attribute( 'num_values', 'num_values' )
+        return self._get_int_attribute( 'num_values', 'num_values' )
 
     __doc_num_values = (
         "Returns the number of `value<N>` attributes that will return a valid value\n"
@@ -967,7 +966,7 @@ class Sensor(Device):
     num_values = property( __get_num_values, None, None, __doc_num_values )
 
     def __get_port_name(self):
-        return self._device._get_string_attribute( 'port_name', 'port_name' )
+        return self._get_string_attribute( 'port_name', 'port_name' )
 
     __doc_port_name = (
         "Returns the name of the port that the sensor is connected to, e.g. `ev3:in1`.\n"
@@ -976,7 +975,7 @@ class Sensor(Device):
     port_name = property( __get_port_name, None, None, __doc_port_name )
 
     def __get_units(self):
-        return self._device._get_string_attribute( 'units', 'units' )
+        return self._get_string_attribute( 'units', 'units' )
 
     __doc_units = (
         "Returns the units of the measured value for the current mode. May return\n"
@@ -994,7 +993,7 @@ class Sensor(Device):
             n = '{0:.0f}'.format( n )
 
         if True == isinstance( n, str ):
-            return self._device._get_int_attribute( 'value'+n, 'value'+n )
+            return self._get_int_attribute( 'value'+n, 'value'+n )
         else:
             return 0
 
@@ -1011,14 +1010,14 @@ class I2cSensor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Device( I2cSensor.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__(self, I2cSensor.SYSTEM_CLASS_NAME, port, name)
 
 #~autogen
 #~autogen python_generic-get-set classes.i2cSensor>currentClass
 
 
     def __get_fw_version(self):
-        return self._device._get_string_attribute( 'fw_version', 'fw_version' )
+        return self._get_string_attribute( 'fw_version', 'fw_version' )
 
     __doc_fw_version = (
         "Returns the firmware version of the sensor if available. Currently only\n"
@@ -1027,10 +1026,10 @@ class I2cSensor(Device):
     fw_version = property( __get_fw_version, None, None, __doc_fw_version )
 
     def __get_poll_ms(self):
-        return self._device._get_int_attribute( 'poll_ms', 'poll_ms' )
+        return self._get_int_attribute( 'poll_ms', 'poll_ms' )
 
     def __set_poll_ms(self, value):
-        self._device._set_int_attribute( 'poll_ms', 'poll_ms', value )
+        self._set_int_attribute( 'poll_ms', 'poll_ms', value )
 
     __doc_poll_ms = (
         "Returns the polling period of the sensor in milliseconds. Writing sets the\n"
@@ -1055,7 +1054,7 @@ class ColorSensor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Device( ColorSensor.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__(self, ColorSensor.SYSTEM_CLASS_NAME, port, name)
 
 #~autogen
 #~autogen python_generic-property-value classes.colorSensor>currentClass
@@ -1082,8 +1081,8 @@ class UltrasonicSensor(Device):
     SYSTEM_CLASS_NAME = 'lego-sensor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
-    def __init__(self, port='auto', name='*' ):
-        self._device = Device( UltrasonicSensor.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='auto', name='*'):
+        Device.__init__(self, UltrasonicSensor.SYSTEM_CLASS_NAME, port, name)
 
 #~autogen
 #~autogen python_generic-property-value classes.ultrasonicSensor>currentClass
@@ -1110,8 +1109,8 @@ class GyroSensor(Device):
     SYSTEM_CLASS_NAME = 'lego-sensor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
-    def __init__(self, port='auto', name='*' ):
-        self._device = Device( GyroSensor.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='auto', name='*'):
+        Device.__init__(self, GyroSensor.SYSTEM_CLASS_NAME, port, name)
 
 #~autogen
 #~autogen python_generic-property-value classes.gyroSensor>currentClass
@@ -1139,7 +1138,7 @@ class InfraredSensor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Device( InfraredSensor.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__(self,InfraredSensor.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-property-value classes.infraredSensor>currentClass
@@ -1169,7 +1168,7 @@ class SoundSensor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Device( SoundSensor.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__(self,SoundSensor.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-property-value classes.soundSensor>currentClass
@@ -1194,7 +1193,7 @@ class LightSensor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Device( LightSensor.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__(self,LightSensor.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-property-value classes.lightSensor>currentClass
@@ -1221,14 +1220,14 @@ class Led(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = ''
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Device( Led.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__(self,Led.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-get-set classes.led>currentClass
 
 
     def __get_max_brightness(self):
-        return self._device._get_int_attribute( 'max_brightness', 'max_brightness' )
+        return self._get_int_attribute( 'max_brightness', 'max_brightness' )
 
     __doc_max_brightness = (
         "Returns the maximum allowable brightness value.\n"        )
@@ -1236,10 +1235,10 @@ class Led(Device):
     max_brightness = property( __get_max_brightness, None, None, __doc_max_brightness )
 
     def __get_brightness(self):
-        return self._device._get_int_attribute( 'brightness', 'brightness' )
+        return self._get_int_attribute( 'brightness', 'brightness' )
 
     def __set_brightness(self, value):
-        self._device._set_int_attribute( 'brightness', 'brightness', value )
+        self._set_int_attribute( 'brightness', 'brightness', value )
 
     __doc_brightness = (
         "Sets the brightness level. Possible values are from 0 to `max_brightness`.\n"        )
@@ -1247,7 +1246,7 @@ class Led(Device):
     brightness = property( __get_brightness, __set_brightness, None, __doc_brightness )
 
     def __get_triggers(self):
-        return self._device._get_string_array_attribute( 'triggers', 'trigger' )
+        return self._get_string_array_attribute( 'triggers', 'trigger' )
 
     __doc_triggers = (
         "Returns a list of available triggers.\n"        )
@@ -1255,10 +1254,10 @@ class Led(Device):
     triggers = property( __get_triggers, None, None, __doc_triggers )
 
     def __get_trigger(self):
-        return self._device._get_string_selector_attribute( 'trigger', 'trigger' )
+        return self._get_string_selector_attribute( 'trigger', 'trigger' )
 
     def __set_trigger(self, value):
-        self._device._set_string_selector_attribute( 'trigger', 'trigger', value )
+        self._set_string_selector_attribute( 'trigger', 'trigger', value )
 
     __doc_trigger = (
         "Sets the led trigger. A trigger\n"
@@ -1279,10 +1278,10 @@ class Led(Device):
     trigger = property( __get_trigger, __set_trigger, None, __doc_trigger )
 
     def __get_delay_on(self):
-        return self._device._get_int_attribute( 'delay_on', 'delay_on' )
+        return self._get_int_attribute( 'delay_on', 'delay_on' )
 
     def __set_delay_on(self, value):
-        self._device._set_int_attribute( 'delay_on', 'delay_on', value )
+        self._set_int_attribute( 'delay_on', 'delay_on', value )
 
     __doc_delay_on = (
         "The `timer` trigger will periodically change the LED brightness between\n"
@@ -1292,10 +1291,10 @@ class Led(Device):
     delay_on = property( __get_delay_on, __set_delay_on, None, __doc_delay_on )
 
     def __get_delay_off(self):
-        return self._device._get_int_attribute( 'delay_off', 'delay_off' )
+        return self._get_int_attribute( 'delay_off', 'delay_off' )
 
     def __set_delay_off(self, value):
-        self._device._set_int_attribute( 'delay_off', 'delay_off', value )
+        self._set_int_attribute( 'delay_off', 'delay_off', value )
 
     __doc_delay_off = (
         "The `timer` trigger will periodically change the LED brightness between\n"
@@ -1320,14 +1319,14 @@ class PowerSupply(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = ''
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Device( PowerSupply.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__(self,PowerSupply.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-get-set classes.powerSupply>currentClass
 
 
     def __get_measured_current(self):
-        return self._device._get_int_attribute( 'measured_current', 'current_now' )
+        return self._get_int_attribute( 'measured_current', 'current_now' )
 
     __doc_measured_current = (
         "The measured current that the battery is supplying (in microamps)\n"        )
@@ -1335,7 +1334,7 @@ class PowerSupply(Device):
     measured_current = property( __get_measured_current, None, None, __doc_measured_current )
 
     def __get_measured_voltage(self):
-        return self._device._get_int_attribute( 'measured_voltage', 'voltage_now' )
+        return self._get_int_attribute( 'measured_voltage', 'voltage_now' )
 
     __doc_measured_voltage = (
         "The measured voltage that the battery is supplying (in microvolts)\n"        )
@@ -1343,28 +1342,28 @@ class PowerSupply(Device):
     measured_voltage = property( __get_measured_voltage, None, None, __doc_measured_voltage )
 
     def __get_max_voltage(self):
-        return self._device._get_int_attribute( 'max_voltage', 'voltage_max_design' )
+        return self._get_int_attribute( 'max_voltage', 'voltage_max_design' )
 
     __doc_max_voltage = (        )
 
     max_voltage = property( __get_max_voltage, None, None, __doc_max_voltage )
 
     def __get_min_voltage(self):
-        return self._device._get_int_attribute( 'min_voltage', 'voltage_min_design' )
+        return self._get_int_attribute( 'min_voltage', 'voltage_min_design' )
 
     __doc_min_voltage = (        )
 
     min_voltage = property( __get_min_voltage, None, None, __doc_min_voltage )
 
     def __get_technology(self):
-        return self._device._get_string_attribute( 'technology', 'technology' )
+        return self._get_string_attribute( 'technology', 'technology' )
 
     __doc_technology = (        )
 
     technology = property( __get_technology, None, None, __doc_technology )
 
     def __get_type(self):
-        return self._device._get_string_attribute( 'type', 'type' )
+        return self._get_string_attribute( 'type', 'type' )
 
     __doc_type = (        )
 
@@ -1409,14 +1408,14 @@ class LegoPort(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = ''
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Device( LegoPort.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__(self, LegoPort.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-get-set classes.legoPort>currentClass
 
 
     def __get_driver_name(self):
-        return self._device._get_string_attribute( 'driver_name', 'driver_name' )
+        return self._get_string_attribute( 'driver_name', 'driver_name' )
 
     __doc_driver_name = (
         "Returns the name of the driver that loaded this device. You can find the\n"
@@ -1425,7 +1424,7 @@ class LegoPort(Device):
     driver_name = property( __get_driver_name, None, None, __doc_driver_name )
 
     def __get_modes(self):
-        return self._device._get_string_array_attribute( 'modes', 'modes' )
+        return self._get_string_array_attribute( 'modes', 'modes' )
 
     __doc_modes = (
         "Returns a list of the available modes of the port.\n"        )
@@ -1433,10 +1432,10 @@ class LegoPort(Device):
     modes = property( __get_modes, None, None, __doc_modes )
 
     def __get_mode(self):
-        return self._device._get_string_attribute( 'mode', 'mode' )
+        return self._get_string_attribute( 'mode', 'mode' )
 
     def __set_mode(self, value):
-        self._device._set_string_attribute( 'mode', 'mode', value )
+        self._set_string_attribute( 'mode', 'mode', value )
 
     __doc_mode = (
         "Reading returns the currently selected mode. Writing sets the mode.\n"
@@ -1447,7 +1446,7 @@ class LegoPort(Device):
     mode = property( __get_mode, __set_mode, None, __doc_mode )
 
     def __get_port_name(self):
-        return self._device._get_string_attribute( 'port_name', 'port_name' )
+        return self._get_string_attribute( 'port_name', 'port_name' )
 
     __doc_port_name = (
         "Returns the name of the port. See individual driver documentation for\n"
@@ -1456,7 +1455,7 @@ class LegoPort(Device):
     port_name = property( __get_port_name, None, None, __doc_port_name )
 
     def __set_set_device(self, value):
-        self._device._set_string_attribute( 'set_device', 'set_device', value )
+        self._set_string_attribute( 'set_device', 'set_device', value )
 
     __doc_set_device = (
         "For modes that support it, writing the name of a driver will cause a new\n"
@@ -1468,7 +1467,7 @@ class LegoPort(Device):
     set_device = property( None, __set_set_device, None, __doc_set_device )
 
     def __get_status(self):
-        return self._device._get_string_attribute( 'status', 'status' )
+        return self._get_string_attribute( 'status', 'status' )
 
     __doc_status = (
         "In most cases, reading status will return the same value as `mode`. In\n"
