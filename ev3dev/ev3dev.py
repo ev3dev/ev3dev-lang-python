@@ -493,10 +493,28 @@ class Motor(Device):
 
     time_sp = property( __get_time_sp, __set_time_sp, None, __doc_time_sp )
 
-    def run_timed(self,time_sp, duty_cycle_sp):
+    def run_timed(self, time_sp, *args, **kwargs):
+        """
+        Runs the motor for for a certain time in milliseconds at a certain power.
+        motor.run_timed(500, 50)
+
+        Optionally you can use speed regulation and set speed parameter instead.
+        motor.run_timed(500, speed=60)
+
+        :param: time in milliseconds
+        :param: power 0-100 (duty cycle)
+        :returns: self (instantly)
+        """
+
         self.__set_time_sp(time_sp)
-        self.__set_duty_cycle_sp(duty_cycle_sp)
+        if 'speed' in kwargs:
+            self.__set_speed_regulation_enabled('on')
+            self.__set_speed_sp(kwargs['speed'])
+        elif args[0]:
+            self.__set_speed_regulation_enabled('off')
+            self.__set_duty_cycle_sp(args[0])
         self.__set_command("run-timed")
+        return self
 
     def run_forever(self,duty_cycle_sp=75):
         self.__set_duty_cycle_sp(duty_cycle_sp)
