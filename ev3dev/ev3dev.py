@@ -503,6 +503,7 @@ class Motor(Device):
 
         :param: time in milliseconds
         :param: power 0-100 (duty cycle)
+        :param speed: speed in
         :returns: self (instantly)
         """
 
@@ -516,9 +517,49 @@ class Motor(Device):
         self.__set_command("run-timed")
         return self
 
-    def run_forever(self,duty_cycle_sp=75):
-        self.__set_duty_cycle_sp(duty_cycle_sp)
+    def run_forever(self, *args, **kwargs):
+        """
+        Runs the motor at a certain power until you stop it.
+        motor.run_forever(50)
+
+        Optionally you can use speed regulation and set speed parameter instead.
+        motor.run_timed(speed=60)
+
+        :param: power 0-100 (duty cycle)
+        :param speed: Speed (in RPM? or deg/sec? or tacho/sec?)
+        :returns: self (instantly)
+        """
+
+        if 'speed' in kwargs:
+            self.__set_speed_regulation_enabled('on')
+            self.__set_speed_sp(kwargs['speed'])
+        elif args[0]:
+            self.__set_speed_regulation_enabled('off')
+            self.__set_duty_cycle_sp(args[0])
         self.__set_command("run-forever")
+        return self
+
+    def run_to_abs_pos(self, position_sp, **kwargs):
+        """
+        Runs the motor to a certain position and then stops.
+        You can optionally set PID parameters
+        e.g.
+            motor.run_to_abs_pos(50, kp=1, ki=0.5, kd=0.2)
+
+        :param: position (in tacho's? degrees?)
+        :returns: self (instantly)
+        """
+
+        if 'kp' in kwargs:
+            self.__set_position_p(kwargs['kp'])
+        if 'ki' in kwargs:
+            self.__set_position_i(kwargs['ki'])
+        if 'kd' in kwargs:
+            self.__set_position_d(kwargs['kd'])
+
+        self.__set_position_sp(position_sp)
+        self.__set_command("run-to-abs-pos")
+
 
     def stop(self):
         self.__set_command("stop")
