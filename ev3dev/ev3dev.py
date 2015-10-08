@@ -529,6 +529,12 @@ class Motor(Device):
           }
 
 #~autogen
+#~autogen python_generic-helper-function classes.motor>currentClass
+
+  def foo:
+      pass
+
+#~autogen
 #~autogen python_generic-class classes.dcMotor>currentClass
 
  
