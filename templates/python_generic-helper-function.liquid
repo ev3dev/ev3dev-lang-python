@@ -1,17 +1,17 @@
 {% assign class_name = currentClass.friendlyName | camel_case | capitalize %}{%
-    assign properties = "    _properties = [" %}{%
+    assign properties = "    _properties = {" %}{%
     for propval in currentClass.systemProperties %}{%
         if propval.writeAccess %}{%
             capture properties %}{{ properties }}
-            , '{{ propval.systemName  }}'{% endcapture %}{%
+	    , '{{ propval.name | replace:' ','_' | downcase }}' : __set_{{ propval.name | replace:' ','_' | downcase }}{% endcapture %}{%
         endif %}{%
     endfor %}
-{{ properties | replace_first:',',' ' }} ]
+{{ properties | replace_first:',',' ' }} }
     
     def _helper( self, **kwargs ):
         for p,v in kwargs.iteritems():
             if p in self._properties:
-	        self._set_int_attribute( p, p, v )
+                self._properties[p]( self, v )
 {%  for propval in currentClass.propertyValues %}{%
 	if propval.propertyName == "Command" %}{%
 	    for value in propval.values %}{%

@@ -531,30 +531,30 @@ class Motor(Device):
 #~autogen
 #~autogen python_generic-helper-function classes.motor>currentClass
 
-    _properties = [
-              'command'
-            , 'duty_cycle_sp'
-            , 'encoder_polarity'
-            , 'polarity'
-            , 'position'
-            , 'hold_pid/Kp'
-            , 'hold_pid/Ki'
-            , 'hold_pid/Kd'
-            , 'position_sp'
-            , 'speed_sp'
-            , 'ramp_up_sp'
-            , 'ramp_down_sp'
-            , 'speed_regulation'
-            , 'speed_pid/Kp'
-            , 'speed_pid/Ki'
-            , 'speed_pid/Kd'
-            , 'stop_command'
-            , 'time_sp' ]
+    _properties = {
+	      'command' : __set_command
+	    , 'duty_cycle_sp' : __set_duty_cycle_sp
+	    , 'encoder_polarity' : __set_encoder_polarity
+	    , 'polarity' : __set_polarity
+	    , 'position' : __set_position
+	    , 'position_p' : __set_position_p
+	    , 'position_i' : __set_position_i
+	    , 'position_d' : __set_position_d
+	    , 'position_sp' : __set_position_sp
+	    , 'speed_sp' : __set_speed_sp
+	    , 'ramp_up_sp' : __set_ramp_up_sp
+	    , 'ramp_down_sp' : __set_ramp_down_sp
+	    , 'speed_regulation_enabled' : __set_speed_regulation_enabled
+	    , 'speed_regulation_p' : __set_speed_regulation_p
+	    , 'speed_regulation_i' : __set_speed_regulation_i
+	    , 'speed_regulation_d' : __set_speed_regulation_d
+	    , 'stop_command' : __set_stop_command
+	    , 'time_sp' : __set_time_sp }
     
     def _helper( self, **kwargs ):
         for p,v in kwargs.iteritems():
             if p in self._properties:
-	        self._set_int_attribute( p, p, v )
+                self._properties[p]( self, v )
 
     def run_forever( self, **kwargs ):
         self._helper( **kwargs )
@@ -768,19 +768,19 @@ class DcMotor(Device):
 
 #~autogen python_generic-helper-function classes.dcMotor>currentClass
 
-    _properties = [
-              'command'
-            , 'duty_cycle_sp'
-            , 'polarity'
-            , 'ramp_down_sp'
-            , 'ramp_up_sp'
-            , 'stop_command'
-            , 'time_sp' ]
+    _properties = {
+	      'command' : __set_command
+	    , 'duty_cycle_sp' : __set_duty_cycle_sp
+	    , 'polarity' : __set_polarity
+	    , 'ramp_down_sp' : __set_ramp_down_sp
+	    , 'ramp_up_sp' : __set_ramp_up_sp
+	    , 'stop_command' : __set_stop_command
+	    , 'time_sp' : __set_time_sp }
     
     def _helper( self, **kwargs ):
         for p,v in kwargs.iteritems():
             if p in self._properties:
-	        self._set_int_attribute( p, p, v )
+                self._properties[p]( self, v )
 
     def run_forever( self, **kwargs ):
         self._helper( **kwargs )
@@ -965,19 +965,19 @@ class ServoMotor(Device):
 
 #~autogen python_generic-helper-function classes.servoMotor>currentClass
 
-    _properties = [
-              'command'
-            , 'max_pulse_sp'
-            , 'mid_pulse_sp'
-            , 'min_pulse_sp'
-            , 'polarity'
-            , 'position_sp'
-            , 'rate_sp' ]
+    _properties = {
+	      'command' : __set_command
+	    , 'max_pulse_sp' : __set_max_pulse_sp
+	    , 'mid_pulse_sp' : __set_mid_pulse_sp
+	    , 'min_pulse_sp' : __set_min_pulse_sp
+	    , 'polarity' : __set_polarity
+	    , 'position_sp' : __set_position_sp
+	    , 'rate_sp' : __set_rate_sp }
     
     def _helper( self, **kwargs ):
         for p,v in kwargs.iteritems():
             if p in self._properties:
-	        self._set_int_attribute( p, p, v )
+                self._properties[p]( self, v )
 
     def run( self, **kwargs ):
         self._helper( **kwargs )
