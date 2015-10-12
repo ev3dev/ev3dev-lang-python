@@ -531,8 +531,59 @@ class Motor(Device):
 #~autogen
 #~autogen python_generic-helper-function classes.motor>currentClass
 
-  def foo:
-      pass
+    _properties = [
+              'command'
+            , 'duty_cycle_sp'
+            , 'encoder_polarity'
+            , 'polarity'
+            , 'position'
+            , 'hold_pid/Kp'
+            , 'hold_pid/Ki'
+            , 'hold_pid/Kd'
+            , 'position_sp'
+            , 'speed_sp'
+            , 'ramp_up_sp'
+            , 'ramp_down_sp'
+            , 'speed_regulation'
+            , 'speed_pid/Kp'
+            , 'speed_pid/Ki'
+            , 'speed_pid/Kd'
+            , 'stop_command'
+            , 'time_sp' ]
+    
+    def _helper( self, **kwargs ):
+        for p,v in kwargs.iteritems():
+            if p in self._properties:
+	        self._set_int_attribute( p, p, v )
+
+    def run_forever( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-forever' )
+	
+    def run_to_abs_pos( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-to-abs-pos' )
+	
+    def run_to_rel_pos( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-to-rel-pos' )
+	
+    def run_timed( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-timed' )
+	
+    def run_direct( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-direct' )
+	
+    def stop( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'stop' )
+	
+    def reset( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'reset' )
+	
 
 #~autogen
 #~autogen python_generic-class classes.dcMotor>currentClass
@@ -678,6 +729,19 @@ class DcMotor(Device):
 
     stop_commands = property( __get_stop_commands, None, None, __doc_stop_commands )
 
+    def __get_time_sp(self):
+        return self._get_int_attribute( 'time_sp', 'time_sp' )
+
+    def __set_time_sp(self, value):
+        self._set_int_attribute( 'time_sp', 'time_sp', value )
+
+    __doc_time_sp = (
+        "Writing specifies the amount of time the motor will run when using the\n"
+        "`run-timed` command. Reading returns the current value. Units are in\n"
+        "milliseconds.\n"        )
+
+    time_sp = property( __get_time_sp, __set_time_sp, None, __doc_time_sp )
+
 
 #~autogen
 #~autogen python_generic-property-value classes.dcMotor>currentClass
@@ -701,6 +765,42 @@ class DcMotor(Device):
           }
 
 #~autogen
+
+#~autogen python_generic-helper-function classes.dcMotor>currentClass
+
+    _properties = [
+              'command'
+            , 'duty_cycle_sp'
+            , 'polarity'
+            , 'ramp_down_sp'
+            , 'ramp_up_sp'
+            , 'stop_command'
+            , 'time_sp' ]
+    
+    def _helper( self, **kwargs ):
+        for p,v in kwargs.iteritems():
+            if p in self._properties:
+	        self._set_int_attribute( p, p, v )
+
+    def run_forever( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-forever' )
+	
+    def run_timed( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-timed' )
+	
+    def run_direct( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-direct' )
+	
+    def stop( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'stop' )
+	
+
+#~autogen
+
 #~autogen python_generic-class classes.servoMotor>currentClass
 
  
@@ -862,6 +962,34 @@ class ServoMotor(Device):
           }
 
 #~autogen
+
+#~autogen python_generic-helper-function classes.servoMotor>currentClass
+
+    _properties = [
+              'command'
+            , 'max_pulse_sp'
+            , 'mid_pulse_sp'
+            , 'min_pulse_sp'
+            , 'polarity'
+            , 'position_sp'
+            , 'rate_sp' ]
+    
+    def _helper( self, **kwargs ):
+        for p,v in kwargs.iteritems():
+            if p in self._properties:
+	        self._set_int_attribute( p, p, v )
+
+    def run( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run' )
+	
+    def float( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'float' )
+	
+
+#~autogen
+
 #~autogen python_generic-class classes.sensor>currentClass
 
  
