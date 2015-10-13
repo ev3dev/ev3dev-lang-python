@@ -7,7 +7,7 @@
         endif %}{%
     endfor %}
 {{ properties | replace_first:',',' ' }} }
-    
+
     def _helper( self, **kwargs ):
         for p,v in kwargs.iteritems():
             if p in self._properties:
@@ -21,7 +21,7 @@
 	self._set_string_attribute( 'command', 'command', '{{ value.name }}' )
 	{% endfor %}{%
 	endif %}{%
-    endfor %}{%	
+    endfor %}{%
 comment %}{%
 for func in currentClass.helperFunctions %}{%
 assign func_name = func.name | downcase | underscore_spaces %}{%

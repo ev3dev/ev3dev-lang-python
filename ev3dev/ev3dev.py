@@ -1,4 +1,4 @@
-#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------
 # Copyright (c) 2015 Ralph Hempel
 # Copyright (c) 2015 Anton Vanhoucke
 
@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 # -----------------------------------------------------------------------------
 
-#~autogen autogen-header 
+#~autogen autogen-header
 # Sections of the following code were auto-generated based on spec v0.9.3-pre, rev 2
 
 #~autogen
@@ -30,7 +30,7 @@ import os.path
 import fnmatch
 import numbers
 
-#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------
 # Define the base class from which all other ev3dev classes are defined.
 
 class Device(object):
@@ -41,17 +41,17 @@ class Device(object):
     def __init__(self, class_name, port='auto', name='*' ):
         """Spin through the Linux sysfs class for the device type and find
            the first unconnected device"""
-           
+
         self._classpath = os.path.abspath( Device.DEVICE_ROOT_PATH + '/' + class_name )
         self.filehandle_cache = {}
-        
+
         for file in os.listdir( self._classpath ):
             if 'auto' == port:
                 if fnmatch.fnmatch(file, name):
                     print 'Got a name match ' + file + ' <-> ' + name
                     self._path = os.path.abspath( self._classpath + '/' + file )
                     break
-            else:    
+            else:
                 port_name_file = os.path.abspath( self._classpath + '/' + file + '/port_name')
                 f = open( port_name_file, 'r' )
                 port_name = f.read().strip()
@@ -67,7 +67,7 @@ class Device(object):
         for f in self.filehandle_cache:
             print f
             f.close()
-            
+
     def __attribute_file( self, attribute, sys_attribute, mode, reopen=False ):
         """Manages the file handle cache and opening the files in the correct mode"""
 
@@ -106,7 +106,7 @@ class Device(object):
             f = self.__attribute_file( attribute, sys_attribute, 'w+', True )
             f.write( value )
             f.flush()
-        
+
     def _get_int_attribute( self, attribute, sys_attribute ):
         return int( self._get_attribute( attribute, sys_attribute ) )
 
@@ -117,7 +117,7 @@ class Device(object):
             self._set_attribute( attribute, sys_attribute, '{0:.0f}'.format( value ) )
         elif True == isinstance( value, str ):
             self._set_attribute( attribute, sys_attribute, value )
-        
+
     def _get_string_attribute( self, attribute, sys_attribute ):
         return self._get_attribute( attribute, sys_attribute )
 
@@ -144,7 +144,7 @@ class Device(object):
 
 #~autogen python_generic-class classes.motor>currentClass
 
- 
+
 class Motor(Device):
 
     """
@@ -497,36 +497,36 @@ class Motor(Device):
 #~autogen python_generic-property-value classes.motor>currentClass
 
 
-    __propval_command = {  
-      'run-forever':'Run the motor until another command is sent.' , 
-      'run-to-abs-pos':'Run to an absolute position specified by `position_sp` and thenstop using the command specified in `stop_command`.' , 
-      'run-to-rel-pos':'Run to a position relative to the current `position` value.The new position will be current `position` + `position_sp`.When the new position is reached, the motor will stop usingthe command specified by `stop_command`.' , 
-      'run-timed':'Run the motor for the amount of time specified in `time_sp`and then stop the motor using the command specified by `stop_command`.' , 
-      'run-direct':'Run the motor at the duty cycle specified by `duty_cycle_sp`.Unlike other run commands, changing `duty_cycle_sp` while running *will*take effect immediately.' , 
-      'stop':'Stop any of the run commands before they are complete using thecommand specified by `stop_command`.' , 
+    __propval_command = {
+      'run-forever':'Run the motor until another command is sent.' ,
+      'run-to-abs-pos':'Run to an absolute position specified by `position_sp` and thenstop using the command specified in `stop_command`.' ,
+      'run-to-rel-pos':'Run to a position relative to the current `position` value.The new position will be current `position` + `position_sp`.When the new position is reached, the motor will stop usingthe command specified by `stop_command`.' ,
+      'run-timed':'Run the motor for the amount of time specified in `time_sp`and then stop the motor using the command specified by `stop_command`.' ,
+      'run-direct':'Run the motor at the duty cycle specified by `duty_cycle_sp`.Unlike other run commands, changing `duty_cycle_sp` while running *will*take effect immediately.' ,
+      'stop':'Stop any of the run commands before they are complete using thecommand specified by `stop_command`.' ,
       'reset':'Reset all of the motor parameter attributes to their default value.This will also have the effect of stopping the motor.' ,
-          }
+      }
 
-    __propval_encoder_polarity = {  
-      'normal':'Sets the normal polarity of the rotary encoder.' , 
+    __propval_encoder_polarity = {
+      'normal':'Sets the normal polarity of the rotary encoder.' ,
       'inversed':'Sets the inversed polarity of the rotary encoder.' ,
-          }
+      }
 
-    __propval_polarity = {  
-      'normal':'With `normal` polarity, a positive duty cycle willcause the motor to rotate clockwise.' , 
+    __propval_polarity = {
+      'normal':'With `normal` polarity, a positive duty cycle willcause the motor to rotate clockwise.' ,
       'inversed':'With `inversed` polarity, a positive duty cycle willcause the motor to rotate counter-clockwise.' ,
-          }
+      }
 
-    __propval_speed_regulation = {  
-      'on':'The motor controller will vary the power supplied to the motorto try to maintain the speed specified in `speed_sp`.' , 
+    __propval_speed_regulation = {
+      'on':'The motor controller will vary the power supplied to the motorto try to maintain the speed specified in `speed_sp`.' ,
       'off':'The motor controller will use the power specified in `duty_cycle_sp`.' ,
-          }
+      }
 
-    __propval_stop_command = {  
-      'coast':'Power will be removed from the motor and it will freely coast to a stop.' , 
-      'brake':'Power will be removed from the motor and a passive electrical load willbe placed on the motor. This is usually done by shorting the motor terminalstogether. This load will absorb the energy from the rotation of the motors andcause the motor to stop more quickly than coasting.' , 
+    __propval_stop_command = {
+      'coast':'Power will be removed from the motor and it will freely coast to a stop.' ,
+      'brake':'Power will be removed from the motor and a passive electrical load willbe placed on the motor. This is usually done by shorting the motor terminalstogether. This load will absorb the energy from the rotation of the motors andcause the motor to stop more quickly than coasting.' ,
       'hold':'Does not remove power from the motor. Instead it actively try to hold the motorat the current position. If an external force tries to turn the motor, the motorwill ``push back`` to maintain its position.' ,
-          }
+      }
 
 #~autogen
 #~autogen python_generic-helper-function classes.motor>currentClass
@@ -550,7 +550,7 @@ class Motor(Device):
 	    , 'speed_regulation_d' : __set_speed_regulation_d
 	    , 'stop_command' : __set_stop_command
 	    , 'time_sp' : __set_time_sp }
-    
+
     def _helper( self, **kwargs ):
         for p,v in kwargs.iteritems():
             if p in self._properties:
@@ -588,7 +588,7 @@ class Motor(Device):
 #~autogen
 #~autogen python_generic-class classes.dcMotor>currentClass
 
- 
+
 class DcMotor(Device):
 
     """
@@ -747,22 +747,22 @@ class DcMotor(Device):
 #~autogen python_generic-property-value classes.dcMotor>currentClass
 
 
-    __propval_command = {  
-      'run-forever':'Run the motor until another command is sent.' , 
-      'run-timed':'Run the motor for the amount of time specified in `time_sp`and then stop the motor using the command specified by `stop_command`.' , 
-      'run-direct':'Run the motor at the duty cycle specified by `duty_cycle_sp`.Unlike other run commands, changing `duty_cycle_sp` while running *will*take effect immediately.' , 
+    __propval_command = {
+      'run-forever':'Run the motor until another command is sent.' ,
+      'run-timed':'Run the motor for the amount of time specified in `time_sp`and then stop the motor using the command specified by `stop_command`.' ,
+      'run-direct':'Run the motor at the duty cycle specified by `duty_cycle_sp`.Unlike other run commands, changing `duty_cycle_sp` while running *will*take effect immediately.' ,
       'stop':'Stop any of the run commands before they are complete using thecommand specified by `stop_command`.' ,
-          }
+      }
 
-    __propval_polarity = {  
-      'normal':'With `normal` polarity, a positive duty cycle willcause the motor to rotate clockwise.' , 
+    __propval_polarity = {
+      'normal':'With `normal` polarity, a positive duty cycle willcause the motor to rotate clockwise.' ,
       'inversed':'With `inversed` polarity, a positive duty cycle willcause the motor to rotate counter-clockwise.' ,
-          }
+      }
 
-    __propval_stop_command = {  
-      'coast':'Power will be removed from the motor and it will freely coast to a stop.' , 
+    __propval_stop_command = {
+      'coast':'Power will be removed from the motor and it will freely coast to a stop.' ,
       'brake':'Power will be removed from the motor and a passive electrical load willbe placed on the motor. This is usually done by shorting the motor terminalstogether. This load will absorb the energy from the rotation of the motors andcause the motor to stop more quickly than coasting.' ,
-          }
+      }
 
 #~autogen
 
@@ -776,7 +776,7 @@ class DcMotor(Device):
 	    , 'ramp_up_sp' : __set_ramp_up_sp
 	    , 'stop_command' : __set_stop_command
 	    , 'time_sp' : __set_time_sp }
-    
+
     def _helper( self, **kwargs ):
         for p,v in kwargs.iteritems():
             if p in self._properties:
@@ -803,7 +803,7 @@ class DcMotor(Device):
 
 #~autogen python_generic-class classes.servoMotor>currentClass
 
- 
+
 class ServoMotor(Device):
 
     """
@@ -951,15 +951,15 @@ class ServoMotor(Device):
 #~autogen python_generic-property-value classes.servoMotor>currentClass
 
 
-    __propval_command = {  
-      'run':'Drive servo to the position set in the `position_sp` attribute.' , 
+    __propval_command = {
+      'run':'Drive servo to the position set in the `position_sp` attribute.' ,
       'float':'Remove power from the motor.' ,
-          }
+      }
 
-    __propval_polarity = {  
-      'normal':'With `normal` polarity, a positive duty cycle willcause the motor to rotate clockwise.' , 
+    __propval_polarity = {
+      'normal':'With `normal` polarity, a positive duty cycle willcause the motor to rotate clockwise.' ,
       'inversed':'With `inversed` polarity, a positive duty cycle willcause the motor to rotate counter-clockwise.' ,
-          }
+      }
 
 #~autogen
 
@@ -973,7 +973,7 @@ class ServoMotor(Device):
 	    , 'polarity' : __set_polarity
 	    , 'position_sp' : __set_position_sp
 	    , 'rate_sp' : __set_rate_sp }
-    
+
     def _helper( self, **kwargs ):
         for p,v in kwargs.iteritems():
             if p in self._properties:
@@ -992,7 +992,7 @@ class ServoMotor(Device):
 
 #~autogen python_generic-class classes.sensor>currentClass
 
- 
+
 class Sensor(Device):
 
     """
@@ -1120,7 +1120,7 @@ class Sensor(Device):
 
 #~autogen python_generic-class classes.i2cSensor>currentClass
 
- 
+
 class I2cSensor(Device):
 
     """
@@ -1164,7 +1164,7 @@ class I2cSensor(Device):
 #~autogen
 #~autogen python_generic-class classes.colorSensor>currentClass
 
- 
+
 class ColorSensor(Device):
 
     """
@@ -1181,18 +1181,18 @@ class ColorSensor(Device):
 #~autogen python_generic-property-value classes.colorSensor>currentClass
 
 
-    __propval_mode = {  
-      'COL-REFLECT':'Reflected light. Red LED on.' , 
-      'COL-AMBIENT':'Ambient light. Red LEDs off.' , 
-      'COL-COLOR':'Color. All LEDs rapidly cycling, appears white.' , 
-      'REF-RAW':'Raw reflected. Red LED on' , 
+    __propval_mode = {
+      'COL-REFLECT':'Reflected light. Red LED on.' ,
+      'COL-AMBIENT':'Ambient light. Red LEDs off.' ,
+      'COL-COLOR':'Color. All LEDs rapidly cycling, appears white.' ,
+      'REF-RAW':'Raw reflected. Red LED on' ,
       'RGB-RAW':'Raw Color Components. All LEDs rapidly cycling, appears white.' ,
-          }
+      }
 
 #~autogen
 #~autogen python_generic-class classes.ultrasonicSensor>currentClass
 
- 
+
 class UltrasonicSensor(Device):
 
     """
@@ -1209,18 +1209,18 @@ class UltrasonicSensor(Device):
 #~autogen python_generic-property-value classes.ultrasonicSensor>currentClass
 
 
-    __propval_mode = {  
-      'US-DIST-CM':'Continuous measurement in centimeters.LEDs: On, steady' , 
-      'US-DIST-IN':'Continuous measurement in inches.LEDs: On, steady' , 
-      'US-LISTEN':'Listen.  LEDs: On, blinking' , 
-      'US-SI-CM':'Single measurement in centimeters.LEDs: On momentarily when mode is set, then off' , 
+    __propval_mode = {
+      'US-DIST-CM':'Continuous measurement in centimeters.LEDs: On, steady' ,
+      'US-DIST-IN':'Continuous measurement in inches.LEDs: On, steady' ,
+      'US-LISTEN':'Listen.  LEDs: On, blinking' ,
+      'US-SI-CM':'Single measurement in centimeters.LEDs: On momentarily when mode is set, then off' ,
       'US-SI-IN':'Single measurement in inches.LEDs: On momentarily when mode is set, then off' ,
-          }
+      }
 
 #~autogen
 #~autogen python_generic-class classes.gyroSensor>currentClass
 
- 
+
 class GyroSensor(Device):
 
     """
@@ -1237,18 +1237,18 @@ class GyroSensor(Device):
 #~autogen python_generic-property-value classes.gyroSensor>currentClass
 
 
-    __propval_mode = {  
-      'GYRO-ANG':'Angle' , 
-      'GYRO-RATE':'Rotational speed' , 
-      'GYRO-FAS':'Raw sensor value' , 
-      'GYRO-G&A':'Angle and rotational speed' , 
+    __propval_mode = {
+      'GYRO-ANG':'Angle' ,
+      'GYRO-RATE':'Rotational speed' ,
+      'GYRO-FAS':'Raw sensor value' ,
+      'GYRO-G&A':'Angle and rotational speed' ,
       'GYRO-CAL':'Calibration ???' ,
-          }
+      }
 
 #~autogen
 #~autogen python_generic-class classes.infraredSensor>currentClass
 
- 
+
 class InfraredSensor(Device):
 
     """
@@ -1265,20 +1265,20 @@ class InfraredSensor(Device):
 #~autogen python_generic-property-value classes.infraredSensor>currentClass
 
 
-    __propval_mode = {  
-      'IR-PROX':'Proximity' , 
-      'IR-SEEK':'IR Seeker' , 
-      'IR-REMOTE':'IR Remote Control' , 
-      'IR-REM-A':'IR Remote Control. State of the buttons is coded in binary' , 
+    __propval_mode = {
+      'IR-PROX':'Proximity' ,
+      'IR-SEEK':'IR Seeker' ,
+      'IR-REMOTE':'IR Remote Control' ,
+      'IR-REM-A':'IR Remote Control. State of the buttons is coded in binary' ,
       'IR-CAL':'Calibration ???' ,
-          }
+      }
 
 #~autogen
 
- 
+
 #~autogen python_generic-class classes.soundSensor>currentClass
 
- 
+
 class SoundSensor(Device):
 
     """
@@ -1295,15 +1295,15 @@ class SoundSensor(Device):
 #~autogen python_generic-property-value classes.soundSensor>currentClass
 
 
-    __propval_mode = {  
-      'DB':'Sound pressure level. Flat weighting' , 
+    __propval_mode = {
+      'DB':'Sound pressure level. Flat weighting' ,
       'DBA':'Sound pressure level. A weighting' ,
-          }
+      }
 
 #~autogen
 #~autogen python_generic-class classes.lightSensor>currentClass
 
- 
+
 class LightSensor(Device):
 
     """
@@ -1320,15 +1320,15 @@ class LightSensor(Device):
 #~autogen python_generic-property-value classes.lightSensor>currentClass
 
 
-    __propval_mode = {  
-      'REFLECT':'Reflected light. LED on' , 
+    __propval_mode = {
+      'REFLECT':'Reflected light. LED on' ,
       'AMBIENT':'Ambient light. LED off' ,
-          }
+      }
 
 #~autogen
 #~autogen python_generic-class classes.led>currentClass
 
- 
+
 class Led(Device):
 
     """
@@ -1428,7 +1428,7 @@ class Led(Device):
 #~autogen
 #~autogen python_generic-class classes.powerSupply>currentClass
 
- 
+
 class PowerSupply(Device):
 
     """
@@ -1494,7 +1494,7 @@ class PowerSupply(Device):
 #~autogen
 #~autogen python_generic-class classes.legoPort>currentClass
 
- 
+
 class LegoPort(Device):
 
     """
