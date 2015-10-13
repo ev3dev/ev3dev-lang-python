@@ -10,4 +10,4 @@ class {{ class_name }}(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = '{{ device_name_convention }}'
 
     def __init__(self, port='auto', name='*' ):
-        self._device = Device( {{ class_name }}.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )

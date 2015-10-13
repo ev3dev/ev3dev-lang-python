@@ -1,6 +1,7 @@
 #------------------------------------------------------------------------------ 
-# Copyright (c) 2015 Ralph Hempel & Anton Vanhoucke
-#
+# Copyright (c) 2015 Ralph Hempel
+# Copyright (c) 2015 Anton Vanhoucke
+
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -20,7 +21,7 @@
 # THE SOFTWARE.
 # -----------------------------------------------------------------------------
 
-#~autogen autogen-header -->
+#~autogen autogen-header 
 # Sections of the following code were auto-generated based on spec v0.9.3-pre, rev 2
 
 #~autogen
@@ -31,7 +32,6 @@ import numbers
 
 #------------------------------------------------------------------------------ 
 # Define the base class from which all other ev3dev classes are defined.
-
 
 class Device(object):
     """The ev3dev device base class"""
@@ -142,7 +142,7 @@ class Device(object):
                 return v
         return ""
 
-#~autogen "python_generic-class" classes.motor>currentClass
+#~autogen python_generic-class classes.motor>currentClass
 
  
 class Motor(Device):
@@ -161,16 +161,15 @@ class Motor(Device):
         Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
-
 #~autogen python_generic-get-set classes.motor>currentClass
-
 
 
     def __set_command(self, value):
         self._set_string_attribute( 'command', 'command', value )
 
-    __doc_command = """Sends a command to the motor controller. See `commands` for a list of
-                        possible values."""
+    __doc_command = (
+        "Sends a command to the motor controller. See `commands` for a list of\n"
+        "possible values.\n"        )
 
     command = property( None, __set_command, None, __doc_command )
 
@@ -493,76 +492,6 @@ class Motor(Device):
 
     time_sp = property( __get_time_sp, __set_time_sp, None, __doc_time_sp )
 
-    def run_timed(self, time_sp, *args, **kwargs):
-        """
-        Runs the motor for for a certain time in milliseconds at a certain power.
-        motor.run_timed(500, 50)
-
-        Optionally you can use speed regulation and set speed parameter instead.
-        motor.run_timed(500, speed=60)
-
-        :param: time in milliseconds
-        :param: power 0-100 (duty cycle)
-        :param speed: speed in
-        :returns: self (instantly)
-        """
-
-        self.__set_time_sp(time_sp)
-        if 'speed' in kwargs:
-            self.__set_speed_regulation_enabled('on')
-            self.__set_speed_sp(kwargs['speed'])
-        elif args[0]:
-            self.__set_speed_regulation_enabled('off')
-            self.__set_duty_cycle_sp(args[0])
-        self.__set_command("run-timed")
-        return self
-
-    def run_forever(self, *args, **kwargs):
-        """
-        Runs the motor at a certain power until you stop it.
-        motor.run_forever(50)
-
-        Optionally you can use speed regulation and set speed parameter instead.
-        motor.run_timed(speed=60)
-
-        :param: power 0-100 (duty cycle)
-        :param speed: Speed (in RPM? or deg/sec? or tacho/sec?)
-        :returns: self (instantly)
-        """
-
-        if 'speed' in kwargs:
-            self.__set_speed_regulation_enabled('on')
-            self.__set_speed_sp(kwargs['speed'])
-        elif args[0]:
-            self.__set_speed_regulation_enabled('off')
-            self.__set_duty_cycle_sp(args[0])
-        self.__set_command("run-forever")
-        return self
-
-    def run_to_abs_pos(self, position_sp, **kwargs):
-        """
-        Runs the motor to a certain position and then stops.
-        You can optionally set PID parameters
-        e.g.
-            motor.run_to_abs_pos(50, kp=1, ki=0.5, kd=0.2)
-
-        :param: position (in tacho's? degrees?)
-        :returns: self (instantly)
-        """
-
-        if 'kp' in kwargs:
-            self.__set_position_p(kwargs['kp'])
-        if 'ki' in kwargs:
-            self.__set_position_i(kwargs['ki'])
-        if 'kd' in kwargs:
-            self.__set_position_d(kwargs['kd'])
-
-        self.__set_position_sp(position_sp)
-        self.__set_command("run-to-abs-pos")
-
-
-    def stop(self):
-        self.__set_command("stop")
 
 #~autogen
 #~autogen python_generic-property-value classes.motor>currentClass
@@ -599,6 +528,62 @@ class Motor(Device):
       'hold':'Does not remove power from the motor. Instead it actively try to hold the motorat the current position. If an external force tries to turn the motor, the motorwill ``push back`` to maintain its position.' ,
           }
 
+#~autogen
+#~autogen python_generic-helper-function classes.motor>currentClass
+
+    _properties = {
+	      'command' : __set_command
+	    , 'duty_cycle_sp' : __set_duty_cycle_sp
+	    , 'encoder_polarity' : __set_encoder_polarity
+	    , 'polarity' : __set_polarity
+	    , 'position' : __set_position
+	    , 'position_p' : __set_position_p
+	    , 'position_i' : __set_position_i
+	    , 'position_d' : __set_position_d
+	    , 'position_sp' : __set_position_sp
+	    , 'speed_sp' : __set_speed_sp
+	    , 'ramp_up_sp' : __set_ramp_up_sp
+	    , 'ramp_down_sp' : __set_ramp_down_sp
+	    , 'speed_regulation_enabled' : __set_speed_regulation_enabled
+	    , 'speed_regulation_p' : __set_speed_regulation_p
+	    , 'speed_regulation_i' : __set_speed_regulation_i
+	    , 'speed_regulation_d' : __set_speed_regulation_d
+	    , 'stop_command' : __set_stop_command
+	    , 'time_sp' : __set_time_sp }
+    
+    def _helper( self, **kwargs ):
+        for p,v in kwargs.iteritems():
+            if p in self._properties:
+                self._properties[p]( self, v )
+
+    def run_forever( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-forever' )
+	
+    def run_to_abs_pos( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-to-abs-pos' )
+	
+    def run_to_rel_pos( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-to-rel-pos' )
+	
+    def run_timed( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-timed' )
+	
+    def run_direct( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-direct' )
+	
+    def stop( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'stop' )
+	
+    def reset( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'reset' )
+	
 
 #~autogen
 #~autogen python_generic-class classes.dcMotor>currentClass
@@ -616,7 +601,7 @@ class DcMotor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, port='auto', name='*' ):
-        Device.__init__(self, DcMotor.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-get-set classes.dcMotor>currentClass
@@ -744,6 +729,19 @@ class DcMotor(Device):
 
     stop_commands = property( __get_stop_commands, None, None, __doc_stop_commands )
 
+    def __get_time_sp(self):
+        return self._get_int_attribute( 'time_sp', 'time_sp' )
+
+    def __set_time_sp(self, value):
+        self._set_int_attribute( 'time_sp', 'time_sp', value )
+
+    __doc_time_sp = (
+        "Writing specifies the amount of time the motor will run when using the\n"
+        "`run-timed` command. Reading returns the current value. Units are in\n"
+        "milliseconds.\n"        )
+
+    time_sp = property( __get_time_sp, __set_time_sp, None, __doc_time_sp )
+
 
 #~autogen
 #~autogen python_generic-property-value classes.dcMotor>currentClass
@@ -767,6 +765,42 @@ class DcMotor(Device):
           }
 
 #~autogen
+
+#~autogen python_generic-helper-function classes.dcMotor>currentClass
+
+    _properties = {
+	      'command' : __set_command
+	    , 'duty_cycle_sp' : __set_duty_cycle_sp
+	    , 'polarity' : __set_polarity
+	    , 'ramp_down_sp' : __set_ramp_down_sp
+	    , 'ramp_up_sp' : __set_ramp_up_sp
+	    , 'stop_command' : __set_stop_command
+	    , 'time_sp' : __set_time_sp }
+    
+    def _helper( self, **kwargs ):
+        for p,v in kwargs.iteritems():
+            if p in self._properties:
+                self._properties[p]( self, v )
+
+    def run_forever( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-forever' )
+	
+    def run_timed( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-timed' )
+	
+    def run_direct( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run-direct' )
+	
+    def stop( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'stop' )
+	
+
+#~autogen
+
 #~autogen python_generic-class classes.servoMotor>currentClass
 
  
@@ -781,7 +815,7 @@ class ServoMotor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, port='auto', name='*' ):
-        Device.__init__(self, ServoMotor.SYSTEM_CLASS_NAME, port, name)
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-get-set classes.servoMotor>currentClass
@@ -928,6 +962,34 @@ class ServoMotor(Device):
           }
 
 #~autogen
+
+#~autogen python_generic-helper-function classes.servoMotor>currentClass
+
+    _properties = {
+	      'command' : __set_command
+	    , 'max_pulse_sp' : __set_max_pulse_sp
+	    , 'mid_pulse_sp' : __set_mid_pulse_sp
+	    , 'min_pulse_sp' : __set_min_pulse_sp
+	    , 'polarity' : __set_polarity
+	    , 'position_sp' : __set_position_sp
+	    , 'rate_sp' : __set_rate_sp }
+    
+    def _helper( self, **kwargs ):
+        for p,v in kwargs.iteritems():
+            if p in self._properties:
+                self._properties[p]( self, v )
+
+    def run( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'run' )
+	
+    def float( self, **kwargs ):
+        self._helper( **kwargs )
+	self._set_string_attribute( 'command', 'command', 'float' )
+	
+
+#~autogen
+
 #~autogen python_generic-class classes.sensor>currentClass
 
  
@@ -954,7 +1016,7 @@ class Sensor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        Device.__init__(self, Sensor.SYSTEM_CLASS_NAME, port, name)
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-get-set classes.sensor>currentClass
@@ -1052,7 +1114,7 @@ class Sensor(Device):
             n = '{0:.0f}'.format( n )
 
         if True == isinstance( n, str ):
-            return self._get_int_attribute( 'value'+n, 'value'+n )
+            return self._device._get_int_attribute( 'value'+n, 'value'+n )
         else:
             return 0
 
@@ -1069,7 +1131,7 @@ class I2cSensor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        Device.__init__(self, I2cSensor.SYSTEM_CLASS_NAME, port, name)
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-get-set classes.i2cSensor>currentClass
@@ -1113,7 +1175,7 @@ class ColorSensor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        Device.__init__(self, ColorSensor.SYSTEM_CLASS_NAME, port, name)
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-property-value classes.colorSensor>currentClass
@@ -1140,8 +1202,8 @@ class UltrasonicSensor(Device):
     SYSTEM_CLASS_NAME = 'lego-sensor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
-    def __init__(self, port='auto', name='*'):
-        Device.__init__(self, UltrasonicSensor.SYSTEM_CLASS_NAME, port, name)
+    def __init__(self, port='auto', name='*' ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-property-value classes.ultrasonicSensor>currentClass
@@ -1168,8 +1230,8 @@ class GyroSensor(Device):
     SYSTEM_CLASS_NAME = 'lego-sensor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
-    def __init__(self, port='auto', name='*'):
-        Device.__init__(self, GyroSensor.SYSTEM_CLASS_NAME, port, name)
+    def __init__(self, port='auto', name='*' ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-property-value classes.gyroSensor>currentClass
@@ -1197,7 +1259,7 @@ class InfraredSensor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        Device.__init__(self,InfraredSensor.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-property-value classes.infraredSensor>currentClass
@@ -1227,7 +1289,7 @@ class SoundSensor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        Device.__init__(self,SoundSensor.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-property-value classes.soundSensor>currentClass
@@ -1252,7 +1314,7 @@ class LightSensor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, port='auto', name='*' ):
-        Device.__init__(self,LightSensor.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-property-value classes.lightSensor>currentClass
@@ -1279,7 +1341,7 @@ class Led(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = ''
 
     def __init__(self, port='auto', name='*' ):
-        Device.__init__(self,Led.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-get-set classes.led>currentClass
@@ -1378,7 +1440,7 @@ class PowerSupply(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = ''
 
     def __init__(self, port='auto', name='*' ):
-        Device.__init__(self,PowerSupply.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-get-set classes.powerSupply>currentClass
@@ -1467,7 +1529,7 @@ class LegoPort(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = ''
 
     def __init__(self, port='auto', name='*' ):
-        Device.__init__(self, LegoPort.SYSTEM_CLASS_NAME, port, name )
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
 
 #~autogen
 #~autogen python_generic-get-set classes.legoPort>currentClass
