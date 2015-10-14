@@ -12,10 +12,11 @@ for prop in currentClass.systemProperties %}{%
         self._set_{{ prop.type | underscore_spaces }}_attribute( '{{ prop_name }}', '{{ prop.systemName }}', value ){%
   endif %}
 
-    __doc_{{ prop_name }} = ({%
+    __doc_{{ prop_name }} = """{%
   for line in prop.description %}
-        "{{ line }}\n"{%
-  endfor %}        ){%
+        {{ line }}{%
+  endfor %}
+        """{%
   if prop.readAccess and prop.writeAccess %}
 
     {{ prop_name }} = property( __get_{{ prop_name }}, __set_{{ prop_name }}, None, __doc_{{ prop_name }} ){%

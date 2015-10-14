@@ -1,5 +1,5 @@
 {% assign class_name = currentClass.friendlyName | camel_case | capitalize %}
-{% assign device_name_convention = currentClass.systemDeviceNameConvention | replace: '\{0\}', '*' %} 
+{% assign device_name_convention = currentClass.systemDeviceNameConvention | replace: '\{0\}', '*' %}
 class {{ class_name }}(Device):
 
     """{% for line in currentClass.description %}
