@@ -9,5 +9,5 @@ class {{ class_name }}(Device):
     SYSTEM_CLASS_NAME = '{{ currentClass.systemClassName }}'
     SYSTEM_DEVICE_NAME_CONVENTION = '{{ device_name_convention }}'
 
-    def __init__(self, port='auto', name='*' ):
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='', name='*', **kwargs ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, port_name=port, **kwargs )
