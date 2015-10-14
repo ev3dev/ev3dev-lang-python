@@ -39,29 +39,48 @@ class Device(object):
 
     DEVICE_ROOT_PATH = '/sys/class'
 
-    def __init__(self, class_name, port='auto', name='*' ):
+    def __init__(self, class_name, name='*', **kwargs ):
         """Spin through the Linux sysfs class for the device type and find
-           the first unconnected device"""
+        a device that matches the provided name and attributes (if any).
 
-        self._classpath = os.path.abspath( Device.DEVICE_ROOT_PATH + '/' + class_name )
+        Parameters:
+            class_name: class name of the device, a subdirectory of /sys/class.
+                For example, 'tacho-motor'.
+            name: pattern that device name should match.
+                For example, 'sensor*' or 'motor*'. Default value: '*'.
+            keyword arguments: used for matching the corresponding device
+                attributes. For example, port_name='outA', or
+                driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
+                is a list, then a match against any entry of the list is
+                enough.
+
+        Example:
+            d = ev3dev.Device('tacho-motor', port_name='outA')
+            s = ev3dev.Device('lego-sensor', driver_name=['lego-ev3-us', 'lego-nxt-us'])
+
+        When connected succesfully, the `connected` attribute is set to True.
+        """
+
+        classpath = os.path.abspath( Device.DEVICE_ROOT_PATH + '/' + class_name )
         self.filehandle_cache = {}
+        self.connected = False
 
-        for file in os.listdir( self._classpath ):
-            if 'auto' == port:
-                if fnmatch.fnmatch(file, name):
-                    print('Got a name match ' + file + ' <-> ' + name)
-                    self._path = os.path.abspath( self._classpath + '/' + file )
-                    break
-            else:
-                port_name_file = os.path.abspath( self._classpath + '/' + file + '/port_name')
-                f = open( port_name_file, 'r' )
-                port_name = f.read().strip()
-                f.close()
+        for file in os.listdir( classpath ):
+            if fnmatch.fnmatch(file, name):
+                self._path = os.path.abspath( classpath + '/' + file )
 
-                if fnmatch.fnmatch(port_name, port):
-                    print('Got a port match ' + port_name + ' <-> ' + port)
-                    self._path = os.path.abspath( self._classpath + '/' + file )
-                    break
+                # See if requested attributes match:
+                if all([self.__matches(k, kwargs[k]) for k in kwargs]):
+                    self.connected = True
+                    return
+
+    def __matches(self, attribute, pattern):
+        """Test if attribute value matches pattern (that is, if pattern is a
+        substring of attribute value).  If pattern is a list, then a match with
+        any one entry is enough.
+        """
+        value = self._get_attribute(attribute)
+        return any([value.find(pat) >= 0 for pat in list(pattern)])
 
     def __exit__(self, exc_type, exc_value, traceback):
         print("Well, this is embarassing....")
@@ -158,8 +177,8 @@ class Motor(Device):
     SYSTEM_CLASS_NAME = 'tacho-motor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
-    def __init__(self, port='auto', name='*' ):
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='', name='*', **kwargs ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, port_name=port, **kwargs )
 
 #~autogen
 #~autogen python_generic-get-set classes.motor>currentClass
@@ -632,8 +651,8 @@ class DcMotor(Device):
     SYSTEM_CLASS_NAME = 'dc-motor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
-    def __init__(self, port='auto', name='*' ):
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='', name='*', **kwargs ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, port_name=port, **kwargs )
 
 #~autogen
 #~autogen python_generic-get-set classes.dcMotor>currentClass
@@ -861,8 +880,8 @@ class ServoMotor(Device):
     SYSTEM_CLASS_NAME = 'servo-motor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
-    def __init__(self, port='auto', name='*' ):
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='', name='*', **kwargs ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, port_name=port, **kwargs )
 
 #~autogen
 #~autogen python_generic-get-set classes.servoMotor>currentClass
@@ -1064,8 +1083,8 @@ class Sensor(Device):
     SYSTEM_CLASS_NAME = 'lego-sensor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
-    def __init__(self, port='auto', name='*' ):
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='', name='*', **kwargs ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, port_name=port, **kwargs )
 
 #~autogen
 #~autogen python_generic-get-set classes.sensor>currentClass
@@ -1188,8 +1207,8 @@ class I2cSensor(Device):
     SYSTEM_CLASS_NAME = 'lego-sensor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
-    def __init__(self, port='auto', name='*' ):
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='', name='*', **kwargs ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, port_name=port, **kwargs )
 
 #~autogen
 #~autogen python_generic-get-set classes.i2cSensor>currentClass
@@ -1234,8 +1253,8 @@ class ColorSensor(Device):
     SYSTEM_CLASS_NAME = 'lego-sensor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
-    def __init__(self, port='auto', name='*' ):
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='', name='*', **kwargs ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, port_name=port, **kwargs )
 
 #~autogen
 #~autogen python_generic-property-value classes.colorSensor>currentClass
@@ -1262,8 +1281,8 @@ class UltrasonicSensor(Device):
     SYSTEM_CLASS_NAME = 'lego-sensor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
-    def __init__(self, port='auto', name='*' ):
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='', name='*', **kwargs ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, port_name=port, **kwargs )
 
 #~autogen
 #~autogen python_generic-property-value classes.ultrasonicSensor>currentClass
@@ -1290,8 +1309,8 @@ class GyroSensor(Device):
     SYSTEM_CLASS_NAME = 'lego-sensor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
-    def __init__(self, port='auto', name='*' ):
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='', name='*', **kwargs ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, port_name=port, **kwargs )
 
 #~autogen
 #~autogen python_generic-property-value classes.gyroSensor>currentClass
@@ -1318,8 +1337,8 @@ class InfraredSensor(Device):
     SYSTEM_CLASS_NAME = 'lego-sensor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
-    def __init__(self, port='auto', name='*' ):
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='', name='*', **kwargs ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, port_name=port, **kwargs )
 
 #~autogen
 #~autogen python_generic-property-value classes.infraredSensor>currentClass
@@ -1348,8 +1367,8 @@ class SoundSensor(Device):
     SYSTEM_CLASS_NAME = 'lego-nxt-sound'
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
-    def __init__(self, port='auto', name='*' ):
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='', name='*', **kwargs ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, port_name=port, **kwargs )
 
 #~autogen
 #~autogen python_generic-property-value classes.soundSensor>currentClass
@@ -1373,8 +1392,8 @@ class LightSensor(Device):
     SYSTEM_CLASS_NAME = 'lego-nxt-light'
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
-    def __init__(self, port='auto', name='*' ):
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='', name='*', **kwargs ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, port_name=port, **kwargs )
 
 #~autogen
 #~autogen python_generic-property-value classes.lightSensor>currentClass
@@ -1400,8 +1419,8 @@ class Led(Device):
     SYSTEM_CLASS_NAME = 'leds'
     SYSTEM_DEVICE_NAME_CONVENTION = ''
 
-    def __init__(self, port='auto', name='*' ):
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='', name='*', **kwargs ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, port_name=port, **kwargs )
 
 #~autogen
 #~autogen python_generic-get-set classes.led>currentClass
@@ -1505,8 +1524,8 @@ class PowerSupply(Device):
     SYSTEM_CLASS_NAME = 'power_supply'
     SYSTEM_DEVICE_NAME_CONVENTION = ''
 
-    def __init__(self, port='auto', name='*' ):
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='', name='*', **kwargs ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, port_name=port, **kwargs )
 
 #~autogen
 #~autogen python_generic-get-set classes.powerSupply>currentClass
@@ -1600,8 +1619,8 @@ class LegoPort(Device):
     SYSTEM_CLASS_NAME = 'lego_port'
     SYSTEM_DEVICE_NAME_CONVENTION = ''
 
-    def __init__(self, port='auto', name='*' ):
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, port, name )
+    def __init__(self, port='', name='*', **kwargs ):
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, port_name=port, **kwargs )
 
 #~autogen
 #~autogen python_generic-get-set classes.legoPort>currentClass
