@@ -4,12 +4,12 @@ for prop in currentClass.systemProperties %}{%
   if prop.readAccess %}
 
     def __get_{{ prop_name }}(self):
-        return self._get_{{ prop.type | underscore_spaces }}_attribute( '{{ prop_name }}', '{{ prop.systemName }}' ){%
+        return self._get_{{ prop.type | underscore_spaces }}_attribute( '{{ prop.systemName }}' ){%
   endif %}{%
   if prop.writeAccess %}
 
     def __set_{{ prop_name }}(self, value):
-        self._set_{{ prop.type | underscore_spaces }}_attribute( '{{ prop_name }}', '{{ prop.systemName }}', value ){%
+        self._set_{{ prop.type | underscore_spaces }}_attribute( '{{ prop.systemName }}', value ){%
   endif %}
 
     __doc_{{ prop_name }} = """{%
