@@ -49,7 +49,7 @@ class Device(object):
         for file in os.listdir( self._classpath ):
             if 'auto' == port:
                 if fnmatch.fnmatch(file, name):
-                    print 'Got a name match ' + file + ' <-> ' + name
+                    print('Got a name match ' + file + ' <-> ' + name)
                     self._path = os.path.abspath( self._classpath + '/' + file )
                     break
             else:
@@ -59,14 +59,14 @@ class Device(object):
                 f.close()
 
                 if fnmatch.fnmatch(port_name, port):
-                    print 'Got a port match ' + port_name + ' <-> ' + port
+                    print('Got a port match ' + port_name + ' <-> ' + port)
                     self._path = os.path.abspath( self._classpath + '/' + file )
                     break
 
     def __exit__(self, exc_type, exc_value, traceback):
-        print "Well, this is embarassing...."
+        print("Well, this is embarassing....")
         for f in self.filehandle_cache:
-            print f
+            print(f)
             f.close()
 
     def __attribute_file( self, attribute, sys_attribute, mode, reopen=False ):
