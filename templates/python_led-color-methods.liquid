@@ -1,6 +1,0 @@
-{% comment %}
-{% for ledColor in classes.led.ev3LedColors %}
-            .def("set_{{ ledColor[0] }}", &ev3::led::set_{{ ledColor[0] }}, args("intensity")).staticmethod("set_{{ ledColor[0] }}")
-            .def("{{ ledColor[0] }}_on", &ev3::led::{{ ledColor[0] }}_on).staticmethod("{{ ledColor[0] }}_on")
-{% endfor %}
-{% endcomment %}

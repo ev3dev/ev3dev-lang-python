@@ -555,7 +555,7 @@ class Motor(Device):
       }
 
 #~autogen
-#~autogen python_generic-helper-function classes.motor>currentClass
+#~autogen python_motor_commands classes.motor>currentClass
 
     def run_forever( self, **kwargs ):
         """Run the motor until another command is sent.
@@ -810,7 +810,7 @@ class DcMotor(Device):
 
 #~autogen
 
-#~autogen python_generic-helper-function classes.dcMotor>currentClass
+#~autogen python_motor_commands classes.dcMotor>currentClass
 
     def run_forever( self, **kwargs ):
         """Run the motor until another command is sent.
@@ -1019,7 +1019,7 @@ class ServoMotor(Device):
 
 #~autogen
 
-#~autogen python_generic-helper-function classes.servoMotor>currentClass
+#~autogen python_motor_commands classes.servoMotor>currentClass
 
     def run( self, **kwargs ):
         """Drive servo to the position set in the `position_sp` attribute.
