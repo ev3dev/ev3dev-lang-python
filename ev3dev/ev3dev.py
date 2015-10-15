@@ -63,7 +63,6 @@ class Device(object):
 
         classpath = os.path.abspath( Device.DEVICE_ROOT_PATH + '/' + class_name )
         self.filehandle_cache = {}
-        self.connected = False
 
         for file in os.listdir( classpath ):
             if fnmatch.fnmatch(file, name):
@@ -74,13 +73,19 @@ class Device(object):
                     self.connected = True
                     return
 
+        self._path = ''
+        self.connected = False
+
     def _matches(self, attribute, pattern):
         """Test if attribute value matches pattern (that is, if pattern is a
         substring of attribute value).  If pattern is a list, then a match with
         any one entry is enough.
         """
         value = self._get_attribute(attribute)
-        return any([value.find(pat) >= 0 for pat in list(pattern)])
+        if isinstance(pattern, list):
+            return any([value.find(pat) >= 0 for pat in pattern])
+        else:
+            return value.find(pattern) >= 0
 
     def _attribute_file( self, attribute, mode, reopen=False ):
         """Manages the file handle cache and opening the files in the correct mode"""
