@@ -82,12 +82,6 @@ class Device(object):
         value = self._get_attribute(attribute)
         return any([value.find(pat) >= 0 for pat in list(pattern)])
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        print("Well, this is embarassing....")
-        for f in self.filehandle_cache:
-            print(f)
-            f.close()
-
     def __attribute_file( self, attribute, mode, reopen=False ):
         """Manages the file handle cache and opening the files in the correct mode"""
 
