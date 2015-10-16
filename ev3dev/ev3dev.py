@@ -173,20 +173,21 @@ class Motor(Device):
 #~autogen python_generic-get-set classes.motor>currentClass
 
 
-    def _set_command(self, value):
-        self.set_attr_string( 'command', value )
-
-    _doc_command = """
+    @property
+    def command(self):
+        """
         Sends a command to the motor controller. See `commands` for a list of
         possible values.
         """
+        raise Exception( "command is a write-only property!" )
 
-    command = property( None, _set_command, None, _doc_command )
+    @command.setter
+    def command(self, value):
+        self.set_attr_string( 'command', value )
 
-    def _get_commands(self):
-        return self.get_attr_set( 'commands' )
-
-    _doc_commands = """
+    @property
+    def commands(self):
+        """
         Returns a list of commands that are supported by the motor
         controller. Possible values are `run-forever`, `run-to-abs-pos`, `run-to-rel-pos`,
         `run-timed`, `run-direct`, `stop` and `reset`. Not all commands may be supported.
@@ -206,299 +207,269 @@ class Motor(Device):
         `reset` will reset all of the motor parameter attributes to their default value.
         This will also have the effect of stopping the motor.
         """
+        return self.get_attr_set( 'commands' )
 
-    commands = property( _get_commands, None, None, _doc_commands )
-
-    def _get_count_per_rot(self):
-        return self.get_attr_int( 'count_per_rot' )
-
-    _doc_count_per_rot = """
+    @property
+    def count_per_rot(self):
+        """
         Returns the number of tacho counts in one rotation of the motor. Tacho counts
         are used by the position and speed attributes, so you can use this value
         to convert rotations or degrees to tacho counts. In the case of linear
         actuators, the units here will be counts per centimeter.
         """
+        return self.get_attr_int( 'count_per_rot' )
 
-    count_per_rot = property( _get_count_per_rot, None, None, _doc_count_per_rot )
-
-    def _get_driver_name(self):
-        return self.get_attr_string( 'driver_name' )
-
-    _doc_driver_name = """
+    @property
+    def driver_name(self):
+        """
         Returns the name of the driver that provides this tacho motor device.
         """
+        return self.get_attr_string( 'driver_name' )
 
-    driver_name = property( _get_driver_name, None, None, _doc_driver_name )
-
-    def _get_duty_cycle(self):
-        return self.get_attr_int( 'duty_cycle' )
-
-    _doc_duty_cycle = """
+    @property
+    def duty_cycle(self):
+        """
         Returns the current duty cycle of the motor. Units are percent. Values
         are -100 to 100.
         """
+        return self.get_attr_int( 'duty_cycle' )
 
-    duty_cycle = property( _get_duty_cycle, None, None, _doc_duty_cycle )
-
-    def _get_duty_cycle_sp(self):
-        return self.get_attr_int( 'duty_cycle_sp' )
-
-    def _set_duty_cycle_sp(self, value):
-        self.set_attr_int( 'duty_cycle_sp', value )
-
-    _doc_duty_cycle_sp = """
+    @property
+    def duty_cycle_sp(self):
+        """
         Writing sets the duty cycle setpoint. Reading returns the current value.
         Units are in percent. Valid values are -100 to 100. A negative value causes
         the motor to rotate in reverse. This value is only used when `speed_regulation`
         is off.
         """
+        return self.get_attr_int( 'duty_cycle_sp' )
 
-    duty_cycle_sp = property( _get_duty_cycle_sp, _set_duty_cycle_sp, None, _doc_duty_cycle_sp )
+    @duty_cycle_sp.setter
+    def duty_cycle_sp(self, value):
+        self.set_attr_int( 'duty_cycle_sp', value )
 
-    def _get_encoder_polarity(self):
-        return self.get_attr_string( 'encoder_polarity' )
-
-    def _set_encoder_polarity(self, value):
-        self.set_attr_string( 'encoder_polarity', value )
-
-    _doc_encoder_polarity = """
+    @property
+    def encoder_polarity(self):
+        """
         Sets the polarity of the rotary encoder. This is an advanced feature to all
         use of motors that send inversed encoder signals to the EV3. This should
         be set correctly by the driver of a device. It You only need to change this
         value if you are using a unsupported device. Valid values are `normal` and
         `inversed`.
         """
+        return self.get_attr_string( 'encoder_polarity' )
 
-    encoder_polarity = property( _get_encoder_polarity, _set_encoder_polarity, None, _doc_encoder_polarity )
+    @encoder_polarity.setter
+    def encoder_polarity(self, value):
+        self.set_attr_string( 'encoder_polarity', value )
 
-    def _get_polarity(self):
-        return self.get_attr_string( 'polarity' )
-
-    def _set_polarity(self, value):
-        self.set_attr_string( 'polarity', value )
-
-    _doc_polarity = """
+    @property
+    def polarity(self):
+        """
         Sets the polarity of the motor. With `normal` polarity, a positive duty
         cycle will cause the motor to rotate clockwise. With `inversed` polarity,
         a positive duty cycle will cause the motor to rotate counter-clockwise.
         Valid values are `normal` and `inversed`.
         """
+        return self.get_attr_string( 'polarity' )
 
-    polarity = property( _get_polarity, _set_polarity, None, _doc_polarity )
+    @polarity.setter
+    def polarity(self, value):
+        self.set_attr_string( 'polarity', value )
 
-    def _get_port_name(self):
-        return self.get_attr_string( 'port_name' )
-
-    _doc_port_name = """
+    @property
+    def port_name(self):
+        """
         Returns the name of the port that the motor is connected to.
         """
+        return self.get_attr_string( 'port_name' )
 
-    port_name = property( _get_port_name, None, None, _doc_port_name )
-
-    def _get_position(self):
-        return self.get_attr_int( 'position' )
-
-    def _set_position(self, value):
-        self.set_attr_int( 'position', value )
-
-    _doc_position = """
+    @property
+    def position(self):
+        """
         Returns the current position of the motor in pulses of the rotary
         encoder. When the motor rotates clockwise, the position will increase.
         Likewise, rotating counter-clockwise causes the position to decrease.
         Writing will set the position to that value.
         """
+        return self.get_attr_int( 'position' )
 
-    position = property( _get_position, _set_position, None, _doc_position )
+    @position.setter
+    def position(self, value):
+        self.set_attr_int( 'position', value )
 
-    def _get_position_p(self):
-        return self.get_attr_int( 'hold_pid/Kp' )
-
-    def _set_position_p(self, value):
-        self.set_attr_int( 'hold_pid/Kp', value )
-
-    _doc_position_p = """
+    @property
+    def position_p(self):
+        """
         The proportional constant for the position PID.
         """
+        return self.get_attr_int( 'hold_pid/Kp' )
 
-    position_p = property( _get_position_p, _set_position_p, None, _doc_position_p )
+    @position_p.setter
+    def position_p(self, value):
+        self.set_attr_int( 'hold_pid/Kp', value )
 
-    def _get_position_i(self):
-        return self.get_attr_int( 'hold_pid/Ki' )
-
-    def _set_position_i(self, value):
-        self.set_attr_int( 'hold_pid/Ki', value )
-
-    _doc_position_i = """
+    @property
+    def position_i(self):
+        """
         The integral constant for the position PID.
         """
+        return self.get_attr_int( 'hold_pid/Ki' )
 
-    position_i = property( _get_position_i, _set_position_i, None, _doc_position_i )
+    @position_i.setter
+    def position_i(self, value):
+        self.set_attr_int( 'hold_pid/Ki', value )
 
-    def _get_position_d(self):
-        return self.get_attr_int( 'hold_pid/Kd' )
-
-    def _set_position_d(self, value):
-        self.set_attr_int( 'hold_pid/Kd', value )
-
-    _doc_position_d = """
+    @property
+    def position_d(self):
+        """
         The derivative constant for the position PID.
         """
+        return self.get_attr_int( 'hold_pid/Kd' )
 
-    position_d = property( _get_position_d, _set_position_d, None, _doc_position_d )
+    @position_d.setter
+    def position_d(self, value):
+        self.set_attr_int( 'hold_pid/Kd', value )
 
-    def _get_position_sp(self):
-        return self.get_attr_int( 'position_sp' )
-
-    def _set_position_sp(self, value):
-        self.set_attr_int( 'position_sp', value )
-
-    _doc_position_sp = """
+    @property
+    def position_sp(self):
+        """
         Writing specifies the target position for the `run-to-abs-pos` and `run-to-rel-pos`
         commands. Reading returns the current value. Units are in tacho counts. You
         can use the value returned by `counts_per_rot` to convert tacho counts to/from
         rotations or degrees.
         """
+        return self.get_attr_int( 'position_sp' )
 
-    position_sp = property( _get_position_sp, _set_position_sp, None, _doc_position_sp )
+    @position_sp.setter
+    def position_sp(self, value):
+        self.set_attr_int( 'position_sp', value )
 
-    def _get_speed(self):
-        return self.get_attr_int( 'speed' )
-
-    _doc_speed = """
+    @property
+    def speed(self):
+        """
         Returns the current motor speed in tacho counts per second. Not, this is
         not necessarily degrees (although it is for LEGO motors). Use the `count_per_rot`
         attribute to convert this value to RPM or deg/sec.
         """
+        return self.get_attr_int( 'speed' )
 
-    speed = property( _get_speed, None, None, _doc_speed )
-
-    def _get_speed_sp(self):
-        return self.get_attr_int( 'speed_sp' )
-
-    def _set_speed_sp(self, value):
-        self.set_attr_int( 'speed_sp', value )
-
-    _doc_speed_sp = """
+    @property
+    def speed_sp(self):
+        """
         Writing sets the target speed in tacho counts per second used when `speed_regulation`
         is on. Reading returns the current value.  Use the `count_per_rot` attribute
         to convert RPM or deg/sec to tacho counts per second.
         """
+        return self.get_attr_int( 'speed_sp' )
 
-    speed_sp = property( _get_speed_sp, _set_speed_sp, None, _doc_speed_sp )
+    @speed_sp.setter
+    def speed_sp(self, value):
+        self.set_attr_int( 'speed_sp', value )
 
-    def _get_ramp_up_sp(self):
-        return self.get_attr_int( 'ramp_up_sp' )
-
-    def _set_ramp_up_sp(self, value):
-        self.set_attr_int( 'ramp_up_sp', value )
-
-    _doc_ramp_up_sp = """
+    @property
+    def ramp_up_sp(self):
+        """
         Writing sets the ramp up setpoint. Reading returns the current value. Units
         are in milliseconds. When set to a value > 0, the motor will ramp the power
         sent to the motor from 0 to 100% duty cycle over the span of this setpoint
         when starting the motor. If the maximum duty cycle is limited by `duty_cycle_sp`
         or speed regulation, the actual ramp time duration will be less than the setpoint.
         """
+        return self.get_attr_int( 'ramp_up_sp' )
 
-    ramp_up_sp = property( _get_ramp_up_sp, _set_ramp_up_sp, None, _doc_ramp_up_sp )
+    @ramp_up_sp.setter
+    def ramp_up_sp(self, value):
+        self.set_attr_int( 'ramp_up_sp', value )
 
-    def _get_ramp_down_sp(self):
-        return self.get_attr_int( 'ramp_down_sp' )
-
-    def _set_ramp_down_sp(self, value):
-        self.set_attr_int( 'ramp_down_sp', value )
-
-    _doc_ramp_down_sp = """
+    @property
+    def ramp_down_sp(self):
+        """
         Writing sets the ramp down setpoint. Reading returns the current value. Units
         are in milliseconds. When set to a value > 0, the motor will ramp the power
         sent to the motor from 100% duty cycle down to 0 over the span of this setpoint
         when stopping the motor. If the starting duty cycle is less than 100%, the
         ramp time duration will be less than the full span of the setpoint.
         """
+        return self.get_attr_int( 'ramp_down_sp' )
 
-    ramp_down_sp = property( _get_ramp_down_sp, _set_ramp_down_sp, None, _doc_ramp_down_sp )
+    @ramp_down_sp.setter
+    def ramp_down_sp(self, value):
+        self.set_attr_int( 'ramp_down_sp', value )
 
-    def _get_speed_regulation_enabled(self):
-        return self.get_attr_string( 'speed_regulation' )
-
-    def _set_speed_regulation_enabled(self, value):
-        self.set_attr_string( 'speed_regulation', value )
-
-    _doc_speed_regulation_enabled = """
+    @property
+    def speed_regulation_enabled(self):
+        """
         Turns speed regulation on or off. If speed regulation is on, the motor
         controller will vary the power supplied to the motor to try to maintain the
         speed specified in `speed_sp`. If speed regulation is off, the controller
         will use the power specified in `duty_cycle_sp`. Valid values are `on` and
         `off`.
         """
+        return self.get_attr_string( 'speed_regulation' )
 
-    speed_regulation_enabled = property( _get_speed_regulation_enabled, _set_speed_regulation_enabled, None, _doc_speed_regulation_enabled )
+    @speed_regulation_enabled.setter
+    def speed_regulation_enabled(self, value):
+        self.set_attr_string( 'speed_regulation', value )
 
-    def _get_speed_regulation_p(self):
-        return self.get_attr_int( 'speed_pid/Kp' )
-
-    def _set_speed_regulation_p(self, value):
-        self.set_attr_int( 'speed_pid/Kp', value )
-
-    _doc_speed_regulation_p = """
+    @property
+    def speed_regulation_p(self):
+        """
         The proportional constant for the speed regulation PID.
         """
+        return self.get_attr_int( 'speed_pid/Kp' )
 
-    speed_regulation_p = property( _get_speed_regulation_p, _set_speed_regulation_p, None, _doc_speed_regulation_p )
+    @speed_regulation_p.setter
+    def speed_regulation_p(self, value):
+        self.set_attr_int( 'speed_pid/Kp', value )
 
-    def _get_speed_regulation_i(self):
-        return self.get_attr_int( 'speed_pid/Ki' )
-
-    def _set_speed_regulation_i(self, value):
-        self.set_attr_int( 'speed_pid/Ki', value )
-
-    _doc_speed_regulation_i = """
+    @property
+    def speed_regulation_i(self):
+        """
         The integral constant for the speed regulation PID.
         """
+        return self.get_attr_int( 'speed_pid/Ki' )
 
-    speed_regulation_i = property( _get_speed_regulation_i, _set_speed_regulation_i, None, _doc_speed_regulation_i )
+    @speed_regulation_i.setter
+    def speed_regulation_i(self, value):
+        self.set_attr_int( 'speed_pid/Ki', value )
 
-    def _get_speed_regulation_d(self):
-        return self.get_attr_int( 'speed_pid/Kd' )
-
-    def _set_speed_regulation_d(self, value):
-        self.set_attr_int( 'speed_pid/Kd', value )
-
-    _doc_speed_regulation_d = """
+    @property
+    def speed_regulation_d(self):
+        """
         The derivative constant for the speed regulation PID.
         """
+        return self.get_attr_int( 'speed_pid/Kd' )
 
-    speed_regulation_d = property( _get_speed_regulation_d, _set_speed_regulation_d, None, _doc_speed_regulation_d )
+    @speed_regulation_d.setter
+    def speed_regulation_d(self, value):
+        self.set_attr_int( 'speed_pid/Kd', value )
 
-    def _get_state(self):
-        return self.get_attr_set( 'state' )
-
-    _doc_state = """
+    @property
+    def state(self):
+        """
         Reading returns a list of state flags. Possible flags are
         `running`, `ramping` `holding` and `stalled`.
         """
+        return self.get_attr_set( 'state' )
 
-    state = property( _get_state, None, None, _doc_state )
-
-    def _get_stop_command(self):
-        return self.get_attr_string( 'stop_command' )
-
-    def _set_stop_command(self, value):
-        self.set_attr_string( 'stop_command', value )
-
-    _doc_stop_command = """
+    @property
+    def stop_command(self):
+        """
         Reading returns the current stop command. Writing sets the stop command.
         The value determines the motors behavior when `command` is set to `stop`.
         Also, it determines the motors behavior when a run command completes. See
         `stop_commands` for a list of possible values.
         """
+        return self.get_attr_string( 'stop_command' )
 
-    stop_command = property( _get_stop_command, _set_stop_command, None, _doc_stop_command )
+    @stop_command.setter
+    def stop_command(self, value):
+        self.set_attr_string( 'stop_command', value )
 
-    def _get_stop_commands(self):
-        return self.get_attr_set( 'stop_commands' )
-
-    _doc_stop_commands = """
+    @property
+    def stop_commands(self):
+        """
         Returns a list of stop modes supported by the motor controller.
         Possible values are `coast`, `brake` and `hold`. `coast` means that power will
         be removed from the motor and it will freely coast to a stop. `brake` means
@@ -510,22 +481,20 @@ class Motor(Device):
         position. If an external force tries to turn the motor, the motor will 'push
         back' to maintain its position.
         """
+        return self.get_attr_set( 'stop_commands' )
 
-    stop_commands = property( _get_stop_commands, None, None, _doc_stop_commands )
-
-    def _get_time_sp(self):
-        return self.get_attr_int( 'time_sp' )
-
-    def _set_time_sp(self, value):
-        self.set_attr_int( 'time_sp', value )
-
-    _doc_time_sp = """
+    @property
+    def time_sp(self):
+        """
         Writing specifies the amount of time the motor will run when using the
         `run-timed` command. Reading returns the current value. Units are in
         milliseconds.
         """
+        return self.get_attr_int( 'time_sp' )
 
-    time_sp = property( _get_time_sp, _set_time_sp, None, _doc_time_sp )
+    @time_sp.setter
+    def time_sp(self, value):
+        self.set_attr_int( 'time_sp', value )
 
 
 #~autogen
@@ -647,153 +616,140 @@ class DcMotor(Device):
 #~autogen python_generic-get-set classes.dcMotor>currentClass
 
 
-    def _set_command(self, value):
-        self.set_attr_string( 'command', value )
-
-    _doc_command = """
+    @property
+    def command(self):
+        """
         Sets the command for the motor. Possible values are `run-forever`, `run-timed` and
         `stop`. Not all commands may be supported, so be sure to check the contents
         of the `commands` attribute.
         """
+        raise Exception( "command is a write-only property!" )
 
-    command = property( None, _set_command, None, _doc_command )
+    @command.setter
+    def command(self, value):
+        self.set_attr_string( 'command', value )
 
-    def _get_commands(self):
-        return self.get_attr_set( 'commands' )
-
-    _doc_commands = """
+    @property
+    def commands(self):
+        """
         Returns a list of commands supported by the motor
         controller.
         """
+        return self.get_attr_set( 'commands' )
 
-    commands = property( _get_commands, None, None, _doc_commands )
-
-    def _get_driver_name(self):
-        return self.get_attr_string( 'driver_name' )
-
-    _doc_driver_name = """
+    @property
+    def driver_name(self):
+        """
         Returns the name of the motor driver that loaded this device. See the list
         of [supported devices] for a list of drivers.
         """
+        return self.get_attr_string( 'driver_name' )
 
-    driver_name = property( _get_driver_name, None, None, _doc_driver_name )
-
-    def _get_duty_cycle(self):
-        return self.get_attr_int( 'duty_cycle' )
-
-    _doc_duty_cycle = """
+    @property
+    def duty_cycle(self):
+        """
         Shows the current duty cycle of the PWM signal sent to the motor. Values
         are -100 to 100 (-100% to 100%).
         """
+        return self.get_attr_int( 'duty_cycle' )
 
-    duty_cycle = property( _get_duty_cycle, None, None, _doc_duty_cycle )
-
-    def _get_duty_cycle_sp(self):
-        return self.get_attr_int( 'duty_cycle_sp' )
-
-    def _set_duty_cycle_sp(self, value):
-        self.set_attr_int( 'duty_cycle_sp', value )
-
-    _doc_duty_cycle_sp = """
+    @property
+    def duty_cycle_sp(self):
+        """
         Writing sets the duty cycle setpoint of the PWM signal sent to the motor.
         Valid values are -100 to 100 (-100% to 100%). Reading returns the current
         setpoint.
         """
+        return self.get_attr_int( 'duty_cycle_sp' )
 
-    duty_cycle_sp = property( _get_duty_cycle_sp, _set_duty_cycle_sp, None, _doc_duty_cycle_sp )
+    @duty_cycle_sp.setter
+    def duty_cycle_sp(self, value):
+        self.set_attr_int( 'duty_cycle_sp', value )
 
-    def _get_polarity(self):
-        return self.get_attr_string( 'polarity' )
-
-    def _set_polarity(self, value):
-        self.set_attr_string( 'polarity', value )
-
-    _doc_polarity = """
+    @property
+    def polarity(self):
+        """
         Sets the polarity of the motor. Valid values are `normal` and `inversed`.
         """
+        return self.get_attr_string( 'polarity' )
 
-    polarity = property( _get_polarity, _set_polarity, None, _doc_polarity )
+    @polarity.setter
+    def polarity(self, value):
+        self.set_attr_string( 'polarity', value )
 
-    def _get_port_name(self):
-        return self.get_attr_string( 'port_name' )
-
-    _doc_port_name = """
+    @property
+    def port_name(self):
+        """
         Returns the name of the port that the motor is connected to.
         """
+        return self.get_attr_string( 'port_name' )
 
-    port_name = property( _get_port_name, None, None, _doc_port_name )
-
-    def _get_ramp_down_sp(self):
-        return self.get_attr_int( 'ramp_down_sp' )
-
-    def _set_ramp_down_sp(self, value):
-        self.set_attr_int( 'ramp_down_sp', value )
-
-    _doc_ramp_down_sp = """
+    @property
+    def ramp_down_sp(self):
+        """
         Sets the time in milliseconds that it take the motor to ramp down from 100%
         to 0%. Valid values are 0 to 10000 (10 seconds). Default is 0.
         """
+        return self.get_attr_int( 'ramp_down_sp' )
 
-    ramp_down_sp = property( _get_ramp_down_sp, _set_ramp_down_sp, None, _doc_ramp_down_sp )
+    @ramp_down_sp.setter
+    def ramp_down_sp(self, value):
+        self.set_attr_int( 'ramp_down_sp', value )
 
-    def _get_ramp_up_sp(self):
-        return self.get_attr_int( 'ramp_up_sp' )
-
-    def _set_ramp_up_sp(self, value):
-        self.set_attr_int( 'ramp_up_sp', value )
-
-    _doc_ramp_up_sp = """
+    @property
+    def ramp_up_sp(self):
+        """
         Sets the time in milliseconds that it take the motor to up ramp from 0% to
         100%. Valid values are 0 to 10000 (10 seconds). Default is 0.
         """
+        return self.get_attr_int( 'ramp_up_sp' )
 
-    ramp_up_sp = property( _get_ramp_up_sp, _set_ramp_up_sp, None, _doc_ramp_up_sp )
+    @ramp_up_sp.setter
+    def ramp_up_sp(self, value):
+        self.set_attr_int( 'ramp_up_sp', value )
 
-    def _get_state(self):
-        return self.get_attr_set( 'state' )
-
-    _doc_state = """
+    @property
+    def state(self):
+        """
         Gets a list of flags indicating the motor status. Possible
         flags are `running` and `ramping`. `running` indicates that the motor is
         powered. `ramping` indicates that the motor has not yet reached the
         `duty_cycle_sp`.
         """
+        return self.get_attr_set( 'state' )
 
-    state = property( _get_state, None, None, _doc_state )
-
-    def _set_stop_command(self, value):
-        self.set_attr_string( 'stop_command', value )
-
-    _doc_stop_command = """
+    @property
+    def stop_command(self):
+        """
         Sets the stop command that will be used when the motor stops. Read
         `stop_commands` to get the list of valid values.
         """
+        raise Exception( "stop_command is a write-only property!" )
 
-    stop_command = property( None, _set_stop_command, None, _doc_stop_command )
+    @stop_command.setter
+    def stop_command(self, value):
+        self.set_attr_string( 'stop_command', value )
 
-    def _get_stop_commands(self):
-        return self.get_attr_set( 'stop_commands' )
-
-    _doc_stop_commands = """
+    @property
+    def stop_commands(self):
+        """
         Gets a list of stop commands. Valid values are `coast`
         and `brake`.
         """
+        return self.get_attr_set( 'stop_commands' )
 
-    stop_commands = property( _get_stop_commands, None, None, _doc_stop_commands )
-
-    def _get_time_sp(self):
-        return self.get_attr_int( 'time_sp' )
-
-    def _set_time_sp(self, value):
-        self.set_attr_int( 'time_sp', value )
-
-    _doc_time_sp = """
+    @property
+    def time_sp(self):
+        """
         Writing specifies the amount of time the motor will run when using the
         `run-timed` command. Reading returns the current value. Units are in
         milliseconds.
         """
+        return self.get_attr_int( 'time_sp' )
 
-    time_sp = property( _get_time_sp, _set_time_sp, None, _doc_time_sp )
+    @time_sp.setter
+    def time_sp(self, value):
+        self.set_attr_int( 'time_sp', value )
 
 
 #~autogen
@@ -876,49 +832,44 @@ class ServoMotor(Device):
 #~autogen python_generic-get-set classes.servoMotor>currentClass
 
 
-    def _set_command(self, value):
-        self.set_attr_string( 'command', value )
-
-    _doc_command = """
+    @property
+    def command(self):
+        """
         Sets the command for the servo. Valid values are `run` and `float`. Setting
         to `run` will cause the servo to be driven to the position_sp set in the
         `position_sp` attribute. Setting to `float` will remove power from the motor.
         """
+        raise Exception( "command is a write-only property!" )
 
-    command = property( None, _set_command, None, _doc_command )
+    @command.setter
+    def command(self, value):
+        self.set_attr_string( 'command', value )
 
-    def _get_driver_name(self):
-        return self.get_attr_string( 'driver_name' )
-
-    _doc_driver_name = """
+    @property
+    def driver_name(self):
+        """
         Returns the name of the motor driver that loaded this device. See the list
         of [supported devices] for a list of drivers.
         """
+        return self.get_attr_string( 'driver_name' )
 
-    driver_name = property( _get_driver_name, None, None, _doc_driver_name )
-
-    def _get_max_pulse_sp(self):
-        return self.get_attr_int( 'max_pulse_sp' )
-
-    def _set_max_pulse_sp(self, value):
-        self.set_attr_int( 'max_pulse_sp', value )
-
-    _doc_max_pulse_sp = """
+    @property
+    def max_pulse_sp(self):
+        """
         Used to set the pulse size in milliseconds for the signal that tells the
         servo to drive to the maximum (clockwise) position_sp. Default value is 2400.
         Valid values are 2300 to 2700. You must write to the position_sp attribute for
         changes to this attribute to take effect.
         """
+        return self.get_attr_int( 'max_pulse_sp' )
 
-    max_pulse_sp = property( _get_max_pulse_sp, _set_max_pulse_sp, None, _doc_max_pulse_sp )
+    @max_pulse_sp.setter
+    def max_pulse_sp(self, value):
+        self.set_attr_int( 'max_pulse_sp', value )
 
-    def _get_mid_pulse_sp(self):
-        return self.get_attr_int( 'mid_pulse_sp' )
-
-    def _set_mid_pulse_sp(self, value):
-        self.set_attr_int( 'mid_pulse_sp', value )
-
-    _doc_mid_pulse_sp = """
+    @property
+    def mid_pulse_sp(self):
+        """
         Used to set the pulse size in milliseconds for the signal that tells the
         servo to drive to the mid position_sp. Default value is 1500. Valid
         values are 1300 to 1700. For example, on a 180 degree servo, this would be
@@ -926,70 +877,64 @@ class ServoMotor(Device):
         where the motor does not turn. You must write to the position_sp attribute for
         changes to this attribute to take effect.
         """
+        return self.get_attr_int( 'mid_pulse_sp' )
 
-    mid_pulse_sp = property( _get_mid_pulse_sp, _set_mid_pulse_sp, None, _doc_mid_pulse_sp )
+    @mid_pulse_sp.setter
+    def mid_pulse_sp(self, value):
+        self.set_attr_int( 'mid_pulse_sp', value )
 
-    def _get_min_pulse_sp(self):
-        return self.get_attr_int( 'min_pulse_sp' )
-
-    def _set_min_pulse_sp(self, value):
-        self.set_attr_int( 'min_pulse_sp', value )
-
-    _doc_min_pulse_sp = """
+    @property
+    def min_pulse_sp(self):
+        """
         Used to set the pulse size in milliseconds for the signal that tells the
         servo to drive to the miniumum (counter-clockwise) position_sp. Default value
         is 600. Valid values are 300 to 700. You must write to the position_sp
         attribute for changes to this attribute to take effect.
         """
+        return self.get_attr_int( 'min_pulse_sp' )
 
-    min_pulse_sp = property( _get_min_pulse_sp, _set_min_pulse_sp, None, _doc_min_pulse_sp )
+    @min_pulse_sp.setter
+    def min_pulse_sp(self, value):
+        self.set_attr_int( 'min_pulse_sp', value )
 
-    def _get_polarity(self):
-        return self.get_attr_string( 'polarity' )
-
-    def _set_polarity(self, value):
-        self.set_attr_string( 'polarity', value )
-
-    _doc_polarity = """
+    @property
+    def polarity(self):
+        """
         Sets the polarity of the servo. Valid values are `normal` and `inversed`.
         Setting the value to `inversed` will cause the position_sp value to be
         inversed. i.e `-100` will correspond to `max_pulse_sp`, and `100` will
         correspond to `min_pulse_sp`.
         """
+        return self.get_attr_string( 'polarity' )
 
-    polarity = property( _get_polarity, _set_polarity, None, _doc_polarity )
+    @polarity.setter
+    def polarity(self, value):
+        self.set_attr_string( 'polarity', value )
 
-    def _get_port_name(self):
-        return self.get_attr_string( 'port_name' )
-
-    _doc_port_name = """
+    @property
+    def port_name(self):
+        """
         Returns the name of the port that the motor is connected to.
         """
+        return self.get_attr_string( 'port_name' )
 
-    port_name = property( _get_port_name, None, None, _doc_port_name )
-
-    def _get_position_sp(self):
-        return self.get_attr_int( 'position_sp' )
-
-    def _set_position_sp(self, value):
-        self.set_attr_int( 'position_sp', value )
-
-    _doc_position_sp = """
+    @property
+    def position_sp(self):
+        """
         Reading returns the current position_sp of the servo. Writing instructs the
         servo to move to the specified position_sp. Units are percent. Valid values
         are -100 to 100 (-100% to 100%) where `-100` corresponds to `min_pulse_sp`,
         `0` corresponds to `mid_pulse_sp` and `100` corresponds to `max_pulse_sp`.
         """
+        return self.get_attr_int( 'position_sp' )
 
-    position_sp = property( _get_position_sp, _set_position_sp, None, _doc_position_sp )
+    @position_sp.setter
+    def position_sp(self, value):
+        self.set_attr_int( 'position_sp', value )
 
-    def _get_rate_sp(self):
-        return self.get_attr_int( 'rate_sp' )
-
-    def _set_rate_sp(self, value):
-        self.set_attr_int( 'rate_sp', value )
-
-    _doc_rate_sp = """
+    @property
+    def rate_sp(self):
+        """
         Sets the rate_sp at which the servo travels from 0 to 100.0% (half of the full
         range of the servo). Units are in milliseconds. Example: Setting the rate_sp
         to 1000 means that it will take a 180 degree servo 2 second to move from 0
@@ -997,19 +942,20 @@ class ServoMotor(Device):
         case reading and writing will fail with `-EOPNOTSUPP`. In continuous rotation
         servos, this value will affect the rate_sp at which the speed ramps up or down.
         """
+        return self.get_attr_int( 'rate_sp' )
 
-    rate_sp = property( _get_rate_sp, _set_rate_sp, None, _doc_rate_sp )
+    @rate_sp.setter
+    def rate_sp(self, value):
+        self.set_attr_int( 'rate_sp', value )
 
-    def _get_state(self):
-        return self.get_attr_set( 'state' )
-
-    _doc_state = """
+    @property
+    def state(self):
+        """
         Returns a list of flags indicating the state of the servo.
         Possible values are:
         * `running`: Indicates that the motor is powered.
         """
-
-    state = property( _get_state, None, None, _doc_state )
+        return self.get_attr_set( 'state' )
 
 
 #~autogen
@@ -1079,96 +1025,83 @@ class Sensor(Device):
 #~autogen python_generic-get-set classes.sensor>currentClass
 
 
-    def _set_command(self, value):
-        self.set_attr_string( 'command', value )
-
-    _doc_command = """
+    @property
+    def command(self):
+        """
         Sends a command to the sensor.
         """
+        raise Exception( "command is a write-only property!" )
 
-    command = property( None, _set_command, None, _doc_command )
+    @command.setter
+    def command(self, value):
+        self.set_attr_string( 'command', value )
 
-    def _get_commands(self):
-        return self.get_attr_set( 'commands' )
-
-    _doc_commands = """
+    @property
+    def commands(self):
+        """
         Returns a list of the valid commands for the sensor.
         Returns -EOPNOTSUPP if no commands are supported.
         """
+        return self.get_attr_set( 'commands' )
 
-    commands = property( _get_commands, None, None, _doc_commands )
-
-    def _get_decimals(self):
-        return self.get_attr_int( 'decimals' )
-
-    _doc_decimals = """
+    @property
+    def decimals(self):
+        """
         Returns the number of decimal places for the values in the `value<N>`
         attributes of the current mode.
         """
+        return self.get_attr_int( 'decimals' )
 
-    decimals = property( _get_decimals, None, None, _doc_decimals )
-
-    def _get_driver_name(self):
-        return self.get_attr_string( 'driver_name' )
-
-    _doc_driver_name = """
+    @property
+    def driver_name(self):
+        """
         Returns the name of the sensor device/driver. See the list of [supported
         sensors] for a complete list of drivers.
         """
+        return self.get_attr_string( 'driver_name' )
 
-    driver_name = property( _get_driver_name, None, None, _doc_driver_name )
-
-    def _get_mode(self):
-        return self.get_attr_string( 'mode' )
-
-    def _set_mode(self, value):
-        self.set_attr_string( 'mode', value )
-
-    _doc_mode = """
+    @property
+    def mode(self):
+        """
         Returns the current mode. Writing one of the values returned by `modes`
         sets the sensor to that mode.
         """
+        return self.get_attr_string( 'mode' )
 
-    mode = property( _get_mode, _set_mode, None, _doc_mode )
+    @mode.setter
+    def mode(self, value):
+        self.set_attr_string( 'mode', value )
 
-    def _get_modes(self):
-        return self.get_attr_set( 'modes' )
-
-    _doc_modes = """
+    @property
+    def modes(self):
+        """
         Returns a list of the valid modes for the sensor.
         """
+        return self.get_attr_set( 'modes' )
 
-    modes = property( _get_modes, None, None, _doc_modes )
-
-    def _get_num_values(self):
-        return self.get_attr_int( 'num_values' )
-
-    _doc_num_values = """
+    @property
+    def num_values(self):
+        """
         Returns the number of `value<N>` attributes that will return a valid value
         for the current mode.
         """
+        return self.get_attr_int( 'num_values' )
 
-    num_values = property( _get_num_values, None, None, _doc_num_values )
-
-    def _get_port_name(self):
-        return self.get_attr_string( 'port_name' )
-
-    _doc_port_name = """
+    @property
+    def port_name(self):
+        """
         Returns the name of the port that the sensor is connected to, e.g. `ev3:in1`.
         I2C sensors also include the I2C address (decimal), e.g. `ev3:in1:i2c8`.
         """
+        return self.get_attr_string( 'port_name' )
 
-    port_name = property( _get_port_name, None, None, _doc_port_name )
-
-    def _get_units(self):
-        return self.get_attr_string( 'units' )
-
-    _doc_units = """
+    @property
+    def units(self):
+        """
         Returns the units of the measured value for the current mode. May return
         empty string
         """
-
-    units = property( _get_units, None, None, _doc_units )
+        return self.get_attr_string( 'units' )
 
 
 #~autogen
@@ -1203,30 +1136,27 @@ class I2cSensor(Device):
 #~autogen python_generic-get-set classes.i2cSensor>currentClass
 
 
-    def _get_fw_version(self):
-        return self.get_attr_string( 'fw_version' )
-
-    _doc_fw_version = """
+    @property
+    def fw_version(self):
+        """
         Returns the firmware version of the sensor if available. Currently only
         I2C/NXT sensors support this.
         """
+        return self.get_attr_string( 'fw_version' )
 
-    fw_version = property( _get_fw_version, None, None, _doc_fw_version )
-
-    def _get_poll_ms(self):
-        return self.get_attr_int( 'poll_ms' )
-
-    def _set_poll_ms(self, value):
-        self.set_attr_int( 'poll_ms', value )
-
-    _doc_poll_ms = """
+    @property
+    def poll_ms(self):
+        """
         Returns the polling period of the sensor in milliseconds. Writing sets the
         polling period. Setting to 0 disables polling. Minimum value is hard
         coded as 50 msec. Returns -EOPNOTSUPP if changing polling is not supported.
         Currently only I2C/NXT sensors support changing the polling period.
         """
+        return self.get_attr_int( 'poll_ms' )
 
-    poll_ms = property( _get_poll_ms, _set_poll_ms, None, _doc_poll_ms )
+    @poll_ms.setter
+    def poll_ms(self, value):
+        self.set_attr_int( 'poll_ms', value )
 
 
 #~autogen
@@ -1415,43 +1345,34 @@ class Led(Device):
 #~autogen python_generic-get-set classes.led>currentClass
 
 
-    def _get_max_brightness(self):
-        return self.get_attr_int( 'max_brightness' )
-
-    _doc_max_brightness = """
+    @property
+    def max_brightness(self):
+        """
         Returns the maximum allowable brightness value.
         """
+        return self.get_attr_int( 'max_brightness' )
 
-    max_brightness = property( _get_max_brightness, None, None, _doc_max_brightness )
-
-    def _get_brightness(self):
-        return self.get_attr_int( 'brightness' )
-
-    def _set_brightness(self, value):
-        self.set_attr_int( 'brightness', value )
-
-    _doc_brightness = """
+    @property
+    def brightness(self):
+        """
         Sets the brightness level. Possible values are from 0 to `max_brightness`.
         """
+        return self.get_attr_int( 'brightness' )
 
-    brightness = property( _get_brightness, _set_brightness, None, _doc_brightness )
+    @brightness.setter
+    def brightness(self, value):
+        self.set_attr_int( 'brightness', value )
 
-    def _get_triggers(self):
-        return self.get_attr_set( 'trigger' )
-
-    _doc_triggers = """
+    @property
+    def triggers(self):
+        """
         Returns a list of available triggers.
         """
+        return self.get_attr_set( 'trigger' )
 
-    triggers = property( _get_triggers, None, None, _doc_triggers )
-
-    def _get_trigger(self):
-        return self.get_attr_from_set( 'trigger' )
-
-    def _set_trigger(self, value):
-        self.set_attr_string( 'trigger', value )
-
-    _doc_trigger = """
+    @property
+    def trigger(self):
+        """
         Sets the led trigger. A trigger
         is a kernel based source of led events. Triggers can either be simple or
         complex. A simple trigger isn't configurable and is designed to slot into
@@ -1467,36 +1388,37 @@ class Led(Device):
         trigger. However, if you set the brightness value to 0 it will
         also disable the `timer` trigger.
         """
+        return self.get_attr_from_set( 'trigger' )
 
-    trigger = property( _get_trigger, _set_trigger, None, _doc_trigger )
+    @trigger.setter
+    def trigger(self, value):
+        self.set_attr_string( 'trigger', value )
 
-    def _get_delay_on(self):
-        return self.get_attr_int( 'delay_on' )
-
-    def _set_delay_on(self, value):
-        self.set_attr_int( 'delay_on', value )
-
-    _doc_delay_on = """
+    @property
+    def delay_on(self):
+        """
         The `timer` trigger will periodically change the LED brightness between
         0 and the current brightness setting. The `on` time can
         be specified via `delay_on` attribute in milliseconds.
         """
+        return self.get_attr_int( 'delay_on' )
 
-    delay_on = property( _get_delay_on, _set_delay_on, None, _doc_delay_on )
+    @delay_on.setter
+    def delay_on(self, value):
+        self.set_attr_int( 'delay_on', value )
 
-    def _get_delay_off(self):
-        return self.get_attr_int( 'delay_off' )
-
-    def _set_delay_off(self, value):
-        self.set_attr_int( 'delay_off', value )
-
-    _doc_delay_off = """
+    @property
+    def delay_off(self):
+        """
         The `timer` trigger will periodically change the LED brightness between
         0 and the current brightness setting. The `off` time can
         be specified via `delay_off` attribute in milliseconds.
         """
+        return self.get_attr_int( 'delay_off' )
 
-    delay_off = property( _get_delay_off, _set_delay_off, None, _doc_delay_off )
+    @delay_off.setter
+    def delay_off(self, value):
+        self.set_attr_int( 'delay_off', value )
 
 
 #~autogen
@@ -1520,55 +1442,43 @@ class PowerSupply(Device):
 #~autogen python_generic-get-set classes.powerSupply>currentClass
 
 
-    def _get_measured_current(self):
-        return self.get_attr_int( 'current_now' )
-
-    _doc_measured_current = """
+    @property
+    def measured_current(self):
+        """
         The measured current that the battery is supplying (in microamps)
         """
+        return self.get_attr_int( 'current_now' )
 
-    measured_current = property( _get_measured_current, None, None, _doc_measured_current )
-
-    def _get_measured_voltage(self):
-        return self.get_attr_int( 'voltage_now' )
-
-    _doc_measured_voltage = """
+    @property
+    def measured_voltage(self):
+        """
         The measured voltage that the battery is supplying (in microvolts)
         """
+        return self.get_attr_int( 'voltage_now' )
 
-    measured_voltage = property( _get_measured_voltage, None, None, _doc_measured_voltage )
-
-    def _get_max_voltage(self):
+    @property
+    def max_voltage(self):
+        """
+        """
         return self.get_attr_int( 'voltage_max_design' )
 
-    _doc_max_voltage = """
+    @property
+    def min_voltage(self):
         """
-
-    max_voltage = property( _get_max_voltage, None, None, _doc_max_voltage )
-
-    def _get_min_voltage(self):
+        """
         return self.get_attr_int( 'voltage_min_design' )
 
-    _doc_min_voltage = """
+    @property
+    def technology(self):
         """
-
-    min_voltage = property( _get_min_voltage, None, None, _doc_min_voltage )
-
-    def _get_technology(self):
+        """
         return self.get_attr_string( 'technology' )
 
-    _doc_technology = """
+    @property
+    def type(self):
         """
-
-    technology = property( _get_technology, None, None, _doc_technology )
-
-    def _get_type(self):
+        """
         return self.get_attr_string( 'type' )
-
-    _doc_type = """
-        """
-
-    type = property( _get_type, None, None, _doc_type )
 
 
 #~autogen
@@ -1615,74 +1525,67 @@ class LegoPort(Device):
 #~autogen python_generic-get-set classes.legoPort>currentClass
 
 
-    def _get_driver_name(self):
-        return self.get_attr_string( 'driver_name' )
-
-    _doc_driver_name = """
+    @property
+    def driver_name(self):
+        """
         Returns the name of the driver that loaded this device. You can find the
         complete list of drivers in the [list of port drivers].
         """
+        return self.get_attr_string( 'driver_name' )
 
-    driver_name = property( _get_driver_name, None, None, _doc_driver_name )
-
-    def _get_modes(self):
-        return self.get_attr_set( 'modes' )
-
-    _doc_modes = """
+    @property
+    def modes(self):
+        """
         Returns a list of the available modes of the port.
         """
+        return self.get_attr_set( 'modes' )
 
-    modes = property( _get_modes, None, None, _doc_modes )
-
-    def _get_mode(self):
-        return self.get_attr_string( 'mode' )
-
-    def _set_mode(self, value):
-        self.set_attr_string( 'mode', value )
-
-    _doc_mode = """
+    @property
+    def mode(self):
+        """
         Reading returns the currently selected mode. Writing sets the mode.
         Generally speaking when the mode changes any sensor or motor devices
         associated with the port will be removed new ones loaded, however this
         this will depend on the individual driver implementing this class.
         """
+        return self.get_attr_string( 'mode' )
 
-    mode = property( _get_mode, _set_mode, None, _doc_mode )
+    @mode.setter
+    def mode(self, value):
+        self.set_attr_string( 'mode', value )
 
-    def _get_port_name(self):
-        return self.get_attr_string( 'port_name' )
-
-    _doc_port_name = """
+    @property
+    def port_name(self):
+        """
         Returns the name of the port. See individual driver documentation for
         the name that will be returned.
         """
+        return self.get_attr_string( 'port_name' )
 
-    port_name = property( _get_port_name, None, None, _doc_port_name )
-
-    def _set_set_device(self, value):
-        self.set_attr_string( 'set_device', value )
-
-    _doc_set_device = """
+    @property
+    def set_device(self):
+        """
         For modes that support it, writing the name of a driver will cause a new
         device to be registered for that driver and attached to this port. For
         example, since NXT/Analog sensors cannot be auto-detected, you must use
         this attribute to load the correct driver. Returns -EOPNOTSUPP if setting a
         device is not supported.
         """
+        raise Exception( "set_device is a write-only property!" )
 
-    set_device = property( None, _set_set_device, None, _doc_set_device )
+    @set_device.setter
+    def set_device(self, value):
+        self.set_attr_string( 'set_device', value )
 
-    def _get_status(self):
-        return self.get_attr_string( 'status' )
-
-    _doc_status = """
+    @property
+    def status(self):
+        """
         In most cases, reading status will return the same value as `mode`. In
         cases where there is an `auto` mode additional values may be returned,
         such as `no-device` or `error`. See individual port driver documentation
         for the full list of possible values.
         """
-
-    status = property( _get_status, None, None, _doc_status )
+        return self.get_attr_string( 'status' )
 
 
 #~autogen
