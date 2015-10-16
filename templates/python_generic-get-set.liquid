@@ -8,32 +8,25 @@ for prop in currentClass.systemProperties %}{%
   elsif prop.type == 'string selector' %}{%
     assign getter = 'from_set' %}{%
     assign setter = 'string' %}{%
-  endif %}{%
-  if prop.readAccess %}
-
-    def _get_{{ prop_name }}(self):
-        return self.get_attr_{{ getter }}( '{{ prop.systemName }}' ){%
-  endif %}{%
-  if prop.writeAccess %}
-
-    def _set_{{ prop_name }}(self, value):
-        self.set_attr_{{ setter }}( '{{ prop.systemName }}', value ){%
   endif %}
 
-    _doc_{{ prop_name }} = """{%
+    @property
+    def {{prop_name}}(self):
+        """{%
   for line in prop.description %}
         {{ line }}{%
   endfor %}
         """{%
-  if prop.readAccess and prop.writeAccess %}
-
-    {{ prop_name }} = property( _get_{{ prop_name }}, _set_{{ prop_name }}, None, _doc_{{ prop_name }} ){%
-  elsif prop.readAccess %}
-
-    {{ prop_name }} = property( _get_{{ prop_name }}, None, None, _doc_{{ prop_name }} ){%
-  elsif prop.writeAccess %}
-
-    {{ prop_name }} = property( None, _set_{{ prop_name }}, None, _doc_{{ prop_name }} ){%
+  if prop.readAccess %}
+        return self.get_attr_{{ getter }}( '{{ prop.systemName }}' ){%
+  else %}
+        raise Exception( "{{prop_name}} is a write-only property!" ){%
   endif %}{%
+  if prop.writeAccess %}
+
+    @{{prop_name}}.setter
+    def {{ prop_name }}(self, value):
+        self.set_attr_{{ setter }}( '{{ prop.systemName }}', value ){%
+  endif%}{%
 endfor %}
 
