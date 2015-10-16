@@ -1381,6 +1381,24 @@ class LightSensor(Sensor):
       }
 
 #~autogen
+#~autogen python_generic-class classes.touchSensor>currentClass
+
+
+class TouchSensor(Sensor):
+
+    """
+    Touch Sensor
+    """
+
+    SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
+    SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
+
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+        if port is not None:
+            kwargs['port_name'] = port
+        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-touch', 'lego-nxt-touch', ], **kwargs )
+
+#~autogen
 #~autogen python_generic-class classes.led>currentClass
 
 
