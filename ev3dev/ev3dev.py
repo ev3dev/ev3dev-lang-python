@@ -595,6 +595,23 @@ class Motor(Device):
 
 
 #~autogen
+
+class LargeMotor(Motor):
+    """
+    EV3 large motor.
+    """
+
+    def __init__(self, port='', name='*', **kwargs):
+        Motor.__init__(self, port, name, driver_name='lego-ev3-l-motor', **kwargs)
+
+class MediumMotor(Motor):
+    """
+    EV3 medium motor.
+    """
+
+    def __init__(self, port='', name='*', **kwargs):
+        Motor.__init__(self, port, name, driver_name='lego-ev3-m-motor', **kwargs)
+
 #~autogen python_generic-class classes.dcMotor>currentClass
 
 
@@ -811,7 +828,6 @@ class DcMotor(Device):
 
 
 #~autogen
-
 #~autogen python_generic-class classes.servoMotor>currentClass
 
 
