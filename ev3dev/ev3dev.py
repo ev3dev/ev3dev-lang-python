@@ -1149,14 +1149,14 @@ class Sensor(Device):
 
 #~autogen
 
-    def value(self, n):
+    def value(self, n=0):
         if True == isinstance( n, numbers.Integral ):
             n = '{0:d}'.format( n )
         elif True == isinstance( n, numbers.Real ):
             n = '{0:.0f}'.format( n )
 
         if True == isinstance( n, str ):
-            return self._device._get_int_attribute( 'value'+n, 'value'+n )
+            return self.get_attr_int( 'value'+n )
         else:
             return 0
 
