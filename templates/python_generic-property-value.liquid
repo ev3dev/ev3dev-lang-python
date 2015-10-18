@@ -8,3 +8,9 @@
     {{ propName }}_{{ value.name | downcase | underscore_non_wc }} = '{{ value.name }}'
 {% endfor %}{%
 endfor %}
+{% for prop in currentClass.propertyValues %}{%
+  assign propName = prop.propertyName | upcase | underscore_spaces %}{%
+  for value in prop.values %} {% assign valueConstName = value.name | upcase | replace:'-','_' | replace:'&','' %}
+    {{propName}}_{{valueConstName}} = '{{value.name}}'{%
+    endfor %}{%
+endfor %}
