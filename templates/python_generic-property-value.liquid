@@ -6,3 +6,9 @@
 {% for value in prop.values %}      '{{value.name}}':'{{value.description}}' ,
 {% endfor %}      }{%
 endfor %}
+{% for prop in currentClass.propertyValues %}{%
+  assign propName = prop.propertyName | upcase | underscore_spaces %}{%
+  for value in prop.values %} {% assign valueConstName = value.name | upcase | replace:'-','_' | replace:'&','' %}
+    {{propName}}_{{valueConstName}} = '{{value.name}}'{%
+    endfor %}{%
+endfor %}
