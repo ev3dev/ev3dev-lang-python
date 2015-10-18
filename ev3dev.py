@@ -502,37 +502,71 @@ class Motor(Device):
 #~autogen
 #~autogen python_generic-property-value classes.motor>currentClass
 
+    # Run the motor until another command is sent.
+    command_run_forever = 'run-forever'
 
-    _propval_command = {
-      'run-forever':'Run the motor until another command is sent.' ,
-      'run-to-abs-pos':'Run to an absolute position specified by `position_sp` and thenstop using the command specified in `stop_command`.' ,
-      'run-to-rel-pos':'Run to a position relative to the current `position` value.The new position will be current `position` + `position_sp`.When the new position is reached, the motor will stop usingthe command specified by `stop_command`.' ,
-      'run-timed':'Run the motor for the amount of time specified in `time_sp`and then stop the motor using the command specified by `stop_command`.' ,
-      'run-direct':'Run the motor at the duty cycle specified by `duty_cycle_sp`.Unlike other run commands, changing `duty_cycle_sp` while running *will*take effect immediately.' ,
-      'stop':'Stop any of the run commands before they are complete using thecommand specified by `stop_command`.' ,
-      'reset':'Reset all of the motor parameter attributes to their default value.This will also have the effect of stopping the motor.' ,
-      }
+    # Run to an absolute position specified by `position_sp` and then
+    # stop using the command specified in `stop_command`.
+    command_run_to_abs_pos = 'run-to-abs-pos'
 
-    _propval_encoder_polarity = {
-      'normal':'Sets the normal polarity of the rotary encoder.' ,
-      'inversed':'Sets the inversed polarity of the rotary encoder.' ,
-      }
+    # Run to a position relative to the current `position` value.
+    # The new position will be current `position` + `position_sp`.
+    # When the new position is reached, the motor will stop using
+    # the command specified by `stop_command`.
+    command_run_to_rel_pos = 'run-to-rel-pos'
 
-    _propval_polarity = {
-      'normal':'With `normal` polarity, a positive duty cycle willcause the motor to rotate clockwise.' ,
-      'inversed':'With `inversed` polarity, a positive duty cycle willcause the motor to rotate counter-clockwise.' ,
-      }
+    # Run the motor for the amount of time specified in `time_sp`
+    # and then stop the motor using the command specified by `stop_command`.
+    command_run_timed = 'run-timed'
 
-    _propval_speed_regulation = {
-      'on':'The motor controller will vary the power supplied to the motorto try to maintain the speed specified in `speed_sp`.' ,
-      'off':'The motor controller will use the power specified in `duty_cycle_sp`.' ,
-      }
+    # Run the motor at the duty cycle specified by `duty_cycle_sp`.
+    # Unlike other run commands, changing `duty_cycle_sp` while running *will*
+    # take effect immediately.
+    command_run_direct = 'run-direct'
 
-    _propval_stop_command = {
-      'coast':'Power will be removed from the motor and it will freely coast to a stop.' ,
-      'brake':'Power will be removed from the motor and a passive electrical load willbe placed on the motor. This is usually done by shorting the motor terminalstogether. This load will absorb the energy from the rotation of the motors andcause the motor to stop more quickly than coasting.' ,
-      'hold':'Does not remove power from the motor. Instead it actively try to hold the motorat the current position. If an external force tries to turn the motor, the motorwill ``push back`` to maintain its position.' ,
-      }
+    # Stop any of the run commands before they are complete using the
+    # command specified by `stop_command`.
+    command_stop = 'stop'
+
+    # Reset all of the motor parameter attributes to their default value.
+    # This will also have the effect of stopping the motor.
+    command_reset = 'reset'
+
+    # Sets the normal polarity of the rotary encoder.
+    encoder_polarity_normal = 'normal'
+
+    # Sets the inversed polarity of the rotary encoder.
+    encoder_polarity_inversed = 'inversed'
+
+    # With `normal` polarity, a positive duty cycle will
+    # cause the motor to rotate clockwise.
+    polarity_normal = 'normal'
+
+    # With `inversed` polarity, a positive duty cycle will
+    # cause the motor to rotate counter-clockwise.
+    polarity_inversed = 'inversed'
+
+    # The motor controller will vary the power supplied to the motor
+    # to try to maintain the speed specified in `speed_sp`.
+    speed_regulation_on = 'on'
+
+    # The motor controller will use the power specified in `duty_cycle_sp`.
+    speed_regulation_off = 'off'
+
+    # Power will be removed from the motor and it will freely coast to a stop.
+    stop_command_coast = 'coast'
+
+    # Power will be removed from the motor and a passive electrical load will
+    # be placed on the motor. This is usually done by shorting the motor terminals
+    # together. This load will absorb the energy from the rotation of the motors and
+    # cause the motor to stop more quickly than coasting.
+    stop_command_brake = 'brake'
+
+    # Does not remove power from the motor. Instead it actively try to hold the motor
+    # at the current position. If an external force tries to turn the motor, the motor
+    # will ``push back`` to maintain its position.
+    stop_command_hold = 'hold'
+
 
 #~autogen
 #~autogen python_motor_commands classes.motor>currentClass
@@ -795,23 +829,39 @@ class DcMotor(Device):
 #~autogen
 #~autogen python_generic-property-value classes.dcMotor>currentClass
 
+    # Run the motor until another command is sent.
+    command_run_forever = 'run-forever'
 
-    _propval_command = {
-      'run-forever':'Run the motor until another command is sent.' ,
-      'run-timed':'Run the motor for the amount of time specified in `time_sp`and then stop the motor using the command specified by `stop_command`.' ,
-      'run-direct':'Run the motor at the duty cycle specified by `duty_cycle_sp`.Unlike other run commands, changing `duty_cycle_sp` while running *will*take effect immediately.' ,
-      'stop':'Stop any of the run commands before they are complete using thecommand specified by `stop_command`.' ,
-      }
+    # Run the motor for the amount of time specified in `time_sp`
+    # and then stop the motor using the command specified by `stop_command`.
+    command_run_timed = 'run-timed'
 
-    _propval_polarity = {
-      'normal':'With `normal` polarity, a positive duty cycle willcause the motor to rotate clockwise.' ,
-      'inversed':'With `inversed` polarity, a positive duty cycle willcause the motor to rotate counter-clockwise.' ,
-      }
+    # Run the motor at the duty cycle specified by `duty_cycle_sp`.
+    # Unlike other run commands, changing `duty_cycle_sp` while running *will*
+    # take effect immediately.
+    command_run_direct = 'run-direct'
 
-    _propval_stop_command = {
-      'coast':'Power will be removed from the motor and it will freely coast to a stop.' ,
-      'brake':'Power will be removed from the motor and a passive electrical load willbe placed on the motor. This is usually done by shorting the motor terminalstogether. This load will absorb the energy from the rotation of the motors andcause the motor to stop more quickly than coasting.' ,
-      }
+    # Stop any of the run commands before they are complete using the
+    # command specified by `stop_command`.
+    command_stop = 'stop'
+
+    # With `normal` polarity, a positive duty cycle will
+    # cause the motor to rotate clockwise.
+    polarity_normal = 'normal'
+
+    # With `inversed` polarity, a positive duty cycle will
+    # cause the motor to rotate counter-clockwise.
+    polarity_inversed = 'inversed'
+
+    # Power will be removed from the motor and it will freely coast to a stop.
+    stop_command_coast = 'coast'
+
+    # Power will be removed from the motor and a passive electrical load will
+    # be placed on the motor. This is usually done by shorting the motor terminals
+    # together. This load will absorb the energy from the rotation of the motors and
+    # cause the motor to stop more quickly than coasting.
+    stop_command_brake = 'brake'
+
 
 #~autogen
 
@@ -1002,16 +1052,20 @@ class ServoMotor(Device):
 #~autogen
 #~autogen python_generic-property-value classes.servoMotor>currentClass
 
+    # Drive servo to the position set in the `position_sp` attribute.
+    command_run = 'run'
 
-    _propval_command = {
-      'run':'Drive servo to the position set in the `position_sp` attribute.' ,
-      'float':'Remove power from the motor.' ,
-      }
+    # Remove power from the motor.
+    command_float = 'float'
 
-    _propval_polarity = {
-      'normal':'With `normal` polarity, a positive duty cycle willcause the motor to rotate clockwise.' ,
-      'inversed':'With `inversed` polarity, a positive duty cycle willcause the motor to rotate counter-clockwise.' ,
-      }
+    # With `normal` polarity, a positive duty cycle will
+    # cause the motor to rotate clockwise.
+    polarity_normal = 'normal'
+
+    # With `inversed` polarity, a positive duty cycle will
+    # cause the motor to rotate counter-clockwise.
+    polarity_inversed = 'inversed'
+
 
 #~autogen
 
@@ -1225,14 +1279,21 @@ class ColorSensor(Sensor):
 #~autogen
 #~autogen python_generic-property-value classes.colorSensor>currentClass
 
+    # Reflected light. Red LED on.
+    mode_col_reflect = 'COL-REFLECT'
 
-    _propval_mode = {
-      'COL-REFLECT':'Reflected light. Red LED on.' ,
-      'COL-AMBIENT':'Ambient light. Red LEDs off.' ,
-      'COL-COLOR':'Color. All LEDs rapidly cycling, appears white.' ,
-      'REF-RAW':'Raw reflected. Red LED on' ,
-      'RGB-RAW':'Raw Color Components. All LEDs rapidly cycling, appears white.' ,
-      }
+    # Ambient light. Red LEDs off.
+    mode_col_ambient = 'COL-AMBIENT'
+
+    # Color. All LEDs rapidly cycling, appears white.
+    mode_col_color = 'COL-COLOR'
+
+    # Raw reflected. Red LED on
+    mode_ref_raw = 'REF-RAW'
+
+    # Raw Color Components. All LEDs rapidly cycling, appears white.
+    mode_rgb_raw = 'RGB-RAW'
+
 
 #~autogen
 #~autogen python_generic-class classes.ultrasonicSensor>currentClass
@@ -1255,14 +1316,25 @@ class UltrasonicSensor(Sensor):
 #~autogen
 #~autogen python_generic-property-value classes.ultrasonicSensor>currentClass
 
+    # Continuous measurement in centimeters.
+    # LEDs: On, steady
+    mode_us_dist_cm = 'US-DIST-CM'
 
-    _propval_mode = {
-      'US-DIST-CM':'Continuous measurement in centimeters.LEDs: On, steady' ,
-      'US-DIST-IN':'Continuous measurement in inches.LEDs: On, steady' ,
-      'US-LISTEN':'Listen.  LEDs: On, blinking' ,
-      'US-SI-CM':'Single measurement in centimeters.LEDs: On momentarily when mode is set, then off' ,
-      'US-SI-IN':'Single measurement in inches.LEDs: On momentarily when mode is set, then off' ,
-      }
+    # Continuous measurement in inches.
+    # LEDs: On, steady
+    mode_us_dist_in = 'US-DIST-IN'
+
+    # Listen.  LEDs: On, blinking
+    mode_us_listen = 'US-LISTEN'
+
+    # Single measurement in centimeters.
+    # LEDs: On momentarily when mode is set, then off
+    mode_us_si_cm = 'US-SI-CM'
+
+    # Single measurement in inches.
+    # LEDs: On momentarily when mode is set, then off
+    mode_us_si_in = 'US-SI-IN'
+
 
 #~autogen
 #~autogen python_generic-class classes.gyroSensor>currentClass
@@ -1285,14 +1357,21 @@ class GyroSensor(Sensor):
 #~autogen
 #~autogen python_generic-property-value classes.gyroSensor>currentClass
 
+    # Angle
+    mode_gyro_ang = 'GYRO-ANG'
 
-    _propval_mode = {
-      'GYRO-ANG':'Angle' ,
-      'GYRO-RATE':'Rotational speed' ,
-      'GYRO-FAS':'Raw sensor value' ,
-      'GYRO-G&A':'Angle and rotational speed' ,
-      'GYRO-CAL':'Calibration ???' ,
-      }
+    # Rotational speed
+    mode_gyro_rate = 'GYRO-RATE'
+
+    # Raw sensor value
+    mode_gyro_fas = 'GYRO-FAS'
+
+    # Angle and rotational speed
+    mode_gyro_g_a = 'GYRO-G&A'
+
+    # Calibration ???
+    mode_gyro_cal = 'GYRO-CAL'
+
 
 #~autogen
 #~autogen python_generic-class classes.infraredSensor>currentClass
@@ -1315,14 +1394,21 @@ class InfraredSensor(Sensor):
 #~autogen
 #~autogen python_generic-property-value classes.infraredSensor>currentClass
 
+    # Proximity
+    mode_ir_prox = 'IR-PROX'
 
-    _propval_mode = {
-      'IR-PROX':'Proximity' ,
-      'IR-SEEK':'IR Seeker' ,
-      'IR-REMOTE':'IR Remote Control' ,
-      'IR-REM-A':'IR Remote Control. State of the buttons is coded in binary' ,
-      'IR-CAL':'Calibration ???' ,
-      }
+    # IR Seeker
+    mode_ir_seek = 'IR-SEEK'
+
+    # IR Remote Control
+    mode_ir_remote = 'IR-REMOTE'
+
+    # IR Remote Control. State of the buttons is coded in binary
+    mode_ir_rem_a = 'IR-REM-A'
+
+    # Calibration ???
+    mode_ir_cal = 'IR-CAL'
+
 
 #~autogen
 
@@ -1347,11 +1433,12 @@ class SoundSensor(Sensor):
 #~autogen
 #~autogen python_generic-property-value classes.soundSensor>currentClass
 
+    # Sound pressure level. Flat weighting
+    mode_db = 'DB'
 
-    _propval_mode = {
-      'DB':'Sound pressure level. Flat weighting' ,
-      'DBA':'Sound pressure level. A weighting' ,
-      }
+    # Sound pressure level. A weighting
+    mode_dba = 'DBA'
+
 
 #~autogen
 #~autogen python_generic-class classes.lightSensor>currentClass
@@ -1374,11 +1461,12 @@ class LightSensor(Sensor):
 #~autogen
 #~autogen python_generic-property-value classes.lightSensor>currentClass
 
+    # Reflected light. LED on
+    mode_reflect = 'REFLECT'
 
-    _propval_mode = {
-      'REFLECT':'Reflected light. LED on' ,
-      'AMBIENT':'Ambient light. LED off' ,
-      }
+    # Ambient light. LED off
+    mode_ambient = 'AMBIENT'
+
 
 #~autogen
 #~autogen python_generic-class classes.touchSensor>currentClass
