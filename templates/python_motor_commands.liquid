@@ -1,21 +1,16 @@
-{% comment %}
-{% for prop in currentClass.propertyValues %}{%
-    if prop.propertyName == 'Command' %}{%
-        assign className = currentClass.friendlyName | downcase | underscore_spaces %}{%
-        for value in prop.values %}{%
-            assign commandName = value.name | downcase | underscore_non_wc %}
-def {{ className }}_{{ commandName }}(self, **attr):
-    """{%
-    for line in value.description %}{{ line }}
-    {% endfor %}"""
-
-    for key in attr:
-        setattr(self, key, attr[key])
-    self.command = "{{ value.name }}"
-
-{{ className }}.{{commandName}} = {{ className }}_{{ commandName }}
+{% assign class_name = currentClass.friendlyName | camel_case | capitalize %}{%
+for propval in currentClass.propertyValues %}{%
+    if propval.propertyName == "Command" %}{%
+        for value in propval.values %}{%
+            assign cmd = value.name | replace:'-','_' %}
+    def {{ cmd }}( self, **kwargs ):
+        """{%
+        for line in value.description %}{{line}}
+        {% endfor %}"""
+        for key in kwargs:
+            setattr(self, key, kwargs[key])
+        self.command = '{{value.name}}'
 {%
         endfor %}{%
     endif %}{%
 endfor %}
-{% endcomment %}

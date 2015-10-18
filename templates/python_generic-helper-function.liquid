@@ -1,36 +1,16 @@
 {% assign class_name = currentClass.friendlyName | camel_case | capitalize %}{%
-    assign properties = "    _properties = {" %}{%
-    for propval in currentClass.systemProperties %}{%
-        if propval.writeAccess %}{%
-            capture properties %}{{ properties }}
-	    , '{{ propval.name | replace:' ','_' | downcase }}' : __set_{{ propval.name | replace:' ','_' | downcase }}{% endcapture %}{%
-        endif %}{%
-    endfor %}
-{{ properties | replace_first:',',' ' }} }
-    
-    def _helper( self, **kwargs ):
-        for p,v in kwargs.iteritems():
-            if p in self._properties:
-                self._properties[p]( self, v )
-{%  for propval in currentClass.propertyValues %}{%
-	if propval.propertyName == "Command" %}{%
-	    for value in propval.values %}{%
-                assign cmd = value.name | replace:'-','_' %}
+for propval in currentClass.propertyValues %}{%
+    if propval.propertyName == "Command" %}{%
+        for value in propval.values %}{%
+            assign cmd = value.name | replace:'-','_' %}
     def {{ cmd }}( self, **kwargs ):
-        self._helper( **kwargs )
-	self._set_string_attribute( 'command', 'command', '{{ value.name }}' )
-	{% endfor %}{%
-	endif %}{%
-    endfor %}{%	
-comment %}{%
-for func in currentClass.helperFunctions %}{%
-assign func_name = func.name | downcase | underscore_spaces %}{%
-    assign param_list = "" %}{%
-    for param in func.parameters %}{%
-        capture param_list %}{{ param_list }}, {{ param.name }}{% endcapture %}{%
-    endfor %}
-    def {{ func_name }}( {{ param_list | remove_first:', ' }} ):
-        pass {%
-endfor %}{%
+        """{%
+        for line in value.description %}{{line}}
+        {% endfor %}"""
+        for key in kwargs:
+            setattr(self, key, kwargs[key])
+        self.command = '{{value.name}}'
+{%
+        endfor %}{%
+    endif %}{%
 endfor %}
-{% endcomment %}
