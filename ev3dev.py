@@ -1687,6 +1687,36 @@ if current_platform() == 'ev3':
 
 
 #~autogen
+elif current_platform() == 'rpi':
+#~autogen python_led-colors platforms.rpi.led>currentClass
+
+    Led.blue_one = Led(name='brickpi1:blue:ev3dev')
+    Led.blue_two = Led(name='brickpi2:blue:ev3dev')
+
+    @staticmethod
+    def Led_mix_colors(blue):
+        Led.blue_one.brightness_pct = blue
+        Led.blue_two.brightness_pct = blue
+    Led.mix_colors = Led_mix_colors
+
+    @staticmethod
+    def Led_set_blue(pct):
+        Led.mix_colors(blue=1*pct)
+    Led.set_blue = Led_set_blue
+
+    @staticmethod
+    def Led_blue_on():
+        Led.set_blue(1)
+    Led.blue_on = Led_blue_on
+
+    @staticmethod
+    def Led_all_off():
+        Led.blue_one.brightness = 0
+        Led.blue_two.brightness = 0
+    Led.all_off = Led_all_off
+
+
+#~autogen
 #~autogen python_generic-class classes.powerSupply>currentClass
 
 
