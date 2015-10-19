@@ -1,0 +1,41 @@
+{% for instance in currentClass.instances %}{%
+    assign instanceName = instance.name | downcase | underscore_spaces %}
+    Led.{{instanceName}} = Led(name='{{instance.systemName}}'){%
+endfor %}
+
+    @staticmethod
+    def Led_mix_colors({%
+for group in currentClass.groups%}{{ group.name | downcase | underscore_spaces }}{%
+    unless forloop.last %}, {% endunless %}{%
+endfor %}):{%
+for group in currentClass.groups %}{%
+    assign groupName = group.name | downcase | underscore_spaces %}{%
+    for instance in group.entries %}{%
+        assign instanceName = instance | downcase | underscore_spaces %}
+        Led.{{instanceName}}.brightness_pct = {{groupName}}{%
+    endfor %}{%
+endfor %}
+    Led.mix_colors = Led_mix_colors
+{% for color in currentClass.colors %}{%
+    assign colorName = color.name | downcase | underscore_spaces %}
+    @staticmethod
+    def Led_set_{{ colorName }}(pct):
+        Led.mix_colors({%
+    for group in color.groups %}{{ group.name | downcase | underscore_spaces }}={{ group.value }}*pct{%
+        unless forloop.last %}, {% endunless %}{%
+    endfor %})
+    Led.set_{{ colorName }} = Led_set_{{ colorName }}
+
+    @staticmethod
+    def Led_{{ colorName }}_on():
+        Led.set_{{ colorName }}(1)
+    Led.{{ colorName }}_on = Led_{{ colorName }}_on
+{% endfor %}
+    @staticmethod
+    def Led_all_off():{%
+for instance in currentClass.instances %}{%
+    assign instanceName = instance.name | downcase | underscore_spaces %}
+        Led.{{instanceName}}.brightness = 0{%
+endfor %}
+    Led.all_off = Led_all_off
+

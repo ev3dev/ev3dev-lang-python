@@ -30,6 +30,18 @@
 import os.path
 import fnmatch
 import numbers
+import platform
+
+#------------------------------------------------------------------------------
+# Guess platform we are running on
+def current_platform():
+    machine = platform.machine()
+    if machine == 'armv5tejl':
+        return 'ev3'
+    elif machine == 'armv6l':
+        return 'brickpi'
+    else:
+        return 'unsupported'
 
 #------------------------------------------------------------------------------
 # Define the base class from which all other ev3dev classes are defined.
@@ -1584,6 +1596,124 @@ class Led(Device):
     @delay_off.setter
     def delay_off(self, value):
         self.set_attr_int( 'delay_off', value )
+
+
+#~autogen
+
+    @property
+    def brightness_pct(self):
+        """
+        Returns led brightness as a fraction of max_brightness
+        """
+        return float(self.brightness) / self.max_brightness
+
+    @brightness_pct.setter
+    def brightness_pct(self, value):
+        self.brightness = value * self.max_brightness
+
+if current_platform() == 'ev3':
+#~autogen python_led-colors platforms.ev3.led>currentClass
+
+    Led.red_left = Led(name='ev3-left0:red:ev3dev')
+    Led.red_right = Led(name='ev3-right0:red:ev3dev')
+    Led.green_left = Led(name='ev3-left1:green:ev3dev')
+    Led.green_right = Led(name='ev3-right1:green:ev3dev')
+
+    @staticmethod
+    def Led_mix_colors(red, green):
+        Led.red_left.brightness_pct = red
+        Led.red_right.brightness_pct = red
+        Led.green_left.brightness_pct = green
+        Led.green_right.brightness_pct = green
+    Led.mix_colors = Led_mix_colors
+
+    @staticmethod
+    def Led_set_red(pct):
+        Led.mix_colors(red=1*pct, green=0*pct)
+    Led.set_red = Led_set_red
+
+    @staticmethod
+    def Led_red_on():
+        Led.set_red(1)
+    Led.red_on = Led_red_on
+
+    @staticmethod
+    def Led_set_green(pct):
+        Led.mix_colors(red=0*pct, green=1*pct)
+    Led.set_green = Led_set_green
+
+    @staticmethod
+    def Led_green_on():
+        Led.set_green(1)
+    Led.green_on = Led_green_on
+
+    @staticmethod
+    def Led_set_amber(pct):
+        Led.mix_colors(red=1*pct, green=1*pct)
+    Led.set_amber = Led_set_amber
+
+    @staticmethod
+    def Led_amber_on():
+        Led.set_amber(1)
+    Led.amber_on = Led_amber_on
+
+    @staticmethod
+    def Led_set_orange(pct):
+        Led.mix_colors(red=1*pct, green=0.5*pct)
+    Led.set_orange = Led_set_orange
+
+    @staticmethod
+    def Led_orange_on():
+        Led.set_orange(1)
+    Led.orange_on = Led_orange_on
+
+    @staticmethod
+    def Led_set_yellow(pct):
+        Led.mix_colors(red=0.5*pct, green=1*pct)
+    Led.set_yellow = Led_set_yellow
+
+    @staticmethod
+    def Led_yellow_on():
+        Led.set_yellow(1)
+    Led.yellow_on = Led_yellow_on
+
+    @staticmethod
+    def Led_all_off():
+        Led.red_left.brightness = 0
+        Led.red_right.brightness = 0
+        Led.green_left.brightness = 0
+        Led.green_right.brightness = 0
+    Led.all_off = Led_all_off
+
+
+#~autogen
+elif current_platform() == 'brickpi':
+#~autogen python_led-colors platforms.brickpi.led>currentClass
+
+    Led.blue_one = Led(name='brickpi1:blue:ev3dev')
+    Led.blue_two = Led(name='brickpi2:blue:ev3dev')
+
+    @staticmethod
+    def Led_mix_colors(blue):
+        Led.blue_one.brightness_pct = blue
+        Led.blue_two.brightness_pct = blue
+    Led.mix_colors = Led_mix_colors
+
+    @staticmethod
+    def Led_set_blue(pct):
+        Led.mix_colors(blue=1*pct)
+    Led.set_blue = Led_set_blue
+
+    @staticmethod
+    def Led_blue_on():
+        Led.set_blue(1)
+    Led.blue_on = Led_blue_on
+
+    @staticmethod
+    def Led_all_off():
+        Led.blue_one.brightness = 0
+        Led.blue_two.brightness = 0
+    Led.all_off = Led_all_off
 
 
 #~autogen
