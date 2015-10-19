@@ -39,7 +39,7 @@ def current_platform():
     if machine == 'armv5tejl':
         return 'ev3'
     elif machine == 'armv6l':
-        return 'rpi'
+        return 'brickpi'
     else:
         return 'unsupported'
 
@@ -1687,8 +1687,8 @@ if current_platform() == 'ev3':
 
 
 #~autogen
-elif current_platform() == 'rpi':
-#~autogen python_led-colors platforms.rpi.led>currentClass
+elif current_platform() == 'brickpi':
+#~autogen python_led-colors platforms.brickpi.led>currentClass
 
     Led.blue_one = Led(name='brickpi1:blue:ev3dev')
     Led.blue_two = Led(name='brickpi2:blue:ev3dev')
