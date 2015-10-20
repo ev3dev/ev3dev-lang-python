@@ -51,16 +51,21 @@ OUTPUT_B = 'outB'
 OUTPUT_C = 'outC'
 OUTPUT_D = 'outD'
 
-INPUT_A = 'inA'
-INPUT_B = 'inB'
-INPUT_C = 'inC'
-INPUT_D = 'inD'
+INPUT_1 = 'in1'
+INPUT_2 = 'in2'
+INPUT_3 = 'in3'
+INPUT_4 = 'in4'
 
 if current_platform() == 'brickpi':
     OUTPUT_A = 'ttyAMA0:outA'
     OUTPUT_B = 'ttyAMA0:outB'
     OUTPUT_C = 'ttyAMA0:outC'
     OUTPUT_D = 'ttyAMA0:outD'
+
+    INPUT_1 = 'ttyAMA0:in1'
+    INPUT_2 = 'ttyAMA0:in2'
+    INPUT_3 = 'ttyAMA0:in3'
+    INPUT_4 = 'ttyAMA0:in4'
 
 #------------------------------------------------------------------------------
 # Define the base class from which all other ev3dev classes are defined.
