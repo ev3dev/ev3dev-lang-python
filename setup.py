@@ -8,6 +8,6 @@ setup(
     license='MIT',
     url='https://github.com/rhempel/ev3dev-lang-python',
     include_package_data=True,
-    packages=['ev3dev']
+    py_modules=['ev3dev']
     )
 
