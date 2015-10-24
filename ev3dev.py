@@ -1702,6 +1702,70 @@ elif current_platform() == 'brickpi':
 
 
 #~autogen
+#~autogen button-class classes.button>currentClass
+
+import fcntl
+import array
+
+class Button():
+
+    """
+    Provides a generic button reading mechanism that can be adapted
+    to platform specific implementations. Each platform's specific
+    button capabilites are enumerated in the 'platforms' section
+    of this specification
+    """
+
+    KEY_MAX = 0x2FF
+    KEY_BUF_LEN = int((KEY_MAX + 7) / 8)
+    EVIOCGKEY = (2 << (14 + 8 + 8) | KEY_BUF_LEN << (8 + 8) | ord('E') << 8 | 0x18)
+
+    def __init__(self):
+        self._buf = array.array( 'B', [0] * self.KEY_BUF_LEN )
+        self.filehandle_cache = {}
+
+    def _button_file(self, name):
+        if name not in self.filehandle_cache:
+            f = open( name, 'r' )
+            self.filehandle_cache[name] = f
+        else:
+            f = self.filehandle_cache[name]
+        return f
+
+    def read_button(self, name, button):
+        ret = fcntl.ioctl(self._button_file('/dev/input/by-path/platform-gpio-keys.0-event'), self.EVIOCGKEY, self._buf)
+        if (ret < 0):
+            return None
+	else:
+            return not bool(self._buf[int(button / 8)] & 1 << button % 8)
+
+    @property
+    def up(self):
+        return self.read_button( 'platform-gpio-keys.0-event', 103 )
+
+    @property
+    def down(self):
+        return self.read_button( 'platform-gpio-keys.0-event', 108 )
+
+    @property
+    def left(self):
+        return self.read_button( 'platform-gpio-keys.0-event', 105 )
+
+    @property
+    def right(self):
+        return self.read_button( 'platform-gpio-keys.0-event', 106 )
+
+    @property
+    def enter(self):
+        return self.read_button( 'platform-gpio-keys.0-event', 28 )
+
+    @property
+    def backspace(self):
+        return self.read_button( 'platform-gpio-keys.0-event', 14 )
+
+
+
+#~autogen
 #~autogen generic-class classes.powerSupply>currentClass
 
 class PowerSupply(Device):
