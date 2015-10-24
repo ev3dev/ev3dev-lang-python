@@ -9,8 +9,14 @@ if currentClass.inheritance %}{%
     assign base_class = currentClass.inheritance | camel_case | capitalize %}{%
 else %}{%
     assign base_class = 'Device' %}{%
-endif%}
-
+endif%}{%
+assign driver_name = "" %}{%
+if currentClass.driverName %}{%
+    for name in currentClass.driverName %}{%
+        capture driver_name %}{{ driver_name }}, '{{name}}'{% endcapture %}{%
+    endfor %}{%
+    capture driver_name %} driver_name=[{{ driver_name | remove_first:', ' }}],{% endcapture %}{%
+endif %}
 class {{ class_name }}({{ base_class }}):
 
     """{% for line in currentClass.description %}
@@ -23,11 +29,7 @@ class {{ class_name }}({{ base_class }}):
     SYSTEM_CLASS_NAME = '{{ currentClass.systemClassName }}'
     SYSTEM_DEVICE_NAME_CONVENTION = '{{ device_name_convention }}'
 {% endif %}
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name{%
-if currentClass.driverName %}, driver_name=[{%
-for name in currentClass.driverName %}'{{name}}', {%
-endfor %}]{%
-endif %}, **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name,{{ driver_name }} **kwargs)

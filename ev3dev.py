@@ -165,7 +165,6 @@ class Device(object):
 
 #~autogen python_generic-class classes.motor>currentClass
 
-
 class Motor(Device):
 
     """
@@ -178,10 +177,10 @@ class Motor(Device):
     SYSTEM_CLASS_NAME = 'tacho-motor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 #~autogen
 #~autogen python_generic-get-set classes.motor>currentClass
@@ -645,7 +644,6 @@ class Motor(Device):
 #~autogen
 #~autogen python_generic-class classes.largeMotor>currentClass
 
-
 class LargeMotor(Motor):
 
     """
@@ -655,14 +653,13 @@ class LargeMotor(Motor):
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Motor.SYSTEM_DEVICE_NAME_CONVENTION
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-l-motor', ], **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-l-motor'], **kwargs)
 
 #~autogen
 #~autogen python_generic-class classes.mediumMotor>currentClass
-
 
 class MediumMotor(Motor):
 
@@ -673,14 +670,13 @@ class MediumMotor(Motor):
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Motor.SYSTEM_DEVICE_NAME_CONVENTION
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-m-motor', ], **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-m-motor'], **kwargs)
 
 #~autogen
 #~autogen python_generic-class classes.dcMotor>currentClass
-
 
 class DcMotor(Device):
 
@@ -693,10 +689,10 @@ class DcMotor(Device):
     SYSTEM_CLASS_NAME = 'dc-motor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 #~autogen
 #~autogen python_generic-get-set classes.dcMotor>currentClass
@@ -915,7 +911,6 @@ class DcMotor(Device):
 #~autogen
 #~autogen python_generic-class classes.servoMotor>currentClass
 
-
 class ServoMotor(Device):
 
     """
@@ -926,10 +921,10 @@ class ServoMotor(Device):
     SYSTEM_CLASS_NAME = 'servo-motor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 #~autogen
 #~autogen python_generic-get-set classes.servoMotor>currentClass
@@ -1102,7 +1097,6 @@ class ServoMotor(Device):
 
 #~autogen python_generic-class classes.sensor>currentClass
 
-
 class Sensor(Device):
 
     """
@@ -1125,10 +1119,10 @@ class Sensor(Device):
     SYSTEM_CLASS_NAME = 'lego-sensor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 #~autogen
 #~autogen python_generic-get-set classes.sensor>currentClass
@@ -1228,7 +1222,6 @@ class Sensor(Device):
 
 #~autogen python_generic-class classes.i2cSensor>currentClass
 
-
 class I2cSensor(Sensor):
 
     """
@@ -1238,10 +1231,10 @@ class I2cSensor(Sensor):
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['nxt-i2c-sensor', ], **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['nxt-i2c-sensor'], **kwargs)
 
 #~autogen
 #~autogen python_generic-get-set classes.i2cSensor>currentClass
@@ -1273,7 +1266,6 @@ class I2cSensor(Sensor):
 #~autogen
 #~autogen python_generic-class classes.colorSensor>currentClass
 
-
 class ColorSensor(Sensor):
 
     """
@@ -1283,10 +1275,10 @@ class ColorSensor(Sensor):
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-color', ], **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-color'], **kwargs)
 
 #~autogen
 #~autogen python_generic-property-value classes.colorSensor>currentClass
@@ -1310,7 +1302,6 @@ class ColorSensor(Sensor):
 #~autogen
 #~autogen python_generic-class classes.ultrasonicSensor>currentClass
 
-
 class UltrasonicSensor(Sensor):
 
     """
@@ -1320,10 +1311,10 @@ class UltrasonicSensor(Sensor):
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-us', 'lego-nxt-us', ], **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-us', 'lego-nxt-us'], **kwargs)
 
 #~autogen
 #~autogen python_generic-property-value classes.ultrasonicSensor>currentClass
@@ -1351,7 +1342,6 @@ class UltrasonicSensor(Sensor):
 #~autogen
 #~autogen python_generic-class classes.gyroSensor>currentClass
 
-
 class GyroSensor(Sensor):
 
     """
@@ -1361,10 +1351,10 @@ class GyroSensor(Sensor):
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-gyro', ], **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-gyro'], **kwargs)
 
 #~autogen
 #~autogen python_generic-property-value classes.gyroSensor>currentClass
@@ -1388,7 +1378,6 @@ class GyroSensor(Sensor):
 #~autogen
 #~autogen python_generic-class classes.infraredSensor>currentClass
 
-
 class InfraredSensor(Sensor):
 
     """
@@ -1398,10 +1387,10 @@ class InfraredSensor(Sensor):
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-ir', ], **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-ir'], **kwargs)
 
 #~autogen
 #~autogen python_generic-property-value classes.infraredSensor>currentClass
@@ -1427,7 +1416,6 @@ class InfraredSensor(Sensor):
 
 #~autogen python_generic-class classes.soundSensor>currentClass
 
-
 class SoundSensor(Sensor):
 
     """
@@ -1437,10 +1425,10 @@ class SoundSensor(Sensor):
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-nxt-sound', ], **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-nxt-sound'], **kwargs)
 
 #~autogen
 #~autogen python_generic-property-value classes.soundSensor>currentClass
@@ -1455,7 +1443,6 @@ class SoundSensor(Sensor):
 #~autogen
 #~autogen python_generic-class classes.lightSensor>currentClass
 
-
 class LightSensor(Sensor):
 
     """
@@ -1465,10 +1452,10 @@ class LightSensor(Sensor):
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-nxt-light', ], **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-nxt-light'], **kwargs)
 
 #~autogen
 #~autogen python_generic-property-value classes.lightSensor>currentClass
@@ -1483,7 +1470,6 @@ class LightSensor(Sensor):
 #~autogen
 #~autogen python_generic-class classes.touchSensor>currentClass
 
-
 class TouchSensor(Sensor):
 
     """
@@ -1493,14 +1479,13 @@ class TouchSensor(Sensor):
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-touch', 'lego-nxt-touch', ], **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
 
 #~autogen
 #~autogen python_generic-class classes.led>currentClass
-
 
 class Led(Device):
 
@@ -1513,10 +1498,10 @@ class Led(Device):
     SYSTEM_CLASS_NAME = 'leds'
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 #~autogen
 #~autogen python_generic-get-set classes.led>currentClass
@@ -1719,7 +1704,6 @@ elif current_platform() == 'brickpi':
 #~autogen
 #~autogen python_generic-class classes.powerSupply>currentClass
 
-
 class PowerSupply(Device):
 
     """
@@ -1730,10 +1714,10 @@ class PowerSupply(Device):
     SYSTEM_CLASS_NAME = 'power_supply'
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 #~autogen
 #~autogen python_generic-get-set classes.powerSupply>currentClass
@@ -1781,7 +1765,6 @@ class PowerSupply(Device):
 #~autogen
 #~autogen python_generic-class classes.legoPort>currentClass
 
-
 class LegoPort(Device):
 
     """
@@ -1815,10 +1798,10 @@ class LegoPort(Device):
     SYSTEM_CLASS_NAME = 'lego_port'
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs ):
+    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
             kwargs['port_name'] = port
-        Device.__init__( self, self.SYSTEM_CLASS_NAME, name, **kwargs )
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 #~autogen
 #~autogen python_generic-get-set classes.legoPort>currentClass
