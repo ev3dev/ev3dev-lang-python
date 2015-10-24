@@ -163,7 +163,7 @@ class Device(object):
                 return v
         return ""
 
-#~autogen python_generic-class classes.motor>currentClass
+#~autogen generic-class classes.motor>currentClass
 
 class Motor(Device):
 
@@ -183,7 +183,7 @@ class Motor(Device):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 #~autogen
-#~autogen python_generic-get-set classes.motor>currentClass
+#~autogen generic-get-set classes.motor>currentClass
 
 
     @property
@@ -511,7 +511,7 @@ class Motor(Device):
 
 
 #~autogen
-#~autogen python_generic-property-value classes.motor>currentClass
+#~autogen generic-property-value classes.motor>currentClass
 
     # Run the motor until another command is sent.
     command_run_forever = 'run-forever'
@@ -580,7 +580,7 @@ class Motor(Device):
 
 
 #~autogen
-#~autogen python_motor_commands classes.motor>currentClass
+#~autogen motor_commands classes.motor>currentClass
 
     def run_forever( self, **kwargs ):
         """Run the motor until another command is sent.
@@ -642,7 +642,7 @@ class Motor(Device):
 
 
 #~autogen
-#~autogen python_generic-class classes.largeMotor>currentClass
+#~autogen generic-class classes.largeMotor>currentClass
 
 class LargeMotor(Motor):
 
@@ -659,7 +659,7 @@ class LargeMotor(Motor):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-l-motor'], **kwargs)
 
 #~autogen
-#~autogen python_generic-class classes.mediumMotor>currentClass
+#~autogen generic-class classes.mediumMotor>currentClass
 
 class MediumMotor(Motor):
 
@@ -676,7 +676,7 @@ class MediumMotor(Motor):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-m-motor'], **kwargs)
 
 #~autogen
-#~autogen python_generic-class classes.dcMotor>currentClass
+#~autogen generic-class classes.dcMotor>currentClass
 
 class DcMotor(Device):
 
@@ -695,7 +695,7 @@ class DcMotor(Device):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 #~autogen
-#~autogen python_generic-get-set classes.dcMotor>currentClass
+#~autogen generic-get-set classes.dcMotor>currentClass
 
 
     @property
@@ -835,7 +835,7 @@ class DcMotor(Device):
 
 
 #~autogen
-#~autogen python_generic-property-value classes.dcMotor>currentClass
+#~autogen generic-property-value classes.dcMotor>currentClass
 
     # Run the motor until another command is sent.
     command_run_forever = 'run-forever'
@@ -873,7 +873,7 @@ class DcMotor(Device):
 
 #~autogen
 
-#~autogen python_motor_commands classes.dcMotor>currentClass
+#~autogen motor_commands classes.dcMotor>currentClass
 
     def run_forever( self, **kwargs ):
         """Run the motor until another command is sent.
@@ -909,7 +909,7 @@ class DcMotor(Device):
 
 
 #~autogen
-#~autogen python_generic-class classes.servoMotor>currentClass
+#~autogen generic-class classes.servoMotor>currentClass
 
 class ServoMotor(Device):
 
@@ -927,7 +927,7 @@ class ServoMotor(Device):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 #~autogen
-#~autogen python_generic-get-set classes.servoMotor>currentClass
+#~autogen generic-get-set classes.servoMotor>currentClass
 
 
     @property
@@ -1057,7 +1057,7 @@ class ServoMotor(Device):
 
 
 #~autogen
-#~autogen python_generic-property-value classes.servoMotor>currentClass
+#~autogen generic-property-value classes.servoMotor>currentClass
 
     # Drive servo to the position set in the `position_sp` attribute.
     command_run = 'run'
@@ -1076,7 +1076,7 @@ class ServoMotor(Device):
 
 #~autogen
 
-#~autogen python_motor_commands classes.servoMotor>currentClass
+#~autogen motor_commands classes.servoMotor>currentClass
 
     def run( self, **kwargs ):
         """Drive servo to the position set in the `position_sp` attribute.
@@ -1095,7 +1095,7 @@ class ServoMotor(Device):
 
 #~autogen
 
-#~autogen python_generic-class classes.sensor>currentClass
+#~autogen generic-class classes.sensor>currentClass
 
 class Sensor(Device):
 
@@ -1125,7 +1125,7 @@ class Sensor(Device):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 #~autogen
-#~autogen python_generic-get-set classes.sensor>currentClass
+#~autogen generic-get-set classes.sensor>currentClass
 
 
     @property
@@ -1220,7 +1220,7 @@ class Sensor(Device):
         else:
             return 0
 
-#~autogen python_generic-class classes.i2cSensor>currentClass
+#~autogen generic-class classes.i2cSensor>currentClass
 
 class I2cSensor(Sensor):
 
@@ -1237,7 +1237,7 @@ class I2cSensor(Sensor):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['nxt-i2c-sensor'], **kwargs)
 
 #~autogen
-#~autogen python_generic-get-set classes.i2cSensor>currentClass
+#~autogen generic-get-set classes.i2cSensor>currentClass
 
 
     @property
@@ -1264,7 +1264,7 @@ class I2cSensor(Sensor):
 
 
 #~autogen
-#~autogen python_generic-class classes.colorSensor>currentClass
+#~autogen generic-class classes.colorSensor>currentClass
 
 class ColorSensor(Sensor):
 
@@ -1281,7 +1281,7 @@ class ColorSensor(Sensor):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-color'], **kwargs)
 
 #~autogen
-#~autogen python_generic-property-value classes.colorSensor>currentClass
+#~autogen generic-property-value classes.colorSensor>currentClass
 
     # Reflected light. Red LED on.
     mode_col_reflect = 'COL-REFLECT'
@@ -1300,7 +1300,7 @@ class ColorSensor(Sensor):
 
 
 #~autogen
-#~autogen python_generic-class classes.ultrasonicSensor>currentClass
+#~autogen generic-class classes.ultrasonicSensor>currentClass
 
 class UltrasonicSensor(Sensor):
 
@@ -1317,7 +1317,7 @@ class UltrasonicSensor(Sensor):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-us', 'lego-nxt-us'], **kwargs)
 
 #~autogen
-#~autogen python_generic-property-value classes.ultrasonicSensor>currentClass
+#~autogen generic-property-value classes.ultrasonicSensor>currentClass
 
     # Continuous measurement in centimeters.
     # LEDs: On, steady
@@ -1340,7 +1340,7 @@ class UltrasonicSensor(Sensor):
 
 
 #~autogen
-#~autogen python_generic-class classes.gyroSensor>currentClass
+#~autogen generic-class classes.gyroSensor>currentClass
 
 class GyroSensor(Sensor):
 
@@ -1357,7 +1357,7 @@ class GyroSensor(Sensor):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-gyro'], **kwargs)
 
 #~autogen
-#~autogen python_generic-property-value classes.gyroSensor>currentClass
+#~autogen generic-property-value classes.gyroSensor>currentClass
 
     # Angle
     mode_gyro_ang = 'GYRO-ANG'
@@ -1376,7 +1376,7 @@ class GyroSensor(Sensor):
 
 
 #~autogen
-#~autogen python_generic-class classes.infraredSensor>currentClass
+#~autogen generic-class classes.infraredSensor>currentClass
 
 class InfraredSensor(Sensor):
 
@@ -1393,7 +1393,7 @@ class InfraredSensor(Sensor):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-ir'], **kwargs)
 
 #~autogen
-#~autogen python_generic-property-value classes.infraredSensor>currentClass
+#~autogen generic-property-value classes.infraredSensor>currentClass
 
     # Proximity
     mode_ir_prox = 'IR-PROX'
@@ -1414,7 +1414,7 @@ class InfraredSensor(Sensor):
 #~autogen
 
 
-#~autogen python_generic-class classes.soundSensor>currentClass
+#~autogen generic-class classes.soundSensor>currentClass
 
 class SoundSensor(Sensor):
 
@@ -1431,7 +1431,7 @@ class SoundSensor(Sensor):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-nxt-sound'], **kwargs)
 
 #~autogen
-#~autogen python_generic-property-value classes.soundSensor>currentClass
+#~autogen generic-property-value classes.soundSensor>currentClass
 
     # Sound pressure level. Flat weighting
     mode_db = 'DB'
@@ -1441,7 +1441,7 @@ class SoundSensor(Sensor):
 
 
 #~autogen
-#~autogen python_generic-class classes.lightSensor>currentClass
+#~autogen generic-class classes.lightSensor>currentClass
 
 class LightSensor(Sensor):
 
@@ -1458,7 +1458,7 @@ class LightSensor(Sensor):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-nxt-light'], **kwargs)
 
 #~autogen
-#~autogen python_generic-property-value classes.lightSensor>currentClass
+#~autogen generic-property-value classes.lightSensor>currentClass
 
     # Reflected light. LED on
     mode_reflect = 'REFLECT'
@@ -1468,7 +1468,7 @@ class LightSensor(Sensor):
 
 
 #~autogen
-#~autogen python_generic-class classes.touchSensor>currentClass
+#~autogen generic-class classes.touchSensor>currentClass
 
 class TouchSensor(Sensor):
 
@@ -1485,7 +1485,7 @@ class TouchSensor(Sensor):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
 
 #~autogen
-#~autogen python_generic-class classes.led>currentClass
+#~autogen generic-class classes.led>currentClass
 
 class Led(Device):
 
@@ -1504,7 +1504,7 @@ class Led(Device):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 #~autogen
-#~autogen python_generic-get-set classes.led>currentClass
+#~autogen generic-get-set classes.led>currentClass
 
 
     @property
@@ -1597,7 +1597,7 @@ class Led(Device):
         self.brightness = value * self.max_brightness
 
 if current_platform() == 'ev3':
-#~autogen python_led-colors platforms.ev3.led>currentClass
+#~autogen led-colors platforms.ev3.led>currentClass
 
     Led.red_left = Led(name='ev3-left0:red:ev3dev')
     Led.red_right = Led(name='ev3-right0:red:ev3dev')
@@ -1673,7 +1673,7 @@ if current_platform() == 'ev3':
 
 #~autogen
 elif current_platform() == 'brickpi':
-#~autogen python_led-colors platforms.brickpi.led>currentClass
+#~autogen led-colors platforms.brickpi.led>currentClass
 
     Led.blue_one = Led(name='brickpi1:blue:ev3dev')
     Led.blue_two = Led(name='brickpi2:blue:ev3dev')
@@ -1702,7 +1702,7 @@ elif current_platform() == 'brickpi':
 
 
 #~autogen
-#~autogen python_generic-class classes.powerSupply>currentClass
+#~autogen generic-class classes.powerSupply>currentClass
 
 class PowerSupply(Device):
 
@@ -1720,7 +1720,7 @@ class PowerSupply(Device):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 #~autogen
-#~autogen python_generic-get-set classes.powerSupply>currentClass
+#~autogen generic-get-set classes.powerSupply>currentClass
 
 
     @property
@@ -1763,7 +1763,7 @@ class PowerSupply(Device):
 
 
 #~autogen
-#~autogen python_generic-class classes.legoPort>currentClass
+#~autogen generic-class classes.legoPort>currentClass
 
 class LegoPort(Device):
 
@@ -1804,7 +1804,7 @@ class LegoPort(Device):
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 #~autogen
-#~autogen python_generic-get-set classes.legoPort>currentClass
+#~autogen generic-get-set classes.legoPort>currentClass
 
 
     @property
