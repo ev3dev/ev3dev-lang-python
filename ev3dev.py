@@ -514,69 +514,69 @@ class Motor(Device):
 #~autogen generic-property-value classes.motor>currentClass
 
     # Run the motor until another command is sent.
-    command_run_forever = 'run-forever'
+    COMMAND_RUN_FOREVER = 'run-forever'
 
     # Run to an absolute position specified by `position_sp` and then
     # stop using the command specified in `stop_command`.
-    command_run_to_abs_pos = 'run-to-abs-pos'
+    COMMAND_RUN_TO_ABS_POS = 'run-to-abs-pos'
 
     # Run to a position relative to the current `position` value.
     # The new position will be current `position` + `position_sp`.
     # When the new position is reached, the motor will stop using
     # the command specified by `stop_command`.
-    command_run_to_rel_pos = 'run-to-rel-pos'
+    COMMAND_RUN_TO_REL_POS = 'run-to-rel-pos'
 
     # Run the motor for the amount of time specified in `time_sp`
     # and then stop the motor using the command specified by `stop_command`.
-    command_run_timed = 'run-timed'
+    COMMAND_RUN_TIMED = 'run-timed'
 
     # Run the motor at the duty cycle specified by `duty_cycle_sp`.
     # Unlike other run commands, changing `duty_cycle_sp` while running *will*
     # take effect immediately.
-    command_run_direct = 'run-direct'
+    COMMAND_RUN_DIRECT = 'run-direct'
 
     # Stop any of the run commands before they are complete using the
     # command specified by `stop_command`.
-    command_stop = 'stop'
+    COMMAND_STOP = 'stop'
 
     # Reset all of the motor parameter attributes to their default value.
     # This will also have the effect of stopping the motor.
-    command_reset = 'reset'
+    COMMAND_RESET = 'reset'
 
     # Sets the normal polarity of the rotary encoder.
-    encoder_polarity_normal = 'normal'
+    ENCODER_POLARITY_NORMAL = 'normal'
 
     # Sets the inversed polarity of the rotary encoder.
-    encoder_polarity_inversed = 'inversed'
+    ENCODER_POLARITY_INVERSED = 'inversed'
 
     # With `normal` polarity, a positive duty cycle will
     # cause the motor to rotate clockwise.
-    polarity_normal = 'normal'
+    POLARITY_NORMAL = 'normal'
 
     # With `inversed` polarity, a positive duty cycle will
     # cause the motor to rotate counter-clockwise.
-    polarity_inversed = 'inversed'
+    POLARITY_INVERSED = 'inversed'
 
     # The motor controller will vary the power supplied to the motor
     # to try to maintain the speed specified in `speed_sp`.
-    speed_regulation_on = 'on'
+    SPEED_REGULATION_ON = 'on'
 
     # The motor controller will use the power specified in `duty_cycle_sp`.
-    speed_regulation_off = 'off'
+    SPEED_REGULATION_OFF = 'off'
 
     # Power will be removed from the motor and it will freely coast to a stop.
-    stop_command_coast = 'coast'
+    STOP_COMMAND_COAST = 'coast'
 
     # Power will be removed from the motor and a passive electrical load will
     # be placed on the motor. This is usually done by shorting the motor terminals
     # together. This load will absorb the energy from the rotation of the motors and
     # cause the motor to stop more quickly than coasting.
-    stop_command_brake = 'brake'
+    STOP_COMMAND_BRAKE = 'brake'
 
     # Does not remove power from the motor. Instead it actively try to hold the motor
     # at the current position. If an external force tries to turn the motor, the motor
     # will ``push back`` to maintain its position.
-    stop_command_hold = 'hold'
+    STOP_COMMAND_HOLD = 'hold'
 
 
 #~autogen
@@ -838,37 +838,37 @@ class DcMotor(Device):
 #~autogen generic-property-value classes.dcMotor>currentClass
 
     # Run the motor until another command is sent.
-    command_run_forever = 'run-forever'
+    COMMAND_RUN_FOREVER = 'run-forever'
 
     # Run the motor for the amount of time specified in `time_sp`
     # and then stop the motor using the command specified by `stop_command`.
-    command_run_timed = 'run-timed'
+    COMMAND_RUN_TIMED = 'run-timed'
 
     # Run the motor at the duty cycle specified by `duty_cycle_sp`.
     # Unlike other run commands, changing `duty_cycle_sp` while running *will*
     # take effect immediately.
-    command_run_direct = 'run-direct'
+    COMMAND_RUN_DIRECT = 'run-direct'
 
     # Stop any of the run commands before they are complete using the
     # command specified by `stop_command`.
-    command_stop = 'stop'
+    COMMAND_STOP = 'stop'
 
     # With `normal` polarity, a positive duty cycle will
     # cause the motor to rotate clockwise.
-    polarity_normal = 'normal'
+    POLARITY_NORMAL = 'normal'
 
     # With `inversed` polarity, a positive duty cycle will
     # cause the motor to rotate counter-clockwise.
-    polarity_inversed = 'inversed'
+    POLARITY_INVERSED = 'inversed'
 
     # Power will be removed from the motor and it will freely coast to a stop.
-    stop_command_coast = 'coast'
+    STOP_COMMAND_COAST = 'coast'
 
     # Power will be removed from the motor and a passive electrical load will
     # be placed on the motor. This is usually done by shorting the motor terminals
     # together. This load will absorb the energy from the rotation of the motors and
     # cause the motor to stop more quickly than coasting.
-    stop_command_brake = 'brake'
+    STOP_COMMAND_BRAKE = 'brake'
 
 
 #~autogen
@@ -1060,18 +1060,18 @@ class ServoMotor(Device):
 #~autogen generic-property-value classes.servoMotor>currentClass
 
     # Drive servo to the position set in the `position_sp` attribute.
-    command_run = 'run'
+    COMMAND_RUN = 'run'
 
     # Remove power from the motor.
-    command_float = 'float'
+    COMMAND_FLOAT = 'float'
 
     # With `normal` polarity, a positive duty cycle will
     # cause the motor to rotate clockwise.
-    polarity_normal = 'normal'
+    POLARITY_NORMAL = 'normal'
 
     # With `inversed` polarity, a positive duty cycle will
     # cause the motor to rotate counter-clockwise.
-    polarity_inversed = 'inversed'
+    POLARITY_INVERSED = 'inversed'
 
 
 #~autogen
@@ -1284,19 +1284,19 @@ class ColorSensor(Sensor):
 #~autogen generic-property-value classes.colorSensor>currentClass
 
     # Reflected light. Red LED on.
-    mode_col_reflect = 'COL-REFLECT'
+    MODE_COL_REFLECT = 'COL-REFLECT'
 
     # Ambient light. Red LEDs off.
-    mode_col_ambient = 'COL-AMBIENT'
+    MODE_COL_AMBIENT = 'COL-AMBIENT'
 
     # Color. All LEDs rapidly cycling, appears white.
-    mode_col_color = 'COL-COLOR'
+    MODE_COL_COLOR = 'COL-COLOR'
 
     # Raw reflected. Red LED on
-    mode_ref_raw = 'REF-RAW'
+    MODE_REF_RAW = 'REF-RAW'
 
     # Raw Color Components. All LEDs rapidly cycling, appears white.
-    mode_rgb_raw = 'RGB-RAW'
+    MODE_RGB_RAW = 'RGB-RAW'
 
 
 #~autogen
@@ -1321,22 +1321,22 @@ class UltrasonicSensor(Sensor):
 
     # Continuous measurement in centimeters.
     # LEDs: On, steady
-    mode_us_dist_cm = 'US-DIST-CM'
+    MODE_US_DIST_CM = 'US-DIST-CM'
 
     # Continuous measurement in inches.
     # LEDs: On, steady
-    mode_us_dist_in = 'US-DIST-IN'
+    MODE_US_DIST_IN = 'US-DIST-IN'
 
     # Listen.  LEDs: On, blinking
-    mode_us_listen = 'US-LISTEN'
+    MODE_US_LISTEN = 'US-LISTEN'
 
     # Single measurement in centimeters.
     # LEDs: On momentarily when mode is set, then off
-    mode_us_si_cm = 'US-SI-CM'
+    MODE_US_SI_CM = 'US-SI-CM'
 
     # Single measurement in inches.
     # LEDs: On momentarily when mode is set, then off
-    mode_us_si_in = 'US-SI-IN'
+    MODE_US_SI_IN = 'US-SI-IN'
 
 
 #~autogen
@@ -1360,19 +1360,19 @@ class GyroSensor(Sensor):
 #~autogen generic-property-value classes.gyroSensor>currentClass
 
     # Angle
-    mode_gyro_ang = 'GYRO-ANG'
+    MODE_GYRO_ANG = 'GYRO-ANG'
 
     # Rotational speed
-    mode_gyro_rate = 'GYRO-RATE'
+    MODE_GYRO_RATE = 'GYRO-RATE'
 
     # Raw sensor value
-    mode_gyro_fas = 'GYRO-FAS'
+    MODE_GYRO_FAS = 'GYRO-FAS'
 
     # Angle and rotational speed
-    mode_gyro_g_a = 'GYRO-G&A'
+    MODE_GYRO_G_A = 'GYRO-G&A'
 
     # Calibration ???
-    mode_gyro_cal = 'GYRO-CAL'
+    MODE_GYRO_CAL = 'GYRO-CAL'
 
 
 #~autogen
@@ -1396,19 +1396,19 @@ class InfraredSensor(Sensor):
 #~autogen generic-property-value classes.infraredSensor>currentClass
 
     # Proximity
-    mode_ir_prox = 'IR-PROX'
+    MODE_IR_PROX = 'IR-PROX'
 
     # IR Seeker
-    mode_ir_seek = 'IR-SEEK'
+    MODE_IR_SEEK = 'IR-SEEK'
 
     # IR Remote Control
-    mode_ir_remote = 'IR-REMOTE'
+    MODE_IR_REMOTE = 'IR-REMOTE'
 
     # IR Remote Control. State of the buttons is coded in binary
-    mode_ir_rem_a = 'IR-REM-A'
+    MODE_IR_REM_A = 'IR-REM-A'
 
     # Calibration ???
-    mode_ir_cal = 'IR-CAL'
+    MODE_IR_CAL = 'IR-CAL'
 
 
 #~autogen
@@ -1434,10 +1434,10 @@ class SoundSensor(Sensor):
 #~autogen generic-property-value classes.soundSensor>currentClass
 
     # Sound pressure level. Flat weighting
-    mode_db = 'DB'
+    MODE_DB = 'DB'
 
     # Sound pressure level. A weighting
-    mode_dba = 'DBA'
+    MODE_DBA = 'DBA'
 
 
 #~autogen
@@ -1461,10 +1461,10 @@ class LightSensor(Sensor):
 #~autogen generic-property-value classes.lightSensor>currentClass
 
     # Reflected light. LED on
-    mode_reflect = 'REFLECT'
+    MODE_REFLECT = 'REFLECT'
 
     # Ambient light. LED off
-    mode_ambient = 'AMBIENT'
+    MODE_AMBIENT = 'AMBIENT'
 
 
 #~autogen
