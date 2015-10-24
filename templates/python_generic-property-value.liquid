@@ -1,10 +1,10 @@
 {% for prop in currentClass.propertyValues %}{%
   assign className = currentClass.friendlyName | downcase | underscore_spaces %}{%
-  assign propName = prop.propertyName | downcase | underscore_spaces %}{%
+  assign propName = prop.propertyName | upcase | underscore_spaces %}{%
   for value in prop.values %}{%
     for line in value.description %}
     # {{ line }}{%
     endfor %}
-    {{ propName }}_{{ value.name | downcase | underscore_non_wc }} = '{{ value.name }}'
+    {{ propName }}_{{ value.name | upcase | underscore_non_wc }} = '{{ value.name }}'
 {% endfor %}{%
 endfor %}

@@ -1,4 +1,4 @@
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Copyright (c) 2015 Ralph Hempel
 # Copyright (c) 2015 Anton Vanhoucke
 # Copyright (c) 2015 Denis Demidov
@@ -43,6 +43,30 @@ def current_platform():
     else:
         return 'unsupported'
 
+
+#------------------------------------------------------------------------------
+# Define constants
+OUTPUT_A = 'outA'
+OUTPUT_B = 'outB'
+OUTPUT_C = 'outC'
+OUTPUT_D = 'outD'
+
+INPUT_1 = 'in1'
+INPUT_2 = 'in2'
+INPUT_3 = 'in3'
+INPUT_4 = 'in4'
+
+if current_platform() == 'brickpi':
+    OUTPUT_A = 'ttyAMA0:outA'
+    OUTPUT_B = 'ttyAMA0:outB'
+    OUTPUT_C = 'ttyAMA0:outC'
+    OUTPUT_D = 'ttyAMA0:outD'
+
+    INPUT_1 = 'ttyAMA0:in1'
+    INPUT_2 = 'ttyAMA0:in2'
+    INPUT_3 = 'ttyAMA0:in3'
+    INPUT_4 = 'ttyAMA0:in4'
+
 #------------------------------------------------------------------------------
 # Define the base class from which all other ev3dev classes are defined.
 
@@ -51,7 +75,7 @@ class Device(object):
 
     DEVICE_ROOT_PATH = '/sys/class'
 
-    def __init__(self, class_name, name='*', **kwargs ):
+    def __init__(self, class_name, name='*', **kwargs):
         """Spin through the Linux sysfs class for the device type and find
         a device that matches the provided name and attributes (if any).
 
@@ -73,12 +97,12 @@ class Device(object):
         When connected succesfully, the `connected` attribute is set to True.
         """
 
-        classpath = os.path.abspath( Device.DEVICE_ROOT_PATH + '/' + class_name )
+        classpath = os.path.abspath(Device.DEVICE_ROOT_PATH + '/' + class_name)
         self.filehandle_cache = {}
 
-        for file in os.listdir( classpath ):
+        for file in os.listdir(classpath):
             if fnmatch.fnmatch(file, name):
-                self._path = os.path.abspath( classpath + '/' + file )
+                self._path = os.path.abspath(classpath + '/' + file)
 
                 # See if requested attributes match:
                 if all([self._matches(k, kwargs[k]) for k in kwargs]):
@@ -99,69 +123,70 @@ class Device(object):
         else:
             return value.find(pattern) >= 0
 
-    def _attribute_file( self, attribute, mode, reopen=False ):
+    def _attribute_file(self, attribute, mode, reopen=False):
         """Manages the file handle cache and opening the files in the correct mode"""
 
-        attribute_name = os.path.abspath( self._path + '/' + attribute )
+        attribute_name = os.path.abspath(self._path + '/' + attribute)
 
         if attribute_name not in self.filehandle_cache:
-            f = open( attribute_name, mode )
+            f = open(attribute_name, mode)
             self.filehandle_cache[attribute_name] = f
         elif reopen == True:
             self.filehandle_cache[attribute_name].close()
-            f = open( attribute_name, mode )
+            f = open(attribute_name, mode)
             self.filehandle_cache[attribute_name] = f
         else:
             f = self.filehandle_cache[attribute_name]
         return f
 
-    def _get_attribute( self, attribute ):
+    def _get_attribute(self, attribute):
         """Device attribute getter"""
-        f = self._attribute_file( attribute, 'r' )
+        f = self._attribute_file(attribute, 'r')
         try:
             f.seek(0)
             value = f.read()
         except IOError:
-            f = self._attribute_file( attribute, 'w+', True )
+            f = self._attribute_file(attribute, 'w+', True)
             value = f.read()
         return value.strip()
 
-    def _set_attribute( self, attribute, value ):
+    def _set_attribute(self, attribute, value):
         """Device attribute setter"""
-        f = self._attribute_file( attribute, 'w' )
+        f = self._attribute_file(attribute, 'w')
         try:
             f.seek(0)
-            f.write( value )
+            f.write(value)
             f.flush()
         except IOError:
-            f = self._attribute_file( attribute, 'w+', True )
-            f.write( value )
+            f = self._attribute_file(attribute, 'w+', True)
+            f.write(value)
             f.flush()
 
-    def get_attr_int( self, attribute ):
-        return int( self._get_attribute( attribute ) )
+    def get_attr_int(self, attribute):
+        return int(self._get_attribute(attribute))
 
-    def set_attr_int( self, attribute, value ):
-        self._set_attribute( attribute, '{0:d}'.format( int(value) ) )
+    def set_attr_int(self, attribute, value):
+        self._set_attribute(attribute, '{0:d}'.format(int(value)))
 
-    def get_attr_string( self, attribute ):
-        return self._get_attribute( attribute )
+    def get_attr_string(self, attribute):
+        return self._get_attribute(attribute)
 
-    def set_attr_string( self, attribute, value ):
-        self._set_attribute( attribute, "{0}".format(value) )
+    def set_attr_string(self, attribute, value):
+        self._set_attribute(attribute, "{0}".format(value))
 
-    def get_attr_line( self, attribute ):
-        return self._get_attribute( attribute )
+    def get_attr_line(self, attribute):
+        return self._get_attribute(attribute)
 
-    def get_attr_set( self, attribute ):
-        return [v.strip('[]') for v in self.get_attr_line( attribute ).split()]
+    def get_attr_set(self, attribute):
+        return [v.strip('[]') for v in self.get_attr_line(attribute).split()]
 
-    def get_attr_from_set( self, attribute ):
-        for a in self.get_attr_line( attribute ).split():
-            v = a.strip( '[]' )
+    def get_attr_from_set(self, attribute):
+        for a in self.get_attr_line(attribute).split():
+            v = a.strip('[]')
             if v != a:
                 return v
         return ""
+
 
 #~autogen python_generic-class classes.motor>currentClass
 
@@ -184,7 +209,7 @@ class Motor(Device):
         Device.__init__( self, self.SYSTEM_CLASS_NAME, name, **kwargs )
 
 #~autogen
-#~autogen python_generic-get-set classes.motor>currentClass
+    #~autogen python_generic-get-set classes.motor>currentClass
 
 
     @property
@@ -512,76 +537,76 @@ class Motor(Device):
 
 
 #~autogen
-#~autogen python_generic-property-value classes.motor>currentClass
+    #~autogen python_generic-property-value classes.motor>currentClass
 
     # Run the motor until another command is sent.
-    command_run_forever = 'run-forever'
+    COMMAND_RUN_FOREVER = 'run-forever'
 
     # Run to an absolute position specified by `position_sp` and then
     # stop using the command specified in `stop_command`.
-    command_run_to_abs_pos = 'run-to-abs-pos'
+    COMMAND_RUN_TO_ABS_POS = 'run-to-abs-pos'
 
     # Run to a position relative to the current `position` value.
     # The new position will be current `position` + `position_sp`.
     # When the new position is reached, the motor will stop using
     # the command specified by `stop_command`.
-    command_run_to_rel_pos = 'run-to-rel-pos'
+    COMMAND_RUN_TO_REL_POS = 'run-to-rel-pos'
 
     # Run the motor for the amount of time specified in `time_sp`
     # and then stop the motor using the command specified by `stop_command`.
-    command_run_timed = 'run-timed'
+    COMMAND_RUN_TIMED = 'run-timed'
 
     # Run the motor at the duty cycle specified by `duty_cycle_sp`.
     # Unlike other run commands, changing `duty_cycle_sp` while running *will*
     # take effect immediately.
-    command_run_direct = 'run-direct'
+    COMMAND_RUN_DIRECT = 'run-direct'
 
     # Stop any of the run commands before they are complete using the
     # command specified by `stop_command`.
-    command_stop = 'stop'
+    COMMAND_STOP = 'stop'
 
     # Reset all of the motor parameter attributes to their default value.
     # This will also have the effect of stopping the motor.
-    command_reset = 'reset'
+    COMMAND_RESET = 'reset'
 
     # Sets the normal polarity of the rotary encoder.
-    encoder_polarity_normal = 'normal'
+    ENCODER_POLARITY_NORMAL = 'normal'
 
     # Sets the inversed polarity of the rotary encoder.
-    encoder_polarity_inversed = 'inversed'
+    ENCODER_POLARITY_INVERSED = 'inversed'
 
     # With `normal` polarity, a positive duty cycle will
     # cause the motor to rotate clockwise.
-    polarity_normal = 'normal'
+    POLARITY_NORMAL = 'normal'
 
     # With `inversed` polarity, a positive duty cycle will
     # cause the motor to rotate counter-clockwise.
-    polarity_inversed = 'inversed'
+    POLARITY_INVERSED = 'inversed'
 
     # The motor controller will vary the power supplied to the motor
     # to try to maintain the speed specified in `speed_sp`.
-    speed_regulation_on = 'on'
+    SPEED_REGULATION_ON = 'on'
 
     # The motor controller will use the power specified in `duty_cycle_sp`.
-    speed_regulation_off = 'off'
+    SPEED_REGULATION_OFF = 'off'
 
     # Power will be removed from the motor and it will freely coast to a stop.
-    stop_command_coast = 'coast'
+    STOP_COMMAND_COAST = 'coast'
 
     # Power will be removed from the motor and a passive electrical load will
     # be placed on the motor. This is usually done by shorting the motor terminals
     # together. This load will absorb the energy from the rotation of the motors and
     # cause the motor to stop more quickly than coasting.
-    stop_command_brake = 'brake'
+    STOP_COMMAND_BRAKE = 'brake'
 
     # Does not remove power from the motor. Instead it actively try to hold the motor
     # at the current position. If an external force tries to turn the motor, the motor
     # will ``push back`` to maintain its position.
-    stop_command_hold = 'hold'
+    STOP_COMMAND_HOLD = 'hold'
 
 
 #~autogen
-#~autogen python_motor_commands classes.motor>currentClass
+    #~autogen python_motor_commands classes.motor>currentClass
 
     def run_forever( self, **kwargs ):
         """Run the motor until another command is sent.
@@ -699,7 +724,7 @@ class DcMotor(Device):
         Device.__init__( self, self.SYSTEM_CLASS_NAME, name, **kwargs )
 
 #~autogen
-#~autogen python_generic-get-set classes.dcMotor>currentClass
+    #~autogen python_generic-get-set classes.dcMotor>currentClass
 
 
     @property
@@ -839,45 +864,45 @@ class DcMotor(Device):
 
 
 #~autogen
-#~autogen python_generic-property-value classes.dcMotor>currentClass
+    #~autogen python_generic-property-value classes.dcMotor>currentClass
 
     # Run the motor until another command is sent.
-    command_run_forever = 'run-forever'
+    COMMAND_RUN_FOREVER = 'run-forever'
 
     # Run the motor for the amount of time specified in `time_sp`
     # and then stop the motor using the command specified by `stop_command`.
-    command_run_timed = 'run-timed'
+    COMMAND_RUN_TIMED = 'run-timed'
 
     # Run the motor at the duty cycle specified by `duty_cycle_sp`.
     # Unlike other run commands, changing `duty_cycle_sp` while running *will*
     # take effect immediately.
-    command_run_direct = 'run-direct'
+    COMMAND_RUN_DIRECT = 'run-direct'
 
     # Stop any of the run commands before they are complete using the
     # command specified by `stop_command`.
-    command_stop = 'stop'
+    COMMAND_STOP = 'stop'
 
     # With `normal` polarity, a positive duty cycle will
     # cause the motor to rotate clockwise.
-    polarity_normal = 'normal'
+    POLARITY_NORMAL = 'normal'
 
     # With `inversed` polarity, a positive duty cycle will
     # cause the motor to rotate counter-clockwise.
-    polarity_inversed = 'inversed'
+    POLARITY_INVERSED = 'inversed'
 
     # Power will be removed from the motor and it will freely coast to a stop.
-    stop_command_coast = 'coast'
+    STOP_COMMAND_COAST = 'coast'
 
     # Power will be removed from the motor and a passive electrical load will
     # be placed on the motor. This is usually done by shorting the motor terminals
     # together. This load will absorb the energy from the rotation of the motors and
     # cause the motor to stop more quickly than coasting.
-    stop_command_brake = 'brake'
+    STOP_COMMAND_BRAKE = 'brake'
 
 
 #~autogen
 
-#~autogen python_motor_commands classes.dcMotor>currentClass
+    #~autogen python_motor_commands classes.dcMotor>currentClass
 
     def run_forever( self, **kwargs ):
         """Run the motor until another command is sent.
@@ -932,7 +957,7 @@ class ServoMotor(Device):
         Device.__init__( self, self.SYSTEM_CLASS_NAME, name, **kwargs )
 
 #~autogen
-#~autogen python_generic-get-set classes.servoMotor>currentClass
+    #~autogen python_generic-get-set classes.servoMotor>currentClass
 
 
     @property
@@ -1062,26 +1087,26 @@ class ServoMotor(Device):
 
 
 #~autogen
-#~autogen python_generic-property-value classes.servoMotor>currentClass
+    #~autogen python_generic-property-value classes.servoMotor>currentClass
 
     # Drive servo to the position set in the `position_sp` attribute.
-    command_run = 'run'
+    COMMAND_RUN = 'run'
 
     # Remove power from the motor.
-    command_float = 'float'
+    COMMAND_FLOAT = 'float'
 
     # With `normal` polarity, a positive duty cycle will
     # cause the motor to rotate clockwise.
-    polarity_normal = 'normal'
+    POLARITY_NORMAL = 'normal'
 
     # With `inversed` polarity, a positive duty cycle will
     # cause the motor to rotate counter-clockwise.
-    polarity_inversed = 'inversed'
+    POLARITY_INVERSED = 'inversed'
 
 
 #~autogen
 
-#~autogen python_motor_commands classes.servoMotor>currentClass
+    #~autogen python_motor_commands classes.servoMotor>currentClass
 
     def run( self, **kwargs ):
         """Drive servo to the position set in the `position_sp` attribute.
@@ -1131,7 +1156,7 @@ class Sensor(Device):
         Device.__init__( self, self.SYSTEM_CLASS_NAME, name, **kwargs )
 
 #~autogen
-#~autogen python_generic-get-set classes.sensor>currentClass
+    #~autogen python_generic-get-set classes.sensor>currentClass
 
 
     @property
@@ -1216,15 +1241,16 @@ class Sensor(Device):
 #~autogen
 
     def value(self, n=0):
-        if True == isinstance( n, numbers.Integral ):
-            n = '{0:d}'.format( n )
-        elif True == isinstance( n, numbers.Real ):
-            n = '{0:.0f}'.format( n )
+        if True == isinstance(n, numbers.Integral):
+            n = '{0:d}'.format(n)
+        elif True == isinstance(n, numbers.Real):
+            n = '{0:.0f}'.format(n)
 
-        if True == isinstance( n, str ):
-            return self.get_attr_int( 'value'+n )
+        if True == isinstance(n, str):
+            return self.get_attr_int('value' + n)
         else:
             return 0
+
 
 #~autogen python_generic-class classes.i2cSensor>currentClass
 
@@ -1244,7 +1270,7 @@ class I2cSensor(Sensor):
         Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['nxt-i2c-sensor', ], **kwargs )
 
 #~autogen
-#~autogen python_generic-get-set classes.i2cSensor>currentClass
+    #~autogen python_generic-get-set classes.i2cSensor>currentClass
 
 
     @property
@@ -1289,22 +1315,22 @@ class ColorSensor(Sensor):
         Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-color', ], **kwargs )
 
 #~autogen
-#~autogen python_generic-property-value classes.colorSensor>currentClass
+    #~autogen python_generic-property-value classes.colorSensor>currentClass
 
     # Reflected light. Red LED on.
-    mode_col_reflect = 'COL-REFLECT'
+    MODE_COL_REFLECT = 'COL-REFLECT'
 
     # Ambient light. Red LEDs off.
-    mode_col_ambient = 'COL-AMBIENT'
+    MODE_COL_AMBIENT = 'COL-AMBIENT'
 
     # Color. All LEDs rapidly cycling, appears white.
-    mode_col_color = 'COL-COLOR'
+    MODE_COL_COLOR = 'COL-COLOR'
 
     # Raw reflected. Red LED on
-    mode_ref_raw = 'REF-RAW'
+    MODE_REF_RAW = 'REF-RAW'
 
     # Raw Color Components. All LEDs rapidly cycling, appears white.
-    mode_rgb_raw = 'RGB-RAW'
+    MODE_RGB_RAW = 'RGB-RAW'
 
 
 #~autogen
@@ -1326,26 +1352,26 @@ class UltrasonicSensor(Sensor):
         Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-us', 'lego-nxt-us', ], **kwargs )
 
 #~autogen
-#~autogen python_generic-property-value classes.ultrasonicSensor>currentClass
+    #~autogen python_generic-property-value classes.ultrasonicSensor>currentClass
 
     # Continuous measurement in centimeters.
     # LEDs: On, steady
-    mode_us_dist_cm = 'US-DIST-CM'
+    MODE_US_DIST_CM = 'US-DIST-CM'
 
     # Continuous measurement in inches.
     # LEDs: On, steady
-    mode_us_dist_in = 'US-DIST-IN'
+    MODE_US_DIST_IN = 'US-DIST-IN'
 
     # Listen.  LEDs: On, blinking
-    mode_us_listen = 'US-LISTEN'
+    MODE_US_LISTEN = 'US-LISTEN'
 
     # Single measurement in centimeters.
     # LEDs: On momentarily when mode is set, then off
-    mode_us_si_cm = 'US-SI-CM'
+    MODE_US_SI_CM = 'US-SI-CM'
 
     # Single measurement in inches.
     # LEDs: On momentarily when mode is set, then off
-    mode_us_si_in = 'US-SI-IN'
+    MODE_US_SI_IN = 'US-SI-IN'
 
 
 #~autogen
@@ -1367,22 +1393,22 @@ class GyroSensor(Sensor):
         Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-gyro', ], **kwargs )
 
 #~autogen
-#~autogen python_generic-property-value classes.gyroSensor>currentClass
+    #~autogen python_generic-property-value classes.gyroSensor>currentClass
 
     # Angle
-    mode_gyro_ang = 'GYRO-ANG'
+    MODE_GYRO_ANG = 'GYRO-ANG'
 
     # Rotational speed
-    mode_gyro_rate = 'GYRO-RATE'
+    MODE_GYRO_RATE = 'GYRO-RATE'
 
     # Raw sensor value
-    mode_gyro_fas = 'GYRO-FAS'
+    MODE_GYRO_FAS = 'GYRO-FAS'
 
     # Angle and rotational speed
-    mode_gyro_g_a = 'GYRO-G&A'
+    MODE_GYRO_G_A = 'GYRO-G&A'
 
     # Calibration ???
-    mode_gyro_cal = 'GYRO-CAL'
+    MODE_GYRO_CAL = 'GYRO-CAL'
 
 
 #~autogen
@@ -1404,22 +1430,22 @@ class InfraredSensor(Sensor):
         Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-ir', ], **kwargs )
 
 #~autogen
-#~autogen python_generic-property-value classes.infraredSensor>currentClass
+    #~autogen python_generic-property-value classes.infraredSensor>currentClass
 
     # Proximity
-    mode_ir_prox = 'IR-PROX'
+    MODE_IR_PROX = 'IR-PROX'
 
     # IR Seeker
-    mode_ir_seek = 'IR-SEEK'
+    MODE_IR_SEEK = 'IR-SEEK'
 
     # IR Remote Control
-    mode_ir_remote = 'IR-REMOTE'
+    MODE_IR_REMOTE = 'IR-REMOTE'
 
     # IR Remote Control. State of the buttons is coded in binary
-    mode_ir_rem_a = 'IR-REM-A'
+    MODE_IR_REM_A = 'IR-REM-A'
 
     # Calibration ???
-    mode_ir_cal = 'IR-CAL'
+    MODE_IR_CAL = 'IR-CAL'
 
 
 #~autogen
@@ -1443,13 +1469,13 @@ class SoundSensor(Sensor):
         Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-nxt-sound', ], **kwargs )
 
 #~autogen
-#~autogen python_generic-property-value classes.soundSensor>currentClass
+    #~autogen python_generic-property-value classes.soundSensor>currentClass
 
     # Sound pressure level. Flat weighting
-    mode_db = 'DB'
+    MODE_DB = 'DB'
 
     # Sound pressure level. A weighting
-    mode_dba = 'DBA'
+    MODE_DBA = 'DBA'
 
 
 #~autogen
@@ -1471,13 +1497,13 @@ class LightSensor(Sensor):
         Device.__init__( self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-nxt-light', ], **kwargs )
 
 #~autogen
-#~autogen python_generic-property-value classes.lightSensor>currentClass
+    #~autogen python_generic-property-value classes.lightSensor>currentClass
 
     # Reflected light. LED on
-    mode_reflect = 'REFLECT'
+    MODE_REFLECT = 'REFLECT'
 
     # Ambient light. LED off
-    mode_ambient = 'AMBIENT'
+    MODE_AMBIENT = 'AMBIENT'
 
 
 #~autogen
@@ -1519,7 +1545,7 @@ class Led(Device):
         Device.__init__( self, self.SYSTEM_CLASS_NAME, name, **kwargs )
 
 #~autogen
-#~autogen python_generic-get-set classes.led>currentClass
+    #~autogen python_generic-get-set classes.led>currentClass
 
 
     @property
@@ -1611,8 +1637,9 @@ class Led(Device):
     def brightness_pct(self, value):
         self.brightness = value * self.max_brightness
 
+
 if current_platform() == 'ev3':
-#~autogen python_led-colors platforms.ev3.led>currentClass
+    #~autogen python_led-colors platforms.ev3.led>currentClass
 
     Led.red_left = Led(name='ev3-left0:red:ev3dev')
     Led.red_right = Led(name='ev3-right0:red:ev3dev')
@@ -1688,7 +1715,7 @@ if current_platform() == 'ev3':
 
 #~autogen
 elif current_platform() == 'brickpi':
-#~autogen python_led-colors platforms.brickpi.led>currentClass
+    #~autogen python_led-colors platforms.brickpi.led>currentClass
 
     Led.blue_one = Led(name='brickpi1:blue:ev3dev')
     Led.blue_two = Led(name='brickpi2:blue:ev3dev')
@@ -1736,7 +1763,7 @@ class PowerSupply(Device):
         Device.__init__( self, self.SYSTEM_CLASS_NAME, name, **kwargs )
 
 #~autogen
-#~autogen python_generic-get-set classes.powerSupply>currentClass
+    #~autogen python_generic-get-set classes.powerSupply>currentClass
 
 
     @property
@@ -1821,7 +1848,7 @@ class LegoPort(Device):
         Device.__init__( self, self.SYSTEM_CLASS_NAME, name, **kwargs )
 
 #~autogen
-#~autogen python_generic-get-set classes.legoPort>currentClass
+    #~autogen python_generic-get-set classes.legoPort>currentClass
 
 
     @property
@@ -1888,4 +1915,75 @@ class LegoPort(Device):
 
 
 #~autogen
+
+#------------------------------------------------------------------------------
+# Read Ev3 button states
+# Credits for this go to @topikachu and his python-ev3 library
+
+class attach_ev3_keys(object):
+    """
+    This is a decorator class, used to add properties to the Button class.
+	"""
+
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+
+    def __call__(self, cls):
+        key_const = {}
+        for key_name, key_code in self.kwargs.items():
+            def attach_key(key_name, key_code):
+                def fget(self):
+                    buf = self.polling()
+                    return self.test_bit(key_code, buf)
+
+                return property(fget)
+
+            setattr(cls, key_name, attach_key(key_name, key_code))
+            key_const[key_name.upper()] = key_code
+        return cls
+
+
+import array
+import fcntl
+
+
+@attach_ev3_keys(  # Class decorator with arguments. Yay!
+                   up=103,
+                   down=108,
+                   left=105,
+                   right=106,
+                   enter=28,
+                   backspace=14
+)
+class Button(object):
+    """
+    This class allows you to check the state of the buttons on the Ev3 bick.
+    The properties are: up, down, left, right, enter, backspace.
+    Use like this:
+        b = Button()
+        if b.up: print "Up-button is pressed!"
+    """
+    def __init__(self):
+        pass
+
+
+    def EVIOCGKEY(self, length):
+        return 2 << (14 + 8 + 8) | length << (8 + 8) | ord('E') << 8 | 0x18
+
+
+    def test_bit(self, bit, bytes):
+        # bit in bytes is 1 when released and 0 when pressed
+        return not bool(bytes[int(bit / 8)] & 1 << bit % 8)
+
+
+    def polling(self):
+        KEY_MAX = 0x2ff
+        BUF_LEN = int((KEY_MAX + 7) / 8)
+        buf = array.array('B', [0] * BUF_LEN)
+        with open('/dev/input/by-path/platform-gpio-keys.0-event', 'r') as fd:
+            ret = fcntl.ioctl(fd, self.EVIOCGKEY(len(buf)), buf)
+        if (ret < 0):
+            return None
+        else:
+            return buf
 
