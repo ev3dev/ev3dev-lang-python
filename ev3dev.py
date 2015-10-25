@@ -1746,32 +1746,32 @@ class Button(object):
             return not bool(self._buf[int(button / 8)] & 1 << button % 8)
 
 #~autogen
-if current_platform() == 'ev3':
+    if current_platform() == 'ev3':
 #~autogen button-property platforms.ev3.button>currentClass
 
-    @property
-    def up(self):
-        return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 103)
+        @property
+        def up(self):
+            return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 103)
 
-    @property
-    def down(self):
-        return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 108)
+        @property
+        def down(self):
+            return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 108)
 
-    @property
-    def left(self):
-        return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 105)
+        @property
+        def left(self):
+            return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 105)
 
-    @property
-    def right(self):
-        return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 106)
+        @property
+        def right(self):
+            return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 106)
 
-    @property
-    def enter(self):
-        return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 28)
+        @property
+        def enter(self):
+            return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 28)
 
-    @property
-    def backspace(self):
-        return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 14)
+        @property
+        def backspace(self):
+            return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 14)
 
 
 #~autogen

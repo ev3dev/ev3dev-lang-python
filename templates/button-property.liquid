@@ -1,5 +1,5 @@
 {% for instance in currentClass.instances %}
-    @property
-    def {{ instance.name }}(self):
-        return self.read_button('{{ currentClass.systemPath }}/{{ instance.systemName }}', {{ instance.systemValue }})
+        @property
+        def {{ instance.name }}(self):
+            return self.read_button('{{ currentClass.systemPath }}/{{ instance.systemName }}', {{ instance.systemValue }})
 {% endfor %}
