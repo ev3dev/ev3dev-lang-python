@@ -1,23 +1,6 @@
 {%
 assign class_name = currentClass.friendlyName | camel_case | capitalize %}{%
-comment %}{%
-if currentClass.systemDeviceNameConvention %}{%
-    assign device_name_convention = currentClass.systemDeviceNameConvention | replace: '\{\d\}', '*' %}{%
-else %}{%
-    assign device_name_convention = '*' %}{%
-endif %}{%
-if currentClass.inheritance %}{%
-    assign base_class = currentClass.inheritance | camel_case | capitalize %}{%
-else %}{%
-    assign base_class = 'Device' %}{%
-endif%}{%
-assign driver_name = "" %}{%
-if currentClass.driverName %}{%
-    for name in currentClass.driverName %}{%
-        capture driver_name %}{{ driver_name }}, '{{name}}'{% endcapture %}{%
-    endfor %}{%
-    capture driver_name %} driver_name=[{{ driver_name | remove_first:', ' }}],{% endcapture %}{%
-endif %}{% endcomment %}
+assign base_class = 'object' %}
 import fcntl
 import array
 
@@ -25,6 +8,10 @@ class {{ class_name }}({{ base_class }}):
 
     """{% for line in currentClass.description %}
     {{ line }}{% endfor %}
+
+    This implementation depends on the availability of the EVIOCGKEY ioctl
+    to be able to read the button state buffer. See Linux kernel source
+    in /include/uapi/linux/input.h for details.
     """
 
     KEY_MAX = 0x2FF
@@ -44,46 +31,8 @@ class {{ class_name }}({{ base_class }}):
         return f
 
     def read_button(self, name, button):
-        ret = fcntl.ioctl(self._button_file('/dev/input/by-path/platform-gpio-keys.0-event'), self.EVIOCGKEY, self._buf)
+        ret = fcntl.ioctl(self._button_file(name), self.EVIOCGKEY, self._buf)
         if (ret < 0):
             return None
 	else:
             return not bool(self._buf[int(button / 8)] & 1 << button % 8)
-
-    @property
-    def up(self):
-        return self.read_button( 'platform-gpio-keys.0-event', 103 )
-
-    @property
-    def down(self):
-        return self.read_button( 'platform-gpio-keys.0-event', 108 )
-
-    @property
-    def left(self):
-        return self.read_button( 'platform-gpio-keys.0-event', 105 )
-
-    @property
-    def right(self):
-        return self.read_button( 'platform-gpio-keys.0-event', 106 )
-
-    @property
-    def enter(self):
-        return self.read_button( 'platform-gpio-keys.0-event', 28 )
-
-    @property
-    def backspace(self):
-        return self.read_button( 'platform-gpio-keys.0-event', 14 )
-
-{% comment %}
-{% if currentClass.inheritance %}
-    SYSTEM_CLASS_NAME = {{ base_class }}.SYSTEM_CLASS_NAME
-    SYSTEM_DEVICE_NAME_CONVENTION = {{ base_class }}.SYSTEM_DEVICE_NAME_CONVENTION
-{% else %}
-    SYSTEM_CLASS_NAME = '{{ currentClass.systemClassName }}'
-    SYSTEM_DEVICE_NAME_CONVENTION = '{{ device_name_convention }}'
-{% endif %}
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
-        if port is not None:
-            kwargs['port_name'] = port
-        Device.__init__(self, self.SYSTEM_CLASS_NAME, name,{{ driver_name }} **kwargs)
-{% endcomment %}

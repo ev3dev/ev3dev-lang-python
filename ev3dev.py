@@ -31,6 +31,8 @@ import os.path
 import fnmatch
 import numbers
 import platform
+import fcntl
+import array
 
 #------------------------------------------------------------------------------
 # Guess platform we are running on
@@ -1707,13 +1709,17 @@ elif current_platform() == 'brickpi':
 import fcntl
 import array
 
-class Button():
+class Button(object):
 
     """
     Provides a generic button reading mechanism that can be adapted
     to platform specific implementations. Each platform's specific
     button capabilites are enumerated in the 'platforms' section
     of this specification
+
+    This implementation depends on the availability of the EVIOCGKEY ioctl
+    to be able to read the button state buffer. See Linux kernel source
+    in /include/uapi/linux/input.h for details.
     """
 
     KEY_MAX = 0x2FF
@@ -1733,36 +1739,39 @@ class Button():
         return f
 
     def read_button(self, name, button):
-        ret = fcntl.ioctl(self._button_file('/dev/input/by-path/platform-gpio-keys.0-event'), self.EVIOCGKEY, self._buf)
+        ret = fcntl.ioctl(self._button_file(name), self.EVIOCGKEY, self._buf)
         if (ret < 0):
             return None
 	else:
             return not bool(self._buf[int(button / 8)] & 1 << button % 8)
 
+#~autogen
+if current_platform() == 'ev3':
+#~autogen button-property platforms.ev3.button>currentClass
+
     @property
     def up(self):
-        return self.read_button( 'platform-gpio-keys.0-event', 103 )
+        return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 103)
 
     @property
     def down(self):
-        return self.read_button( 'platform-gpio-keys.0-event', 108 )
+        return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 108)
 
     @property
     def left(self):
-        return self.read_button( 'platform-gpio-keys.0-event', 105 )
+        return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 105)
 
     @property
     def right(self):
-        return self.read_button( 'platform-gpio-keys.0-event', 106 )
+        return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 106)
 
     @property
     def enter(self):
-        return self.read_button( 'platform-gpio-keys.0-event', 28 )
+        return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 28)
 
     @property
     def backspace(self):
-        return self.read_button( 'platform-gpio-keys.0-event', 14 )
-
+        return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 14)
 
 
 #~autogen
