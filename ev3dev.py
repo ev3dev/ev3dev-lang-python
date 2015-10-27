@@ -2157,7 +2157,7 @@ class LCD(FbMem):
 
         self._img = Image.new("1", (alignup(self.xres, 32), self.yres), "white")
 
-        self.draw = ImageDraw.Draw(self._img)
+        self._draw = ImageDraw.Draw(self._img)
 
     @property
     def xres(self):
@@ -2187,13 +2187,13 @@ class LCD(FbMem):
         Example::
             lcd.draw.rectangle((10,10,60,20), fill='black')
         """
-        return self.draw
+        return self._draw
 
     def clear(self):
         """
         Clears the LCD screen
         """
-        self.draw.rectangle(((0,0), self.shape), fill="white")
+        self._draw.rectangle(((0,0), self.shape), fill="white")
 
     def update(self):
         """
