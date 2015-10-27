@@ -6,5 +6,5 @@
 {% for instance in currentClass.instances %}
         @property
         def {{ instance.name }}(self):
-            return '{{ instance.name }}' in self.check_buttons()
+            return '{{ instance.name }}' in self.buttons_pressed
 {% endfor %}
