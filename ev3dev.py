@@ -1727,8 +1727,11 @@ class Button(object):
     EVIOCGKEY = (2 << (14 + 8 + 8) | KEY_BUF_LEN << (8 + 8) | ord('E') << 8 | 0x18)
 
     def __init__(self):
-        self._buf = array.array( 'B', [0] * self.KEY_BUF_LEN )
+        self.buffer_cache = {}
         self.filehandle_cache = {}
+        for b in self._buttons:
+            self._button_file( self._buttons[b]['name'] )
+            self._button_buffer( self._buttons[b]['name'] )
 
     def _button_file(self, name):
         if name not in self.filehandle_cache:
@@ -1738,40 +1741,79 @@ class Button(object):
             f = self.filehandle_cache[name]
         return f
 
-    def read_button(self, name, button):
-        ret = fcntl.ioctl(self._button_file(name), self.EVIOCGKEY, self._buf)
-        if (ret < 0):
-            return None
-	else:
-            return not bool(self._buf[int(button / 8)] & 1 << button % 8)
+    def _button_buffer(self, name):
+        if name not in self.buffer_cache:
+            self.buffer_cache[name] = array.array( 'B', [0] * self.KEY_BUF_LEN )
+        return self.buffer_cache[name]
+
+    def read_buttons(self):
+        for b in self.buffer_cache:
+            fcntl.ioctl(self.filehandle_cache[b], self.EVIOCGKEY, self.buffer_cache[b])
+
+    def check_buttons(self):
+        pressed = []
+        self.read_buttons()
+        for k,v in self._buttons.items():
+            buf = self.buffer_cache[v['name']]
+            bit = v['value']
+            if not bool(buf[int(bit / 8)] & 1 << bit % 8):
+                pressed += [k]
+        return pressed
+
+    @property
+    def any(self):
+        return bool(len(self.check_buttons()) != 0)
+
+    @property
+    def which(self):
+        return self.check_buttons()
+
+    def these(self,buttons={}):
+        if len(buttons) == 0:
+            return False
+        s = self.check_buttons()
+        if len(s) == 0:
+            return False
+        for b in buttons:
+            if b not in s:
+                return False
+        return True
 
 #~autogen
     if current_platform() == 'ev3':
 #~autogen button-property platforms.ev3.button>currentClass
+        _buttons = { 
+            'up' : { 'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 103 },
+            'down' : { 'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 108 },
+            'left' : { 'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 105 },
+            'right' : { 'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 106 },
+            'enter' : { 'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 28 },
+            'backspace' : { 'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 14 },
+        }
 
         @property
         def up(self):
-            return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 103)
+            return 'up' in self.check_buttons()
 
         @property
         def down(self):
-            return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 108)
+            return 'down' in self.check_buttons()
 
         @property
         def left(self):
-            return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 105)
+            return 'left' in self.check_buttons()
 
         @property
         def right(self):
-            return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 106)
+            return 'right' in self.check_buttons()
 
         @property
         def enter(self):
-            return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 28)
+            return 'enter' in self.check_buttons()
 
         @property
         def backspace(self):
-            return self.read_button('/dev/input/by-path/platform-gpio-keys.0-event', 14)
+            return 'backspace' in self.check_buttons()
 
 
 #~autogen
