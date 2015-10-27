@@ -1767,7 +1767,7 @@ class Button(object):
     def any(self):
         return bool(self.buttons_pressed)
 
-    def these(self,buttons={}):
+    def check_buttons(self,buttons=[]):
         if len(buttons) == 0:
             return False
         s = self.buttons_pressed
