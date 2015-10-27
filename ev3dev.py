@@ -1722,6 +1722,8 @@ class Button(object):
     in /include/uapi/linux/input.h for details.
     """
 
+#~autogen
+
     KEY_MAX = 0x2FF
     KEY_BUF_LEN = int((KEY_MAX + 7) / 8)
     EVIOCGKEY = (2 << (14 + 8 + 8) | KEY_BUF_LEN << (8 + 8) | ord('E') << 8 | 0x18)
@@ -1779,7 +1781,6 @@ class Button(object):
                 return False
         return True
 
-#~autogen
     if current_platform() == 'ev3':
 #~autogen button-property platforms.ev3.button>currentClass
         _buttons = { 
