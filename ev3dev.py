@@ -37,6 +37,7 @@ import array
 import mmap
 import ctypes
 from PIL import Image, ImageDraw
+from struct import unpack
 
 #------------------------------------------------------------------------------
 # Guess platform we are running on
@@ -1225,6 +1226,58 @@ class Sensor(Device):
             return self.get_attr_int( 'value'+n )
         else:
             return 0
+
+    @property
+    def bin_data_format(self):
+        """
+        Returns the format of the values in `bin_data` for the current mode.
+        Possible values are:
+
+           - `u8`: Unsigned 8-bit integer (byte)
+           - `s8`: Signed 8-bit integer (sbyte)
+           - `u16`: Unsigned 16-bit integer (ushort)
+           - `s16`: Signed 16-bit integer (short)
+           - `s16_be`: Signed 16-bit integer, big endian
+           - `s32`: Signed 32-bit integer (int)
+           - `float`: IEEE 754 32-bit floating point (float)
+        """
+        return self.get_attr_string('bin_data_format')
+
+
+    def bin_data(self, fmt=None):
+        """
+        Returns the unscaled raw values in the `value<N>` attributes as raw byte
+        array. Use `bin_data_format`, `num_values` and the individual sensor
+        documentation to determine how to interpret the data.
+
+        Use `fmt` to unpack the raw bytes into a struct.
+        Example:
+        >>> from ev3dev import *
+        >>> ir = InfraredSensor()
+        >>> ir.value()
+        28
+        >>> ir.bin_data('<b')
+        (28,)
+        """
+
+        if '_bin_data_size' not in self.__dict__:
+            self._bin_data_size = {
+                    "u8":     1,
+                    "s8":     1,
+                    "u16":    2,
+                    "s16":    2,
+                    "s16_be": 2,
+                    "s32":    4,
+                    "float":  4
+                }.get(self.bin_data_format, 1) * self.num_values
+
+        f = self._attribute_file('bin_data', 'rb')
+        f.seek(0)
+        raw = bytearray(f.read(self._bin_data_size))
+
+        if fmt is None: return raw
+
+        return unpack(fmt, raw)
 
 #~autogen generic-class classes.i2cSensor>currentClass
 
