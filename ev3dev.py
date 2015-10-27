@@ -1880,6 +1880,21 @@ class PowerSupply(Device):
 
 
 #~autogen
+
+    @property
+    def measured_amps(self):
+        """
+        The measured current that the battery is supplying (in amps)
+        """
+        return self.measured_current / 1e6
+
+    @property
+    def measured_volts(self):
+        """
+        The measured voltage that the battery is supplying (in volts)
+        """
+        return self.measured_voltage / 1e6
+
 #~autogen generic-class classes.legoPort>currentClass
 
 class LegoPort(Device):
