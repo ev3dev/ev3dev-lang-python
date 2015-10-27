@@ -2141,7 +2141,7 @@ class FbMem(object):
             offset=0
         )
 
-class LCD(FbMem):
+class Screen(FbMem):
     """
     A convenience wrapper for the FbMem class.
     Provides drawing functions from the python imaging library (PIL).
@@ -2162,28 +2162,28 @@ class LCD(FbMem):
     @property
     def xres(self):
         """
-        Horizontal LCD screen resolution
+        Horizontal screen resolution
         """
         return self.var_info.xres
 
     @property
     def yres(self):
         """
-        Vertical LCD screen resolution
+        Vertical screen resolution
         """
         return self.var_info.yres
 
     @property
     def shape(self):
         """
-        Dimensions of the LCD screen.
+        Dimensions of the screen.
         """
         return (self.xres, self.yres)
 
     @property
     def draw(self):
         """
-        Returns a handle to PIL.ImageDraw.Draw class associated with LCD.
+        Returns a handle to PIL.ImageDraw.Draw class associated with the screen.
         Example::
             lcd.draw.rectangle((10,10,60,20), fill='black')
         """
@@ -2191,13 +2191,13 @@ class LCD(FbMem):
 
     def clear(self):
         """
-        Clears the LCD screen
+        Clears the screen
         """
         self._draw.rectangle(((0,0), self.shape), fill="white")
 
     def update(self):
         """
-        Applies pending changes to the LCD.
+        Applies pending changes to the screen.
         Nothing will be drawn on the screen until this function is called.
         """
         self.mmap[:] = self._img.tobytes("raw", "1;IR")
