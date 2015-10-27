@@ -2023,6 +2023,9 @@ class FbMem(object):
     FBIOGET_VSCREENINFO = 0x4600
     FBIOGET_FSCREENINFO = 0x4602
 
+    FB_VISUAL_MONO01 = 0
+    FB_VISUAL_MONO10 = 1
+
     class FixScreenInfo(ctypes.Structure):
 
         """The fb_fix_screeninfo from fb.h."""
@@ -2150,12 +2153,10 @@ class Screen(FbMem):
     def __init__(self):
         FbMem.__init__(self)
 
-        def alignup(n, m):
-            r = n % m
-            if r == 0: return n
-            return n - r + m
-
-        self._img = Image.new("1", (alignup(self.xres, 32), self.yres), "white")
+        self._img = Image.new(
+                "%s" % self.var_info.bits_per_pixel,
+                (self.fix_info.line_length * 8 / self.var_info.bits_per_pixel, self.yres),
+                "white")
 
         self._draw = ImageDraw.Draw(self._img)
 
@@ -2200,5 +2201,6 @@ class Screen(FbMem):
         Applies pending changes to the screen.
         Nothing will be drawn on the screen until this function is called.
         """
-        self.mmap[:] = self._img.tobytes("raw", "1;IR")
+        self.mmap[:] = self._img.tobytes("raw", "%s;I%s" % (self.var_info.bits_per_pixel,
+            self.fix_info.visual in [FbMem.FB_VISUAL_MONO01, FbMem.FB_VISUAL_MONO10] and "R" or ""))
 
