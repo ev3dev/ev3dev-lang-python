@@ -1752,7 +1752,8 @@ class Button(object):
         for b in self.buffer_cache:
             fcntl.ioctl(self.filehandle_cache[b], self.EVIOCGKEY, self.buffer_cache[b])
 
-    def check_buttons(self):
+    @property
+    def buttons_pressed(self):
         pressed = []
         self.read_buttons()
         for k,v in self._buttons.items():
@@ -1764,16 +1765,12 @@ class Button(object):
 
     @property
     def any(self):
-        return bool(len(self.check_buttons()) != 0)
-
-    @property
-    def which(self):
-        return self.check_buttons()
+        return bool(self.buttons_pressed)
 
     def these(self,buttons={}):
         if len(buttons) == 0:
             return False
-        s = self.check_buttons()
+        s = self.buttons_pressed
         if len(s) == 0:
             return False
         for b in buttons:
@@ -1794,27 +1791,27 @@ class Button(object):
 
         @property
         def up(self):
-            return 'up' in self.check_buttons()
+            return 'up' in self.buttons_pressed
 
         @property
         def down(self):
-            return 'down' in self.check_buttons()
+            return 'down' in self.buttons_pressed
 
         @property
         def left(self):
-            return 'left' in self.check_buttons()
+            return 'left' in self.buttons_pressed
 
         @property
         def right(self):
-            return 'right' in self.check_buttons()
+            return 'right' in self.buttons_pressed
 
         @property
         def enter(self):
-            return 'enter' in self.check_buttons()
+            return 'enter' in self.buttons_pressed
 
         @property
         def backspace(self):
-            return 'backspace' in self.check_buttons()
+            return 'backspace' in self.buttons_pressed
 
 
 #~autogen
