@@ -37,7 +37,7 @@ import array
 import mmap
 import ctypes
 from PIL import Image, ImageDraw
-from struct import unpack
+from struct import pack, unpack
 
 #------------------------------------------------------------------------------
 # Guess platform we are running on
@@ -2220,7 +2220,7 @@ class Screen(FbMem):
         FbMem.__init__(self)
 
         self._img = Image.new(
-                "%s" % self.var_info.bits_per_pixel,
+                self.var_info.bits_per_pixel == 1 and "1" or "RGB",
                 (self.fix_info.line_length * 8 / self.var_info.bits_per_pixel, self.yres),
                 "white")
 
@@ -2262,11 +2262,24 @@ class Screen(FbMem):
         """
         self._draw.rectangle(((0,0), self.shape), fill="white")
 
+    def _color565(self, r, g, b):
+	"""Convert red, green, blue components to a 16-bit 565 RGB value. Components
+	should be values 0 to 255.
+	"""
+	return (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3))
+
+    def _img_to_rgb565_bytes(self):
+        pixels = [self._color565(r,g,b) for (r,g,b) in self._img.getdata()]
+        return pack('H' * len(pixels), *pixels)
+
     def update(self):
         """
         Applies pending changes to the screen.
         Nothing will be drawn on the screen until this function is called.
         """
-        self.mmap[:] = self._img.tobytes("raw", "%s;I%s" % (self.var_info.bits_per_pixel,
-            self.fix_info.visual in [FbMem.FB_VISUAL_MONO01, FbMem.FB_VISUAL_MONO10] and "R" or ""))
-
+        if self.var_info.bits_per_pixel == 1:
+            self.mmap[:] = self._img.tobytes("raw", "1;IR")
+        elif self.var_info.bits_per_pixel == 16:
+            self.mmap[:] = self._img_to_rgb565_bytes()
+        else:
+            raise Exception("Not supported")
