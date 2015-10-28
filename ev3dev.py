@@ -1864,6 +1864,110 @@ class Button(object):
 
 
 #~autogen
+
+class RemoteControl(object):
+    """
+    EV3 Remote Control
+    """
+
+    _BUTTON_VALUES = {
+            1:  ['red_up'],
+            2:  ['red_down'],
+            3:  ['blue_up'],
+            4:  ['blue_down'],
+            5:  ['red_up',   'blue_up'],
+            6:  ['red_up',   'blue_down'],
+            7:  ['red_down', 'blue_up'],
+            8:  ['red_down', 'blue_down'],
+            9:  ['beacon'],
+            10: ['red_up',   'red_down'],
+            11: ['blue_up',  'blue_down']
+            }
+
+    on_red_up    = None
+    on_red_down  = None
+    on_blue_up   = None
+    on_blue_down = None
+    on_beacon    = None
+    on_change    = None
+
+    def __init__(self, sensor=None, channel=1):
+        if sensor is None:
+            self._sensor = InfraredSensor()
+        else:
+            self._sensor = sensor
+
+        self._channel = max(1, min(4, channel)) - 1
+        self._state = set([])
+
+        if self._sensor.connected:
+            self._sensor.mode = 'IR-REMOTE'
+
+    @property
+    def buttons_pressed(self):
+        """
+        Returns list of currently pressed buttons.
+        """
+        return RemoteControl._BUTTON_VALUES.get(self._sensor.value(self._channel), [])
+
+    @property
+    def any(self):
+        """
+        Checks if any button is pressed.
+        """
+        return bool(self.buttons_pressed)
+
+    def check_buttons(self, buttons=[]):
+        return set(self.buttons_pressed) == set(buttons)
+
+    @property
+    def red_up(self):
+        """
+        Checks if `red_up` button is pressed
+        """
+        return 'red_up' in self.buttons_pressed
+
+    @property
+    def red_down(self):
+        """
+        Checks if `red_down` button is pressed
+        """
+        return 'red_down' in self.buttons_pressed
+
+    @property
+    def blue_up(self):
+        """
+        Checks if `blue_up` button is pressed
+        """
+        return 'blue_up' in self.buttons_pressed
+
+    @property
+    def blue_down(self):
+        """
+        Checks if `blue_down` button is pressed
+        """
+        return 'blue_down' in self.buttons_pressed
+
+    @property
+    def beacon(self):
+        """
+        Checks if `beacon` button is pressed
+        """
+        return 'beacon' in self.buttons_pressed
+
+    def process(self):
+        new_state = set(self.buttons_pressed)
+        old_state = self._state
+        self._state = new_state
+
+        state_diff = new_state.symmetric_difference(old_state)
+        for button in state_diff:
+            handler = getattr(self, 'on_' + button)
+            if handler is not None: handler(button in new_state)
+
+        if self.on_change is not None and state_diff:
+            self.on_change([(button, button in new_state) for button in state_diff])
+
 #~autogen generic-class classes.powerSupply>currentClass
 
 class PowerSupply(Device):
@@ -2276,106 +2380,3 @@ class Screen(FbMem):
         else:
             raise Exception("Not supported")
 
-
-class RemoteControl(object):
-    """
-    EV3 Remote Control
-    """
-
-    _BUTTON_VALUES = {
-            1:  ['red_up'],
-            2:  ['red_down'],
-            3:  ['blue_up'],
-            4:  ['blue_down'],
-            5:  ['red_up',   'blue_up'],
-            6:  ['red_up',   'blue_down'],
-            7:  ['red_down', 'blue_up'],
-            8:  ['red_down', 'blue_down'],
-            9:  ['beacon'],
-            10: ['red_up',   'red_down'],
-            11: ['blue_up',  'blue_down']
-            }
-
-    on_red_up    = None
-    on_red_down  = None
-    on_blue_up   = None
-    on_blue_down = None
-    on_beacon    = None
-    on_change    = None
-
-    def __init__(self, sensor=None, channel=1):
-        if sensor is None:
-            self._sensor = InfraredSensor()
-        else:
-            self._sensor = sensor
-
-        self._channel = max(1, min(4, channel)) - 1
-        self._state = set([])
-
-        if self._sensor.connected:
-            self._sensor.mode = 'IR-REMOTE'
-
-    @property
-    def buttons_pressed(self):
-        """
-        Returns list of currently pressed buttons.
-        """
-        return RemoteControl._BUTTON_VALUES.get(self._sensor.value(self._channel), [])
-
-    @property
-    def any(self):
-        """
-        Checks if any button is pressed.
-        """
-        return bool(self.buttons_pressed)
-
-    def check_buttons(self, buttons=[]):
-        return set(self.buttons_pressed) == set(buttons)
-
-    @property
-    def red_up(self):
-        """
-        Checks if `red_up` button is pressed
-        """
-        return 'red_up' in self.buttons_pressed
-
-    @property
-    def red_down(self):
-        """
-        Checks if `red_down` button is pressed
-        """
-        return 'red_down' in self.buttons_pressed
-
-    @property
-    def blue_up(self):
-        """
-        Checks if `blue_up` button is pressed
-        """
-        return 'blue_up' in self.buttons_pressed
-
-    @property
-    def blue_down(self):
-        """
-        Checks if `blue_down` button is pressed
-        """
-        return 'blue_down' in self.buttons_pressed
-
-    @property
-    def beacon(self):
-        """
-        Checks if `beacon` button is pressed
-        """
-        return 'beacon' in self.buttons_pressed
-
-    def process(self):
-        new_state = set(self.buttons_pressed)
-        old_state = self._state
-        self._state = new_state
-
-        state_diff = new_state.symmetric_difference(old_state)
-        for button in state_diff:
-            handler = getattr(self, 'on_' + button)
-            if handler is not None: handler(button in new_state)
-
-        if self.on_change is not None and state_diff:
-            self.on_change([(button, button in new_state) for button in state_diff])
