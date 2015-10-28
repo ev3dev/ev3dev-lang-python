@@ -2275,3 +2275,65 @@ class Screen(FbMem):
             self.mmap[:] = self._img_to_rgb565_bytes()
         else:
             raise Exception("Not supported")
+
+
+class RemoteControl(object):
+    """
+    EV3 Remote Control
+    """
+
+    _BUTTON_VALUES = {
+            1:  ['red_up'],
+            2:  ['red_down'],
+            3:  ['blue_up'],
+            4:  ['blue_down'],
+            5:  ['red_up',   'blue_up'],
+            6:  ['red_up',   'blue_down'],
+            7:  ['red_down', 'blue_up'],
+            8:  ['red_down', 'blue_down'],
+            9:  ['beacon'],
+            10: ['red_up',   'red_down'],
+            11: ['blue_up',  'blue_down']
+            }
+
+    def __init__(self, sensor=None, channel=1):
+        if sensor is None:
+            self._sensor = InfraredSensor()
+        else:
+            self._sensor = sensor
+
+        self._channel = max(1, min(4, channel)) - 1
+
+        if self._sensor.connected:
+            self._sensor.mode = 'IR-REMOTE'
+
+    @property
+    def buttons_pressed(self):
+        return RemoteControl._BUTTON_VALUES.get(self._sensor.value(self._channel), [])
+
+    @property
+    def any(self):
+        return bool(self.buttons_pressed)
+
+    def check_buttons(self, buttons=[]):
+        return set(self.buttons_pressed) == set(buttons)
+
+    @property
+    def red_up(self):
+        return 'red_up' in self.buttons_pressed
+
+    @property
+    def red_down(self):
+        return 'red_down' in self.buttons_pressed
+
+    @property
+    def blue_up(self):
+        return 'blue_up' in self.buttons_pressed
+
+    @property
+    def blue_down(self):
+        return 'blue_down' in self.buttons_pressed
+
+    @property
+    def beacon(self):
+        return 'beacon' in self.buttons_pressed
