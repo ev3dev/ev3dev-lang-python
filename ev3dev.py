@@ -1825,15 +1825,7 @@ class Button(object):
         return bool(self.buttons_pressed)
 
     def check_buttons(self,buttons=[]):
-        if len(buttons) == 0:
-            return False
-        s = self.buttons_pressed
-        if len(s) == 0:
-            return False
-        for b in buttons:
-            if b not in s:
-                return False
-        return True
+        return set(self.buttons_pressed) == set(buttons)
 
     if current_platform() == 'ev3':
 #~autogen button-property platforms.ev3.button>currentClass
