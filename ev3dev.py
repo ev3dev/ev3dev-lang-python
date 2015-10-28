@@ -2255,10 +2255,10 @@ class Screen(FbMem):
         self._draw.rectangle(((0,0), self.shape), fill="white")
 
     def _color565(self, r, g, b):
-	"""Convert red, green, blue components to a 16-bit 565 RGB value. Components
-	should be values 0 to 255.
-	"""
-	return (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3))
+        """Convert red, green, blue components to a 16-bit 565 RGB value. Components
+        should be values 0 to 255.
+        """
+        return (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3))
 
     def _img_to_rgb565_bytes(self):
         pixels = [self._color565(r,g,b) for (r,g,b) in self._img.getdata()]
