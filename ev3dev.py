@@ -72,7 +72,7 @@ class FileCache(object):
 
         return f
 
-    def read(self, path, size=None):
+    def read(self, path, size=-1):
         f = self.file_handle(path, 'r')
 
         try:
@@ -81,7 +81,7 @@ class FileCache(object):
             f = self.file_handle( path, 'w+', reopen=True )
             value = f.read(size)
 
-        if size is None:
+        if size < 0:
             return value.strip()
         else:
             return value
@@ -154,7 +154,7 @@ class Device(object):
         else:
             return value.find(pattern) >= 0
 
-    def _get_attribute( self, attribute, size=None ):
+    def _get_attribute( self, attribute, size=-1 ):
         """Device attribute getter"""
         return self._attribute_cache.read(abspath(self._path + '/' + attribute), size)
 
