@@ -56,6 +56,10 @@ class FileCache(object):
     def __init__(self):
         self._cache = {}
 
+    def __del__(self):
+        for f in self._cache.values():
+            f.close()
+
     def file_handle( self, path, mode, reopen=False ):
         """Manages the file handle cache and opening the files in the correct mode"""
 
