@@ -1,10 +1,4 @@
-{%
-assign class_name = currentClass.friendlyName | camel_case | capitalize %}{%
-assign base_class = 'object' %}
-import fcntl
-import array
-
-class {{ class_name }}({{ base_class }}):
+class Button(ButtonBase):
 
     """{% for line in currentClass.description %}
     {{ line }}{% endfor %}

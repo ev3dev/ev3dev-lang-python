@@ -1761,12 +1761,48 @@ elif current_platform() == 'brickpi':
 
 
 #~autogen
+
+class ButtonBase(object):
+    """
+    Abstract button interface.
+    """
+
+    on_change = None
+
+    _state = set([])
+
+    @property
+    def any(self):
+        """
+        Checks if any button is pressed.
+        """
+        return bool(self.buttons_pressed)
+
+    def check_buttons(self,buttons=[]):
+        """
+        Check if currently pressed buttons exactly match the given list.
+        """
+        return set(self.buttons_pressed) == set(buttons)
+
+    def process(self):
+        """
+        Check for currenly pressed buttons. If the new state differs from the
+        old state, call the appropriate button event handlers.
+        """
+        new_state = set(self.buttons_pressed)
+        old_state = self._state
+        self._state = new_state
+
+        state_diff = new_state.symmetric_difference(old_state)
+        for button in state_diff:
+            handler = getattr(self, 'on_' + button)
+            if handler is not None: handler(button in new_state)
+
+        if self.on_change is not None and state_diff:
+            self.on_change([(button, button in new_state) for button in state_diff])
+
 #~autogen button-class classes.button>currentClass
-
-import fcntl
-import array
-
-class Button(object):
+class Button(ButtonBase):
 
     """
     Provides a generic button reading mechanism that can be adapted
@@ -1805,14 +1841,12 @@ class Button(object):
             self.buffer_cache[name] = array.array( 'B', [0] * self.KEY_BUF_LEN )
         return self.buffer_cache[name]
 
-    def read_buttons(self):
+    @property
+    def buttons_pressed(self):
         for b in self.buffer_cache:
             fcntl.ioctl(self.filehandle_cache[b], self.EVIOCGKEY, self.buffer_cache[b])
 
-    @property
-    def buttons_pressed(self):
         pressed = []
-        self.read_buttons()
         for k,v in self._buttons.items():
             buf = self.buffer_cache[v['name']]
             bit = v['value']
@@ -1820,16 +1854,17 @@ class Button(object):
                 pressed += [k]
         return pressed
 
-    @property
-    def any(self):
-        return bool(self.buttons_pressed)
-
-    def check_buttons(self,buttons=[]):
-        return set(self.buttons_pressed) == set(buttons)
-
     if current_platform() == 'ev3':
 #~autogen button-property platforms.ev3.button>currentClass
-        _buttons = { 
+
+        on_up = None
+        on_down = None
+        on_left = None
+        on_right = None
+        on_enter = None
+        on_backspace = None
+
+        _buttons = {
             'up' : { 'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 103 },
             'down' : { 'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 108 },
             'left' : { 'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 105 },
@@ -1864,6 +1899,97 @@ class Button(object):
 
 
 #~autogen
+
+#~autogen remote-control classes.infraredSensor.remoteControl>currentClass
+class RemoteControl(ButtonBase):
+    """
+    EV3 Remote Controller
+    """
+
+    _BUTTON_VALUES = {
+            0: [],
+            1: ['red_up'],
+            2: ['red_down'],
+            3: ['blue_up'],
+            4: ['blue_down'],
+            5: ['red_up', 'blue_up'],
+            6: ['red_up', 'blue_down'],
+            7: ['red_down', 'blue_up'],
+            8: ['red_down', 'blue_down'],
+            9: ['beacon'],
+            10: ['red_up', 'red_down'],
+            11: ['blue_up', 'blue_down']
+            }
+
+    on_red_up = None
+    on_red_down = None
+    on_blue_up = None
+    on_blue_down = None
+    on_beacon = None
+
+
+    @property
+    def red_up(self):
+        """
+        Checks if `red_up` button is pressed.
+        """
+        return 'red_up' in self.buttons_pressed
+
+
+    @property
+    def red_down(self):
+        """
+        Checks if `red_down` button is pressed.
+        """
+        return 'red_down' in self.buttons_pressed
+
+
+    @property
+    def blue_up(self):
+        """
+        Checks if `blue_up` button is pressed.
+        """
+        return 'blue_up' in self.buttons_pressed
+
+
+    @property
+    def blue_down(self):
+        """
+        Checks if `blue_down` button is pressed.
+        """
+        return 'blue_down' in self.buttons_pressed
+
+
+    @property
+    def beacon(self):
+        """
+        Checks if `beacon` button is pressed.
+        """
+        return 'beacon' in self.buttons_pressed
+
+
+
+#~autogen
+
+    def __init__(self, sensor=None, channel=1):
+        if sensor is None:
+            self._sensor = InfraredSensor()
+        else:
+            self._sensor = sensor
+
+        self._channel = max(1, min(4, channel)) - 1
+        self._state = set([])
+
+        if self._sensor.connected:
+            self._sensor.mode = 'IR-REMOTE'
+
+    @property
+    def buttons_pressed(self):
+        """
+        Returns list of currently pressed buttons.
+        """
+        return RemoteControl._BUTTON_VALUES.get(self._sensor.value(self._channel), [])
+
 #~autogen generic-class classes.powerSupply>currentClass
 
 class PowerSupply(Device):
@@ -2255,10 +2381,10 @@ class Screen(FbMem):
         self._draw.rectangle(((0,0), self.shape), fill="white")
 
     def _color565(self, r, g, b):
-	"""Convert red, green, blue components to a 16-bit 565 RGB value. Components
-	should be values 0 to 255.
-	"""
-	return (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3))
+        """Convert red, green, blue components to a 16-bit 565 RGB value. Components
+        should be values 0 to 255.
+        """
+        return (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3))
 
     def _img_to_rgb565_bytes(self):
         pixels = [self._color565(r,g,b) for (r,g,b) in self._img.getdata()]
@@ -2275,3 +2401,4 @@ class Screen(FbMem):
             self.mmap[:] = self._img_to_rgb565_bytes()
         else:
             raise Exception("Not supported")
+

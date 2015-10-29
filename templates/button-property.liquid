@@ -1,8 +1,10 @@
-        _buttons = { {%
-   for instance in currentClass.instances %}
-            '{{ instance.name }}' : { 'name': '{{ currentClass.systemPath }}/{{ instance.systemName }}', 'value': {{ instance.systemValue }} },{%
-   endfor %}
-        }
+{% for instance in currentClass.instances %}
+        on_{{ instance.name }} = None{%
+endfor %}
+
+        _buttons = {
+{% for instance in currentClass.instances %}            '{{ instance.name }}' : { 'name': '{{ currentClass.systemPath }}/{{ instance.systemName }}', 'value': {{ instance.systemValue }} },
+{% endfor %}        }
 {% for instance in currentClass.instances %}
         @property
         def {{ instance.name }}(self):
