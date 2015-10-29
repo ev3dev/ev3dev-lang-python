@@ -72,7 +72,6 @@ class FileCache(object):
             self._cache[path] = f
         else:
             f = self._cache[path]
-            f.seek(0)
 
         return f
 
