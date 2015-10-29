@@ -28,7 +28,6 @@
 #~autogen
 
 import os
-import os.path
 import fnmatch
 import numbers
 import platform
@@ -36,6 +35,7 @@ import fcntl
 import array
 import mmap
 import ctypes
+from os.path import abspath
 from PIL import Image, ImageDraw
 from struct import pack, unpack
 
@@ -49,6 +49,58 @@ def current_platform():
         return 'brickpi'
     else:
         return 'unsupported'
+
+#------------------------------------------------------------------------------
+# Attribute reader/writer with cached file access
+class FileCache(object):
+    def __init__(self):
+        self._cache = {}
+
+    def __del__(self):
+        for f in self._cache.values():
+            f.close()
+
+    def file_handle( self, path, mode, reopen=False ):
+        """Manages the file handle cache and opening the files in the correct mode"""
+
+        if path not in self._cache:
+            f = open( path, mode )
+            self._cache[path] = f
+        elif reopen == True:
+            self._cache[path].close()
+            f = open( path, mode )
+            self._cache[path] = f
+        else:
+            f = self._cache[path]
+            f.seek(0)
+
+        return f
+
+    def read(self, path, size=-1):
+        f = self.file_handle(path, 'r')
+
+        try:
+            value = f.read(size)
+        except IOError:
+            f = self.file_handle( path, 'w+', reopen=True )
+            value = f.read(size)
+
+        if size < 0:
+            return value.strip()
+        else:
+            return value
+
+    def write(self, path, value):
+        f = self.file_handle( path, 'w' )
+
+        try:
+            f.write( value )
+            f.flush()
+        except IOError:
+            f = self.file_handle( path, 'w+', reopen=True )
+            f.write( value )
+            f.flush()
+
 
 #------------------------------------------------------------------------------
 # Define the base class from which all other ev3dev classes are defined.
@@ -80,12 +132,12 @@ class Device(object):
         When connected succesfully, the `connected` attribute is set to True.
         """
 
-        classpath = os.path.abspath( Device.DEVICE_ROOT_PATH + '/' + class_name )
-        self.filehandle_cache = {}
+        classpath = abspath( Device.DEVICE_ROOT_PATH + '/' + class_name )
+        self._attribute_cache = FileCache()
 
         for file in os.listdir( classpath ):
             if fnmatch.fnmatch(file, name):
-                self._path = os.path.abspath( classpath + '/' + file )
+                self._path = abspath( classpath + '/' + file )
 
                 # See if requested attributes match:
                 if all([self._matches(k, kwargs[k]) for k in kwargs]):
@@ -106,44 +158,13 @@ class Device(object):
         else:
             return value.find(pattern) >= 0
 
-    def _attribute_file( self, attribute, mode, reopen=False ):
-        """Manages the file handle cache and opening the files in the correct mode"""
-
-        attribute_name = os.path.abspath( self._path + '/' + attribute )
-
-        if attribute_name not in self.filehandle_cache:
-            f = open( attribute_name, mode )
-            self.filehandle_cache[attribute_name] = f
-        elif reopen == True:
-            self.filehandle_cache[attribute_name].close()
-            f = open( attribute_name, mode )
-            self.filehandle_cache[attribute_name] = f
-        else:
-            f = self.filehandle_cache[attribute_name]
-        return f
-
-    def _get_attribute( self, attribute ):
+    def _get_attribute( self, attribute, size=-1 ):
         """Device attribute getter"""
-        f = self._attribute_file( attribute, 'r' )
-        try:
-            f.seek(0)
-            value = f.read()
-        except IOError:
-            f = self._attribute_file( attribute, 'w+', True )
-            value = f.read()
-        return value.strip()
+        return self._attribute_cache.read(abspath(self._path + '/' + attribute), size)
 
     def _set_attribute( self, attribute, value ):
         """Device attribute setter"""
-        f = self._attribute_file( attribute, 'w' )
-        try:
-            f.seek(0)
-            f.write( value )
-            f.flush()
-        except IOError:
-            f = self._attribute_file( attribute, 'w+', True )
-            f.write( value )
-            f.flush()
+        self._attribute_cache.write( abspath(self._path + '/' + attribute), value )
 
     def get_attr_int( self, attribute ):
         return int( self._get_attribute( attribute ) )
@@ -1271,9 +1292,7 @@ class Sensor(Device):
                     "float":  4
                 }.get(self.bin_data_format, 1) * self.num_values
 
-        f = self._attribute_file('bin_data', 'rb')
-        f.seek(0)
-        raw = bytearray(f.read(self._bin_data_size))
+        raw = bytearray(self._get_attribute('bin_data', self._bin_data_size))
 
         if fmt is None: return raw
 
@@ -1822,19 +1841,14 @@ class Button(ButtonBase):
     EVIOCGKEY = (2 << (14 + 8 + 8) | KEY_BUF_LEN << (8 + 8) | ord('E') << 8 | 0x18)
 
     def __init__(self):
-        self.buffer_cache = {}
-        self.filehandle_cache = {}
+        self._file_cache = FileCache()
+        self._buffer_cache = {}
         for b in self._buttons:
             self._button_file( self._buttons[b]['name'] )
             self._button_buffer( self._buttons[b]['name'] )
 
     def _button_file(self, name):
-        if name not in self.filehandle_cache:
-            f = open( name, 'r' )
-            self.filehandle_cache[name] = f
-        else:
-            f = self.filehandle_cache[name]
-        return f
+        return self._file_cache.file_handle(name, 'r')
 
     def _button_buffer(self, name):
         if name not in self.buffer_cache:
@@ -1844,7 +1858,7 @@ class Button(ButtonBase):
     @property
     def buttons_pressed(self):
         for b in self.buffer_cache:
-            fcntl.ioctl(self.filehandle_cache[b], self.EVIOCGKEY, self.buffer_cache[b])
+            fcntl.ioctl(self._button_file(b), self.EVIOCGKEY, self.buffer_cache[b])
 
         pressed = []
         for k,v in self._buttons.items():
