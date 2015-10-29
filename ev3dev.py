@@ -1851,18 +1851,18 @@ class Button(ButtonBase):
         return self._file_cache.file_handle(name, 'r')
 
     def _button_buffer(self, name):
-        if name not in self.buffer_cache:
-            self.buffer_cache[name] = array.array( 'B', [0] * self.KEY_BUF_LEN )
-        return self.buffer_cache[name]
+        if name not in self._buffer_cache:
+            self._buffer_cache[name] = array.array( 'B', [0] * self.KEY_BUF_LEN )
+        return self._buffer_cache[name]
 
     @property
     def buttons_pressed(self):
-        for b in self.buffer_cache:
-            fcntl.ioctl(self._button_file(b), self.EVIOCGKEY, self.buffer_cache[b])
+        for b in self._buffer_cache:
+            fcntl.ioctl(self._button_file(b), self.EVIOCGKEY, self._buffer_cache[b])
 
         pressed = []
         for k,v in self._buttons.items():
-            buf = self.buffer_cache[v['name']]
+            buf = self._buffer_cache[v['name']]
             bit = v['value']
             if not bool(buf[int(bit / 8)] & 1 << bit % 8):
                 pressed += [k]
