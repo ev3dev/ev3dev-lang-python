@@ -1664,70 +1664,70 @@ if current_platform() == 'ev3':
     Led.green_right = Led(name='ev3-right1:green:ev3dev')
 
     @staticmethod
-    def Led_mix_colors(red, green):
+    def _Led_mix_colors(red, green):
         Led.red_left.brightness_pct = red
         Led.red_right.brightness_pct = red
         Led.green_left.brightness_pct = green
         Led.green_right.brightness_pct = green
-    Led.mix_colors = Led_mix_colors
+    Led.mix_colors = _Led_mix_colors
 
     @staticmethod
-    def Led_set_red(pct):
+    def _Led_set_red(pct):
         Led.mix_colors(red=1*pct, green=0*pct)
-    Led.set_red = Led_set_red
+    Led.set_red = _Led_set_red
 
     @staticmethod
-    def Led_red_on():
+    def _Led_red_on():
         Led.set_red(1)
-    Led.red_on = Led_red_on
+    Led.red_on = _Led_red_on
 
     @staticmethod
-    def Led_set_green(pct):
+    def _Led_set_green(pct):
         Led.mix_colors(red=0*pct, green=1*pct)
-    Led.set_green = Led_set_green
+    Led.set_green = _Led_set_green
 
     @staticmethod
-    def Led_green_on():
+    def _Led_green_on():
         Led.set_green(1)
-    Led.green_on = Led_green_on
+    Led.green_on = _Led_green_on
 
     @staticmethod
-    def Led_set_amber(pct):
+    def _Led_set_amber(pct):
         Led.mix_colors(red=1*pct, green=1*pct)
-    Led.set_amber = Led_set_amber
+    Led.set_amber = _Led_set_amber
 
     @staticmethod
-    def Led_amber_on():
+    def _Led_amber_on():
         Led.set_amber(1)
-    Led.amber_on = Led_amber_on
+    Led.amber_on = _Led_amber_on
 
     @staticmethod
-    def Led_set_orange(pct):
+    def _Led_set_orange(pct):
         Led.mix_colors(red=1*pct, green=0.5*pct)
-    Led.set_orange = Led_set_orange
+    Led.set_orange = _Led_set_orange
 
     @staticmethod
-    def Led_orange_on():
+    def _Led_orange_on():
         Led.set_orange(1)
-    Led.orange_on = Led_orange_on
+    Led.orange_on = _Led_orange_on
 
     @staticmethod
-    def Led_set_yellow(pct):
+    def _Led_set_yellow(pct):
         Led.mix_colors(red=0.5*pct, green=1*pct)
-    Led.set_yellow = Led_set_yellow
+    Led.set_yellow = _Led_set_yellow
 
     @staticmethod
-    def Led_yellow_on():
+    def _Led_yellow_on():
         Led.set_yellow(1)
-    Led.yellow_on = Led_yellow_on
+    Led.yellow_on = _Led_yellow_on
 
     @staticmethod
-    def Led_all_off():
+    def _Led_all_off():
         Led.red_left.brightness = 0
         Led.red_right.brightness = 0
         Led.green_left.brightness = 0
         Led.green_right.brightness = 0
-    Led.all_off = Led_all_off
+    Led.all_off = _Led_all_off
 
 
 #~autogen
@@ -1738,26 +1738,26 @@ elif current_platform() == 'brickpi':
     Led.blue_two = Led(name='brickpi2:blue:ev3dev')
 
     @staticmethod
-    def Led_mix_colors(blue):
+    def _Led_mix_colors(blue):
         Led.blue_one.brightness_pct = blue
         Led.blue_two.brightness_pct = blue
-    Led.mix_colors = Led_mix_colors
+    Led.mix_colors = _Led_mix_colors
 
     @staticmethod
-    def Led_set_blue(pct):
+    def _Led_set_blue(pct):
         Led.mix_colors(blue=1*pct)
-    Led.set_blue = Led_set_blue
+    Led.set_blue = _Led_set_blue
 
     @staticmethod
-    def Led_blue_on():
+    def _Led_blue_on():
         Led.set_blue(1)
-    Led.blue_on = Led_blue_on
+    Led.blue_on = _Led_blue_on
 
     @staticmethod
-    def Led_all_off():
+    def _Led_all_off():
         Led.blue_one.brightness = 0
         Led.blue_two.brightness = 0
-    Led.all_off = Led_all_off
+    Led.all_off = _Led_all_off
 
 
 #~autogen
