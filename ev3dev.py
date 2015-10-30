@@ -79,6 +79,7 @@ class FileCache(object):
         f = self.file_handle(path, 'r')
 
         try:
+            f.seek(0)
             value = f.read(size)
         except IOError:
             f = self.file_handle( path, 'w+', reopen=True )
@@ -93,6 +94,7 @@ class FileCache(object):
         f = self.file_handle( path, 'w' )
 
         try:
+            f.seek(0)
             f.write( value )
             f.flush()
         except IOError:
