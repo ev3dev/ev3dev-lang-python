@@ -80,10 +80,10 @@ class FileCache(object):
 
         try:
             f.seek(0)
-            value = f.read()
+            value = f.readline()
         except IOError:
             f = self.file_handle( path, 'w+', reopen=True )
-            value = f.read()
+            value = f.readline()
 
         return value.strip()
 
