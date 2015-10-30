@@ -1,0 +1,11 @@
+language: python
+python:
+    - 2.7
+
+sudo: false
+
+install:
+    - pip install PIL --allow-external PIL --allow-unverified PIL
+
+script:
+    - ./tests/api_tests.py
