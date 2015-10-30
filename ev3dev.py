@@ -35,6 +35,7 @@ import fcntl
 import array
 import mmap
 import ctypes
+import re
 from os.path import abspath
 from PIL import Image, ImageDraw
 from struct import pack, unpack
@@ -108,6 +109,8 @@ class Device(object):
 
     DEVICE_ROOT_PATH = '/sys/class'
 
+    _DEVICE_INDEX = re.compile(r'^.*(?P<idx>\d+)$')
+
     def __init__(self, class_name, name='*', **kwargs ):
         """Spin through the Linux sysfs class for the device type and find
         a device that matches the provided name and attributes (if any).
@@ -140,6 +143,13 @@ class Device(object):
                 # See if requested attributes match:
                 if all([self._matches(k, kwargs[k]) for k in kwargs]):
                     self.connected = True
+
+                    match = Device._DEVICE_INDEX.match(file)
+                    if match:
+                        self._device_index = int(match.group('idx'))
+                    else:
+                        self._device_index = None
+
                     return
 
         self._path = ''
@@ -188,6 +198,10 @@ class Device(object):
             if v != a:
                 return v
         return ""
+
+    @property
+    def device_index(self):
+        return self._device_index
 
 #~autogen generic-class classes.motor>currentClass
 
