@@ -75,20 +75,17 @@ class FileCache(object):
 
         return f
 
-    def read(self, path, size=-1):
+    def read(self, path):
         f = self.file_handle(path, 'r')
 
         try:
             f.seek(0)
-            value = f.read(size)
+            value = f.read()
         except IOError:
             f = self.file_handle( path, 'w+', reopen=True )
-            value = f.read(size)
+            value = f.read()
 
-        if size < 0:
-            return value.strip()
-        else:
-            return value
+        return value.strip()
 
     def write(self, path, value):
         f = self.file_handle( path, 'w' )
@@ -159,9 +156,9 @@ class Device(object):
         else:
             return value.find(pattern) >= 0
 
-    def _get_attribute( self, attribute, size=-1 ):
+    def _get_attribute( self, attribute ):
         """Device attribute getter"""
-        return self._attribute_cache.read(abspath(self._path + '/' + attribute), size)
+        return self._attribute_cache.read(abspath(self._path + '/' + attribute))
 
     def _set_attribute( self, attribute, value ):
         """Device attribute setter"""
@@ -1293,7 +1290,9 @@ class Sensor(Device):
                     "float":  4
                 }.get(self.bin_data_format, 1) * self.num_values
 
-        raw = bytearray(self._get_attribute('bin_data', self._bin_data_size))
+        f = self._attribute_cache.file_handle(abspath(self._path + '/bin_data'), 'rb')
+        f.seek(0)
+        raw = bytearray(f.read(self._bin_data_size))
 
         if fmt is None: return raw
 
