@@ -8,11 +8,32 @@ import ev3dev
 ev3dev.Device.DEVICE_ROOT_PATH = os.path.join(os.path.dirname(__file__), 'fake_sys_class')
 
 class TestAPI(unittest.TestCase):
+    def test_device(self):
+        d = ev3dev.Device('tacho-motor', 'motor*')
+        self.assertTrue(d.connected)
+
+        d = ev3dev.Device('tacho-motor', 'motor0')
+        self.assertTrue(d.connected)
+
+        d = ev3dev.Device('tacho-motor', 'motor*', driver_name='lego-ev3-m-motor')
+        self.assertTrue(d.connected)
+
+        d = ev3dev.Device('tacho-motor', 'motor*', port_name='outA')
+        self.assertTrue(d.connected)
+
+        d = ev3dev.Device('tacho-motor', 'motor*', port_name='outA', driver_name='not-valid')
+        self.assertTrue(not d.connected)
+
+        d = ev3dev.Device('lego-sensor', 'sensor*')
+        self.assertTrue(d.connected)
+
     def test_medium_motor(self):
         m = ev3dev.MediumMotor()
 
         self.assertTrue(m.connected);
+
         self.assertEqual(m.count_per_rot,            360)
+        self.assertEqual(m.commands,                 ['run-forever', 'run-to-abs-pos', 'run-to-rel-pos', 'run-timed', 'run-direct', 'stop', 'reset'])
         self.assertEqual(m.driver_name,              'lego-ev3-m-motor')
         self.assertEqual(m.duty_cycle,               0)
         self.assertEqual(m.duty_cycle_sp,            42)
@@ -30,6 +51,19 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(m.stop_command,             'coast')
         self.assertEqual(m.time_sp,                  1000)
 
+        with self.assertRaises(Exception):
+            c = m.command
+
+    def test_infrared_sensor(self):
+        s = ev3dev.InfraredSensor()
+
+        self.assertTrue(s.connected)
+
+        self.assertEqual(s.bin_data_format, 's8')
+        self.assertEqual(s.bin_data('<b'),  (16,))
+        self.assertEqual(s.num_values,      1)
+        self.assertEqual(s.port_name,       'in1')
+        self.assertEqual(s.value(0),        16)
 
 if __name__ == "__main__":
     unittest.main()
