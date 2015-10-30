@@ -93,11 +93,11 @@ class FileCache(object):
         try:
             f.seek(0)
             f.write( value )
-            f.flush()
         except IOError:
             f = self.file_handle( path, 'w+', reopen=True )
             f.write( value )
-            f.flush()
+
+        f.flush()
 
 
 #------------------------------------------------------------------------------
