@@ -2441,7 +2441,7 @@ class Sound:
     Note that all methods of the class spawn system processes and return
     subprocess.Popen objects. The methods are asynchronous (they return
     immediately after child process was spawned, without waiting for its
-    completion, but you can call wait() on the returned result.
+    completion), but you can call wait() on the returned result.
 
     Examples:
 
