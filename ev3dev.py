@@ -2436,7 +2436,7 @@ class Sound:
     """
     Sound-related functions. The class has only static methods and is not
     intended for instantiation. It can beep, play wav files, or convert text to
-    speach.
+    speech.
 
     Note that all methods of the class spawn system processes and return
     subprocess.Popen objects. The methods are asynchronous (they return
