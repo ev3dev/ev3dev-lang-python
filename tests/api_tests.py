@@ -32,9 +32,14 @@ class TestAPI(unittest.TestCase):
 
         self.assertTrue(m.connected);
 
+        self.assertEqual(m.device_index, 0)
+
+        # Check that reading twice works:
+        self.assertEqual(m.driver_name, 'lego-ev3-m-motor')
+        self.assertEqual(m.driver_name, 'lego-ev3-m-motor')
+
         self.assertEqual(m.count_per_rot,            360)
         self.assertEqual(m.commands,                 ['run-forever', 'run-to-abs-pos', 'run-to-rel-pos', 'run-timed', 'run-direct', 'stop', 'reset'])
-        self.assertEqual(m.driver_name,              'lego-ev3-m-motor')
         self.assertEqual(m.duty_cycle,               0)
         self.assertEqual(m.duty_cycle_sp,            42)
         self.assertEqual(m.encoder_polarity,         'normal')
@@ -59,6 +64,7 @@ class TestAPI(unittest.TestCase):
 
         self.assertTrue(s.connected)
 
+        self.assertEqual(s.device_index,    0)
         self.assertEqual(s.bin_data_format, 's8')
         self.assertEqual(s.bin_data('<b'),  (16,))
         self.assertEqual(s.num_values,      1)
