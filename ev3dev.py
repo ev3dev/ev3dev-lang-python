@@ -2458,7 +2458,7 @@ class Sound:
         Call beep command with the provided arguments (if any).
         See beep man page [1] and google 'linux beep music' for inspiration.
 
-        [1]: http://linux.die.net/man/1/beep
+        [1]: http://manpages.debian.org/cgi-bin/man.cgi?query=beep
         """
         with open(os.devnull, 'w') as n:
             return Popen('/usr/bin/beep %s' % args, stdout=n, shell=True)
