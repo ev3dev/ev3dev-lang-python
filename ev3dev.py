@@ -127,7 +127,8 @@ class Device(object):
                 is a list, then a match against any entry of the list is
                 enough.
 
-        Example:
+        Example::
+
             d = ev3dev.Device('tacho-motor', port_name='outA')
             s = ev3dev.Device('lego-sensor', driver_name=['lego-ev3-us', 'lego-nxt-us'])
 
@@ -1267,13 +1268,13 @@ class Sensor(Device):
         Returns the format of the values in `bin_data` for the current mode.
         Possible values are:
 
-           - `u8`: Unsigned 8-bit integer (byte)
-           - `s8`: Signed 8-bit integer (sbyte)
-           - `u16`: Unsigned 16-bit integer (ushort)
-           - `s16`: Signed 16-bit integer (short)
-           - `s16_be`: Signed 16-bit integer, big endian
-           - `s32`: Signed 32-bit integer (int)
-           - `float`: IEEE 754 32-bit floating point (float)
+        - `u8`: Unsigned 8-bit integer (byte)
+        - `s8`: Signed 8-bit integer (sbyte)
+        - `u16`: Unsigned 16-bit integer (ushort)
+        - `s16`: Signed 16-bit integer (short)
+        - `s16_be`: Signed 16-bit integer, big endian
+        - `s32`: Signed 32-bit integer (int)
+        - `float`: IEEE 754 32-bit floating point (float)
         """
         return self.get_attr_string('bin_data_format')
 
@@ -1285,13 +1286,15 @@ class Sensor(Device):
         documentation to determine how to interpret the data.
 
         Use `fmt` to unpack the raw bytes into a struct.
-        Example:
-        >>> from ev3dev import *
-        >>> ir = InfraredSensor()
-        >>> ir.value()
-        28
-        >>> ir.bin_data('<b')
-        (28,)
+
+        Example::
+
+            >>> from ev3dev import *
+            >>> ir = InfraredSensor()
+            >>> ir.value()
+            28
+            >>> ir.bin_data('<b')
+            (28,)
         """
 
         if '_bin_data_size' not in self.__dict__:
@@ -2398,8 +2401,10 @@ class Screen(FbMem):
     def draw(self):
         """
         Returns a handle to PIL.ImageDraw.Draw class associated with the screen.
+
         Example::
-            lcd.draw.rectangle((10,10,60,20), fill='black')
+
+            screen.draw.rectangle((10,10,60,20), fill='black')
         """
         return self._draw
 
@@ -2443,7 +2448,7 @@ class Sound:
     immediately after child process was spawned, without waiting for its
     completion, but you can call wait() on the returned result.
 
-    Examples:
+    Examples::
 
         # Play 'bark.wav', return immediately:
         Sound.play('bark.wav')
@@ -2456,9 +2461,9 @@ class Sound:
     def beep(args=''):
         """
         Call beep command with the provided arguments (if any).
-        See beep man page [1] and google 'linux beep music' for inspiration.
+        See `beep man page`_ and google 'linux beep music' for inspiration.
 
-        [1]: http://linux.die.net/man/1/beep
+        .. _`beep man page`: http://linux.die.net/man/1/beep
         """
         with open(os.devnull, 'w') as n:
             return Popen('/usr/bin/beep %s' % args, stdout=n, shell=True)
@@ -2473,27 +2478,28 @@ class Sound:
         is delay in milliseconds between this and the next tone in the
         sequence.
 
-        Here is a cheerful example:
-        Sound.tone([
-            (392, 350, 100), (392, 350, 100), (392, 350, 100), (311.1, 250, 100),
-            (466.2, 25, 100), (392, 350, 100), (311.1, 250, 100), (466.2, 25, 100),
-            (392, 700, 100), (587.32, 350, 100), (587.32, 350, 100),
-            (587.32, 350, 100), (622.26, 250, 100), (466.2, 25, 100),
-            (369.99, 350, 100), (311.1, 250, 100), (466.2, 25, 100), (392, 700, 100),
-            (784, 350, 100), (392, 250, 100), (392, 25, 100), (784, 350, 100),
-            (739.98, 250, 100), (698.46, 25, 100), (659.26, 25, 100),
-            (622.26, 25, 100), (659.26, 50, 400), (415.3, 25, 200), (554.36, 350, 100),
-            (523.25, 250, 100), (493.88, 25, 100), (466.16, 25, 100), (440, 25, 100),
-            (466.16, 50, 400), (311.13, 25, 200), (369.99, 350, 100),
-            (311.13, 250, 100), (392, 25, 100), (466.16, 350, 100), (392, 250, 100),
-            (466.16, 25, 100), (587.32, 700, 100), (784, 350, 100), (392, 250, 100),
-            (392, 25, 100), (784, 350, 100), (739.98, 250, 100), (698.46, 25, 100),
-            (659.26, 25, 100), (622.26, 25, 100), (659.26, 50, 400), (415.3, 25, 200),
-            (554.36, 350, 100), (523.25, 250, 100), (493.88, 25, 100),
-            (466.16, 25, 100), (440, 25, 100), (466.16, 50, 400), (311.13, 25, 200),
-            (392, 350, 100), (311.13, 250, 100), (466.16, 25, 100),
-            (392.00, 300, 150), (311.13, 250, 100), (466.16, 25, 100), (392, 700)
-            ]).wait()
+        Here is a cheerful example::
+
+            Sound.tone([
+                (392, 350, 100), (392, 350, 100), (392, 350, 100), (311.1, 250, 100),
+                (466.2, 25, 100), (392, 350, 100), (311.1, 250, 100), (466.2, 25, 100),
+                (392, 700, 100), (587.32, 350, 100), (587.32, 350, 100),
+                (587.32, 350, 100), (622.26, 250, 100), (466.2, 25, 100),
+                (369.99, 350, 100), (311.1, 250, 100), (466.2, 25, 100), (392, 700, 100),
+                (784, 350, 100), (392, 250, 100), (392, 25, 100), (784, 350, 100),
+                (739.98, 250, 100), (698.46, 25, 100), (659.26, 25, 100),
+                (622.26, 25, 100), (659.26, 50, 400), (415.3, 25, 200), (554.36, 350, 100),
+                (523.25, 250, 100), (493.88, 25, 100), (466.16, 25, 100), (440, 25, 100),
+                (466.16, 50, 400), (311.13, 25, 200), (369.99, 350, 100),
+                (311.13, 250, 100), (392, 25, 100), (466.16, 350, 100), (392, 250, 100),
+                (466.16, 25, 100), (587.32, 700, 100), (784, 350, 100), (392, 250, 100),
+                (392, 25, 100), (784, 350, 100), (739.98, 250, 100), (698.46, 25, 100),
+                (659.26, 25, 100), (622.26, 25, 100), (659.26, 50, 400), (415.3, 25, 200),
+                (554.36, 350, 100), (523.25, 250, 100), (493.88, 25, 100),
+                (466.16, 25, 100), (440, 25, 100), (466.16, 50, 400), (311.13, 25, 200),
+                (392, 350, 100), (311.13, 250, 100), (466.16, 25, 100),
+                (392.00, 300, 150), (311.13, 250, 100), (466.16, 25, 100), (392, 700)
+                ]).wait()
         """
         def beep_args(frequency=None, duration=None, delay=None):
             args = '-n '
