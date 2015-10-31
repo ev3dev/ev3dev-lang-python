@@ -39,6 +39,7 @@ import re
 from os.path import abspath
 from PIL import Image, ImageDraw
 from struct import pack, unpack
+from subprocess import Popen
 
 #------------------------------------------------------------------------------
 # Guess platform we are running on
@@ -2430,3 +2431,94 @@ class Screen(FbMem):
         else:
             raise Exception("Not supported")
 
+
+class Sound:
+    """
+    Sound-related functions. The class has only static methods and is not
+    intended for instantiation. It can beep, play wav files, or convert text to
+    speach.
+
+    Note that all methods of the class spawn system processes and return
+    subprocess.Popen objects. The methods are asynchronous (they return
+    immediately after child process was spawned, without waiting for its
+    completion, but you can call wait() on the returned result.
+
+    Examples:
+
+        # Play 'bark.wav', return immediately:
+        Sound.play('bark.wav')
+
+        # Introduce yourself, wait for completion:
+        Sound.speak('Hello, I am Robot').wait()
+    """
+
+    @staticmethod
+    def beep(args=''):
+        """
+        Call beep command with the provided arguments (if any).
+        See beep man page [1] and google 'linux beep music' for inspiration.
+
+        [1]: http://linux.die.net/man/1/beep
+        """
+        with open(os.devnull, 'w') as n:
+            return Popen('/usr/bin/beep %s' % args, stdout=n, shell=True)
+
+
+    @staticmethod
+    def tone(tone_sequence):
+        """
+        Play tone sequence. The tone_sequence parameter is a list of tuples,
+        where each tuple contains up to three numbers. The first number is
+        frequency in Hz, the second is duration in milliseconds, and the third
+        is delay in milliseconds between this and the next tone in the
+        sequence.
+
+        Here is a cheerful example:
+        Sound.tone([
+            (392, 350, 100), (392, 350, 100), (392, 350, 100), (311.1, 250, 100),
+            (466.2, 25, 100), (392, 350, 100), (311.1, 250, 100), (466.2, 25, 100),
+            (392, 700, 100), (587.32, 350, 100), (587.32, 350, 100),
+            (587.32, 350, 100), (622.26, 250, 100), (466.2, 25, 100),
+            (369.99, 350, 100), (311.1, 250, 100), (466.2, 25, 100), (392, 700, 100),
+            (784, 350, 100), (392, 250, 100), (392, 25, 100), (784, 350, 100),
+            (739.98, 250, 100), (698.46, 25, 100), (659.26, 25, 100),
+            (622.26, 25, 100), (659.26, 50, 400), (415.3, 25, 200), (554.36, 350, 100),
+            (523.25, 250, 100), (493.88, 25, 100), (466.16, 25, 100), (440, 25, 100),
+            (466.16, 50, 400), (311.13, 25, 200), (369.99, 350, 100),
+            (311.13, 250, 100), (392, 25, 100), (466.16, 350, 100), (392, 250, 100),
+            (466.16, 25, 100), (587.32, 700, 100), (784, 350, 100), (392, 250, 100),
+            (392, 25, 100), (784, 350, 100), (739.98, 250, 100), (698.46, 25, 100),
+            (659.26, 25, 100), (622.26, 25, 100), (659.26, 50, 400), (415.3, 25, 200),
+            (554.36, 350, 100), (523.25, 250, 100), (493.88, 25, 100),
+            (466.16, 25, 100), (440, 25, 100), (466.16, 50, 400), (311.13, 25, 200),
+            (392, 350, 100), (311.13, 250, 100), (466.16, 25, 100),
+            (392.00, 300, 150), (311.13, 250, 100), (466.16, 25, 100), (392, 700)
+            ]).wait()
+        """
+        def beep_args(frequency=None, duration=None, delay=None):
+            args = '-n '
+            if frequency is not None: args += '-f %s ' % frequency
+            if duration  is not None: args += '-l %s ' % duration
+            if delay     is not None: args += '-d %s ' % delay
+
+            return args
+
+        return Sound.beep(' '.join([beep_args(*t) for t in tone_sequence]))
+
+
+    @staticmethod
+    def play(wav_file):
+        """
+        Play wav file.
+        """
+        with open(os.devnull, 'w') as n:
+            return Popen('/usr/bin/aplay -q "%s"' % wav_file, stdout=n, shell=True)
+
+
+    @staticmethod
+    def speak(text):
+        """
+        Speak the given text aloud.
+        """
+        with open(os.devnull, 'w') as n:
+            return Popen('/usr/bin/espeak -a 200 --stdout "%s" | /usr/bin/aplay -q' % text, stdout=n, shell=True)
