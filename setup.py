@@ -1,18 +1,17 @@
 from setuptools import setup
 from git_version import git_version
-from spec_version import spec_version
 
-# write version to version.py
-open("ev3dev/version.py", "w").write("__version__='%s (%s)'\n" % (git_version(), spec_version))
 
 setup(
     name='python-ev3dev',
     version=git_version(),
     description='Python language bindings for ev3dev',
-    author='Ralph Hempel/Denis Demidov/Anton Vanhoucke',
+    author='Ralph Hempel et al - See ev3dev.py for credits',
+    author_email='rhempel@hempeldesigngroup.com',
     license='MIT',
     url='https://github.com/rhempel/ev3dev-lang-python',
     include_package_data=True,
-    py_modules=['ev3dev']
+    py_modules=['ev3dev'],
+    install_requires=['pil']
     )
 
