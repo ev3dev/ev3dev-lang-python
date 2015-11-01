@@ -1,8 +1,10 @@
 from setuptools import setup
+from git_version import git_version
+
 
 setup(
     name='python-ev3dev',
-    version='0.0.1',
+    version=git_version(),
     description='Python language bindings for ev3dev',
     author='Ralph Hempel/Denis Demidov/Anton Vanhoucke',
     license='MIT',
