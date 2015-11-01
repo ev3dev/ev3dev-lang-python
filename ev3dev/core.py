@@ -30,7 +30,6 @@
 import os
 import fnmatch
 import numbers
-import platform
 import fcntl
 import array
 import mmap
@@ -40,18 +39,6 @@ from os.path import abspath
 from PIL import Image, ImageDraw
 from struct import pack, unpack
 from subprocess import Popen
-
-
-# -----------------------------------------------------------------------------
-# Guess platform we are running on
-def current_platform():
-    machine = platform.machine()
-    if machine == 'armv5tejl':
-        return 'ev3'
-    elif machine == 'armv6l':
-        return 'brickpi'
-    else:
-        return 'unsupported'
 
 
 # -----------------------------------------------------------------------------
