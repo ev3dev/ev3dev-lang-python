@@ -33,3 +33,4 @@ class {{ class_name }}({{ base_class }}):
         if port is not None:
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name,{{ driver_name }} **kwargs)
+

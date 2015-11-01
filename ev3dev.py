@@ -41,6 +41,7 @@ from PIL import Image, ImageDraw
 from struct import pack, unpack
 from subprocess import Popen
 
+
 # -----------------------------------------------------------------------------
 # Guess platform we are running on
 def current_platform():
@@ -51,6 +52,7 @@ def current_platform():
         return 'brickpi'
     else:
         return 'unsupported'
+
 
 # -----------------------------------------------------------------------------
 # Attribute reader/writer with cached file access
@@ -205,6 +207,7 @@ class Device(object):
     def device_index(self):
         return self._device_index
 
+
 # ~autogen generic-class classes.motor>currentClass
 
 class Motor(Device):
@@ -223,6 +226,7 @@ class Motor(Device):
         if port is not None:
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
+
 
 # ~autogen
 # ~autogen generic-get-set classes.motor>currentClass
@@ -701,6 +705,7 @@ class LargeMotor(Motor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-l-motor'], **kwargs)
 
+
 # ~autogen
 # ~autogen generic-class classes.mediumMotor>currentClass
 
@@ -717,6 +722,7 @@ class MediumMotor(Motor):
         if port is not None:
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-m-motor'], **kwargs)
+
 
 # ~autogen
 # ~autogen generic-class classes.dcMotor>currentClass
@@ -736,6 +742,7 @@ class DcMotor(Device):
         if port is not None:
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
+
 
 # ~autogen
 # ~autogen generic-get-set classes.dcMotor>currentClass
@@ -915,7 +922,6 @@ class DcMotor(Device):
 
 
 # ~autogen
-
 # ~autogen motor_commands classes.dcMotor>currentClass
 
     def run_forever( self, **kwargs ):
@@ -968,6 +974,7 @@ class ServoMotor(Device):
         if port is not None:
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
+
 
 # ~autogen
 # ~autogen generic-get-set classes.servoMotor>currentClass
@@ -1118,7 +1125,6 @@ class ServoMotor(Device):
 
 
 # ~autogen
-
 # ~autogen motor_commands classes.servoMotor>currentClass
 
     def run( self, **kwargs ):
@@ -1137,7 +1143,6 @@ class ServoMotor(Device):
 
 
 # ~autogen
-
 # ~autogen generic-class classes.sensor>currentClass
 
 class Sensor(Device):
@@ -1166,6 +1171,7 @@ class Sensor(Device):
         if port is not None:
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
+
 
 # ~autogen
 # ~autogen generic-get-set classes.sensor>currentClass
@@ -1317,6 +1323,7 @@ class Sensor(Device):
 
         return unpack(fmt, raw)
 
+
 # ~autogen generic-class classes.i2cSensor>currentClass
 
 class I2cSensor(Sensor):
@@ -1332,6 +1339,7 @@ class I2cSensor(Sensor):
         if port is not None:
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['nxt-i2c-sensor'], **kwargs)
+
 
 # ~autogen
 # ~autogen generic-get-set classes.i2cSensor>currentClass
@@ -1377,6 +1385,7 @@ class ColorSensor(Sensor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-color'], **kwargs)
 
+
 # ~autogen
 # ~autogen generic-property-value classes.colorSensor>currentClass
 
@@ -1412,6 +1421,7 @@ class UltrasonicSensor(Sensor):
         if port is not None:
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-us', 'lego-nxt-us'], **kwargs)
+
 
 # ~autogen
 # ~autogen generic-property-value classes.ultrasonicSensor>currentClass
@@ -1453,6 +1463,7 @@ class GyroSensor(Sensor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-gyro'], **kwargs)
 
+
 # ~autogen
 # ~autogen generic-property-value classes.gyroSensor>currentClass
 
@@ -1489,6 +1500,7 @@ class InfraredSensor(Sensor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-ir'], **kwargs)
 
+
 # ~autogen
 # ~autogen generic-property-value classes.infraredSensor>currentClass
 
@@ -1509,8 +1521,6 @@ class InfraredSensor(Sensor):
 
 
 # ~autogen
-
-
 # ~autogen generic-class classes.soundSensor>currentClass
 
 class SoundSensor(Sensor):
@@ -1526,6 +1536,7 @@ class SoundSensor(Sensor):
         if port is not None:
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-nxt-sound'], **kwargs)
+
 
 # ~autogen
 # ~autogen generic-property-value classes.soundSensor>currentClass
@@ -1554,6 +1565,7 @@ class LightSensor(Sensor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-nxt-light'], **kwargs)
 
+
 # ~autogen
 # ~autogen generic-property-value classes.lightSensor>currentClass
 
@@ -1581,6 +1593,7 @@ class TouchSensor(Sensor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
 
+
 # ~autogen
 # ~autogen generic-class classes.led>currentClass
 
@@ -1599,6 +1612,7 @@ class Led(Device):
         if port is not None:
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
+
 
 # ~autogen
 # ~autogen generic-get-set classes.led>currentClass
@@ -1839,6 +1853,7 @@ class ButtonBase(object):
         if self.on_change is not None and state_diff:
             self.on_change([(button, button in new_state) for button in state_diff])
 
+
 # ~autogen button-class classes.button>currentClass
 class Button(ButtonBase):
 
@@ -1932,7 +1947,6 @@ class Button(ButtonBase):
 
 
 # ~autogen
-
 # ~autogen remote-control classes.infraredSensor.remoteControl>currentClass
 class RemoteControl(ButtonBase):
     """
@@ -2023,6 +2037,7 @@ class RemoteControl(ButtonBase):
         """
         return RemoteControl._BUTTON_VALUES.get(self._sensor.value(self._channel), [])
 
+
 # ~autogen generic-class classes.powerSupply>currentClass
 
 class PowerSupply(Device):
@@ -2039,6 +2054,7 @@ class PowerSupply(Device):
         if port is not None:
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
+
 
 # ~autogen
 # ~autogen generic-get-set classes.powerSupply>currentClass
@@ -2099,6 +2115,7 @@ class PowerSupply(Device):
         """
         return self.measured_voltage / 1e6
 
+
 # ~autogen generic-class classes.legoPort>currentClass
 
 class LegoPort(Device):
@@ -2138,6 +2155,7 @@ class LegoPort(Device):
         if port is not None:
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
+
 
 # ~autogen
 # ~autogen generic-get-set classes.legoPort>currentClass
@@ -2360,6 +2378,7 @@ class FbMem(object):
             mmap.PROT_READ | mmap.PROT_WRITE,
             offset=0
         )
+
 
 class Screen(FbMem):
     """
