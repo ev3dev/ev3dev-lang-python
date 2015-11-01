@@ -9,24 +9,27 @@ for prop in currentClass.systemProperties %}{%
     assign getter = 'from_set' %}{%
     assign setter = 'string' %}{%
   endif %}
-
     @property
     def {{prop_name}}(self):
         """{%
-  for line in prop.description %}
+  for line in prop.description %}{%
+      if line %}
         {{ line }}{%
+      else %}
+{%    endif %}{%
   endfor %}
         """{%
   if prop.readAccess %}
-        return self.get_attr_{{ getter }}( '{{ prop.systemName }}' ){%
+        return self.get_attr_{{ getter }}('{{ prop.systemName }}'){%
   else %}
-        raise Exception( "{{prop_name}} is a write-only property!" ){%
+        raise Exception("{{prop_name}} is a write-only property!"){%
   endif %}{%
   if prop.writeAccess %}
 
     @{{prop_name}}.setter
     def {{ prop_name }}(self, value):
-        self.set_attr_{{ setter }}( '{{ prop.systemName }}', value ){%
-  endif%}{%
+        self.set_attr_{{ setter }}('{{ prop.systemName }}', value){%
+endif%}{% unless forloop.last %}
+{% endunless %}{%
 endfor %}
 
