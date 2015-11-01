@@ -30,7 +30,6 @@
 import os
 import fnmatch
 import numbers
-import platform
 import fcntl
 import array
 import mmap
@@ -40,18 +39,6 @@ from os.path import abspath
 from PIL import Image, ImageDraw
 from struct import pack, unpack
 from subprocess import Popen
-
-
-# -----------------------------------------------------------------------------
-# Guess platform we are running on
-def current_platform():
-    machine = platform.machine()
-    if machine == 'armv5tejl':
-        return 'ev3'
-    elif machine == 'armv6l':
-        return 'brickpi'
-    else:
-        return 'unsupported'
 
 
 # -----------------------------------------------------------------------------
@@ -1700,112 +1687,6 @@ class Led(Device):
     def brightness_pct(self, value):
         self.brightness = value * self.max_brightness
 
-if current_platform() == 'ev3':
-# ~autogen led-colors platforms.ev3.led>currentClass
-
-    Led.red_left = Led(name='ev3-left0:red:ev3dev')
-    Led.red_right = Led(name='ev3-right0:red:ev3dev')
-    Led.green_left = Led(name='ev3-left1:green:ev3dev')
-    Led.green_right = Led(name='ev3-right1:green:ev3dev')
-
-    @staticmethod
-    def _Led_mix_colors(red, green):
-        Led.red_left.brightness_pct = red
-        Led.red_right.brightness_pct = red
-        Led.green_left.brightness_pct = green
-        Led.green_right.brightness_pct = green
-    Led.mix_colors = _Led_mix_colors
-
-    @staticmethod
-    def _Led_set_red(pct):
-        Led.mix_colors(red=1*pct, green=0*pct)
-    Led.set_red = _Led_set_red
-
-    @staticmethod
-    def _Led_red_on():
-        Led.set_red(1)
-    Led.red_on = _Led_red_on
-
-    @staticmethod
-    def _Led_set_green(pct):
-        Led.mix_colors(red=0*pct, green=1*pct)
-    Led.set_green = _Led_set_green
-
-    @staticmethod
-    def _Led_green_on():
-        Led.set_green(1)
-    Led.green_on = _Led_green_on
-
-    @staticmethod
-    def _Led_set_amber(pct):
-        Led.mix_colors(red=1*pct, green=1*pct)
-    Led.set_amber = _Led_set_amber
-
-    @staticmethod
-    def _Led_amber_on():
-        Led.set_amber(1)
-    Led.amber_on = _Led_amber_on
-
-    @staticmethod
-    def _Led_set_orange(pct):
-        Led.mix_colors(red=1*pct, green=0.5*pct)
-    Led.set_orange = _Led_set_orange
-
-    @staticmethod
-    def _Led_orange_on():
-        Led.set_orange(1)
-    Led.orange_on = _Led_orange_on
-
-    @staticmethod
-    def _Led_set_yellow(pct):
-        Led.mix_colors(red=0.5*pct, green=1*pct)
-    Led.set_yellow = _Led_set_yellow
-
-    @staticmethod
-    def _Led_yellow_on():
-        Led.set_yellow(1)
-    Led.yellow_on = _Led_yellow_on
-
-    @staticmethod
-    def _Led_all_off():
-        Led.red_left.brightness = 0
-        Led.red_right.brightness = 0
-        Led.green_left.brightness = 0
-        Led.green_right.brightness = 0
-    Led.all_off = _Led_all_off
-
-
-# ~autogen
-elif current_platform() == 'brickpi':
-# ~autogen led-colors platforms.brickpi.led>currentClass
-
-    Led.blue_one = Led(name='brickpi1:blue:ev3dev')
-    Led.blue_two = Led(name='brickpi2:blue:ev3dev')
-
-    @staticmethod
-    def _Led_mix_colors(blue):
-        Led.blue_one.brightness_pct = blue
-        Led.blue_two.brightness_pct = blue
-    Led.mix_colors = _Led_mix_colors
-
-    @staticmethod
-    def _Led_set_blue(pct):
-        Led.mix_colors(blue=1*pct)
-    Led.set_blue = _Led_set_blue
-
-    @staticmethod
-    def _Led_blue_on():
-        Led.set_blue(1)
-    Led.blue_on = _Led_blue_on
-
-    @staticmethod
-    def _Led_all_off():
-        Led.blue_one.brightness = 0
-        Led.blue_two.brightness = 0
-    Led.all_off = _Led_all_off
-
-
-# ~autogen
 
 class ButtonBase(object):
     """
@@ -1847,25 +1728,22 @@ class ButtonBase(object):
             self.on_change([(button, button in new_state) for button in state_diff])
 
 
-# ~autogen button-class classes.button>currentClass
-class Button(ButtonBase):
+class ButtonEVIO(ButtonBase):
 
     """
-    Provides a generic button reading mechanism that can be adapted
-    to platform specific implementations. Each platform's specific
-    button capabilites are enumerated in the 'platforms' section
-    of this specification
+    Provides a generic button reading mechanism that works with event interface
+    and may be adapted to platform specific implementations.
 
     This implementation depends on the availability of the EVIOCGKEY ioctl
     to be able to read the button state buffer. See Linux kernel source
     in /include/uapi/linux/input.h for details.
     """
 
-# ~autogen
-
     KEY_MAX = 0x2FF
     KEY_BUF_LEN = int((KEY_MAX + 7) / 8)
     EVIOCGKEY = (2 << (14 + 8 + 8) | KEY_BUF_LEN << (8 + 8) | ord('E') << 8 | 0x18)
+
+    _buttons = {}
 
     def __init__(self):
         self._file_cache = FileCache()
@@ -1895,51 +1773,7 @@ class Button(ButtonBase):
                 pressed += [k]
         return pressed
 
-    if current_platform() == 'ev3':
-# ~autogen button-property platforms.ev3.button>currentClass
 
-        on_up = None
-        on_down = None
-        on_left = None
-        on_right = None
-        on_enter = None
-        on_backspace = None
-
-        _buttons = {
-            'up': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 103},
-            'down': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 108},
-            'left': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 105},
-            'right': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 106},
-            'enter': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 28},
-            'backspace': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 14},
-        }
-
-        @property
-        def up(self):
-            return 'up' in self.buttons_pressed
-
-        @property
-        def down(self):
-            return 'down' in self.buttons_pressed
-
-        @property
-        def left(self):
-            return 'left' in self.buttons_pressed
-
-        @property
-        def right(self):
-            return 'right' in self.buttons_pressed
-
-        @property
-        def enter(self):
-            return 'enter' in self.buttons_pressed
-
-        @property
-        def backspace(self):
-            return 'backspace' in self.buttons_pressed
-
-
-# ~autogen
 # ~autogen remote-control classes.infraredSensor.remoteControl>currentClass
 class RemoteControl(ButtonBase):
     """

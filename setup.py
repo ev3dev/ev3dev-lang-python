@@ -1,6 +1,9 @@
 from setuptools import setup
 from git_version import git_version
+from spec_version import spec_version
 
+# write version to version.py
+open("ev3dev/version.py", "w").write("__version__='%s (%s)'\n" % (git_version(), spec_version))
 
 setup(
     name='python-ev3dev',
