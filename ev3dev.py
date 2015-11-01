@@ -1,4 +1,4 @@
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2015 Ralph Hempel
 # Copyright (c) 2015 Anton Vanhoucke
 # Copyright (c) 2015 Denis Demidov
@@ -22,10 +22,10 @@
 # THE SOFTWARE.
 # -----------------------------------------------------------------------------
 
-#~autogen autogen-header
+# ~autogen autogen-header
 # Sections of the following code were auto-generated based on spec v0.9.3-pre, rev 2
 
-#~autogen
+# ~autogen
 
 import os
 import fnmatch
@@ -41,7 +41,7 @@ from PIL import Image, ImageDraw
 from struct import pack, unpack
 from subprocess import Popen
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Guess platform we are running on
 def current_platform():
     machine = platform.machine()
@@ -52,7 +52,7 @@ def current_platform():
     else:
         return 'unsupported'
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Attribute reader/writer with cached file access
 class FileCache(object):
     def __init__(self):
@@ -102,7 +102,7 @@ class FileCache(object):
         f.flush()
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Define the base class from which all other ev3dev classes are defined.
 
 class Device(object):
@@ -205,7 +205,7 @@ class Device(object):
     def device_index(self):
         return self._device_index
 
-#~autogen generic-class classes.motor>currentClass
+# ~autogen generic-class classes.motor>currentClass
 
 class Motor(Device):
 
@@ -224,8 +224,8 @@ class Motor(Device):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
-#~autogen
-#~autogen generic-get-set classes.motor>currentClass
+# ~autogen
+# ~autogen generic-get-set classes.motor>currentClass
 
 
     @property
@@ -553,8 +553,8 @@ class Motor(Device):
         self.set_attr_int( 'time_sp', value )
 
 
-#~autogen
-#~autogen generic-property-value classes.motor>currentClass
+# ~autogen
+# ~autogen generic-property-value classes.motor>currentClass
 
     # Run the motor until another command is sent.
     COMMAND_RUN_FOREVER = 'run-forever'
@@ -622,8 +622,8 @@ class Motor(Device):
     STOP_COMMAND_HOLD = 'hold'
 
 
-#~autogen
-#~autogen motor_commands classes.motor>currentClass
+# ~autogen
+# ~autogen motor_commands classes.motor>currentClass
 
     def run_forever( self, **kwargs ):
         """Run the motor until another command is sent.
@@ -684,8 +684,8 @@ class Motor(Device):
         self.command = 'reset'
 
 
-#~autogen
-#~autogen generic-class classes.largeMotor>currentClass
+# ~autogen
+# ~autogen generic-class classes.largeMotor>currentClass
 
 class LargeMotor(Motor):
 
@@ -701,8 +701,8 @@ class LargeMotor(Motor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-l-motor'], **kwargs)
 
-#~autogen
-#~autogen generic-class classes.mediumMotor>currentClass
+# ~autogen
+# ~autogen generic-class classes.mediumMotor>currentClass
 
 class MediumMotor(Motor):
 
@@ -718,8 +718,8 @@ class MediumMotor(Motor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-m-motor'], **kwargs)
 
-#~autogen
-#~autogen generic-class classes.dcMotor>currentClass
+# ~autogen
+# ~autogen generic-class classes.dcMotor>currentClass
 
 class DcMotor(Device):
 
@@ -737,8 +737,8 @@ class DcMotor(Device):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
-#~autogen
-#~autogen generic-get-set classes.dcMotor>currentClass
+# ~autogen
+# ~autogen generic-get-set classes.dcMotor>currentClass
 
 
     @property
@@ -877,8 +877,8 @@ class DcMotor(Device):
         self.set_attr_int( 'time_sp', value )
 
 
-#~autogen
-#~autogen generic-property-value classes.dcMotor>currentClass
+# ~autogen
+# ~autogen generic-property-value classes.dcMotor>currentClass
 
     # Run the motor until another command is sent.
     COMMAND_RUN_FOREVER = 'run-forever'
@@ -914,9 +914,9 @@ class DcMotor(Device):
     STOP_COMMAND_BRAKE = 'brake'
 
 
-#~autogen
+# ~autogen
 
-#~autogen motor_commands classes.dcMotor>currentClass
+# ~autogen motor_commands classes.dcMotor>currentClass
 
     def run_forever( self, **kwargs ):
         """Run the motor until another command is sent.
@@ -951,8 +951,8 @@ class DcMotor(Device):
         self.command = 'stop'
 
 
-#~autogen
-#~autogen generic-class classes.servoMotor>currentClass
+# ~autogen
+# ~autogen generic-class classes.servoMotor>currentClass
 
 class ServoMotor(Device):
 
@@ -969,8 +969,8 @@ class ServoMotor(Device):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
-#~autogen
-#~autogen generic-get-set classes.servoMotor>currentClass
+# ~autogen
+# ~autogen generic-get-set classes.servoMotor>currentClass
 
 
     @property
@@ -1099,8 +1099,8 @@ class ServoMotor(Device):
         return self.get_attr_set( 'state' )
 
 
-#~autogen
-#~autogen generic-property-value classes.servoMotor>currentClass
+# ~autogen
+# ~autogen generic-property-value classes.servoMotor>currentClass
 
     # Drive servo to the position set in the `position_sp` attribute.
     COMMAND_RUN = 'run'
@@ -1117,9 +1117,9 @@ class ServoMotor(Device):
     POLARITY_INVERSED = 'inversed'
 
 
-#~autogen
+# ~autogen
 
-#~autogen motor_commands classes.servoMotor>currentClass
+# ~autogen motor_commands classes.servoMotor>currentClass
 
     def run( self, **kwargs ):
         """Drive servo to the position set in the `position_sp` attribute.
@@ -1136,9 +1136,9 @@ class ServoMotor(Device):
         self.command = 'float'
 
 
-#~autogen
+# ~autogen
 
-#~autogen generic-class classes.sensor>currentClass
+# ~autogen generic-class classes.sensor>currentClass
 
 class Sensor(Device):
 
@@ -1167,8 +1167,8 @@ class Sensor(Device):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
-#~autogen
-#~autogen generic-get-set classes.sensor>currentClass
+# ~autogen
+# ~autogen generic-get-set classes.sensor>currentClass
 
 
     @property
@@ -1250,7 +1250,7 @@ class Sensor(Device):
         return self.get_attr_string( 'units' )
 
 
-#~autogen
+# ~autogen
 
     def value(self, n=0):
         if True == isinstance( n, numbers.Integral ):
@@ -1317,7 +1317,7 @@ class Sensor(Device):
 
         return unpack(fmt, raw)
 
-#~autogen generic-class classes.i2cSensor>currentClass
+# ~autogen generic-class classes.i2cSensor>currentClass
 
 class I2cSensor(Sensor):
 
@@ -1333,8 +1333,8 @@ class I2cSensor(Sensor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['nxt-i2c-sensor'], **kwargs)
 
-#~autogen
-#~autogen generic-get-set classes.i2cSensor>currentClass
+# ~autogen
+# ~autogen generic-get-set classes.i2cSensor>currentClass
 
 
     @property
@@ -1360,8 +1360,8 @@ class I2cSensor(Sensor):
         self.set_attr_int( 'poll_ms', value )
 
 
-#~autogen
-#~autogen generic-class classes.colorSensor>currentClass
+# ~autogen
+# ~autogen generic-class classes.colorSensor>currentClass
 
 class ColorSensor(Sensor):
 
@@ -1377,8 +1377,8 @@ class ColorSensor(Sensor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-color'], **kwargs)
 
-#~autogen
-#~autogen generic-property-value classes.colorSensor>currentClass
+# ~autogen
+# ~autogen generic-property-value classes.colorSensor>currentClass
 
     # Reflected light. Red LED on.
     MODE_COL_REFLECT = 'COL-REFLECT'
@@ -1396,8 +1396,8 @@ class ColorSensor(Sensor):
     MODE_RGB_RAW = 'RGB-RAW'
 
 
-#~autogen
-#~autogen generic-class classes.ultrasonicSensor>currentClass
+# ~autogen
+# ~autogen generic-class classes.ultrasonicSensor>currentClass
 
 class UltrasonicSensor(Sensor):
 
@@ -1413,8 +1413,8 @@ class UltrasonicSensor(Sensor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-us', 'lego-nxt-us'], **kwargs)
 
-#~autogen
-#~autogen generic-property-value classes.ultrasonicSensor>currentClass
+# ~autogen
+# ~autogen generic-property-value classes.ultrasonicSensor>currentClass
 
     # Continuous measurement in centimeters.
     # LEDs: On, steady
@@ -1436,8 +1436,8 @@ class UltrasonicSensor(Sensor):
     MODE_US_SI_IN = 'US-SI-IN'
 
 
-#~autogen
-#~autogen generic-class classes.gyroSensor>currentClass
+# ~autogen
+# ~autogen generic-class classes.gyroSensor>currentClass
 
 class GyroSensor(Sensor):
 
@@ -1453,8 +1453,8 @@ class GyroSensor(Sensor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-gyro'], **kwargs)
 
-#~autogen
-#~autogen generic-property-value classes.gyroSensor>currentClass
+# ~autogen
+# ~autogen generic-property-value classes.gyroSensor>currentClass
 
     # Angle
     MODE_GYRO_ANG = 'GYRO-ANG'
@@ -1472,8 +1472,8 @@ class GyroSensor(Sensor):
     MODE_GYRO_CAL = 'GYRO-CAL'
 
 
-#~autogen
-#~autogen generic-class classes.infraredSensor>currentClass
+# ~autogen
+# ~autogen generic-class classes.infraredSensor>currentClass
 
 class InfraredSensor(Sensor):
 
@@ -1489,8 +1489,8 @@ class InfraredSensor(Sensor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-ir'], **kwargs)
 
-#~autogen
-#~autogen generic-property-value classes.infraredSensor>currentClass
+# ~autogen
+# ~autogen generic-property-value classes.infraredSensor>currentClass
 
     # Proximity
     MODE_IR_PROX = 'IR-PROX'
@@ -1508,10 +1508,10 @@ class InfraredSensor(Sensor):
     MODE_IR_CAL = 'IR-CAL'
 
 
-#~autogen
+# ~autogen
 
 
-#~autogen generic-class classes.soundSensor>currentClass
+# ~autogen generic-class classes.soundSensor>currentClass
 
 class SoundSensor(Sensor):
 
@@ -1527,8 +1527,8 @@ class SoundSensor(Sensor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-nxt-sound'], **kwargs)
 
-#~autogen
-#~autogen generic-property-value classes.soundSensor>currentClass
+# ~autogen
+# ~autogen generic-property-value classes.soundSensor>currentClass
 
     # Sound pressure level. Flat weighting
     MODE_DB = 'DB'
@@ -1537,8 +1537,8 @@ class SoundSensor(Sensor):
     MODE_DBA = 'DBA'
 
 
-#~autogen
-#~autogen generic-class classes.lightSensor>currentClass
+# ~autogen
+# ~autogen generic-class classes.lightSensor>currentClass
 
 class LightSensor(Sensor):
 
@@ -1554,8 +1554,8 @@ class LightSensor(Sensor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-nxt-light'], **kwargs)
 
-#~autogen
-#~autogen generic-property-value classes.lightSensor>currentClass
+# ~autogen
+# ~autogen generic-property-value classes.lightSensor>currentClass
 
     # Reflected light. LED on
     MODE_REFLECT = 'REFLECT'
@@ -1564,8 +1564,8 @@ class LightSensor(Sensor):
     MODE_AMBIENT = 'AMBIENT'
 
 
-#~autogen
-#~autogen generic-class classes.touchSensor>currentClass
+# ~autogen
+# ~autogen generic-class classes.touchSensor>currentClass
 
 class TouchSensor(Sensor):
 
@@ -1581,8 +1581,8 @@ class TouchSensor(Sensor):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
 
-#~autogen
-#~autogen generic-class classes.led>currentClass
+# ~autogen
+# ~autogen generic-class classes.led>currentClass
 
 class Led(Device):
 
@@ -1600,8 +1600,8 @@ class Led(Device):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
-#~autogen
-#~autogen generic-get-set classes.led>currentClass
+# ~autogen
+# ~autogen generic-get-set classes.led>currentClass
 
 
     @property
@@ -1680,7 +1680,7 @@ class Led(Device):
         self.set_attr_int( 'delay_off', value )
 
 
-#~autogen
+# ~autogen
 
     @property
     def brightness_pct(self):
@@ -1694,7 +1694,7 @@ class Led(Device):
         self.brightness = value * self.max_brightness
 
 if current_platform() == 'ev3':
-#~autogen led-colors platforms.ev3.led>currentClass
+# ~autogen led-colors platforms.ev3.led>currentClass
 
     Led.red_left = Led(name='ev3-left0:red:ev3dev')
     Led.red_right = Led(name='ev3-right0:red:ev3dev')
@@ -1768,9 +1768,9 @@ if current_platform() == 'ev3':
     Led.all_off = _Led_all_off
 
 
-#~autogen
+# ~autogen
 elif current_platform() == 'brickpi':
-#~autogen led-colors platforms.brickpi.led>currentClass
+# ~autogen led-colors platforms.brickpi.led>currentClass
 
     Led.blue_one = Led(name='brickpi1:blue:ev3dev')
     Led.blue_two = Led(name='brickpi2:blue:ev3dev')
@@ -1798,7 +1798,7 @@ elif current_platform() == 'brickpi':
     Led.all_off = _Led_all_off
 
 
-#~autogen
+# ~autogen
 
 class ButtonBase(object):
     """
@@ -1839,7 +1839,7 @@ class ButtonBase(object):
         if self.on_change is not None and state_diff:
             self.on_change([(button, button in new_state) for button in state_diff])
 
-#~autogen button-class classes.button>currentClass
+# ~autogen button-class classes.button>currentClass
 class Button(ButtonBase):
 
     """
@@ -1853,7 +1853,7 @@ class Button(ButtonBase):
     in /include/uapi/linux/input.h for details.
     """
 
-#~autogen
+# ~autogen
 
     KEY_MAX = 0x2FF
     KEY_BUF_LEN = int((KEY_MAX + 7) / 8)
@@ -1888,7 +1888,7 @@ class Button(ButtonBase):
         return pressed
 
     if current_platform() == 'ev3':
-#~autogen button-property platforms.ev3.button>currentClass
+# ~autogen button-property platforms.ev3.button>currentClass
 
         on_up = None
         on_down = None
@@ -1931,9 +1931,9 @@ class Button(ButtonBase):
             return 'backspace' in self.buttons_pressed
 
 
-#~autogen
+# ~autogen
 
-#~autogen remote-control classes.infraredSensor.remoteControl>currentClass
+# ~autogen remote-control classes.infraredSensor.remoteControl>currentClass
 class RemoteControl(ButtonBase):
     """
     EV3 Remote Controller
@@ -2002,7 +2002,7 @@ class RemoteControl(ButtonBase):
 
 
 
-#~autogen
+# ~autogen
 
     def __init__(self, sensor=None, channel=1):
         if sensor is None:
@@ -2023,7 +2023,7 @@ class RemoteControl(ButtonBase):
         """
         return RemoteControl._BUTTON_VALUES.get(self._sensor.value(self._channel), [])
 
-#~autogen generic-class classes.powerSupply>currentClass
+# ~autogen generic-class classes.powerSupply>currentClass
 
 class PowerSupply(Device):
 
@@ -2040,8 +2040,8 @@ class PowerSupply(Device):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
-#~autogen
-#~autogen generic-get-set classes.powerSupply>currentClass
+# ~autogen
+# ~autogen generic-get-set classes.powerSupply>currentClass
 
 
     @property
@@ -2083,7 +2083,7 @@ class PowerSupply(Device):
         return self.get_attr_string( 'type' )
 
 
-#~autogen
+# ~autogen
 
     @property
     def measured_amps(self):
@@ -2099,7 +2099,7 @@ class PowerSupply(Device):
         """
         return self.measured_voltage / 1e6
 
-#~autogen generic-class classes.legoPort>currentClass
+# ~autogen generic-class classes.legoPort>currentClass
 
 class LegoPort(Device):
 
@@ -2139,8 +2139,8 @@ class LegoPort(Device):
             kwargs['port_name'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
-#~autogen
-#~autogen generic-get-set classes.legoPort>currentClass
+# ~autogen
+# ~autogen generic-get-set classes.legoPort>currentClass
 
 
     @property
@@ -2206,7 +2206,7 @@ class LegoPort(Device):
         return self.get_attr_string( 'status' )
 
 
-#~autogen
+# ~autogen
 
 class FbMem(object):
 
@@ -2219,12 +2219,12 @@ class FbMem(object):
         - the mapped memory
     """
 
-    #-------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # The code is adapted from
     # https://github.com/LinkCareServices/cairotft/blob/master/cairotft/linuxfb.py
     #
     # The original code came with the following license:
-    #-------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # Copyright (c) 2012 Kurichan
     #
     # This program is free software. It comes without any warranty, to
@@ -2232,7 +2232,7 @@ class FbMem(object):
     # and/or modify it under the terms of the Do What The Fuck You Want
     # To Public License, Version 2, as published by Sam Hocevar. See
     # http://sam.zoy.org/wtfpl/COPYING for more details.
-    #-------------------------------------------------------------------
+    # ------------------------------------------------------------------
 
 
     __slots__ = ('fid', 'fix_info', 'var_info', 'mmap')
