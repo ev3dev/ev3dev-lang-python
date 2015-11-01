@@ -1,0 +1,12 @@
+Source: python-ev3dev
+Maintainer: Ralph Hempel et al - See ev3dev.py for credits <rhempel@hempeldesigngroup.com>
+Section: python
+Priority: optional
+Build-Depends: python-setuptools (>= 0.6b3), python-all (>= 2.6.6-3), debhelper (>= 9)
+Standards-Version: 3.9.1
+
+Package: python-ev3dev
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}
+Description: Python language bindings for ev3dev
+
