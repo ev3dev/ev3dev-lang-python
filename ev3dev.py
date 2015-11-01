@@ -70,7 +70,7 @@ class FileCache(object):
         if path not in self._cache:
             f = open(path, mode)
             self._cache[path] = f
-        elif reopen == True:
+        elif reopen:
             self._cache[path].close()
             f = open(path, mode)
             self._cache[path] = f
@@ -1259,12 +1259,12 @@ class Sensor(Device):
 # ~autogen
 
     def value(self, n=0):
-        if True == isinstance(n, numbers.Integral):
+        if isinstance(n, numbers.Integral):
             n = '{0:d}'.format(n)
-        elif True == isinstance(n, numbers.Real):
+        elif isinstance(n, numbers.Real):
             n = '{0:.0f}'.format(n)
 
-        if True == isinstance(n, str):
+        if isinstance(n, str):
             return self.get_attr_int('value'+n)
         else:
             return 0
