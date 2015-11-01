@@ -9,7 +9,6 @@ for prop in currentClass.systemProperties %}{%
     assign getter = 'from_set' %}{%
     assign setter = 'string' %}{%
   endif %}
-
     @property
     def {{prop_name}}(self):
         """{%
@@ -27,6 +26,7 @@ for prop in currentClass.systemProperties %}{%
     @{{prop_name}}.setter
     def {{ prop_name }}(self, value):
         self.set_attr_{{ setter }}('{{ prop.systemName }}', value){%
-  endif%}{%
+endif%}{% unless forloop.last %}
+{% endunless %}{%
 endfor %}
 

@@ -231,7 +231,6 @@ class Motor(Device):
 # ~autogen
 # ~autogen generic-get-set classes.motor>currentClass
 
-
     @property
     def command(self):
         """
@@ -747,7 +746,6 @@ class DcMotor(Device):
 # ~autogen
 # ~autogen generic-get-set classes.dcMotor>currentClass
 
-
     @property
     def command(self):
         """
@@ -979,7 +977,6 @@ class ServoMotor(Device):
 # ~autogen
 # ~autogen generic-get-set classes.servoMotor>currentClass
 
-
     @property
     def command(self):
         """
@@ -1176,7 +1173,6 @@ class Sensor(Device):
 # ~autogen
 # ~autogen generic-get-set classes.sensor>currentClass
 
-
     @property
     def command(self):
         """
@@ -1285,7 +1281,6 @@ class Sensor(Device):
         """
         return self.get_attr_string('bin_data_format')
 
-
     def bin_data(self, fmt=None):
         """
         Returns the unscaled raw values in the `value<N>` attributes as raw byte
@@ -1343,7 +1338,6 @@ class I2cSensor(Sensor):
 
 # ~autogen
 # ~autogen generic-get-set classes.i2cSensor>currentClass
-
 
     @property
     def fw_version(self):
@@ -1616,7 +1610,6 @@ class Led(Device):
 
 # ~autogen
 # ~autogen generic-get-set classes.led>currentClass
-
 
     @property
     def max_brightness(self):
@@ -1974,14 +1967,12 @@ class RemoteControl(ButtonBase):
     on_blue_down = None
     on_beacon = None
 
-
     @property
     def red_up(self):
         """
         Checks if `red_up` button is pressed.
         """
         return 'red_up' in self.buttons_pressed
-
 
     @property
     def red_down(self):
@@ -1990,14 +1981,12 @@ class RemoteControl(ButtonBase):
         """
         return 'red_down' in self.buttons_pressed
 
-
     @property
     def blue_up(self):
         """
         Checks if `blue_up` button is pressed.
         """
         return 'blue_up' in self.buttons_pressed
-
 
     @property
     def blue_down(self):
@@ -2006,14 +1995,12 @@ class RemoteControl(ButtonBase):
         """
         return 'blue_down' in self.buttons_pressed
 
-
     @property
     def beacon(self):
         """
         Checks if `beacon` button is pressed.
         """
         return 'beacon' in self.buttons_pressed
-
 
 
 # ~autogen
@@ -2058,7 +2045,6 @@ class PowerSupply(Device):
 
 # ~autogen
 # ~autogen generic-get-set classes.powerSupply>currentClass
-
 
     @property
     def measured_current(self):
@@ -2160,7 +2146,6 @@ class LegoPort(Device):
 # ~autogen
 # ~autogen generic-get-set classes.legoPort>currentClass
 
-
     @property
     def driver_name(self):
         """
@@ -2252,7 +2237,6 @@ class FbMem(object):
     # http://sam.zoy.org/wtfpl/COPYING for more details.
     # ------------------------------------------------------------------
 
-
     __slots__ = ('fid', 'fix_info', 'var_info', 'mmap')
 
     FBIOGET_VSCREENINFO = 0x4600
@@ -2282,7 +2266,6 @@ class FbMem(object):
             ('reserved', ctypes.c_uint16 * 3),
         ]
 
-
     class VarScreenInfo(ctypes.Structure):
 
         class FbBitField(ctypes.Structure):
@@ -2294,7 +2277,6 @@ class FbMem(object):
                 ('length', ctypes.c_uint32),
                 ('msb_right', ctypes.c_uint32),
             ]
-
 
         """The fb_var_screeninfo struct from fb.h."""
 
@@ -2315,7 +2297,6 @@ class FbMem(object):
             ('transp', FbBitField),
         ]
 
-
     def __init__(self, fbdev=None):
         """Create the FbMem framebuffer memory object."""
         fid = FbMem._open_fbdev(fbdev)
@@ -2326,12 +2307,10 @@ class FbMem(object):
         self.var_info = FbMem._get_var_info(fid)
         self.mmap = fbmmap
 
-
     def __del__(self):
         """Close the FbMem framebuffer memory object."""
         self.mmap.close()
         FbMem._close_fbdev(self.fid)
-
 
     @staticmethod
     def _open_fbdev(fbdev=None):
@@ -2345,12 +2324,10 @@ class FbMem(object):
         fbfid = os.open(dev, os.O_RDWR)
         return fbfid
 
-
     @staticmethod
     def _close_fbdev(fbfid):
         """Close the framebuffer file descriptor."""
         os.close(fbfid)
-
 
     @staticmethod
     def _get_fix_info(fbfid):
@@ -2359,14 +2336,12 @@ class FbMem(object):
         fcntl.ioctl(fbfid, FbMem.FBIOGET_FSCREENINFO, fix_info)
         return fix_info
 
-
     @staticmethod
     def _get_var_info(fbfid):
         """Return the var screen info from the framebuffer file descriptor."""
         var_info = FbMem.VarScreenInfo()
         fcntl.ioctl(fbfid, FbMem.FBIOGET_VSCREENINFO, var_info)
         return var_info
-
 
     @staticmethod
     def _map_fb_memory(fbfid, fix_info):
@@ -2488,7 +2463,6 @@ class Sound:
         with open(os.devnull, 'w') as n:
             return Popen('/usr/bin/beep %s' % args, stdout=n, shell=True)
 
-
     @staticmethod
     def tone(tone_sequence):
         """
@@ -2531,7 +2505,6 @@ class Sound:
 
         return Sound.beep(' '.join([beep_args(*t) for t in tone_sequence]))
 
-
     @staticmethod
     def play(wav_file):
         """
@@ -2539,7 +2512,6 @@ class Sound:
         """
         with open(os.devnull, 'w') as n:
             return Popen('/usr/bin/aplay -q "%s"' % wav_file, stdout=n, shell=True)
-
 
     @staticmethod
     def speak(text):
