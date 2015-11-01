@@ -29,6 +29,17 @@ An assortment of classes modeling specific features of the BrickPi.
 from .core import *
 
 
+OUTPUT_A = 'ttyAMA0:outA'
+OUTPUT_B = 'ttyAMA0:outB'
+OUTPUT_C = 'ttyAMA0:outC'
+OUTPUT_D = 'ttyAMA0:outD'
+
+INPUT_1 = 'ttyAMA0:in1'
+INPUT_2 = 'ttyAMA0:in2'
+INPUT_3 = 'ttyAMA0:in3'
+INPUT_4 = 'ttyAMA0:in4'
+
+
 class Leds(object):
     """
     The BrickPi LEDs.
