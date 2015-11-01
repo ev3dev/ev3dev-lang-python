@@ -19,8 +19,13 @@ if currentClass.driverName %}{%
 endif %}
 class {{ class_name }}({{ base_class }}):
 
-    """{% for line in currentClass.description %}
-    {{ line }}{% endfor %}
+    """{%
+for line in currentClass.description %}{%
+    if line %}
+    {{ line }}{%
+    else %}
+{%  endif %}{%
+endfor %}
     """
 {% if currentClass.inheritance %}
     SYSTEM_CLASS_NAME = {{ base_class }}.SYSTEM_CLASS_NAME

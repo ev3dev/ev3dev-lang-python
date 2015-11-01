@@ -12,8 +12,11 @@ for prop in currentClass.systemProperties %}{%
     @property
     def {{prop_name}}(self):
         """{%
-  for line in prop.description %}
+  for line in prop.description %}{%
+      if line %}
         {{ line }}{%
+      else %}
+{%    endif %}{%
   endfor %}
         """{%
   if prop.readAccess %}
