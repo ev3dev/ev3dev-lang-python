@@ -1741,25 +1741,22 @@ class ButtonBase(object):
             self.on_change([(button, button in new_state) for button in state_diff])
 
 
-# ~autogen button-class classes.button>currentClass
-class Button(ButtonBase):
+class ButtonEVIO(ButtonBase):
 
     """
-    Provides a generic button reading mechanism that can be adapted
-    to platform specific implementations. Each platform's specific
-    button capabilites are enumerated in the 'platforms' section
-    of this specification
+    Provides a generic button reading mechanism that works with event interface
+    and may be adapted to platform specific implementations.
 
     This implementation depends on the availability of the EVIOCGKEY ioctl
     to be able to read the button state buffer. See Linux kernel source
     in /include/uapi/linux/input.h for details.
     """
 
-# ~autogen
-
     KEY_MAX = 0x2FF
     KEY_BUF_LEN = int((KEY_MAX + 7) / 8)
     EVIOCGKEY = (2 << (14 + 8 + 8) | KEY_BUF_LEN << (8 + 8) | ord('E') << 8 | 0x18)
+
+    _buttons = {}
 
     def __init__(self):
         self._file_cache = FileCache()
@@ -1789,51 +1786,7 @@ class Button(ButtonBase):
                 pressed += [k]
         return pressed
 
-    if current_platform() == 'ev3':
-# ~autogen button-property platforms.ev3.button>currentClass
 
-        on_up = None
-        on_down = None
-        on_left = None
-        on_right = None
-        on_enter = None
-        on_backspace = None
-
-        _buttons = {
-            'up': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 103},
-            'down': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 108},
-            'left': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 105},
-            'right': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 106},
-            'enter': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 28},
-            'backspace': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 14},
-        }
-
-        @property
-        def up(self):
-            return 'up' in self.buttons_pressed
-
-        @property
-        def down(self):
-            return 'down' in self.buttons_pressed
-
-        @property
-        def left(self):
-            return 'left' in self.buttons_pressed
-
-        @property
-        def right(self):
-            return 'right' in self.buttons_pressed
-
-        @property
-        def enter(self):
-            return 'enter' in self.buttons_pressed
-
-        @property
-        def backspace(self):
-            return 'backspace' in self.buttons_pressed
-
-
-# ~autogen
 # ~autogen remote-control classes.infraredSensor.remoteControl>currentClass
 class RemoteControl(ButtonBase):
     """

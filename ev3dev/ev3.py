@@ -108,3 +108,53 @@ class Leds(object):
 
 
 # ~autogen
+
+class Button(ButtonEVIO):
+    """
+    EV3 Buttons
+    """
+
+# ~autogen button-property platforms.ev3.button>currentClass
+
+    on_up = None
+    on_down = None
+    on_left = None
+    on_right = None
+    on_enter = None
+    on_backspace = None
+
+    _buttons = {
+            'up': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 103},
+            'down': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 108},
+            'left': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 105},
+            'right': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 106},
+            'enter': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 28},
+            'backspace': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 14},
+        }
+
+    @property
+    def up(self):
+        return 'up' in self.buttons_pressed
+
+    @property
+    def down(self):
+        return 'down' in self.buttons_pressed
+
+    @property
+    def left(self):
+        return 'left' in self.buttons_pressed
+
+    @property
+    def right(self):
+        return 'right' in self.buttons_pressed
+
+    @property
+    def enter(self):
+        return 'enter' in self.buttons_pressed
+
+    @property
+    def backspace(self):
+        return 'backspace' in self.buttons_pressed
+
+
+# ~autogen
