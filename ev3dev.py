@@ -1823,7 +1823,7 @@ class ButtonBase(object):
         """
         return bool(self.buttons_pressed)
 
-    def check_buttons(self,buttons=[]):
+    def check_buttons(self, buttons=[]):
         """
         Check if currently pressed buttons exactly match the given list.
         """
@@ -1888,7 +1888,7 @@ class Button(ButtonBase):
             fcntl.ioctl(self._button_file(b), self.EVIOCGKEY, self._buffer_cache[b])
 
         pressed = []
-        for k,v in self._buttons.items():
+        for k, v in self._buttons.items():
             buf = self._buffer_cache[v['name']]
             bit = v['value']
             if not bool(buf[int(bit / 8)] & 1 << bit % 8):
@@ -2407,7 +2407,7 @@ class Screen(FbMem):
         """
         Clears the screen
         """
-        self._draw.rectangle(((0,0), self.shape), fill="white")
+        self._draw.rectangle(((0, 0), self.shape), fill="white")
 
     def _color565(self, r, g, b):
         """Convert red, green, blue components to a 16-bit 565 RGB value. Components
@@ -2416,7 +2416,7 @@ class Screen(FbMem):
         return (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3))
 
     def _img_to_rgb565_bytes(self):
-        pixels = [self._color565(r,g,b) for (r,g,b) in self._img.getdata()]
+        pixels = [self._color565(r, g, b) for (r, g, b) in self._img.getdata()]
         return pack('H' * len(pixels), *pixels)
 
     def update(self):
