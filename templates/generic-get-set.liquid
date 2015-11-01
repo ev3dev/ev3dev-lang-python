@@ -18,15 +18,15 @@ for prop in currentClass.systemProperties %}{%
   endfor %}
         """{%
   if prop.readAccess %}
-        return self.get_attr_{{ getter }}( '{{ prop.systemName }}' ){%
+        return self.get_attr_{{ getter }}('{{ prop.systemName }}'){%
   else %}
-        raise Exception( "{{prop_name}} is a write-only property!" ){%
+        raise Exception("{{prop_name}} is a write-only property!"){%
   endif %}{%
   if prop.writeAccess %}
 
     @{{prop_name}}.setter
     def {{ prop_name }}(self, value):
-        self.set_attr_{{ setter }}( '{{ prop.systemName }}', value ){%
+        self.set_attr_{{ setter }}('{{ prop.systemName }}', value){%
   endif%}{%
 endfor %}
 

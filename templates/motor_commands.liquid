@@ -3,7 +3,7 @@ for propval in currentClass.propertyValues %}{%
     if propval.propertyName == "Command" %}{%
         for value in propval.values %}{%
             assign cmd = value.name | replace:'-','_' %}
-    def {{ cmd }}( self, **kwargs ):
+    def {{ cmd }}(self, **kwargs):
         """{%
         for line in value.description %}{{line}}
         {% endfor %}"""
