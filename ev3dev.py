@@ -1906,12 +1906,12 @@ class Button(ButtonBase):
         on_backspace = None
 
         _buttons = {
-            'up' : {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 103},
-            'down' : {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 108},
-            'left' : {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 105},
-            'right' : {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 106},
-            'enter' : {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 28},
-            'backspace' : {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 14},
+            'up': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 103},
+            'down': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 108},
+            'left': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 105},
+            'right': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 106},
+            'enter': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 28},
+            'backspace': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 14},
         }
 
         @property
