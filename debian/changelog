@@ -1,5 +1,5 @@
-python-ev3dev (0.4.2-1) unstable; urgency=low
+python-ev3dev (0.4.2) stable; urgency=low
 
   * source package automatically created by stdeb 0.8.2
 
- -- Ralph Hempel et al - See ev3dev.py for credits <rhempel@hempeldesigngroup.com>  Sun, 01 Nov 2015 16:51:45 -0500
+ -- Ralph Hempel <rhempel@hempeldesigngroup.com>  Sun, 01 Nov 2015 16:51:45 -0500
