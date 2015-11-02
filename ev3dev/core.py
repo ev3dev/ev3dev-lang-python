@@ -41,6 +41,8 @@ from PIL import Image, ImageDraw
 from struct import pack, unpack
 from subprocess import Popen
 
+INPUT_AUTO = ''
+OUTPUT_AUTO = ''
 
 # -----------------------------------------------------------------------------
 # Attribute reader/writer with cached file access
