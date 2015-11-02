@@ -5,7 +5,6 @@ sudo: false
 install:
 - pip install PIL --allow-external PIL --allow-unverified PIL
 script:
-- echo "__version__=''" > ev3dev/version.py
 - ./tests/api_tests.py
 deploy:
   provider: pypi

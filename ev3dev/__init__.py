@@ -1,5 +1,4 @@
 import platform
-from .version import __version__
 
 # -----------------------------------------------------------------------------
 # Guess platform we are running on
