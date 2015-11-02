@@ -3,5 +3,4 @@ __pycache__
 *.swp
 dist
 *.egg-info
-RELEASE-VERSION
 ev3dev/version.py

@@ -2,11 +2,16 @@ Source: python-ev3dev
 Maintainer: Ralph Hempel <rhempel@hempeldesigngroup.com>
 Section: python
 Priority: optional
+Standards-Version: 3.9.5
 Build-Depends: python-setuptools (>= 0.6b3), python-all (>= 2.6.6-3), debhelper (>= 9), dh-python
-Standards-Version: 3.9.1
+VCS-Git: git://github.com/rhempel/ev3dev-lang-python.git
+VCS-Browser: https://github.com/rhempel/ev3dev-lang-python
 
 Package: python-ev3dev
 Architecture: all
 Depends: ${misc:Depends}, ${python:Depends}
 Description: Python language bindings for ev3dev
-
+ This package is a pure Python binding to the peripheral
+ devices on hardware that is supported by ev3dev.org - a
+ minimal Debian distribution optimized for the LEGO
+ MINDSTORMS EV3.
