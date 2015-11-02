@@ -2301,8 +2301,10 @@ class Sound:
             return Popen('/usr/bin/beep %s' % args, stdout=n, shell=True)
 
     @staticmethod
-    def tone(tone_sequence):
+    def tone(*args):
         """
+        tone(tone_sequence):
+
         Play tone sequence. The tone_sequence parameter is a list of tuples,
         where each tuple contains up to three numbers. The first number is
         frequency in Hz, the second is duration in milliseconds, and the third
@@ -2331,16 +2333,28 @@ class Sound:
                 (392, 350, 100), (311.13, 250, 100), (466.16, 25, 100),
                 (392.00, 300, 150), (311.13, 250, 100), (466.16, 25, 100), (392, 700)
                 ]).wait()
+
+        tone(frequency, duration):
+
+        Play single tone of given frequency (Hz) and duration (milliseconds).
         """
-        def beep_args(frequency=None, duration=None, delay=None):
-            args = '-n '
-            if frequency is not None: args += '-f %s ' % frequency
-            if duration  is not None: args += '-l %s ' % duration
-            if delay     is not None: args += '-d %s ' % delay
+        def play_tone_sequence(tone_sequence):
+            def beep_args(frequency=None, duration=None, delay=None):
+                args = '-n '
+                if frequency is not None: args += '-f %s ' % frequency
+                if duration  is not None: args += '-l %s ' % duration
+                if delay     is not None: args += '-d %s ' % delay
 
-            return args
+                return args
 
-        return Sound.beep(' '.join([beep_args(*t) for t in tone_sequence]))
+            return Sound.beep(' '.join([beep_args(*t) for t in tone_sequence]))
+
+        if len(args) == 1:
+            return play_tone_sequence(args[0])
+        elif len(args) == 2:
+            return play_tone_sequence([(args[0], args[1])])
+        else:
+            raise Exception("Unsupported number of parameters in Sound.tone()")
 
     @staticmethod
     def play(wav_file):
