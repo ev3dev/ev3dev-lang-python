@@ -3,4 +3,3 @@ __pycache__
 *.swp
 dist
 *.egg-info
-RELEASE-VERSION
