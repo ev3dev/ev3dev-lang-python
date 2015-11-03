@@ -12,6 +12,6 @@ setup(
     url='https://github.com/rhempel/ev3dev-lang-python',
     include_package_data=True,
     py_modules=['ev3dev'],
-    install_requires=['pil']
+    install_requires=['Pillow']
     )
 
