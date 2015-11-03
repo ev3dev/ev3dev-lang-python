@@ -8,9 +8,6 @@
 Module interface
 ----------------
 
-.. toctree::
-   :maxdepth: 2
-
 .. automodule:: ev3dev
 
 .. autosummary::
