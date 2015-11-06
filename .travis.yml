@@ -3,7 +3,7 @@ python:
 - 2.7
 sudo: false
 install:
-- pip install PIL --allow-external PIL --allow-unverified PIL
+- pip install Pillow
 script:
 - ./tests/api_tests.py
 deploy:
