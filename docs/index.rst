@@ -101,6 +101,7 @@ Sensors
 
 .. autoclass:: RemoteControl
     :members:
+    :inherited-members:
 
 Other
 ^^^^^
@@ -113,6 +114,7 @@ Other
 
 .. autoclass:: Button
     :members:
+    :inherited-members:
 
 .. autoclass:: Sound
     :members:

@@ -1694,7 +1694,14 @@ class ButtonBase(object):
     Abstract button interface.
     """
 
-    on_change = None
+    @staticmethod
+    def on_change(changed_buttons):
+        """
+        This handler is called by `process()` whenever state of any button has
+        changed since last `process()` call. `changed_buttons` is a list of
+        tuples of changed button names and their states.
+        """
+        pass
 
     _state = set([])
 
@@ -1763,6 +1770,9 @@ class ButtonEVIO(ButtonBase):
 
     @property
     def buttons_pressed(self):
+        """
+        Returns list of names of pressed buttons.
+        """
         for b in self._buffer_cache:
             fcntl.ioctl(self._button_file(b), self.EVIOCGKEY, self._buffer_cache[b])
 

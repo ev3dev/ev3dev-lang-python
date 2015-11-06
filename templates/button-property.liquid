@@ -1,6 +1,13 @@
 {% for instance in currentClass.instances %}
-    on_{{ instance.name }} = None{%
-endfor %}
+    @staticmethod
+    def on_{{ instance.name }}(state):
+        """
+        This handler is called by `process()` whenever state of '{{ instance.name }}' button
+        has changed since last `process()` call. `state` parameter is the new
+        state of the button.
+        """
+        pass
+{% endfor %}
 
     _buttons = {
 {% for instance in currentClass.instances %}            '{{ instance.name }}': {'name': '{{ currentClass.systemPath }}/{{ instance.systemName }}', 'value': {{ instance.systemValue }}},
@@ -8,5 +15,8 @@ endfor %}
 {% for instance in currentClass.instances %}
     @property
     def {{ instance.name }}(self):
+        """
+        Check if '{{ instance.name }}' button is pressed.
+        """
         return '{{ instance.name }}' in self.buttons_pressed
 {% endfor %}
