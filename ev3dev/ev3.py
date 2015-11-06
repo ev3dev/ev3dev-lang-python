@@ -109,7 +109,7 @@ class Leds(object):
 
 # ~autogen
 
-class Button(object):
+class Button(ButtonEVIO):
     """
     EV3 Buttons
     """
