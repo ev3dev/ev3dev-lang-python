@@ -1704,7 +1704,6 @@ class ButtonBase(object):
 
     _state = set([])
 
-    @property
     def any(self):
         """
         Checks if any button is pressed.
