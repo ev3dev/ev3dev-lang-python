@@ -58,11 +58,11 @@ class FileCache(object):
         """Manages the file handle cache and opening the files in the correct mode"""
 
         if path not in self._cache:
-            f = open(path, mode)
+            f = open(path, mode, 0)
             self._cache[path] = f
         elif reopen:
             self._cache[path].close()
-            f = open(path, mode)
+            f = open(path, mode, 0)
             self._cache[path] = f
         else:
             f = self._cache[path]
@@ -74,10 +74,10 @@ class FileCache(object):
 
         try:
             f.seek(0)
-            value = f.readline()
+            value = f.read()
         except IOError:
             f = self.file_handle(path, 'w+', reopen=True)
-            value = f.readline()
+            value = f.read()
 
         return value.strip()
 
@@ -90,8 +90,6 @@ class FileCache(object):
         except IOError:
             f = self.file_handle(path, 'w+', reopen=True)
             f.write(value)
-
-        f.flush()
 
 
 # -----------------------------------------------------------------------------
