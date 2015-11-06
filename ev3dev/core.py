@@ -54,14 +54,23 @@ class FileCache(object):
         for f in self._cache.values():
             f.close()
 
-    def file_handle(self, path, mode, reopen=False):
+    def file_handle(self, path, binary=False):
         """Manages the file handle cache and opening the files in the correct mode"""
 
         if path not in self._cache:
-            f = open(path, mode, 0)
-            self._cache[path] = f
-        elif reopen:
-            self._cache[path].close()
+            r_ok = os.access(path, os.R_OK)
+            w_ok = os.access(path, os.W_OK)
+
+            if r_ok and w_ok:
+                mode = 'a+'
+            elif w_ok:
+                mode = 'a'
+            else:
+                mode = 'r'
+
+            if binary:
+                mode += 'b'
+
             f = open(path, mode, 0)
             self._cache[path] = f
         else:
@@ -70,26 +79,16 @@ class FileCache(object):
         return f
 
     def read(self, path):
-        f = self.file_handle(path, 'r')
+        f = self.file_handle(path)
 
-        try:
-            f.seek(0)
-            value = f.read()
-        except IOError:
-            f = self.file_handle(path, 'w+', reopen=True)
-            value = f.read()
-
-        return value.strip()
+        f.seek(0)
+        return f.read().strip()
 
     def write(self, path, value):
-        f = self.file_handle(path, 'w')
+        f = self.file_handle(path)
 
-        try:
-            f.seek(0)
-            f.write(value)
-        except IOError:
-            f = self.file_handle(path, 'w+', reopen=True)
-            f.write(value)
+        f.seek(0)
+        f.write(value)
 
 
 # -----------------------------------------------------------------------------
@@ -1298,7 +1297,7 @@ class Sensor(Device):
                     "float":  4
                 }.get(self.bin_data_format, 1) * self.num_values
 
-        f = self._attribute_cache.file_handle(abspath(self._path + '/bin_data'), 'rb')
+        f = self._attribute_cache.file_handle(abspath(self._path + '/bin_data'), binary=True)
         f.seek(0)
         raw = bytearray(f.read(self._bin_data_size))
 
@@ -1761,7 +1760,7 @@ class ButtonEVIO(ButtonBase):
             self._button_buffer(self._buttons[b]['name'])
 
     def _button_file(self, name):
-        return self._file_cache.file_handle(name, 'r')
+        return self._file_cache.file_handle(name)
 
     def _button_buffer(self, name):
         if name not in self._buffer_cache:
