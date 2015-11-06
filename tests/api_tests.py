@@ -3,32 +3,32 @@ import unittest, sys, os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-import ev3dev
+import ev3dev.ev3 as ev3
 
-ev3dev.Device.DEVICE_ROOT_PATH = os.path.join(os.path.dirname(__file__), 'fake_sys_class')
+ev3.Device.DEVICE_ROOT_PATH = os.path.join(os.path.dirname(__file__), 'fake_sys_class')
 
 class TestAPI(unittest.TestCase):
     def test_device(self):
-        d = ev3dev.Device('tacho-motor', 'motor*')
+        d = ev3.Device('tacho-motor', 'motor*')
         self.assertTrue(d.connected)
 
-        d = ev3dev.Device('tacho-motor', 'motor0')
+        d = ev3.Device('tacho-motor', 'motor0')
         self.assertTrue(d.connected)
 
-        d = ev3dev.Device('tacho-motor', 'motor*', driver_name='lego-ev3-m-motor')
+        d = ev3.Device('tacho-motor', 'motor*', driver_name='lego-ev3-m-motor')
         self.assertTrue(d.connected)
 
-        d = ev3dev.Device('tacho-motor', 'motor*', port_name='outA')
+        d = ev3.Device('tacho-motor', 'motor*', port_name='outA')
         self.assertTrue(d.connected)
 
-        d = ev3dev.Device('tacho-motor', 'motor*', port_name='outA', driver_name='not-valid')
+        d = ev3.Device('tacho-motor', 'motor*', port_name='outA', driver_name='not-valid')
         self.assertTrue(not d.connected)
 
-        d = ev3dev.Device('lego-sensor', 'sensor*')
+        d = ev3.Device('lego-sensor', 'sensor*')
         self.assertTrue(d.connected)
 
     def test_medium_motor(self):
-        m = ev3dev.MediumMotor()
+        m = ev3.MediumMotor()
 
         self.assertTrue(m.connected);
 
@@ -52,7 +52,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(m.speed,                    0)
         self.assertEqual(m.speed_regulation_enabled, 'off')
         self.assertEqual(m.speed_sp,                 0)
-        self.assertEqual(m.state,                    [])
+        self.assertEqual(m.state,                    ['running'])
         self.assertEqual(m.stop_command,             'coast')
         self.assertEqual(m.time_sp,                  1000)
 
@@ -60,7 +60,7 @@ class TestAPI(unittest.TestCase):
             c = m.command
 
     def test_infrared_sensor(self):
-        s = ev3dev.InfraredSensor()
+        s = ev3.InfraredSensor()
 
         self.assertTrue(s.connected)
 
