@@ -52,55 +52,47 @@ class Leds(object):
     green_left = Led(name='ev3-left1:green:ev3dev')
     green_right = Led(name='ev3-right1:green:ev3dev')
 
-    @staticmethod
-    def mix_colors(red, green):
-        Leds.red_left.brightness_pct = red
-        Leds.red_right.brightness_pct = red
-        Leds.green_left.brightness_pct = green
-        Leds.green_right.brightness_pct = green
+    LEFT = (red_left, green_left)
+    RIGHT = (red_right, green_right)
+
+    RED = (1, 0)
+    GREEN = (0, 1)
+    AMBER = (1, 1)
+    ORANGE = (1, 0.5)
+    YELLOW = (0.5, 1)
 
     @staticmethod
-    def set_red(pct):
-        Leds.mix_colors(red=1 * pct, green=0 * pct)
+    def set_color(group, color, pct=1):
+        """
+        Sets brigthness of leds in the given group to the values specified in
+        color tuple. When percentage is specified, brightness of each led is
+        reduced proportionally.
+
+        Example::
+
+            Leds.set_color(LEFT, AMBER)
+        """
+        for l, v in zip(group, color):
+            l.brightness_pct = v * pct
 
     @staticmethod
-    def red_on():
-        Leds.set_red(1)
+    def set(group, **kwargs):
+        """
+        Set attributes for each led in group.
 
-    @staticmethod
-    def set_green(pct):
-        Leds.mix_colors(red=0 * pct, green=1 * pct)
+        Example::
 
-    @staticmethod
-    def green_on():
-        Leds.set_green(1)
-
-    @staticmethod
-    def set_amber(pct):
-        Leds.mix_colors(red=1 * pct, green=1 * pct)
-
-    @staticmethod
-    def amber_on():
-        Leds.set_amber(1)
-
-    @staticmethod
-    def set_orange(pct):
-        Leds.mix_colors(red=1 * pct, green=0.5 * pct)
-
-    @staticmethod
-    def orange_on():
-        Leds.set_orange(1)
-
-    @staticmethod
-    def set_yellow(pct):
-        Leds.mix_colors(red=0.5 * pct, green=1 * pct)
-
-    @staticmethod
-    def yellow_on():
-        Leds.set_yellow(1)
+            Leds.set(LEFT, brightness_pct=0.5, trigger='timer')
+        """
+        for led in group:
+            for k in kwargs:
+                setattr(led, k, kwargs[k])
 
     @staticmethod
     def all_off():
+        """
+        Turn all leds off
+        """
         Leds.red_left.brightness = 0
         Leds.red_right.brightness = 0
         Leds.green_left.brightness = 0

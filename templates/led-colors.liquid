@@ -2,34 +2,50 @@
     assign instanceName = instance.name | downcase | underscore_spaces %}
     {{instanceName}} = Led(name='{{instance.systemName}}'){%
 endfor %}
-
-    @staticmethod
-    def mix_colors({%
-for group in currentClass.groups%}{{ group.name | downcase | underscore_spaces }}{%
-    unless forloop.last %}, {% endunless %}{%
-endfor %}):{%
-for group in currentClass.groups %}{%
-    assign groupName = group.name | downcase | underscore_spaces %}{%
-    for instance in group.entries %}{%
-        assign instanceName = instance | downcase | underscore_spaces %}
-        Leds.{{instanceName}}.brightness_pct = {{groupName}}{%
-    endfor %}{%
+{% for group in currentClass.groups %}{%
+    assign groupName = group.name | upcase | underscore_spaces %}
+    {{ groupName }} = ({% for e in group.entries %}{%
+        assign instance = e | downcase | underscore_spaces
+%}{{ instance }}{% unless forloop.last %}, {% endunless %}{%
+    endfor %}){%
 endfor %}
 {% for color in currentClass.colors %}{%
-    assign colorName = color.name | downcase | underscore_spaces %}
-    @staticmethod
-    def set_{{ colorName }}(pct):
-        Leds.mix_colors({%
-    for group in color.groups %}{{ group.name | downcase | underscore_spaces }}={{ group.value }} * pct{%
-        unless forloop.last %}, {% endunless %}{%
-    endfor %})
+    assign colorName = color.name | upcase | underscore_spaces %}
+    {{ colorName }} = ({% for v in color.value %}{{ v }}{% unless forloop.last %}, {% endunless %}{%endfor %}){%
+endfor %}
 
     @staticmethod
-    def {{ colorName }}_on():
-        Leds.set_{{ colorName }}(1)
-{% endfor %}
+    def set_color(group, color, pct=1):
+        """
+        Sets brigthness of leds in the given group to the values specified in
+        color tuple. When percentage is specified, brightness of each led is
+        reduced proportionally.
+
+        Example::
+
+            Leds.set_color(LEFT, AMBER)
+        """
+        for l, v in zip(group, color):
+            l.brightness_pct = v * pct
+
     @staticmethod
-    def all_off():{%
+    def set(group, **kwargs):
+        """
+        Set attributes for each led in group.
+
+        Example::
+
+            Leds.set(LEFT, brightness_pct=0.5, trigger='timer')
+        """
+        for led in group:
+            for k in kwargs:
+                setattr(led, k, kwargs[k])
+
+    @staticmethod
+    def all_off():
+        """
+        Turn all leds off
+        """{%
 for instance in currentClass.instances %}{%
     assign instanceName = instance.name | downcase | underscore_spaces %}
         Leds.{{instanceName}}.brightness = 0{%
