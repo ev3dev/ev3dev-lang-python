@@ -50,21 +50,43 @@ class Leds(object):
     blue_one = Led(name='brickpi1:blue:ev3dev')
     blue_two = Led(name='brickpi2:blue:ev3dev')
 
-    @staticmethod
-    def mix_colors(blue):
-        Leds.blue_one.brightness_pct = blue
-        Leds.blue_two.brightness_pct = blue
+    BLUE_ONE = (blue_one, )
+    BLUE_TWO = (blue_two, )
+
+    BLUE = (1, )
 
     @staticmethod
-    def set_blue(pct):
-        Leds.mix_colors(blue=1 * pct)
+    def set_color(group, color, pct=1):
+        """
+        Sets brigthness of leds in the given group to the values specified in
+        color tuple. When percentage is specified, brightness of each led is
+        reduced proportionally.
+
+        Example::
+
+            Leds.set_color(LEFT, AMBER)
+        """
+        for l, v in zip(group, color):
+            l.brightness_pct = v * pct
 
     @staticmethod
-    def blue_on():
-        Leds.set_blue(1)
+    def set(group, **kwargs):
+        """
+        Set attributes for each led in group.
+
+        Example::
+
+            Leds.set(LEFT, brightness_pct=0.5, trigger='timer')
+        """
+        for led in group:
+            for k in kwargs:
+                setattr(led, k, kwargs[k])
 
     @staticmethod
     def all_off():
+        """
+        Turn all leds off
+        """
         Leds.blue_one.brightness = 0
         Leds.blue_two.brightness = 0
 

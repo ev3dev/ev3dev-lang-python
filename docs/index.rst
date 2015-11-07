@@ -30,6 +30,7 @@ Module interface
     InfraredSensor
     RemoteControl
     Led
+    Leds
     PowerSupply
     Button
     Sound
@@ -107,6 +108,9 @@ Other
 ^^^^^
 
 .. autoclass:: Led
+    :members:
+
+.. autoclass:: Leds
     :members:
 
 .. autoclass:: PowerSupply
