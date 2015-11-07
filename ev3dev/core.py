@@ -1733,6 +1733,10 @@ class ButtonBase(object):
         if self.on_change is not None and state_diff:
             self.on_change([(button, button in new_state) for button in state_diff])
 
+    @property
+    def buttons_pressed(self):
+        raise NotImplementedError()
+
 
 class ButtonEVIO(ButtonBase):
 
