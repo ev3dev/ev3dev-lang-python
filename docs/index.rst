@@ -8,7 +8,7 @@
 Module interface
 ----------------
 
-.. automodule:: ev3dev
+.. automodule:: ev3dev.ev3
 
 .. autosummary::
     :nosignatures:
