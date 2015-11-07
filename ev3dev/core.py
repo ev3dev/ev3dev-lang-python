@@ -2362,14 +2362,14 @@ class Sound:
         """
         def play_tone_sequence(tone_sequence):
             def beep_args(frequency=None, duration=None, delay=None):
-                args = '-n '
+                args = ''
                 if frequency is not None: args += '-f %s ' % frequency
                 if duration  is not None: args += '-l %s ' % duration
                 if delay     is not None: args += '-D %s ' % delay
 
                 return args
 
-            return Sound.beep(' '.join([beep_args(*t) for t in tone_sequence]))
+            return Sound.beep(' -n '.join([beep_args(*t) for t in tone_sequence]))
 
         if len(args) == 1:
             return play_tone_sequence(args[0])
