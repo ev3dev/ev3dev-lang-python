@@ -216,6 +216,10 @@ class Motor(Device):
 
 
 # ~autogen
+
+    def __del__(self):
+        self.stop()
+
 # ~autogen generic-get-set classes.motor>currentClass
 
     @property
@@ -731,6 +735,10 @@ class DcMotor(Device):
 
 
 # ~autogen
+
+    def __del__(self):
+        self.stop()
+
 # ~autogen generic-get-set classes.dcMotor>currentClass
 
     @property
@@ -962,6 +970,10 @@ class ServoMotor(Device):
 
 
 # ~autogen
+
+    def __del__(self):
+        self.float()
+
 # ~autogen generic-get-set classes.servoMotor>currentClass
 
     @property

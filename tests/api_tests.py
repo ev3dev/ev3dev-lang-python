@@ -28,6 +28,12 @@ class TestAPI(unittest.TestCase):
         self.assertTrue(d.connected)
 
     def test_medium_motor(self):
+        def dummy(self):
+            pass
+
+        # Do not write motor.command on exit (so that fake tree stays intact)
+        ev3.MediumMotor.__del__ = dummy
+
         m = ev3.MediumMotor()
 
         self.assertTrue(m.connected);
