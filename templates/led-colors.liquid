@@ -6,12 +6,12 @@ endfor %}
     assign groupName = group.name | upcase | underscore_spaces %}
     {{ groupName }} = ({% for e in group.entries %}{%
         assign instance = e | downcase | underscore_spaces
-%}{{ instance }}{% unless forloop.last %}, {% endunless %}{%
+%}{{ instance }}, {%
     endfor %}){%
 endfor %}
 {% for color in currentClass.colors %}{%
     assign colorName = color.name | upcase | underscore_spaces %}
-    {{ colorName }} = ({% for v in color.value %}{{ v }}{% unless forloop.last %}, {% endunless %}{%endfor %}){%
+    {{ colorName }} = ({% for v in color.value %}{{ v }}, {%endfor %}){%
 endfor %}
 
     @staticmethod
