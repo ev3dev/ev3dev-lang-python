@@ -2353,7 +2353,7 @@ class Sound:
                 args = '-n '
                 if frequency is not None: args += '-f %s ' % frequency
                 if duration  is not None: args += '-l %s ' % duration
-                if delay     is not None: args += '-d %s ' % delay
+                if delay     is not None: args += '-D %s ' % delay
 
                 return args
 
