@@ -36,6 +36,7 @@ import array
 import mmap
 import ctypes
 import re
+import stat
 from os.path import abspath
 from PIL import Image, ImageDraw
 from struct import pack, unpack
@@ -58,8 +59,10 @@ class FileCache(object):
         """Manages the file handle cache and opening the files in the correct mode"""
 
         if path not in self._cache:
-            r_ok = os.access(path, os.R_OK)
-            w_ok = os.access(path, os.W_OK)
+            mode = stat.S_IMODE(os.stat(path)[stat.ST_MODE])
+
+            r_ok = mode & stat.S_IRGRP
+            w_ok = mode & stat.S_IWGRP
 
             if r_ok and w_ok:
                 mode = 'a+'
