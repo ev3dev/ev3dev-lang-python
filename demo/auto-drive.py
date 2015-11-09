@@ -37,7 +37,7 @@ from random import choice, randint
 from ev3dev.auto import *
 
 # Connect two large motors on output ports B and C:
-motors = [LargeMotor(port) for port in (OUTPUT_C, OUTPUT_B)];
+motors = [LargeMotor(port) for port in (OUTPUT_B, OUTPUT_C)]
 
 # Every device in ev3dev has `connected` property. Use it to check that the
 # device has actually been connected.
@@ -45,8 +45,8 @@ assert all([m.connected for m in motors]), \
     "Two large motors should be connected to ports B and C"
 
 # Connect infrared and touch sensors.
-ir  = InfraredSensor(); assert ir.connected
-ts  = TouchSensor();    assert ts.connected
+ir = InfraredSensor(); assert ir.connected
+ts = TouchSensor();    assert ts.connected
 
 # Put the infrared sensor into proximity mode.
 ir.mode = 'IR-PROX'
