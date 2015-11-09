@@ -1880,6 +1880,10 @@ class RemoteControl(ButtonBase):
             self._sensor.mode = 'IR-REMOTE'
 
     @property
+    def connected(self):
+        return self._sensor.connected
+
+    @property
     def buttons_pressed(self):
         """
         Returns list of currently pressed buttons.
