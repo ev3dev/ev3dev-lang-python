@@ -50,8 +50,8 @@ class Leds(object):
     blue_one = Led(name='brickpi1:blue:ev3dev')
     blue_two = Led(name='brickpi2:blue:ev3dev')
 
-    ONE = ( blue_one )
-    TWO = ( blue_two )
+    BLUE_ONE = ( blue_one )
+    BLUE_TWO = ( blue_two )
 
     BLUE = ( 1 )
 

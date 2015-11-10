@@ -13,12 +13,12 @@ endfor %}
 endfor %}
 {% for color in currentClass.colors %}{%
     assign colorName = color.name | upcase | underscore_spaces %}{%
-    assign mixRatio = '' %}{%
-    for mix in color.mix %}{%
-        capture mixRatio %}{{ mixRatio }}, {{ mix.value }}{%
+    assign mixValues = '' %}{%
+    for value in color.value %}{%
+        capture mixValues %}{{ mixValues }}, {{ value }}{%
         endcapture %}{%
     endfor %}
-    {{ colorName }} = ( {{ mixRatio | remove_first:', ' }} ){%
+    {{ colorName }} = ( {{ mixValues | remove_first:', ' }} ){%
 endfor %}
 
     @staticmethod
