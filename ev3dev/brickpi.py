@@ -50,10 +50,10 @@ class Leds(object):
     blue_one = Led(name='brickpi1:blue:ev3dev')
     blue_two = Led(name='brickpi2:blue:ev3dev')
 
-    BLUE_ONE = (blue_one, )
-    BLUE_TWO = (blue_two, )
+    ONE = ( blue_one )
+    TWO = ( blue_two )
 
-    BLUE = (1, )
+    BLUE = ( 1 )
 
     @staticmethod
     def set_color(group, color, pct=1):

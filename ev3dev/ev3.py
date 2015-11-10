@@ -52,14 +52,14 @@ class Leds(object):
     green_left = Led(name='ev3-left1:green:ev3dev')
     green_right = Led(name='ev3-right1:green:ev3dev')
 
-    LEFT = (red_left, green_left, )
-    RIGHT = (red_right, green_right, )
+    LEFT = ( red_left, green_left )
+    RIGHT = ( red_right, green_right )
 
-    RED = (1, 0, )
-    GREEN = (0, 1, )
-    AMBER = (1, 1, )
-    ORANGE = (1, 0.5, )
-    YELLOW = (0.5, 1, )
+    RED = ( 1, 0 )
+    GREEN = ( 0, 1 )
+    AMBER = ( 1, 1 )
+    ORANGE = ( 1, 0.5 )
+    YELLOW = ( 0.5, 1 )
 
     @staticmethod
     def set_color(group, color, pct=1):

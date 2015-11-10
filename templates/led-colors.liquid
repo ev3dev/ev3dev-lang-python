@@ -3,15 +3,22 @@
     {{instanceName}} = Led(name='{{instance.systemName}}'){%
 endfor %}
 {% for group in currentClass.groups %}{%
-    assign groupName = group.name | upcase | underscore_spaces %}
-    {{ groupName }} = ({% for e in group.entries %}{%
-        assign instance = e | downcase | underscore_spaces
-%}{{ instance }}, {%
-    endfor %}){%
+    assign groupName = group.name | upcase | underscore_spaces %}{%
+    assign ledNames = '' %}{%
+    for name in group.entries %}{%
+        capture ledNames %}{{ ledNames }}, {{ name | downcase | underscore_spaces }}{%
+        endcapture %}{%
+    endfor %}
+    {{ groupName }} = ( {{ ledNames | remove_first:', ' }} ){%
 endfor %}
 {% for color in currentClass.colors %}{%
-    assign colorName = color.name | upcase | underscore_spaces %}
-    {{ colorName }} = ({% for v in color.value %}{{ v }}, {%endfor %}){%
+    assign colorName = color.name | upcase | underscore_spaces %}{%
+    assign mixRatio = '' %}{%
+    for mix in color.mix %}{%
+        capture mixRatio %}{{ mixRatio }}, {{ mix.value }}{%
+        endcapture %}{%
+    endfor %}
+    {{ colorName }} = ( {{ mixRatio | remove_first:', ' }} ){%
 endfor %}
 
     @staticmethod
