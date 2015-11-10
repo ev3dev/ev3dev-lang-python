@@ -6,19 +6,19 @@ endfor %}
     assign groupName = group.name | upcase | underscore_spaces %}{%
     assign ledNames = '' %}{%
     for name in group.entries %}{%
-        capture ledNames %}{{ ledNames }}, {{ name | downcase | underscore_spaces }}{%
+        capture ledNames %}{{ ledNames }}{{ name | downcase | underscore_spaces }}, {%
         endcapture %}{%
     endfor %}
-    {{ groupName }} = ( {{ ledNames | remove_first:', ' }} ){%
+    {{ groupName }} = ( {{ ledNames }}){%
 endfor %}
 {% for color in currentClass.colors %}{%
     assign colorName = color.name | upcase | underscore_spaces %}{%
     assign mixValues = '' %}{%
     for value in color.value %}{%
-        capture mixValues %}{{ mixValues }}, {{ value }}{%
+        capture mixValues %}{{ mixValues }}{{ value }}, {%
         endcapture %}{%
     endfor %}
-    {{ colorName }} = ( {{ mixValues | remove_first:', ' }} ){%
+    {{ colorName }} = ( {{ mixValues }}){%
 endfor %}
 
     @staticmethod
