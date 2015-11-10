@@ -47,10 +47,10 @@ class Leds(object):
 
 # ~autogen led-colors platforms.ev3.led>currentClass
 
-    red_left = Led(name='ev3-left0:red:ev3dev')
-    red_right = Led(name='ev3-right0:red:ev3dev')
-    green_left = Led(name='ev3-left1:green:ev3dev')
-    green_right = Led(name='ev3-right1:green:ev3dev')
+    red_left = Led(name='ev3:left:red:ev3dev')
+    red_right = Led(name='ev3:right:red:ev3dev')
+    green_left = Led(name='ev3:left:green:ev3dev')
+    green_right = Led(name='ev3:right:green:ev3dev')
 
     LEFT = ( red_left, green_left, )
     RIGHT = ( red_right, green_right, )
