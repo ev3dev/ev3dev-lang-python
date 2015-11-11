@@ -95,6 +95,41 @@ class FileCache(object):
 
 
 # -----------------------------------------------------------------------------
+def list_device_names(class_path, name_pattern, **kwargs):
+    """
+    This is a generator function that lists names of all devices matching the
+    provided parameters.
+
+    Parameters:
+	class_path: class path of the device, a subdirectory of /sys/class.
+	    For example, '/sys/class/tacho-motor'.
+	name_pattern: pattern that device name should match.
+	    For example, 'sensor*' or 'motor*'. Default value: '*'.
+	keyword arguments: used for matching the corresponding device
+	    attributes. For example, port_name='outA', or
+	    driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
+	    is a list, then a match against any entry of the list is
+	    enough.
+    """
+    def matches(attribute, pattern):
+        try:
+            with open(attribute) as f:
+                value = f.read().strip()
+        except:
+            return False
+
+        if isinstance(pattern, list):
+            return any([value.find(p) >= 0 for p in pattern])
+        else:
+            return value.find(pattern) >= 0
+
+    for f in os.listdir(class_path):
+        if fnmatch.fnmatch(f, name_pattern):
+            path = class_path + '/' + f
+            if all([matches(path + '/' + k, kwargs[k]) for k in kwargs]):
+                yield f
+
+# -----------------------------------------------------------------------------
 # Define the base class from which all other ev3dev classes are defined.
 
 class Device(object):
