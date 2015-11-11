@@ -742,6 +742,27 @@ class Motor(Device):
 
 
 # ~autogen
+
+def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
+    """
+    This is a generator function that enumerates all tacho motors that match
+    the provided arguments.
+
+    Parameters:
+	name_pattern: pattern that device name should match.
+	    For example, 'sensor*' or 'motor*'. Default value: '*'.
+	keyword arguments: used for matching the corresponding device
+	    attributes. For example, driver_name='lego-ev3-l-motor', or
+	    port_name=['outB', 'outC']. When argument value
+	    is a list, then a match against any entry of the list is
+	    enough.
+    """
+    classpath = abspath(Device.DEVICE_ROOT_PATH + '/' + Motor.SYSTEM_CLASS_NAME)
+
+    return (Motor(name_pattern=name, name_exact=True)
+            for name in list_device_names(classpath, name_pattern, **kwargs))
+
+
 # ~autogen generic-class classes.largeMotor>currentClass
 
 class LargeMotor(Motor):
