@@ -139,7 +139,7 @@ class Device(object):
 
     _DEVICE_INDEX = re.compile(r'^.*(?P<idx>\d+)$')
 
-    def __init__(self, class_name, name_pattern='*', **kwargs):
+    def __init__(self, class_name, name_pattern='*', name_exact=False, **kwargs):
         """Spin through the Linux sysfs class for the device type and find
         a device that matches the provided name pattern and attributes (if any).
 
@@ -148,6 +148,8 @@ class Device(object):
                 For example, 'tacho-motor'.
             name_pattern: pattern that device name should match.
                 For example, 'sensor*' or 'motor*'. Default value: '*'.
+            name_exact: when True, assume that the name_pattern provided is the
+                exact device name and use it directly.
             keyword arguments: used for matching the corresponding device
                 attributes. For example, port_name='outA', or
                 driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
@@ -165,24 +167,25 @@ class Device(object):
         classpath = abspath(Device.DEVICE_ROOT_PATH + '/' + class_name)
         self._attribute_cache = FileCache()
 
-        for file in os.listdir(classpath):
-            if fnmatch.fnmatch(file, name_pattern):
-                self._path = abspath(classpath + '/' + file)
+        def get_index(file):
+            match = Device._DEVICE_INDEX.match(file)
+            if match:
+                return int(match.group('idx'))
+            else:
+                return None
 
-                # See if requested attributes match:
-                if all([self._matches(k, kwargs[k]) for k in kwargs]):
-                    self.connected = True
-
-                    match = Device._DEVICE_INDEX.match(file)
-                    if match:
-                        self._device_index = int(match.group('idx'))
-                    else:
-                        self._device_index = None
-
-                    return
-
-        self._path = ''
-        self.connected = False
+        if name_exact:
+            self._path = classpath + '/' + name_pattern
+            self._device_index = get_index(name_pattern)
+            self.connected = True
+        else:
+            try:
+                name = next(list_device_names(classpath, name_pattern, **kwargs))
+                self._path = classpath + '/' + name
+                self._device_index = get_index(name)
+                self.connected = True
+            except StopIteration:
+                self.connected = False
 
     def _matches(self, attribute, pattern):
         """Test if attribute value matches pattern (that is, if pattern is a
@@ -232,6 +235,28 @@ class Device(object):
     def device_index(self):
         return self._device_index
 
+
+def list_devices(class_name, name_pattern, **kwargs):
+    """
+    This is a generator function that takes same arguments as `Device` class
+    and enumerates all devices present in the system that match the provided
+    arguments.
+
+    Parameters:
+	class_name: class name of the device, a subdirectory of /sys/class.
+	    For example, 'tacho-motor'.
+	name_pattern: pattern that device name should match.
+	    For example, 'sensor*' or 'motor*'. Default value: '*'.
+	keyword arguments: used for matching the corresponding device
+	    attributes. For example, port_name='outA', or
+	    driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
+	    is a list, then a match against any entry of the list is
+	    enough.
+    """
+    classpath = abspath(Device.DEVICE_ROOT_PATH + '/' + class_name)
+
+    return (Device(class_name, name, name_exact=True)
+            for name in list_device_names(classpath, name_pattern, **kwargs))
 
 # ~autogen generic-class classes.motor>currentClass
 
