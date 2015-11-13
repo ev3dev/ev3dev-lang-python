@@ -47,8 +47,8 @@ class Leds(object):
 
 # ~autogen led-colors platforms.brickpi.led>currentClass
 
-    blue_one = Led(name='brickpi1:blue:ev3dev')
-    blue_two = Led(name='brickpi2:blue:ev3dev')
+    blue_one = Led(name_pattern='brickpi1:blue:ev3dev')
+    blue_two = Led(name_pattern='brickpi2:blue:ev3dev')
 
     BLUE_ONE = ( blue_one, )
     BLUE_TWO = ( blue_two, )
