@@ -1,6 +1,6 @@
 {% for instance in currentClass.instances %}{%
     assign instanceName = instance.name | downcase | underscore_spaces %}
-    {{instanceName}} = Led(name='{{instance.systemName}}'){%
+    {{instanceName}} = Led(name_pattern='{{instance.systemName}}'){%
 endfor %}
 {% for group in currentClass.groups %}{%
     assign groupName = group.name | upcase | underscore_spaces %}{%
