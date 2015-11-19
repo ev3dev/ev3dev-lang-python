@@ -55,7 +55,7 @@ class FileCache(object):
         for f in self._cache.values():
             f.close()
 
-    def file_handle(self, path, binary=False):
+    def file_handle(self, path):
         """Manages the file handle cache and opening the files in the correct mode"""
 
         if path not in self._cache:
@@ -65,14 +65,11 @@ class FileCache(object):
             w_ok = mode & stat.S_IWGRP
 
             if r_ok and w_ok:
-                mode = 'a+'
+                mode = 'ab+'
             elif w_ok:
-                mode = 'a'
+                mode = 'ab'
             else:
-                mode = 'r'
-
-            if binary:
-                mode += 'b'
+                mode = 'rb'
 
             f = open(path, mode, 0)
             self._cache[path] = f
@@ -85,13 +82,13 @@ class FileCache(object):
         f = self.file_handle(path)
 
         f.seek(0)
-        return f.read().strip()
+        return f.read().decode().strip()
 
     def write(self, path, value):
         f = self.file_handle(path)
 
         f.seek(0)
-        f.write(value)
+        f.write(value.encode())
 
 
 # -----------------------------------------------------------------------------
@@ -1312,7 +1309,7 @@ class Sensor(Device):
                     "float":  4
                 }.get(self.bin_data_format, 1) * self.num_values
 
-        f = self._attribute_cache.file_handle(abspath(self._path + '/bin_data'), binary=True)
+        f = self._attribute_cache.file_handle(abspath(self._path + '/bin_data'))
         f.seek(0)
         raw = bytearray(f.read(self._bin_data_size))
 
