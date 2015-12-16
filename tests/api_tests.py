@@ -18,10 +18,10 @@ class TestAPI(unittest.TestCase):
         d = ev3.Device('tacho-motor', 'motor*', driver_name='lego-ev3-m-motor')
         self.assertTrue(d.connected)
 
-        d = ev3.Device('tacho-motor', 'motor*', port_name='outA')
+        d = ev3.Device('tacho-motor', 'motor*', address='outA')
         self.assertTrue(d.connected)
 
-        d = ev3.Device('tacho-motor', 'motor*', port_name='outA', driver_name='not-valid')
+        d = ev3.Device('tacho-motor', 'motor*', address='outA', driver_name='not-valid')
         self.assertTrue(not d.connected)
 
         d = ev3.Device('lego-sensor', 'sensor*')
@@ -50,7 +50,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(m.duty_cycle_sp,            42)
         self.assertEqual(m.encoder_polarity,         'normal')
         self.assertEqual(m.polarity,                 'normal')
-        self.assertEqual(m.port_name,                'outA')
+        self.assertEqual(m.address,                  'outA')
         self.assertEqual(m.position,                 42)
         self.assertEqual(m.position_sp,              42)
         self.assertEqual(m.ramp_down_sp,             0)
@@ -74,7 +74,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(s.bin_data_format, 's8')
         self.assertEqual(s.bin_data('<b'),  (16,))
         self.assertEqual(s.num_values,      1)
-        self.assertEqual(s.port_name,       'in1')
+        self.assertEqual(s.address,         'in1')
         self.assertEqual(s.value(0),        16)
 
 if __name__ == "__main__":
