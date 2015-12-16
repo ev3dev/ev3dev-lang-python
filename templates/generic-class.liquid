@@ -36,6 +36,6 @@ endfor %}
 {% endif %}
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name,{{ driver_name }} **kwargs)
 

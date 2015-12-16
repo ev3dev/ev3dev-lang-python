@@ -114,14 +114,14 @@ class Device(object):
             name: pattern that device name should match.
                 For example, 'sensor*' or 'motor*'. Default value: '*'.
             keyword arguments: used for matching the corresponding device
-                attributes. For example, port_name='outA', or
+                attributes. For example, address='outA', or
                 driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
                 is a list, then a match against any entry of the list is
                 enough.
 
         Example::
 
-            d = ev3dev.Device('tacho-motor', port_name='outA')
+            d = ev3dev.Device('tacho-motor', address='outA')
             s = ev3dev.Device('lego-sensor', driver_name=['lego-ev3-us', 'lego-nxt-us'])
 
         When connected succesfully, the `connected` attribute is set to True.
@@ -214,7 +214,7 @@ class Motor(Device):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 
@@ -331,11 +331,11 @@ class Motor(Device):
         self.set_attr_string('polarity', value)
 
     @property
-    def port_name(self):
+    def address(self):
         """
-        Returns the name of the port that the motor is connected to.
+        Returns the name of the port that this motor is connected to.
         """
-        return self.get_attr_string('port_name')
+        return self.get_attr_string('address')
 
     @property
     def position(self):
@@ -695,7 +695,7 @@ class LargeMotor(Motor):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-l-motor'], **kwargs)
 
 
@@ -713,7 +713,7 @@ class MediumMotor(Motor):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-m-motor'], **kwargs)
 
 
@@ -733,7 +733,7 @@ class DcMotor(Device):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 
@@ -806,11 +806,11 @@ class DcMotor(Device):
         self.set_attr_string('polarity', value)
 
     @property
-    def port_name(self):
+    def address(self):
         """
-        Returns the name of the port that the motor is connected to.
+        Returns the name of the port that this motor is connected to.
         """
-        return self.get_attr_string('port_name')
+        return self.get_attr_string('address')
 
     @property
     def ramp_down_sp(self):
@@ -968,7 +968,7 @@ class ServoMotor(Device):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 
@@ -1059,11 +1059,11 @@ class ServoMotor(Device):
         self.set_attr_string('polarity', value)
 
     @property
-    def port_name(self):
+    def address(self):
         """
-        Returns the name of the port that the motor is connected to.
+        Returns the name of the port that this motor is connected to.
         """
-        return self.get_attr_string('port_name')
+        return self.get_attr_string('address')
 
     @property
     def position_sp(self):
@@ -1156,7 +1156,7 @@ class Sensor(Device):
     if needed by `value<N>` / 10.0 ^ `decimals`.
 
     Since the name of the `sensor<N>` device node does not correspond to the port
-    that a sensor is plugged in to, you must look at the `port_name` attribute if
+    that a sensor is plugged in to, you must look at the `address` attribute if
     you need to know which port a sensor is plugged in to. However, if you don't
     have more than one sensor of each type, you can just look for a matching
     `driver_name`. Then it will not matter which port a sensor is plugged in to - your
@@ -1168,7 +1168,7 @@ class Sensor(Device):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 
@@ -1238,12 +1238,12 @@ class Sensor(Device):
         return self.get_attr_int('num_values')
 
     @property
-    def port_name(self):
+    def address(self):
         """
         Returns the name of the port that the sensor is connected to, e.g. `ev3:in1`.
         I2C sensors also include the I2C address (decimal), e.g. `ev3:in1:i2c8`.
         """
-        return self.get_attr_string('port_name')
+        return self.get_attr_string('address')
 
     @property
     def units(self):
@@ -1334,7 +1334,7 @@ class I2cSensor(Sensor):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['nxt-i2c-sensor'], **kwargs)
 
 
@@ -1365,7 +1365,7 @@ class I2cSensor(Sensor):
 
 
 # ~autogen
-# ~autogen generic-class classes.colorSensor>currentClass
+# ~autogen generic-class specialSensorTypes.colorSensor>currentClass
 
 class ColorSensor(Sensor):
 
@@ -1378,12 +1378,12 @@ class ColorSensor(Sensor):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-color'], **kwargs)
 
 
 # ~autogen
-# ~autogen generic-property-value classes.colorSensor>currentClass
+# ~autogen generic-property-value specialSensorTypes.colorSensor>currentClass
 
     # Reflected light. Red LED on.
     MODE_COL_REFLECT = 'COL-REFLECT'
@@ -1402,7 +1402,7 @@ class ColorSensor(Sensor):
 
 
 # ~autogen
-# ~autogen generic-class classes.ultrasonicSensor>currentClass
+# ~autogen generic-class specialSensorTypes.ultrasonicSensor>currentClass
 
 class UltrasonicSensor(Sensor):
 
@@ -1415,35 +1415,31 @@ class UltrasonicSensor(Sensor):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-us', 'lego-nxt-us'], **kwargs)
 
 
 # ~autogen
-# ~autogen generic-property-value classes.ultrasonicSensor>currentClass
+# ~autogen generic-property-value specialSensorTypes.ultrasonicSensor>currentClass
 
     # Continuous measurement in centimeters.
-    # LEDs: On, steady
     MODE_US_DIST_CM = 'US-DIST-CM'
 
     # Continuous measurement in inches.
-    # LEDs: On, steady
     MODE_US_DIST_IN = 'US-DIST-IN'
 
-    # Listen.  LEDs: On, blinking
+    # Listen.
     MODE_US_LISTEN = 'US-LISTEN'
 
     # Single measurement in centimeters.
-    # LEDs: On momentarily when mode is set, then off
     MODE_US_SI_CM = 'US-SI-CM'
 
     # Single measurement in inches.
-    # LEDs: On momentarily when mode is set, then off
     MODE_US_SI_IN = 'US-SI-IN'
 
 
 # ~autogen
-# ~autogen generic-class classes.gyroSensor>currentClass
+# ~autogen generic-class specialSensorTypes.gyroSensor>currentClass
 
 class GyroSensor(Sensor):
 
@@ -1456,12 +1452,12 @@ class GyroSensor(Sensor):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-gyro'], **kwargs)
 
 
 # ~autogen
-# ~autogen generic-property-value classes.gyroSensor>currentClass
+# ~autogen generic-property-value specialSensorTypes.gyroSensor>currentClass
 
     # Angle
     MODE_GYRO_ANG = 'GYRO-ANG'
@@ -1480,7 +1476,7 @@ class GyroSensor(Sensor):
 
 
 # ~autogen
-# ~autogen generic-class classes.infraredSensor>currentClass
+# ~autogen generic-class specialSensorTypes.infraredSensor>currentClass
 
 class InfraredSensor(Sensor):
 
@@ -1493,12 +1489,12 @@ class InfraredSensor(Sensor):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-ir'], **kwargs)
 
 
 # ~autogen
-# ~autogen generic-property-value classes.infraredSensor>currentClass
+# ~autogen generic-property-value specialSensorTypes.infraredSensor>currentClass
 
     # Proximity
     MODE_IR_PROX = 'IR-PROX'
@@ -1517,7 +1513,7 @@ class InfraredSensor(Sensor):
 
 
 # ~autogen
-# ~autogen generic-class classes.soundSensor>currentClass
+# ~autogen generic-class specialSensorTypes.soundSensor>currentClass
 
 class SoundSensor(Sensor):
 
@@ -1530,12 +1526,12 @@ class SoundSensor(Sensor):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-nxt-sound'], **kwargs)
 
 
 # ~autogen
-# ~autogen generic-property-value classes.soundSensor>currentClass
+# ~autogen generic-property-value specialSensorTypes.soundSensor>currentClass
 
     # Sound pressure level. Flat weighting
     MODE_DB = 'DB'
@@ -1545,7 +1541,7 @@ class SoundSensor(Sensor):
 
 
 # ~autogen
-# ~autogen generic-class classes.lightSensor>currentClass
+# ~autogen generic-class specialSensorTypes.lightSensor>currentClass
 
 class LightSensor(Sensor):
 
@@ -1558,12 +1554,12 @@ class LightSensor(Sensor):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-nxt-light'], **kwargs)
 
 
 # ~autogen
-# ~autogen generic-property-value classes.lightSensor>currentClass
+# ~autogen generic-property-value specialSensorTypes.lightSensor>currentClass
 
     # Reflected light. LED on
     MODE_REFLECT = 'REFLECT'
@@ -1573,7 +1569,7 @@ class LightSensor(Sensor):
 
 
 # ~autogen
-# ~autogen generic-class classes.touchSensor>currentClass
+# ~autogen generic-class specialSensorTypes.touchSensor>currentClass
 
 class TouchSensor(Sensor):
 
@@ -1586,7 +1582,7 @@ class TouchSensor(Sensor):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
 
 
@@ -1606,7 +1602,7 @@ class Led(Device):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 
@@ -1802,7 +1798,7 @@ class ButtonEVIO(ButtonBase):
         return pressed
 
 
-# ~autogen remote-control classes.infraredSensor.remoteControl>currentClass
+# ~autogen remote-control specialSensorTypes.infraredSensor.remoteControl>currentClass
 class RemoteControl(ButtonBase):
     """
     EV3 Remote Controller
@@ -1905,7 +1901,7 @@ class PowerSupply(Device):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 
@@ -1996,7 +1992,7 @@ class LegoPort(Device):
 
     Ports can be found at `/sys/class/lego-port/port<N>` where `<N>` is
     incremented each time a new port is registered. Note: The number is not
-    related to the actual port at all - use the `port_name` attribute to find
+    related to the actual port at all - use the `address` attribute to find
     a specific port.
     """
 
@@ -2005,7 +2001,7 @@ class LegoPort(Device):
 
     def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         if port is not None:
-            kwargs['port_name'] = port
+            kwargs['address'] = port
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name, **kwargs)
 
 
@@ -2042,12 +2038,12 @@ class LegoPort(Device):
         self.set_attr_string('mode', value)
 
     @property
-    def port_name(self):
+    def address(self):
         """
         Returns the name of the port. See individual driver documentation for
         the name that will be returned.
         """
-        return self.get_attr_string('port_name')
+        return self.get_attr_string('address')
 
     @property
     def set_device(self):
@@ -2309,7 +2305,7 @@ class Sound:
     immediately after child process was spawned, without waiting for its
     completion), but you can call wait() on the returned result.
 
-    Examples::
+    Examples:
 
         # Play 'bark.wav', return immediately:
         Sound.play('bark.wav')

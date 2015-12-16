@@ -47,11 +47,11 @@ class Leds(object):
 
 # ~autogen led-colors platforms.brickpi.led>currentClass
 
-    blue_one = Led(name='brickpi1:blue:ev3dev')
-    blue_two = Led(name='brickpi2:blue:ev3dev')
+    blue_led1 = Led(name='brickpi1:blue:ev3dev')
+    blue_led2 = Led(name='brickpi2:blue:ev3dev')
 
-    BLUE_ONE = ( blue_one, )
-    BLUE_TWO = ( blue_two, )
+    LED1 = ( blue_led1, )
+    LED2 = ( blue_led2, )
 
     BLUE = ( 1, )
 
@@ -87,8 +87,8 @@ class Leds(object):
         """
         Turn all leds off
         """
-        Leds.blue_one.brightness = 0
-        Leds.blue_two.brightness = 0
+        Leds.blue_led1.brightness = 0
+        Leds.blue_led2.brightness = 0
 
 
 # ~autogen
