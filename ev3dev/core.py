@@ -2078,7 +2078,7 @@ class LegoPort(Device):
     a specific port.
     """
 
-    SYSTEM_CLASS_NAME = 'lego_port'
+    SYSTEM_CLASS_NAME = 'lego-port'
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
     def __init__(self, port=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
