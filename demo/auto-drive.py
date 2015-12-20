@@ -37,7 +37,7 @@ from random import choice, randint
 from ev3dev.auto import *
 
 # Connect two large motors on output ports B and C:
-motors = [LargeMotor(port) for port in (OUTPUT_B, OUTPUT_C)]
+motors = [LargeMotor(address) for address in (OUTPUT_B, OUTPUT_C)]
 
 # Every device in ev3dev has `connected` property. Use it to check that the
 # device has actually been connected.

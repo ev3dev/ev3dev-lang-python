@@ -33,7 +33,7 @@ from time import sleep
 from ev3dev.auto import *
 
 # Connect two large motors on output ports B and C
-lmotor, rmotor = [LargeMotor(port) for port in (OUTPUT_B, OUTPUT_C)]
+lmotor, rmotor = [LargeMotor(address) for address in (OUTPUT_B, OUTPUT_C)]
 
 # Check that the motors are actually connected
 assert lmotor.connected
