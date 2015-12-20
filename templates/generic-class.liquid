@@ -34,8 +34,8 @@ endfor %}
     SYSTEM_CLASS_NAME = '{{ currentClass.systemClassName }}'
     SYSTEM_DEVICE_NAME_CONVENTION = '{{ device_name_convention }}'
 {% endif %}
-    def __init__(self, port=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
-        if port is not None:
-            kwargs['address'] = port
+    def __init__(self, address=None, name=SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
+        if address is not None:
+            kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name,{{ driver_name }} **kwargs)
 
