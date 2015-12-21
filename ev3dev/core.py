@@ -103,7 +103,7 @@ def list_device_names(class_path, name_pattern, **kwargs):
 	name_pattern: pattern that device name should match.
 	    For example, 'sensor*' or 'motor*'. Default value: '*'.
 	keyword arguments: used for matching the corresponding device
-	    attributes. For example, port_name='outA', or
+	    attributes. For example, address='outA', or
 	    driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
 	    is a list, then a match against any entry of the list is
 	    enough.
@@ -245,7 +245,7 @@ def list_devices(class_name, name_pattern, **kwargs):
 	name_pattern: pattern that device name should match.
 	    For example, 'sensor*' or 'motor*'. Default value: '*'.
 	keyword arguments: used for matching the corresponding device
-	    attributes. For example, port_name='outA', or
+	    attributes. For example, address='outA', or
 	    driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
 	    is a list, then a match against any entry of the list is
 	    enough.
@@ -270,7 +270,7 @@ class Motor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
@@ -750,7 +750,7 @@ def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
 	    For example, 'sensor*' or 'motor*'. Default value: '*'.
 	keyword arguments: used for matching the corresponding device
 	    attributes. For example, driver_name='lego-ev3-l-motor', or
-	    port_name=['outB', 'outC']. When argument value
+	    address=['outB', 'outC']. When argument value
 	    is a list, then a match against any entry of the list is
 	    enough.
     """
@@ -772,7 +772,7 @@ class LargeMotor(Motor):
     SYSTEM_DEVICE_NAME_CONVENTION = Motor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-l-motor'], **kwargs)
 
@@ -790,7 +790,7 @@ class MediumMotor(Motor):
     SYSTEM_DEVICE_NAME_CONVENTION = Motor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-m-motor'], **kwargs)
 
@@ -810,7 +810,7 @@ class DcMotor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
@@ -1045,7 +1045,7 @@ class ServoMotor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
@@ -1245,7 +1245,7 @@ class Sensor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
@@ -1411,7 +1411,7 @@ class I2cSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['nxt-i2c-sensor'], **kwargs)
 
@@ -1455,7 +1455,7 @@ class ColorSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-color'], **kwargs)
 
@@ -1492,7 +1492,7 @@ class UltrasonicSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-us', 'lego-nxt-us'], **kwargs)
 
@@ -1529,7 +1529,7 @@ class GyroSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-gyro'], **kwargs)
 
@@ -1566,7 +1566,7 @@ class InfraredSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
 
@@ -1603,7 +1603,7 @@ class SoundSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-nxt-sound'], **kwargs)
 
@@ -1631,7 +1631,7 @@ class LightSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-nxt-light'], **kwargs)
 
@@ -1659,7 +1659,7 @@ class TouchSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
 
@@ -1679,7 +1679,7 @@ class Led(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
@@ -1978,7 +1978,7 @@ class PowerSupply(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
@@ -2078,7 +2078,7 @@ class LegoPort(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if port is not None:
+        if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
