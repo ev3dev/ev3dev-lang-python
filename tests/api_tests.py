@@ -5,7 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import ev3dev.ev3 as ev3
 
-ev3.Device.DEVICE_ROOT_PATH = os.path.join(os.path.dirname(__file__), 'fake_sys_class')
+ev3.Device.DEVICE_ROOT_PATH = os.path.join(os.path.dirname(__file__), 'fake-sys')
 
 class TestAPI(unittest.TestCase):
     def test_device(self):
