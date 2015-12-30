@@ -1,3 +1,14 @@
+python-ev3dev (0.6.0) stable; urgency=medium
+
+  [Ralph Hempel]
+  * Change port_name to address.
+
+  [Denis Demidov]
+  * Restore python3 compatibility
+  * Implement device enumeration functions
+
+ -- David Lechner <david@lechnology.com>  Tue, 29 Dec 2015 23:05:39 -0600
+
 python-ev3dev (0.5.0) stable; urgency=low
 
   * Initial Release.
