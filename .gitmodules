@@ -1,0 +1,3 @@
+[submodule "ev3dev-lang"]
+	path = ev3dev-lang
+	url = https://github.com/ev3dev/ev3dev-lang.git

@@ -1,0 +1,9 @@
+{
+    "files": [
+        "ev3dev/core.py",
+        "ev3dev/ev3.py",
+        "ev3dev/brickpi.py",
+        "spec_version.py"
+    ],
+    "templateDir": "templates/"
+}
