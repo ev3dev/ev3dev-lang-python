@@ -16,7 +16,7 @@ ev3.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 class TestAPI(unittest.TestCase):
     def test_device(self):
         clean_arena()
-        populate_arena({'medium_motor' : [0], 'infrared_sensor' : [0]})
+        populate_arena({'medium_motor' : [0, 'outA'], 'infrared_sensor' : [0, 'in1']})
 
         d = ev3.Device('tacho-motor', 'motor*')
         self.assertTrue(d.connected)
@@ -41,7 +41,7 @@ class TestAPI(unittest.TestCase):
             pass
 
         clean_arena()
-        populate_arena({'medium_motor' : [0]})
+        populate_arena({'medium_motor' : [0, 'outA']})
 
         # Do not write motor.command on exit (so that fake tree stays intact)
         ev3.MediumMotor.__del__ = dummy
@@ -79,7 +79,7 @@ class TestAPI(unittest.TestCase):
 
     def test_infrared_sensor(self):
         clean_arena()
-        populate_arena({'infrared_sensor' : [0]})
+        populate_arena({'infrared_sensor' : [0, 'in1']})
 
         s = ev3.InfraredSensor()
 
