@@ -1443,7 +1443,36 @@ class I2cSensor(Sensor):
 
 
 # ~autogen
-# ~autogen generic-class specialSensorTypes.colorSensor>currentClass
+
+
+# ~autogen special-sensors
+
+class TouchSensor(Sensor):
+
+    """
+    Touch Sensor
+    """
+
+    SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
+    SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
+
+    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+        if address is not None:
+            kwargs['address'] = address
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
+
+    # Button state
+    MODE_TOUCH = 'TOUCH'
+
+
+    def is_pressed():
+        """
+        A boolean indicating whether the current touch sensor is being
+        pressed.
+        """
+        self.mode = MODE_TOUCH
+        return self.value(0)
+
 
 class ColorSensor(Sensor):
 
@@ -1458,10 +1487,6 @@ class ColorSensor(Sensor):
         if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-color'], **kwargs)
-
-
-# ~autogen
-# ~autogen generic-property-value specialSensorTypes.colorSensor>currentClass
 
     # Reflected light. Red LED on.
     MODE_COL_REFLECT = 'COL-REFLECT'
@@ -1479,8 +1504,56 @@ class ColorSensor(Sensor):
     MODE_RGB_RAW = 'RGB-RAW'
 
 
-# ~autogen
-# ~autogen generic-class specialSensorTypes.ultrasonicSensor>currentClass
+    def reflected_light_intensity():
+        """
+        Reflected light intensity as a percentage. Light on sensor is red.
+        """
+        self.mode = MODE_COL_REFLECT
+        return self.value(0)
+
+    def ambient_light_intensity():
+        """
+        Ambient light intensity. Light on sensor is dimly lit blue.
+        """
+        self.mode = MODE_COL_AMBIENT
+        return self.value(0)
+
+    def color():
+        """
+        Color detected by the sensor, categorized by overall value.
+          - 0: No color
+          - 1: Black
+          - 2: Blue
+          - 3: Green
+          - 4: Yellow
+          - 5: Red
+          - 6: White
+          - 7: Brown
+        """
+        self.mode = MODE_COL_COLOR
+        return self.value(0)
+
+    def red():
+        """
+        Red component of the detected color, in the range 0-1020.
+        """
+        self.mode = MODE_RGB_RAW
+        return self.value(0)
+
+    def green():
+        """
+        Green component of the detected color, in the range 0-1020.
+        """
+        self.mode = MODE_RGB_RAW
+        return self.value(1)
+
+    def blue():
+        """
+        Blue component of the detected color, in the range 0-1020.
+        """
+        self.mode = MODE_RGB_RAW
+        return self.value(2)
+
 
 class UltrasonicSensor(Sensor):
 
@@ -1495,10 +1568,6 @@ class UltrasonicSensor(Sensor):
         if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-us', 'lego-nxt-us'], **kwargs)
-
-
-# ~autogen
-# ~autogen generic-property-value specialSensorTypes.ultrasonicSensor>currentClass
 
     # Continuous measurement in centimeters.
     MODE_US_DIST_CM = 'US-DIST-CM'
@@ -1516,8 +1585,30 @@ class UltrasonicSensor(Sensor):
     MODE_US_SI_IN = 'US-SI-IN'
 
 
-# ~autogen
-# ~autogen generic-class specialSensorTypes.gyroSensor>currentClass
+    def distance_centimeters():
+        """
+        Measurement of the distance detected by the sensor,
+        in centimeters.
+        """
+        self.mode = MODE_US_DIST_CM
+        return self.value(0)
+
+    def distance_inches():
+        """
+        Measurement of the distance detected by the sensor,
+        in inches.
+        """
+        self.mode = MODE_US_DIST_IN
+        return self.value(0)
+
+    def other_sensor_present():
+        """
+        Value indicating whether another ultrasonic sensor could
+        be heard nearby.
+        """
+        self.mode = MODE_US_LISTEN
+        return self.value(0)
+
 
 class GyroSensor(Sensor):
 
@@ -1532,10 +1623,6 @@ class GyroSensor(Sensor):
         if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-gyro'], **kwargs)
-
-
-# ~autogen
-# ~autogen generic-property-value specialSensorTypes.gyroSensor>currentClass
 
     # Angle
     MODE_GYRO_ANG = 'GYRO-ANG'
@@ -1553,8 +1640,21 @@ class GyroSensor(Sensor):
     MODE_GYRO_CAL = 'GYRO-CAL'
 
 
-# ~autogen
-# ~autogen generic-class specialSensorTypes.infraredSensor>currentClass
+    def angle():
+        """
+        The number of degrees that the sensor has been rotated
+        since it was put into this mode.
+        """
+        self.mode = MODE_GYRO_ANG
+        return self.value(0)
+
+    def rate():
+        """
+        The rate at which the sensor is rotating, in degrees/second.
+        """
+        self.mode = MODE_GYRO_RATE
+        return self.value(0)
+
 
 class InfraredSensor(Sensor):
 
@@ -1569,10 +1669,6 @@ class InfraredSensor(Sensor):
         if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
-
-
-# ~autogen
-# ~autogen generic-property-value specialSensorTypes.infraredSensor>currentClass
 
     # Proximity
     MODE_IR_PROX = 'IR-PROX'
@@ -1590,8 +1686,14 @@ class InfraredSensor(Sensor):
     MODE_IR_CAL = 'IR-CAL'
 
 
-# ~autogen
-# ~autogen generic-class specialSensorTypes.soundSensor>currentClass
+    def proximity():
+        """
+        A measurement of the distance between the sensor and the remote,
+        as a percentage. 100% is approximately 70cm/27in.
+        """
+        self.mode = MODE_IR_PROX
+        return self.value(0)
+
 
 class SoundSensor(Sensor):
 
@@ -1607,10 +1709,6 @@ class SoundSensor(Sensor):
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-nxt-sound'], **kwargs)
 
-
-# ~autogen
-# ~autogen generic-property-value specialSensorTypes.soundSensor>currentClass
-
     # Sound pressure level. Flat weighting
     MODE_DB = 'DB'
 
@@ -1618,8 +1716,22 @@ class SoundSensor(Sensor):
     MODE_DBA = 'DBA'
 
 
-# ~autogen
-# ~autogen generic-class specialSensorTypes.lightSensor>currentClass
+    def sound_pressure():
+        """
+        A measurement of the measured sound pressure level, as a
+        percent. Uses a flat weighting.
+        """
+        self.mode = MODE_DB
+        return self.value(0)
+
+    def sound_pressure_low():
+        """
+        A measurement of the measured sound pressure level, as a
+        percent. Uses A-weighting, which focuses on levels up to 55 dB.
+        """
+        self.mode = MODE_DBA
+        return self.value(0)
+
 
 class LightSensor(Sensor):
 
@@ -1635,10 +1747,6 @@ class LightSensor(Sensor):
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-nxt-light'], **kwargs)
 
-
-# ~autogen
-# ~autogen generic-property-value specialSensorTypes.lightSensor>currentClass
-
     # Reflected light. LED on
     MODE_REFLECT = 'REFLECT'
 
@@ -1646,25 +1754,24 @@ class LightSensor(Sensor):
     MODE_AMBIENT = 'AMBIENT'
 
 
-# ~autogen
-# ~autogen generic-class specialSensorTypes.touchSensor>currentClass
+    def reflected_light_intensity():
+        """
+        A measurement of the reflected light intensity, as a percentage.
+        """
+        self.mode = MODE_REFLECT
+        return self.value(0)
 
-class TouchSensor(Sensor):
+    def ambient_light_intensity():
+        """
+        A measurement of the ambient light intensity, as a percentage.
+        """
+        self.mode = MODE_AMBIENT
+        return self.value(0)
 
-    """
-    Touch Sensor
-    """
-
-    SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
-    SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
-
-    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if address is not None:
-            kwargs['address'] = address
-        Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
 
 
 # ~autogen
+
 # ~autogen generic-class classes.led>currentClass
 
 class Led(Device):
