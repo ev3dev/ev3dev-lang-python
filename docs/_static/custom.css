@@ -1,0 +1,14 @@
+pre {
+    box-shadow: 0px 1px 6px 0px lightgray;
+}
+
+dl.class {
+    padding: 5px;
+    box-shadow: 0px 1px 6px 0px lightgray;
+}
+
+pre {
+    overflow: auto;
+    word-wrap: normal;
+    white-space: pre;
+}
