@@ -1,0 +1,11 @@
+{% for classPair in specialSensorTypes %}{%
+assign class = classPair[1] %}
+{{ class.friendlyName }}
+########################
+
+.. autoclass:: {{ class.friendlyName | camel_case | capitalize }}
+    :members:
+    :show-inheritance:
+
+
+{% endfor %}

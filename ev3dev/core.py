@@ -24,7 +24,7 @@
 # -----------------------------------------------------------------------------
 
 # ~autogen autogen-header
-# Sections of the following code were auto-generated based on spec v0.9.3-pre, rev 2
+# Sections of the following code were auto-generated based on spec v1.0.0
 
 # ~autogen
 
@@ -280,6 +280,13 @@ class Motor(Device):
 # ~autogen generic-get-set classes.motor>currentClass
 
     @property
+    def address(self):
+        """
+        Returns the name of the port that this motor is connected to.
+        """
+        return self.get_attr_string('address')
+
+    @property
     def command(self):
         """
         Sends a command to the motor controller. See `commands` for a list of
@@ -385,13 +392,6 @@ class Motor(Device):
         self.set_attr_string('polarity', value)
 
     @property
-    def address(self):
-        """
-        Returns the name of the port that this motor is connected to.
-        """
-        return self.get_attr_string('address')
-
-    @property
     def position(self):
         """
         Returns the current position of the motor in pulses of the rotary
@@ -455,7 +455,7 @@ class Motor(Device):
     @property
     def speed(self):
         """
-        Returns the current motor speed in tacho counts per second. Not, this is
+        Returns the current motor speed in tacho counts per second. Note, this is
         not necessarily degrees (although it is for LEGO motors). Use the `count_per_rot`
         attribute to convert this value to RPM or deg/sec.
         """
@@ -817,6 +817,13 @@ class DcMotor(Device):
 # ~autogen generic-get-set classes.dcMotor>currentClass
 
     @property
+    def address(self):
+        """
+        Returns the name of the port that this motor is connected to.
+        """
+        return self.get_attr_string('address')
+
+    @property
     def command(self):
         """
         Sets the command for the motor. Possible values are `run-forever`, `run-timed` and
@@ -876,13 +883,6 @@ class DcMotor(Device):
     @polarity.setter
     def polarity(self, value):
         self.set_attr_string('polarity', value)
-
-    @property
-    def address(self):
-        """
-        Returns the name of the port that this motor is connected to.
-        """
-        return self.get_attr_string('address')
 
     @property
     def ramp_down_sp(self):
@@ -1049,6 +1049,13 @@ class ServoMotor(Device):
 # ~autogen generic-get-set classes.servoMotor>currentClass
 
     @property
+    def address(self):
+        """
+        Returns the name of the port that this motor is connected to.
+        """
+        return self.get_attr_string('address')
+
+    @property
     def command(self):
         """
         Sets the command for the servo. Valid values are `run` and `float`. Setting
@@ -1126,13 +1133,6 @@ class ServoMotor(Device):
     @polarity.setter
     def polarity(self, value):
         self.set_attr_string('polarity', value)
-
-    @property
-    def address(self):
-        """
-        Returns the name of the port that this motor is connected to.
-        """
-        return self.get_attr_string('address')
 
     @property
     def position_sp(self):
@@ -1245,6 +1245,14 @@ class Sensor(Device):
 # ~autogen generic-get-set classes.sensor>currentClass
 
     @property
+    def address(self):
+        """
+        Returns the name of the port that the sensor is connected to, e.g. `ev3:in1`.
+        I2C sensors also include the I2C address (decimal), e.g. `ev3:in1:i2c8`.
+        """
+        return self.get_attr_string('address')
+
+    @property
     def command(self):
         """
         Sends a command to the sensor.
@@ -1305,14 +1313,6 @@ class Sensor(Device):
         for the current mode.
         """
         return self.get_attr_int('num_values')
-
-    @property
-    def address(self):
-        """
-        Returns the name of the port that the sensor is connected to, e.g. `ev3:in1`.
-        I2C sensors also include the I2C address (decimal), e.g. `ev3:in1:i2c8`.
-        """
-        return self.get_attr_string('address')
 
     @property
     def units(self):
@@ -1452,6 +1452,7 @@ class TouchSensor(Sensor):
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
 
+
     # Button state
     MODE_TOUCH = 'TOUCH'
 
@@ -1478,6 +1479,7 @@ class ColorSensor(Sensor):
         if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-color'], **kwargs)
+
 
     # Reflected light. Red LED on.
     MODE_COL_REFLECT = 'COL-REFLECT'
@@ -1560,6 +1562,7 @@ class UltrasonicSensor(Sensor):
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-us', 'lego-nxt-us'], **kwargs)
 
+
     # Continuous measurement in centimeters.
     MODE_US_DIST_CM = 'US-DIST-CM'
 
@@ -1615,6 +1618,7 @@ class GyroSensor(Sensor):
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-gyro'], **kwargs)
 
+
     # Angle
     MODE_GYRO_ANG = 'GYRO-ANG'
 
@@ -1661,6 +1665,7 @@ class InfraredSensor(Sensor):
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
 
+
     # Proximity
     MODE_IR_PROX = 'IR-PROX'
 
@@ -1700,6 +1705,7 @@ class SoundSensor(Sensor):
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-nxt-sound'], **kwargs)
 
+
     # Sound pressure level. Flat weighting
     MODE_DB = 'DB'
 
@@ -1737,6 +1743,7 @@ class LightSensor(Sensor):
         if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-nxt-light'], **kwargs)
+
 
     # Reflected light. LED on
     MODE_REFLECT = 'REFLECT'
@@ -2172,7 +2179,7 @@ class LegoPort(Device):
     a specific port.
     """
 
-    SYSTEM_CLASS_NAME = 'lego_port'
+    SYSTEM_CLASS_NAME = 'lego-port'
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
@@ -2183,6 +2190,14 @@ class LegoPort(Device):
 
 # ~autogen
 # ~autogen generic-get-set classes.legoPort>currentClass
+
+    @property
+    def address(self):
+        """
+        Returns the name of the port. See individual driver documentation for
+        the name that will be returned.
+        """
+        return self.get_attr_string('address')
 
     @property
     def driver_name(self):
@@ -2212,14 +2227,6 @@ class LegoPort(Device):
     @mode.setter
     def mode(self, value):
         self.set_attr_string('mode', value)
-
-    @property
-    def address(self):
-        """
-        Returns the name of the port. See individual driver documentation for
-        the name that will be returned.
-        """
-        return self.get_attr_string('address')
 
     @property
     def set_device(self):
