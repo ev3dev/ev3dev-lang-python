@@ -33,11 +33,13 @@ OUTPUT_A = 'outA'
 OUTPUT_B = 'outB'
 OUTPUT_C = 'outC'
 OUTPUT_D = 'outD'
+OUTPUTS = (OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D)
 
 INPUT_1 = 'in1'
 INPUT_2 = 'in2'
 INPUT_3 = 'in3'
 INPUT_4 = 'in4'
+INPUTS = (INPUT_1, INPUT_2, INPUT_3, INPUT_4)
 
 
 class Leds(object):
