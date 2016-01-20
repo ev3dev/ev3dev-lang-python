@@ -4,12 +4,12 @@ Other classes
 .. currentmodule:: ev3dev.core
 
 Leds
----
+----
 
 .. autoclass:: Led
     :members:
 
-.. autoclass:: Leds
+.. autoclass:: ev3dev.ev3.Leds
     :members:
 
 Power Supply
