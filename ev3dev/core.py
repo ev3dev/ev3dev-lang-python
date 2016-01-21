@@ -2306,7 +2306,7 @@ class Screen(FbMem):
 
         self._img = Image.new(
                 self.var_info.bits_per_pixel == 1 and "1" or "RGB",
-                (self.fix_info.line_length * 8 / self.var_info.bits_per_pixel, self.yres),
+                (self.fix_info.line_length * 8 // self.var_info.bits_per_pixel, self.yres),
                 "white")
 
         self._draw = ImageDraw.Draw(self._img)
