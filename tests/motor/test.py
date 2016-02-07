@@ -1,65 +1,81 @@
-#! /usr/bin/python2.7
-
 import json
+import argparse
 import time
+import threading
+
 import ev3dev.ev3 as ev3
 
-def next_commands():
-        for d in test['data']:
-                for c in d['commands']:
-                        yield c
+parser = argparse.ArgumentParser()
+parser.add_argument("infile", help="the name of the input specification")
+args = parser.parse_args()
 
-test = json.loads( open( './run-direct.json' ).read() )
+# Log device readings at requested intervals
+class LogThread(threading.Thread):
+    def __init__(self, interval, device, attributes):
+        super(LogThread, self).__init__()
 
-print test['data'][0]['port']
-m = ev3.Motor( test['data'][0]['port'] )
+        self.interval   = interval
+        self.device     = device
+        self.attributes = attributes
+        self.done       = threading.Event()
 
-name     = test['meta']['name']
-interval = test['meta']['interval']
-max_time = test['meta']['max_time']
+    def run(self):
+        tic = time.time()
+        toc = tic
+        self.results = []
 
-start = time.clock()
-end   = start + max_time/1000
+        while not self.done.isSet():
+            now = time.time()
+            s = ()
+            for a in self.attributes:
+                s += ( getattr( self.device, a ), )
+            self.results.append((now-tic, s))
 
-intervals = [x/1000.0 for x in range( 0, max_time, interval )]
+            while .005 > toc - time.time():
+                toc += self.interval
+            time.sleep(toc - time.time())
 
-now = time.clock()
-
-commands = next_commands()
-
-c = commands.next()
-
-next_interval = c['time']/1000.0
-results = []
-
-for i in intervals:
-        i = i + start
-        while now < i:
-                now = time.clock()
-        if now >= start + next_interval:
-                print i, next_interval, now
-                for a in c['attributes']:
-                        for k in a.keys():
-                                print "    ", k, " = ", a[k]
-                                setattr(m,k,a[k])
-                try:
-                        c = commands.next()
-                        next_interval = c['time']/1000.0
-                except StopIteration:
-                        next_interval = max_time/1000.0
-        results.append( (now-start, (m.speed, m.position, m.duty_cycle)) )
+    def join(self, timeout=None):
+        self.done.set()
+        super(LogThread, self).join(timeout)
 
 
-print 'data = ['
+test = json.loads( open( args.infile ).read() )
 
-first = True
-for r in results:
-        if first:
-                print( '      ({0}, ({1}, {2}, {3}))'.format(r[0], r[1][0], r[1][1], r[1][2]))
-                first = False
-        else:
-                print( '    , ({0}, ({1}, {2}, {3}))'.format(r[0], r[1][0], r[1][1], r[1][2]))
+device = {}
+logs = {}
 
-print ']'
+for p,v in test['meta']['ports'].items():
+    device[p] = getattr( ev3, v['device_class'] )( p )
 
+    logs[p] = LogThread(test['meta']['interval'] * 1e-3,
+                        device[p],
+                        v['log_attributes'] )
+    logs[p].start()
 
+start = time.time()
+end   = start + test['meta']['max_time'] * 1e-3
+
+for a in test['actions']:
+    then = start + a['time'] * 1e-3
+    while time.time() < then: pass
+    print a['time']
+
+    for p,c in a['ports'].items():
+        print "  ", p
+        for b in c:
+            for k,v in b.items():
+                setattr( device[p], k, v )
+                print "        ", k, v
+
+while time.time() < end:
+    pass
+
+test['data'] = {}
+
+for p,v in test['meta']['ports'].items():
+     logs[p].join()
+     test['data'][p] = logs[p].results
+
+# Add a nice JSON formatter here - maybe?
+print json.dumps( test, indent = 4 )
