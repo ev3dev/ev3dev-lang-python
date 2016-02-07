@@ -59,14 +59,11 @@ end   = start + test['meta']['max_time'] * 1e-3
 for a in test['actions']:
     then = start + a['time'] * 1e-3
     while time.time() < then: pass
-    print a['time']
 
     for p,c in a['ports'].items():
-        print "  ", p
         for b in c:
             for k,v in b.items():
                 setattr( device[p], k, v )
-                print "        ", k, v
 
 while time.time() < end:
     pass
