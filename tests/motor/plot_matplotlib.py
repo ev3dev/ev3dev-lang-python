@@ -20,7 +20,8 @@ for i in range(len(tableau20)):
 
 plt.style.use(['dark_background'])
 
-test = json.loads( open( 'motorlog-fast-ramp.json' ).read() )
+infile = 'motorlog-fast-ramp.json'
+test = json.loads( open( infile ).read() )
 
 values = {}
 
@@ -42,6 +43,18 @@ for k,d in test['data'].items():
     f, axarr = plt.subplots(3, sharex=True)
 
     axarr[2].set_xlabel('Time (seconds)')
+
+    f.text(.8,0, infile,
+                      fontsize=10,
+                      horizontalalignment='left',
+                      verticalalignment='center' )
+     #                 transform = axarr[i].transAxes)
+
+    f.text(.5,1, "{0} - Port:{1}".format( test['meta']['title'], k ),
+                      fontsize=14,
+                      horizontalalignment='center',
+                      verticalalignment='center' )
+     #                 transform = axarr[i].transAxes)
 
     # Clean up the chartjunk
     for i,ax in enumerate(axarr):
@@ -68,12 +81,13 @@ for k,d in test['data'].items():
 # plt.xticks(fontsize=14)
 
         axarr[i].plot(values['k']['x'],values['k']['y'][i]['values'], lw=2.5, color=tableau20[i] )
-        axarr[i].text(.8,1, "{0}:{1}".format( k, values['k']['y'][i]['name'] ),
+        axarr[i].text(1,1, "{0}".format( values['k']['y'][i]['name'] ),
                       fontsize=14,
                       color=tableau20[i],
-                      horizontalalignment='left',
+                      horizontalalignment='right',
                       verticalalignment='center',
                       transform = axarr[i].transAxes)
+
 
 #axarr[0].plot(x, y0, lw=2.5, color=tableau20[0])
 # y_pos = y0[-1]
