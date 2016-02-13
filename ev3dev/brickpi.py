@@ -33,13 +33,11 @@ OUTPUT_A = 'ttyAMA0:outA'
 OUTPUT_B = 'ttyAMA0:outB'
 OUTPUT_C = 'ttyAMA0:outC'
 OUTPUT_D = 'ttyAMA0:outD'
-OUTPUTS = (OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D)
 
 INPUT_1 = 'ttyAMA0:in1'
 INPUT_2 = 'ttyAMA0:in2'
 INPUT_3 = 'ttyAMA0:in3'
 INPUT_4 = 'ttyAMA0:in4'
-INPUTS = (INPUT_1, INPUT_2, INPUT_3, INPUT_4)
 
 
 class Leds(object):

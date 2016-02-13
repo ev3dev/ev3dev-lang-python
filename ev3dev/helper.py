@@ -4,12 +4,16 @@ import logging
 import sys
 import time
 import ev3dev.auto
-from ev3dev.auto import OUTPUTS, RemoteControl, list_motors
+from ev3dev.auto import (RemoteControl, list_motors,
+                         INPUT_1, INPUT_2, INPUT_3,INPUT_4,
+                         OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D)
 from math import pi
 from time import sleep
 
 log = logging.getLogger(__name__)
 
+INPUTS = (INPUT_1, INPUT_2, INPUT_3, INPUT_4)
+OUTPUTS = (OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D)
 
 def wait_for(condition, timeout=1e5, interval=0.01):
     tic = time.time() + timeout
