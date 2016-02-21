@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import json
 import argparse
 import time
@@ -42,8 +44,20 @@ class LogThread(threading.Thread):
 
 test = json.loads( open( args.infile ).read() )
 
+def execute_actions(actions):
+    for p,c in actions['ports'].items():
+        for b in c:
+            for k,v in b.items():
+                setattr( device[p], k, v )
+ 
 device = {}
 logs = {}
+
+for p,v in test['meta']['ports'].items():
+    device[p] = getattr( ev3, v['device_class'] )( p )
+
+if test['actions'][0]['time'] < 0:
+    execute_actions(test['actions'][0])
 
 for p,v in test['meta']['ports'].items():
     device[p] = getattr( ev3, v['device_class'] )( p )
@@ -57,13 +71,10 @@ start = time.time()
 end   = start + test['meta']['max_time'] * 1e-3
 
 for a in test['actions']:
-    then = start + a['time'] * 1e-3
-    while time.time() < then: pass
-
-    for p,c in a['ports'].items():
-        for b in c:
-            for k,v in b.items():
-                setattr( device[p], k, v )
+    if a['time'] >= 0:
+        then = start + a['time'] * 1e-3
+        while time.time() < then: pass
+        execute_actions(a)
 
 while time.time() < end:
     pass
