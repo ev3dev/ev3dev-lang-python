@@ -55,6 +55,7 @@ class Leds(object):
     LEFT = ( red_left, green_left, )
     RIGHT = ( red_right, green_right, )
 
+    BLACK = ( 0, 0, )
     RED = ( 1, 0, )
     GREEN = ( 0, 1, )
     AMBER = ( 1, 1, )

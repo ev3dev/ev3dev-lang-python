@@ -163,6 +163,7 @@ class Device(object):
 
         classpath = abspath(Device.DEVICE_ROOT_PATH + '/' + class_name)
         self._attribute_cache = FileCache()
+        self.kwargs = kwargs
 
         def get_index(file):
             match = Device._DEVICE_INDEX.match(file)
@@ -182,7 +183,15 @@ class Device(object):
                 self._device_index = get_index(name)
                 self.connected = True
             except StopIteration:
+                self._path = None
+                self._device_index = None
                 self.connected = False
+
+    def __str__(self):
+        if 'address' in self.kwargs:
+            return "%s(%s)" % (self.__class__.__name__, self.kwargs.get('address'))
+        else:
+            return self.__class__.__name__
 
     def _matches(self, attribute, pattern):
         """Test if attribute value matches pattern (that is, if pattern is a
@@ -1892,6 +1901,9 @@ class ButtonBase(object):
     """
     Abstract button interface.
     """
+
+    def __str__(self):
+        return self.__class__.__name__
 
     @staticmethod
     def on_change(changed_buttons):
