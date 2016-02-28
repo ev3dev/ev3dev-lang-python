@@ -60,7 +60,7 @@ class Leds(object):
     GREEN = ( 0, 1, )
     AMBER = ( 1, 1, )
     ORANGE = ( 1, 0.5, )
-    YELLOW = ( 0.5, 1, )
+    YELLOW = ( 0.1, 1, )
 
     @staticmethod
     def set_color(group, color, pct=1):
