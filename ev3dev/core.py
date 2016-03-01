@@ -279,6 +279,11 @@ class Motor(Device):
     positional and directional feedback such as the EV3 and NXT motors.
     This feedback allows for precise control of the motors. This is the
     most common type of motor, so we just call it `motor`.
+    
+    The way to configure a motor is to set the '_sp' attributes when
+    calling a command or before. Only in 'run_direct' mode attribute
+    changes are processed immediately, in the other modes they only
+    take place when a new command is issued.
     """
 
     SYSTEM_CLASS_NAME = 'tacho-motor'
