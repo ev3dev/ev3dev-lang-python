@@ -68,7 +68,6 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(m.ramp_down_sp,             0)
         self.assertEqual(m.ramp_up_sp,               0)
         self.assertEqual(m.speed,                    0)
-        self.assertEqual(m.speed_regulation_enabled, 'off')
         self.assertEqual(m.speed_sp,                 0)
         self.assertEqual(m.state,                    ['running'])
         self.assertEqual(m.stop_command,             'coast')

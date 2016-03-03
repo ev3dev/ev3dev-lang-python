@@ -24,7 +24,7 @@
 # -----------------------------------------------------------------------------
 
 # ~autogen autogen-header
-# Sections of the following code were auto-generated based on spec v1.0.0
+# Sections of the following code were auto-generated based on spec v1.1.0
 
 # ~autogen
 
@@ -279,10 +279,15 @@ class Motor(Device):
     positional and directional feedback such as the EV3 and NXT motors.
     This feedback allows for precise control of the motors. This is the
     most common type of motor, so we just call it `motor`.
+
+    The way to configure a motor is to set the '_sp' attributes when
+    calling a command or before. Only in 'run_direct' mode attribute
+    changes are processed immediately, in the other modes they only
+    take place when a new command is issued.
     """
 
     SYSTEM_CLASS_NAME = 'tacho-motor'
-    SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
+    SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         if address is not None:
@@ -343,10 +348,18 @@ class Motor(Device):
         """
         Returns the number of tacho counts in one rotation of the motor. Tacho counts
         are used by the position and speed attributes, so you can use this value
-        to convert rotations or degrees to tacho counts. In the case of linear
-        actuators, the units here will be counts per centimeter.
+        to convert rotations or degrees to tacho counts. (rotation motors only)
         """
         return self.get_attr_int('count_per_rot')
+
+    @property
+    def count_per_m(self):
+        """
+        Returns the number of tacho counts in one meter of travel of the motor. Tacho
+        counts are used by the position and speed attributes, so you can use this
+        value to convert from distance to tacho counts. (linear motors only)
+        """
+        return self.get_attr_int('count_per_m')
 
     @property
     def driver_name(self):
@@ -368,8 +381,7 @@ class Motor(Device):
         """
         Writing sets the duty cycle setpoint. Reading returns the current value.
         Units are in percent. Valid values are -100 to 100. A negative value causes
-        the motor to rotate in reverse. This value is only used when `speed_regulation`
-        is off.
+        the motor to rotate in reverse.
         """
         return self.get_attr_int('duty_cycle_sp')
 
@@ -391,6 +403,15 @@ class Motor(Device):
     @encoder_polarity.setter
     def encoder_polarity(self, value):
         self.set_attr_string('encoder_polarity', value)
+
+    @property
+    def full_travel_count(self):
+        """
+        Returns the number of tacho counts in the full travel of the motor. When
+        combined with the `count_per_m` atribute, you can use this value to
+        calculate the maximum travel distance of the motor. (linear motors only)
+        """
+        return self.get_attr_int('full_travel_count')
 
     @property
     def polarity(self):
@@ -468,6 +489,15 @@ class Motor(Device):
         self.set_attr_int('position_sp', value)
 
     @property
+    def max_speed(self):
+        """
+        Returns the maximum value that is accepted by the `speed_sp` attribute. This
+        may be slightly different than the maximum speed that a particular motor can
+        reach - it's the maximum theoretical speed.
+        """
+        return self.get_attr_int('max_speed')
+
+    @property
     def speed(self):
         """
         Returns the current motor speed in tacho counts per second. Note, this is
@@ -479,9 +509,12 @@ class Motor(Device):
     @property
     def speed_sp(self):
         """
-        Writing sets the target speed in tacho counts per second used when `speed_regulation`
-        is on. Reading returns the current value.  Use the `count_per_rot` attribute
-        to convert RPM or deg/sec to tacho counts per second.
+        Writing sets the target speed in tacho counts per second used for all `run-*`
+        commands except `run-direct`. Reading returns the current value. A negative
+        value causes the motor to rotate in reverse with the exception of `run-to-*-pos`
+        commands where the sign is ignored. Use the `count_per_rot` attribute to convert
+        RPM or deg/sec to tacho counts per second. Use the `count_per_m` attribute to
+        convert m/s to tacho counts per second.
         """
         return self.get_attr_int('speed_sp')
 
@@ -493,10 +526,10 @@ class Motor(Device):
     def ramp_up_sp(self):
         """
         Writing sets the ramp up setpoint. Reading returns the current value. Units
-        are in milliseconds. When set to a value > 0, the motor will ramp the power
-        sent to the motor from 0 to 100% duty cycle over the span of this setpoint
-        when starting the motor. If the maximum duty cycle is limited by `duty_cycle_sp`
-        or speed regulation, the actual ramp time duration will be less than the setpoint.
+        are in milliseconds and must be positive. When set to a non-zero value, the
+        motor speed will increase from 0 to 100% of `max_speed` over the span of this
+        setpoint. The actual ramp time is the ratio of the difference between the
+        `speed_sp` and the current `speed` and max_speed multiplied by `ramp_up_sp`.
         """
         return self.get_attr_int('ramp_up_sp')
 
@@ -508,10 +541,10 @@ class Motor(Device):
     def ramp_down_sp(self):
         """
         Writing sets the ramp down setpoint. Reading returns the current value. Units
-        are in milliseconds. When set to a value > 0, the motor will ramp the power
-        sent to the motor from 100% duty cycle down to 0 over the span of this setpoint
-        when stopping the motor. If the starting duty cycle is less than 100%, the
-        ramp time duration will be less than the full span of the setpoint.
+        are in milliseconds and must be positive. When set to a non-zero value, the
+        motor speed will decrease from 0 to 100% of `max_speed` over the span of this
+        setpoint. The actual ramp time is the ratio of the difference between the
+        `speed_sp` and the current `speed` and max_speed multiplied by `ramp_down_sp`.
         """
         return self.get_attr_int('ramp_down_sp')
 
@@ -520,51 +553,36 @@ class Motor(Device):
         self.set_attr_int('ramp_down_sp', value)
 
     @property
-    def speed_regulation_enabled(self):
-        """
-        Turns speed regulation on or off. If speed regulation is on, the motor
-        controller will vary the power supplied to the motor to try to maintain the
-        speed specified in `speed_sp`. If speed regulation is off, the controller
-        will use the power specified in `duty_cycle_sp`. Valid values are `on` and
-        `off`.
-        """
-        return self.get_attr_string('speed_regulation')
-
-    @speed_regulation_enabled.setter
-    def speed_regulation_enabled(self, value):
-        self.set_attr_string('speed_regulation', value)
-
-    @property
-    def speed_regulation_p(self):
+    def speed_p(self):
         """
         The proportional constant for the speed regulation PID.
         """
         return self.get_attr_int('speed_pid/Kp')
 
-    @speed_regulation_p.setter
-    def speed_regulation_p(self, value):
+    @speed_p.setter
+    def speed_p(self, value):
         self.set_attr_int('speed_pid/Kp', value)
 
     @property
-    def speed_regulation_i(self):
+    def speed_i(self):
         """
         The integral constant for the speed regulation PID.
         """
         return self.get_attr_int('speed_pid/Ki')
 
-    @speed_regulation_i.setter
-    def speed_regulation_i(self, value):
+    @speed_i.setter
+    def speed_i(self, value):
         self.set_attr_int('speed_pid/Ki', value)
 
     @property
-    def speed_regulation_d(self):
+    def speed_d(self):
         """
         The derivative constant for the speed regulation PID.
         """
         return self.get_attr_int('speed_pid/Kd')
 
-    @speed_regulation_d.setter
-    def speed_regulation_d(self, value):
+    @speed_d.setter
+    def speed_d(self, value):
         self.set_attr_int('speed_pid/Kd', value)
 
     @property
@@ -665,13 +683,6 @@ class Motor(Device):
     # With `inversed` polarity, a positive duty cycle will
     # cause the motor to rotate counter-clockwise.
     POLARITY_INVERSED = 'inversed'
-
-    # The motor controller will vary the power supplied to the motor
-    # to try to maintain the speed specified in `speed_sp`.
-    SPEED_REGULATION_ON = 'on'
-
-    # The motor controller will use the power specified in `duty_cycle_sp`.
-    SPEED_REGULATION_OFF = 'off'
 
     # Power will be removed from the motor and it will freely coast to a stop.
     STOP_COMMAND_COAST = 'coast'
@@ -781,7 +792,7 @@ class LargeMotor(Motor):
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
-    SYSTEM_DEVICE_NAME_CONVENTION = Motor.SYSTEM_DEVICE_NAME_CONVENTION
+    SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         if address is not None:
@@ -799,12 +810,66 @@ class MediumMotor(Motor):
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
-    SYSTEM_DEVICE_NAME_CONVENTION = Motor.SYSTEM_DEVICE_NAME_CONVENTION
+    SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         if address is not None:
             kwargs['address'] = address
         Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-ev3-m-motor'], **kwargs)
+
+
+# ~autogen
+# ~autogen generic-class classes.nxtMotor>currentClass
+
+class NxtMotor(Motor):
+
+    """
+    NXT servo motor
+    """
+
+    SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
+    SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
+
+    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+        if address is not None:
+            kwargs['address'] = address
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['lego-nxt-motor'], **kwargs)
+
+
+# ~autogen
+# ~autogen generic-class classes.firgelli50Motor>currentClass
+
+class FirgelliL1250Motor(Motor):
+
+    """
+    Firgelli L12 50 linear servo motor
+    """
+
+    SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
+    SYSTEM_DEVICE_NAME_CONVENTION = 'linear*'
+
+    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+        if address is not None:
+            kwargs['address'] = address
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['fi-l12-ev3-50'], **kwargs)
+
+
+# ~autogen
+# ~autogen generic-class classes.firgelli100Motor>currentClass
+
+class FirgelliL12100Motor(Motor):
+
+    """
+    Firgelli L12 100 linear servo motor
+    """
+
+    SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
+    SYSTEM_DEVICE_NAME_CONVENTION = 'linear*'
+
+    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+        if address is not None:
+            kwargs['address'] = address
+        Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact, driver_name=['fi-l12-ev3-100'], **kwargs)
 
 
 # ~autogen
@@ -1420,7 +1485,7 @@ class I2cSensor(Sensor):
     """
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
-    SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
+    SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         if address is not None:
@@ -2435,7 +2500,7 @@ class Screen(FbMem):
 
         self._img = Image.new(
                 self.var_info.bits_per_pixel == 1 and "1" or "RGB",
-                (self.fix_info.line_length * 8 / self.var_info.bits_per_pixel, self.yres),
+                (self.fix_info.line_length * 8 // self.var_info.bits_per_pixel, self.yres),
                 "white")
 
         self._draw = ImageDraw.Draw(self._img)
