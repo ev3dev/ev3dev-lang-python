@@ -28,8 +28,12 @@ for line in currentClass.description %}{%
 endfor %}
     """
 {% if currentClass.inheritance %}
-    SYSTEM_CLASS_NAME = {{ base_class }}.SYSTEM_CLASS_NAME
-    SYSTEM_DEVICE_NAME_CONVENTION = {{ base_class }}.SYSTEM_DEVICE_NAME_CONVENTION
+    SYSTEM_CLASS_NAME = {{ base_class }}.SYSTEM_CLASS_NAME{%
+  if currentClass.systemDeviceNameConvention %}
+    SYSTEM_DEVICE_NAME_CONVENTION = '{{ device_name_convention }}'{%
+  else %}
+    SYSTEM_DEVICE_NAME_CONVENTION = {{ base_class }}.SYSTEM_DEVICE_NAME_CONVENTION{%
+  endif %}
 {% else %}
     SYSTEM_CLASS_NAME = '{{ currentClass.systemClassName }}'
     SYSTEM_DEVICE_NAME_CONVENTION = '{{ device_name_convention }}'
