@@ -72,6 +72,7 @@ class Leds(object):
         Example::
 
             Leds.set_color(LEFT, AMBER)
+            Leds.set_color(LEFT + RIGHT, GREEN)
         """
         for l, v in zip(group, color):
             l.brightness_pct = v * pct
@@ -84,6 +85,7 @@ class Leds(object):
         Example::
 
             Leds.set(LEFT, brightness_pct=0.5, trigger='timer')
+            Leds.set([Leds.red_left, Leds.red_right], brightness_pct=0.5, trigger='timer')
         """
         for led in group:
             for k in kwargs:
