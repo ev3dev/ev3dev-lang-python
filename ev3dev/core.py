@@ -207,14 +207,14 @@ class Device(object):
     def _get_attribute(self, attribute):
         """Device attribute getter"""
         if self.connected:
-            return self._attribute_cache.read(abspath(self._path + '/' + attribute))
+            return self._attribute_cache.read(self._path + '/' + attribute)
         else:
             raise Exception('Device is not connected')
 
     def _set_attribute(self, attribute, value):
         """Device attribute setter"""
         if self.connected:
-            self._attribute_cache.write(abspath(self._path + '/' + attribute), value)
+            self._attribute_cache.write(self._path + '/' + attribute, value)
         else:
             raise Exception('Device is not connected')
 
