@@ -35,7 +35,7 @@ motor_info = {
                           'position_p': 80000,
                           'position_i': 0,
                           'position_d': 0,
-                          'max_speed': 0,
+                          'max_speed': 1020,
                           'polarity': 'normal',
                           'speed_p': 1000,
                           'speed_i': 60,
