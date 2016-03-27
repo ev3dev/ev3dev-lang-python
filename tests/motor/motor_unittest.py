@@ -78,13 +78,7 @@ class TestTachoMotorAddressValue(ptc.ParameterizedTestCase):
 class TestTachoMotorCommandsValue(ptc.ParameterizedTestCase):
 
     def test_commands_value(self):
-        self.assertTrue(set(self._param['motor'].commands) == {'run-forever'
-                                                              ,'run-to-abs-pos'
-                                                              ,'run-to-rel-pos'
-                                                              ,'run-timed'
-                                                              ,'run-direct'
-                                                              ,'stop'
-                                                              ,'reset'})
+        self.assertTrue(self._param['motor'].commands == self._param['commands'])
 
     def test_commands_value_is_read_only(self):
         # Use the class variable
@@ -163,18 +157,30 @@ class TestTachoMotorDutyCycleSpValue(ptc.ParameterizedTestCase):
 class TestTachoMotorEncoderPolarityValue(ptc.ParameterizedTestCase):
 
     def test_encoder_polarity_normal_value(self):
-        self._param['motor'].encoder_polarity = 'normal'
-        self.assertEqual(self._param['motor'].encoder_polarity, 'normal')
+        if self._param['supports_encoder_polarity']:
+            self._param['motor'].encoder_polarity = 'normal'
+            self.assertEqual(self._param['motor'].encoder_polarity, 'normal')
+        else:
+            with self.assertRaises(IOError):
+                self._param['motor'].encoder_polarity = 'normal'
 
     def test_encoder_polarity_inversed_value(self):
-        self._param['motor'].encoder_polarity = 'inversed'
-        self.assertEqual(self._param['motor'].encoder_polarity, 'inversed')
+        if self._param['supports_encoder_polarity']:
+            self._param['motor'].encoder_polarity = 'inversed'
+            self.assertEqual(self._param['motor'].encoder_polarity, 'inversed')
+        else:
+            with self.assertRaises(IOError):
+                self._param['motor'].encoder_polarity = 'inversed'
 
     def test_encoder_polarity_illegal_value(self):
         with self.assertRaises(IOError):
             self._param['motor'].encoder_polarity = "ThisShouldNotWork"
 
     def test_encoder_polarity_after_reset(self):
+        if not self._param['supports_encoder_polarity']:
+            # nothing to test that has not already been tested
+            return
+
         if 'normal' == motor_info[self._param['motor'].driver_name]['encoder_polarity']:
             self._param['motor'].encoder_polarity = 'inversed'
         else:
@@ -217,7 +223,11 @@ class TestTachoMotorPositionPValue(ptc.ParameterizedTestCase):
 
         self._param['motor'].command = 'reset'
 
-        self.assertEqual(self._param['motor'].position_p, motor_info[self._param['motor'].driver_name]['position_p'])
+        if self._param['hold_pid']:
+            expected = self._param['hold_pid']['kP']
+        else:
+             expected = motor_info[self._param['motor'].driver_name]['position_p']
+        self.assertEqual(self._param['motor'].position_p, expected)
 
 class TestTachoMotorPositionIValue(ptc.ParameterizedTestCase):
 
@@ -238,7 +248,11 @@ class TestTachoMotorPositionIValue(ptc.ParameterizedTestCase):
 
         self._param['motor'].command = 'reset'
 
-        self.assertEqual(self._param['motor'].position_i, motor_info[self._param['motor'].driver_name]['position_i'])
+        if self._param['hold_pid']:
+            expected = self._param['hold_pid']['kI']
+        else:
+             expected = motor_info[self._param['motor'].driver_name]['position_i']
+        self.assertEqual(self._param['motor'].position_i, expected)
 
 class TestTachoMotorPositionDValue(ptc.ParameterizedTestCase):
 
@@ -259,7 +273,11 @@ class TestTachoMotorPositionDValue(ptc.ParameterizedTestCase):
 
         self._param['motor'].command = 'reset'
 
-        self.assertEqual(self._param['motor'].position_d, motor_info[self._param['motor'].driver_name]['position_d'])
+        if self._param['hold_pid']:
+            expected = self._param['hold_pid']['kD']
+        else:
+             expected = motor_info[self._param['motor'].driver_name]['position_d']
+        self.assertEqual(self._param['motor'].position_d, expected)
 
 class TestTachoMotorPolarityValue(ptc.ParameterizedTestCase):
 
@@ -416,10 +434,10 @@ class TestTachoMotorSpeedSpValue(ptc.ParameterizedTestCase):
 
    def test_speed_sp_large_negative(self):
         with self.assertRaises(IOError):
-            self._param['motor'].speed_sp = -(motor_info[self._param['motor'].driver_name]['max_speed']+1)
+            self._param['motor'].speed_sp = -((motor_info[self._param['motor'].driver_name]['max_speed']) + 1)
 
    def test_speed_sp_max_negative(self):
-        self._param['motor'].speed_sp = -motor_info[self._param['motor'].driver_name]['max_speed']
+        self._param['motor'].speed_sp = (-motor_info[self._param['motor'].driver_name]['max_speed'])
         self.assertEqual(self._param['motor'].speed_sp, -motor_info[self._param['motor'].driver_name]['max_speed'])
 
    def test_speed_sp_min_negative(self):
@@ -435,12 +453,12 @@ class TestTachoMotorSpeedSpValue(ptc.ParameterizedTestCase):
         self.assertEqual(self._param['motor'].speed_sp, 1)
 
    def test_speed_sp_max_positive(self):
-        self._param['motor'].speed_sp = motor_info[self._param['motor'].driver_name]['max_speed']
+        self._param['motor'].speed_sp = (motor_info[self._param['motor'].driver_name]['max_speed'])
         self.assertEqual(self._param['motor'].speed_sp, motor_info[self._param['motor'].driver_name]['max_speed'])
 
    def test_speed_sp_large_positive(self):
         with self.assertRaises(IOError):
-            self._param['motor'].speed_sp = (motor_info[self._param['motor'].driver_name]['max_speed']+1)
+            self._param['motor'].speed_sp = ((motor_info[self._param['motor'].driver_name]['max_speed']) + 1)
 
    def test_speed_sp_after_reset(self):
         self._param['motor'].speed_sp = 100
@@ -467,7 +485,11 @@ class TestTachoMotorSpeedPValue(ptc.ParameterizedTestCase):
 
         self._param['motor'].command = 'reset'
 
-        self.assertEqual(self._param['motor'].speed_p, motor_info[self._param['motor'].driver_name]['speed_p'])
+        if self._param['speed_pid']:
+            expected = self._param['speed_pid']['kP']
+        else:
+             expected = motor_info[self._param['motor'].driver_name]['speed_p']
+        self.assertEqual(self._param['motor'].speed_p, expected)
 
 class TestTachoMotorSpeedIValue(ptc.ParameterizedTestCase):
 
@@ -488,7 +510,11 @@ class TestTachoMotorSpeedIValue(ptc.ParameterizedTestCase):
 
         self._param['motor'].command = 'reset'
 
-        self.assertEqual(self._param['motor'].speed_i, motor_info[self._param['motor'].driver_name]['speed_i'])
+        if self._param['speed_pid']:
+            expected = self._param['speed_pid']['kI']
+        else:
+             expected = motor_info[self._param['motor'].driver_name]['speed_i']
+        self.assertEqual(self._param['motor'].speed_i, expected)
 
 class TestTachoMotorSpeedDValue(ptc.ParameterizedTestCase):
 
@@ -509,7 +535,11 @@ class TestTachoMotorSpeedDValue(ptc.ParameterizedTestCase):
 
         self._param['motor'].command = 'reset'
 
-        self.assertEqual(self._param['motor'].speed_d, motor_info[self._param['motor'].driver_name]['speed_d'])
+        if self._param['speed_pid']:
+            expected = self._param['speed_pid']['kD']
+        else:
+             expected = motor_info[self._param['motor'].driver_name]['speed_d']
+        self.assertEqual(self._param['motor'].speed_d, expected)
 
 class TestTachoMotorStateValue(ptc.ParameterizedTestCase):
 
@@ -531,28 +561,42 @@ class TestTachoMotorStopCommandValue(ptc.ParameterizedTestCase):
             self._param['motor'].stop_command = 'ThisShouldNotWork'
 
     def test_stop_command_coast(self):
-        self._param['motor'].stop_command = 'coast'
-        self.assertEqual(self._param['motor'].stop_command, 'coast')
+        if 'coast' in self._param['stop_actions']:
+            self._param['motor'].stop_command = 'coast'
+            self.assertEqual(self._param['motor'].stop_command, 'coast')
+        else:
+            with self.assertRaises(IOError):
+                self._param['motor'].stop_command = 'coast'
 
     def test_stop_command_brake(self):
-        self._param['motor'].stop_command = 'brake'
-        self.assertEqual(self._param['motor'].stop_command, 'brake')
+        if 'brake' in self._param['stop_actions']:
+            self._param['motor'].stop_command = 'brake'
+            self.assertEqual(self._param['motor'].stop_command, 'brake')
+        else:
+            with self.assertRaises(IOError):
+                self._param['motor'].stop_command = 'brake'
 
     def test_stop_command_hold(self):
-        self._param['motor'].stop_command = 'hold'
-        self.assertEqual(self._param['motor'].stop_command, 'hold')
+        if 'hold' in self._param['stop_actions']:
+            self._param['motor'].stop_command = 'hold'
+            self.assertEqual(self._param['motor'].stop_command, 'hold')
+        else:
+            with self.assertRaises(IOError):
+                self._param['motor'].stop_command = 'hold'
 
-    def test_time_sp_after_reset(self):
-        self._param['motor'].stop_command = 'hold'
+    def test_stop_command_after_reset(self):
+        action = 1
+        # controller may only support one stop action
+        if len(self._param['stop_actions']) < 2:
+            action = 0
+        self._param['motor'].stop_command = self._param['stop_actions'][action]
         self._param['motor'].command = 'reset'
-        self.assertEqual(self._param['motor'].stop_command, 'coast')
+        self.assertEqual(self._param['motor'].stop_command, self._param['stop_actions'][0])
 
 class TestTachoMotorStopCommandsValue(ptc.ParameterizedTestCase):
 
     def test_stop_commands_value(self):
-        self.assertTrue(set(self._param['motor'].stop_commands) == {'coast'
-                                                                   ,'brake'
-                                                                   ,'hold'})
+        self.assertTrue(self._param['motor'].stop_commands == self._param['stop_actions'])
 
     def test_stop_commands_value_is_read_only(self):
         # Use the class variable
@@ -580,9 +624,35 @@ class TestTachoMotorTimeSpValue(ptc.ParameterizedTestCase):
     def test_time_sp_after_reset(self):
         self._param['motor'].time_sp = 1
         self._param['motor'].command = 'reset'
-        self.assertEqual(self._param['motor'].speed_d, 0)
+        self.assertEqual(self._param['motor'].time_sp, 0)
 
-paramsA = { 'motor': ev3.Motor('outA'), 'port': 'outA', 'driver_name': 'lego-ev3-l-motor' }
+ev3_params = {
+    'motor': ev3.Motor('outA'),
+    'port': 'outA',
+    'driver_name': 'lego-ev3-l-motor',
+    'commands': ['run-forever', 'run-to-abs-pos', 'run-to-rel-pos', 'run-timed', 'run-direct', 'stop', 'reset'],
+    'stop_actions': ['coast', 'brake', 'hold'],
+    'supports_encoder_polarity': True,
+}
+evb_params = {
+    'motor': ev3.Motor('evb-ports:outA'),
+    'port': 'evb-ports:outA',
+    'driver_name': 'lego-ev3-l-motor',
+    'commands': ['run-forever', 'run-to-abs-pos', 'run-to-rel-pos', 'run-timed', 'run-direct', 'stop', 'reset'],
+    'stop_actions': ['coast', 'brake', 'hold'],
+    'supports_encoder_polarity': True,
+}
+brickpi_params = {
+    'motor': ev3.Motor('ttyAMA0:MA'),
+    'port': 'ttyAMA0:MA',
+    'driver_name': 'lego-nxt-motor',
+    'commands': ['run-forever', 'run-to-abs-pos', 'run-to-rel-pos', 'run-timed', 'run-direct', 'stop', 'reset'],
+    'stop_actions': ['coast', 'hold'],
+    'supports_encoder_polarity': False,
+    'speed_pid': { 'kP': 1000, 'kI': 60, 'kD': 0 },
+    'hold_pid': { 'kP': 20000, 'kI': 0, 'kD': 0 },
+}
+paramsA = brickpi_params
 paramsA['motor'].command = 'reset'
 
 suite = unittest.TestSuite()
