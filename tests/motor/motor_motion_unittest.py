@@ -48,6 +48,8 @@ class TestMotorMotion(ptc.ParameterizedTestCase):
         self._param['motor'].command = 'stop'
 
     def test_stop_brake_no_ramp_med_speed_relative(self):
+        if not self._param['has_brake']:
+            self.skipTest('brake not supported by this motor controller')
         self.initialize_motor()
         self.run_to_positions('brake','run-to-rel-pos',400,[0,90,180,360,720,-720,-360,-180,-90,0],20)
 
@@ -56,6 +58,8 @@ class TestMotorMotion(ptc.ParameterizedTestCase):
         self.run_to_positions('hold','run-to-rel-pos',400,[0,90,180,360,720,-720,-360,-180,-90,0],5)
 
     def test_stop_brake_no_ramp_low_speed_relative(self):
+        if not self._param['has_brake']:
+            self.skipTest('brake not supported by this motor controller')
         self.initialize_motor()
         self.run_to_positions('brake','run-to-rel-pos',100,[0,90,180,360,720,-720,-360,-180,-90,0],20)
 
@@ -64,6 +68,8 @@ class TestMotorMotion(ptc.ParameterizedTestCase):
         self.run_to_positions('hold','run-to-rel-pos',100,[0,90,180,360,720,-720,-360,-180,-90,0],5)
 
     def test_stop_brake_no_ramp_high_speed_relative(self):
+        if not self._param['has_brake']:
+            self.skipTest('brake not supported by this motor controller')
         self.initialize_motor()
         self.run_to_positions('brake','run-to-rel-pos',900,[0,90,180,360,720,-720,-360,-180,-90,0],50)
 
@@ -72,6 +78,8 @@ class TestMotorMotion(ptc.ParameterizedTestCase):
         self.run_to_positions('hold','run-to-rel-pos',100,[0,90,180,360,720,-720,-360,-180,-90,0],5)
 
     def test_stop_brake_no_ramp_med_speed_absolute(self):
+        if not self._param['has_brake']:
+            self.skipTest('brake not supported by this motor controller')
         self.initialize_motor()
         self.run_to_positions('brake','run-to-abs-pos',400,[0,90,180,360,180,90,0,-90,-180,-360,-180,-90,0],20)
 
@@ -80,6 +88,8 @@ class TestMotorMotion(ptc.ParameterizedTestCase):
         self.run_to_positions('hold','run-to-abs-pos',400,[0,90,180,360,180,90,0,-90,-180,-360,-180,-90,0],5)
 
     def test_stop_brake_no_ramp_low_speed_absolute(self):
+        if not self._param['has_brake']:
+            self.skipTest('brake not supported by this motor controller')
         self.initialize_motor()
         self.run_to_positions('brake','run-to-abs-pos',100,[0,90,180,360,180,90,0,-90,-180,-360,-180,-90,0],20)
 
@@ -88,6 +98,8 @@ class TestMotorMotion(ptc.ParameterizedTestCase):
         self.run_to_positions('hold','run-to-abs-pos',100,[0,90,180,360,180,90,0,-90,-180,-360,-180,-90,0],5)
 
     def test_stop_brake_no_ramp_high_speed_absolute(self):
+        if not self._param['has_brake']:
+            self.skipTest('brake not supported by this motor controller')
         self.initialize_motor()
         self.run_to_positions('brake','run-to-abs-pos',900,[0,90,180,360,180,90,0,-90,-180,-360,-180,-90,0],50)
 
@@ -97,14 +109,25 @@ class TestMotorMotion(ptc.ParameterizedTestCase):
 
 # Add all the tests to the suite - some tests apply only to certain drivers!
 
-def AddTachoMotorMotionTestsToSuite( suite, driver_name, params ):
+def AddTachoMotorMotionTestsToSuite(suite, params):
     suite.addTest(ptc.ParameterizedTestCase.parameterize(TestMotorMotion, param=params))
 
 if __name__ == '__main__':
-    params = { 'motor': ev3.Motor('outA'), 'port': 'outA', 'driver_name': 'lego-ev3-l-motor' }
+    ev3_params = {
+        'motor': ev3.Motor('outA'),
+        'port': 'outA',
+        'driver_name': 'lego-ev3-l-motor',
+        'has_brake': True,
+    }
+    brickpi_params = {
+        'motor': ev3.Motor('ttyAMA0:MA'),
+        'port': 'ttyAMA0:MA',
+        'driver_name': 'lego-nxt-motor',
+        'has_brake': False,
+    }
 
     suite = unittest.TestSuite()
 
-    AddTachoMotorMotionTestsToSuite( suite, 'lego-ev3-l-motor', params )
+    AddTachoMotorMotionTestsToSuite(suite, brickpi_params)
 
     unittest.TextTestRunner(verbosity=1,buffer=True ).run(suite)
