@@ -175,14 +175,14 @@ class TestTachoMotorEncoderPolarityValue(ptc.ParameterizedTestCase):
             self._param['motor'].encoder_polarity = "ThisShouldNotWork"
 
     def test_encoder_polarity_after_reset(self):
-        if ('normal' == motor_info[self._param['motor'].driver_name]['encoder_polarity']):
+        if 'normal' == motor_info[self._param['motor'].driver_name]['encoder_polarity']:
             self._param['motor'].encoder_polarity = 'inversed'
         else:
             self._param['motor'].encoder_polarity = 'normal'
 
         self._param['motor'].command = 'reset'
 
-        if ('normal' == motor_info[self._param['motor'].driver_name]['encoder_polarity']):
+        if 'normal' == motor_info[self._param['motor'].driver_name]['encoder_polarity']:
             self.assertEqual(self._param['motor'].encoder_polarity, 'normal')
         else:
             self.assertEqual(self._param['motor'].encoder_polarity, 'inversed')
@@ -276,14 +276,14 @@ class TestTachoMotorPolarityValue(ptc.ParameterizedTestCase):
             self._param['motor'].polarity = "ThisShouldNotWork"
 
     def test_polarity_after_reset(self):
-        if ('normal' == motor_info[self._param['motor'].driver_name]['polarity']):
+        if 'normal' == motor_info[self._param['motor'].driver_name]['polarity']:
             self._param['motor'].polarity = 'inversed'
         else:
             self._param['motor'].polarity = 'normal'
 
         self._param['motor'].command = 'reset'
 
-        if ('normal' == motor_info[self._param['motor'].driver_name]['polarity']):
+        if 'normal' == motor_info[self._param['motor'].driver_name]['polarity']:
             self.assertEqual(self._param['motor'].polarity, 'normal')
         else:
             self.assertEqual(self._param['motor'].polarity, 'inversed')
