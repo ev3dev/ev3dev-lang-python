@@ -53,6 +53,7 @@ class Leds(object):
     LED1 = ( blue_led1, )
     LED2 = ( blue_led2, )
 
+    BLACK = ( 0, )
     BLUE = ( 1, )
 
     @staticmethod

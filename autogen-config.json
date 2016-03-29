@@ -3,7 +3,8 @@
         "ev3dev/core.py",
         "ev3dev/ev3.py",
         "ev3dev/brickpi.py",
-        "spec_version.py"
+        "spec_version.py",
+        "docs/sensors.rst"
     ],
     "templateDir": "templates/"
 }

@@ -1,0 +1,25 @@
+{
+    "meta": {
+        "title": "Test Large EV3 Motor Operation",
+        "subtitle": "Positive and Negative Ramps",
+        "notes": "ramp_up_sp:1000\nramp_down_sp:2000\ntime_sp: 2000\nspeed_sp: +/- 900\nstop_command: coast",
+        "interval": 10,
+        "name": "run-direct-test", 
+        "max_time": 8000, 
+        "ports": { "outA": { "log_attributes": [ "speed", 
+                                                 "position", 
+                                                 "duty_cycle" ],
+                             "device_class": "Motor" } }
+        },
+   "actions": [
+        { "time":   -1, "ports": { "outA": [ { "command": "reset" }, 
+                                             { "position": 0 }, 
+                                             { "ramp_up_sp": 1000 }, 
+                                             { "ramp_down_sp": 2000 }, 
+                                             { "time_sp": 2000 }, 
+                                             { "speed_sp": 900 } ] } }, 
+        { "time":    0, "ports": { "outA": [ { "command": "run-timed" } ] } },
+        { "time": 4000, "ports": { "outA": [ { "speed_sp": -900 }, 
+                                             { "command": "run-timed" } ] } }
+    ]
+}

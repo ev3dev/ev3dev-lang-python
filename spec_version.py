@@ -1,4 +1,8 @@
 # ~autogen spec_version
-spec_version = "spec: 0.9.3-pre-r2, kernel: v3.16.7-ckt16-7-ev3dev-ev3"
+spec_version = "1.1.0"
+kernel_versions = { 
+    "10-ev3dev"
+    "10-rc1-ev3dev"
+    }
 
 # ~autogen

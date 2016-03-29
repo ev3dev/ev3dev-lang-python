@@ -1,1 +1,6 @@
-spec_version = "spec: {{ meta.version }}{% if meta.specRevision %}-r{{ meta.specRevision }}{% endif %}, kernel: {{ meta.supportedKernel }}"
+spec_version = "{{ meta.version }}{% if meta.specRevision %}-r{{ meta.specRevision }}{% endif %}"
+kernel_versions = { {%
+    for kernel in meta.supportedKernel.kernels %}
+    "{{ kernel }}"{%
+    endfor %}
+    }
