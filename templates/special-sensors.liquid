@@ -54,7 +54,7 @@ endfor %}
   assign name = mapping.name | downcase | underscore_spaces %}{%
   assign mode = mapping.requiredMode | upcase | underscore_non_wc %}{%
   assign value_index = mapping.sourceValue %}
-    def {{ name }}():
+    def {{ name }}(self):
         """{%
   for line in mapping.description %}{%
     if line %}
@@ -63,7 +63,7 @@ endfor %}
 {%  endif %}{%
   endfor %}
         """
-        self.mode = MODE_{{ mode }}
+        self.mode = self.MODE_{{ mode }}
         return self.value({{ value_index }})
 {% endfor %}
 {% endfor %}
