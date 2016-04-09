@@ -651,7 +651,17 @@ brickpi_params = {
     'speed_pid': { 'kP': 1000, 'kI': 60, 'kD': 0 },
     'hold_pid': { 'kP': 20000, 'kI': 0, 'kD': 0 },
 }
-paramsA = brickpi_params
+pistorms_params = {
+    'motor': ev3.Motor('pistorms:BAM1'),
+    'port': 'pistorms:BAM1',
+    'driver_name': 'lego-nxt-motor',
+    'commands': ['run-forever', 'run-to-abs-pos', 'run-to-rel-pos', 'run-timed', 'stop', 'reset'],
+    'stop_actions': ['coast', 'brake', 'hold'],
+    'supports_encoder_polarity': False,
+    'speed_pid': { 'kP': 1000, 'kI': 60, 'kD': 0 },
+    'hold_pid': { 'kP': 20000, 'kI': 0, 'kD': 0 },
+}
+paramsA = pistorms_params
 paramsA['motor'].command = 'reset'
 
 suite = unittest.TestSuite()

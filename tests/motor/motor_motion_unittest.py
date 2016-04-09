@@ -125,9 +125,15 @@ if __name__ == '__main__':
         'driver_name': 'lego-nxt-motor',
         'has_brake': False,
     }
+    pistorms_params = {
+        'motor': ev3.Motor('pistorms:BAM1'),
+        'port': 'pistorms:BAM1',
+        'driver_name': 'lego-nxt-motor',
+        'has_brake': True,
+    }
 
     suite = unittest.TestSuite()
 
-    AddTachoMotorMotionTestsToSuite(suite, brickpi_params)
+    AddTachoMotorMotionTestsToSuite(suite, pistorms_params)
 
     unittest.TextTestRunner(verbosity=1,buffer=True ).run(suite)
