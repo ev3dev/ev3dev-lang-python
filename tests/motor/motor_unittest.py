@@ -551,56 +551,56 @@ class TestTachoMotorStateValue(ptc.ParameterizedTestCase):
         self._param['motor'].command = 'reset'
         self.assertEqual(self._param['motor'].state, [])
 
-#    def test_stop_command_value(self):
-#        self.assertEqual(self._param['motor'].stop_command, 'coast')
+#    def test_stop_action_value(self):
+#        self.assertEqual(self._param['motor'].stop_action, 'coast')
 class TestTachoMotorStopCommandValue(ptc.ParameterizedTestCase):
 
-    def test_stop_command_illegal(self):
+    def test_stop_action_illegal(self):
         with self.assertRaises(IOError):
-            self._param['motor'].stop_command = 'ThisShouldNotWork'
+            self._param['motor'].stop_action = 'ThisShouldNotWork'
 
-    def test_stop_command_coast(self):
+    def test_stop_action_coast(self):
         if 'coast' in self._param['stop_actions']:
-            self._param['motor'].stop_command = 'coast'
-            self.assertEqual(self._param['motor'].stop_command, 'coast')
+            self._param['motor'].stop_action = 'coast'
+            self.assertEqual(self._param['motor'].stop_action, 'coast')
         else:
             with self.assertRaises(IOError):
-                self._param['motor'].stop_command = 'coast'
+                self._param['motor'].stop_action = 'coast'
 
-    def test_stop_command_brake(self):
+    def test_stop_action_brake(self):
         if 'brake' in self._param['stop_actions']:
-            self._param['motor'].stop_command = 'brake'
-            self.assertEqual(self._param['motor'].stop_command, 'brake')
+            self._param['motor'].stop_action = 'brake'
+            self.assertEqual(self._param['motor'].stop_action, 'brake')
         else:
             with self.assertRaises(IOError):
-                self._param['motor'].stop_command = 'brake'
+                self._param['motor'].stop_action = 'brake'
 
-    def test_stop_command_hold(self):
+    def test_stop_action_hold(self):
         if 'hold' in self._param['stop_actions']:
-            self._param['motor'].stop_command = 'hold'
-            self.assertEqual(self._param['motor'].stop_command, 'hold')
+            self._param['motor'].stop_action = 'hold'
+            self.assertEqual(self._param['motor'].stop_action, 'hold')
         else:
             with self.assertRaises(IOError):
-                self._param['motor'].stop_command = 'hold'
+                self._param['motor'].stop_action = 'hold'
 
-    def test_stop_command_after_reset(self):
+    def test_stop_action_after_reset(self):
         action = 1
         # controller may only support one stop action
         if len(self._param['stop_actions']) < 2:
             action = 0
-        self._param['motor'].stop_command = self._param['stop_actions'][action]
+        self._param['motor'].stop_action = self._param['stop_actions'][action]
         self._param['motor'].command = 'reset'
-        self.assertEqual(self._param['motor'].stop_command, self._param['stop_actions'][0])
+        self.assertEqual(self._param['motor'].stop_action, self._param['stop_actions'][0])
 
 class TestTachoMotorStopCommandsValue(ptc.ParameterizedTestCase):
 
-    def test_stop_commands_value(self):
-        self.assertTrue(self._param['motor'].stop_commands == self._param['stop_actions'])
+    def test_stop_actions_value(self):
+        self.assertTrue(self._param['motor'].stop_actions == self._param['stop_actions'])
 
-    def test_stop_commands_value_is_read_only(self):
+    def test_stop_actions_value_is_read_only(self):
         # Use the class variable
         with self.assertRaises(AttributeError):
-            self._param['motor'].stop_commands = "ThisShouldNotWork"
+            self._param['motor'].stop_actions = "ThisShouldNotWork"
 
 class TestTachoMotorTimeSpValue(ptc.ParameterizedTestCase):
 
@@ -717,13 +717,13 @@ class TestMotorRelativePosition(unittest.TestCase):
 
     @unittest.skip("Skipping coast mode - always fails")
     def test_stop_coast(self):
-        self._motor.stop_command = 'coast'
+        self._motor.stop_action = 'coast'
         self._motor.command = 'run-to-rel-pos'
         time.sleep(1)
         self.assertGreaterEqual(1, abs(self._motor.position - self._motor.position_sp))
 
     def test_stop_brake(self):
-        self._motor.stop_command = 'brake'
+        self._motor.stop_action = 'brake'
         self._motor.position = 0
 
         for i in range(1,5):
@@ -733,7 +733,7 @@ class TestMotorRelativePosition(unittest.TestCase):
             self.assertGreaterEqual(8, abs(self._motor.position - (i * self._motor.position_sp)))
 
     def test_stop_hold(self):
-        self._motor.stop_command = 'hold'
+        self._motor.stop_action = 'hold'
         self._motor.position = 0
 
         for i in range(1,5):

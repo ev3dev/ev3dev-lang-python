@@ -25,8 +25,8 @@ class TestMotorMotion(ptc.ParameterizedTestCase):
     def initialize_motor(self):
         self._param['motor'].command = 'reset'
 
-    def run_to_positions(self,stop_command,command,speed_sp,positions,tolerance):
-        self._param['motor'].stop_command = stop_command
+    def run_to_positions(self,stop_action,command,speed_sp,positions,tolerance):
+        self._param['motor'].stop_action = stop_action
         self._param['motor'].speed_sp = speed_sp
 
         target = self._param['motor'].position

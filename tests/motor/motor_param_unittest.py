@@ -461,37 +461,37 @@ class TestTachoMotorStateValue(ptc.ParameterizedTestCase):
 
 class TestTachoMotorStopCommandValue(ptc.ParameterizedTestCase):
 
-    def test_stop_command_illegal(self):
+    def test_stop_action_illegal(self):
         with self.assertRaises(IOError):
-            self._param['motor'].stop_command = 'ThisShouldNotWork'
+            self._param['motor'].stop_action = 'ThisShouldNotWork'
 
-    def test_stop_command_coast(self):
-        self._param['motor'].stop_command = 'coast'
-        self.assertEqual(self._param['motor'].stop_command, 'coast')
+    def test_stop_action_coast(self):
+        self._param['motor'].stop_action = 'coast'
+        self.assertEqual(self._param['motor'].stop_action, 'coast')
 
-    def test_stop_command_brake(self):
-        self._param['motor'].stop_command = 'brake'
-        self.assertEqual(self._param['motor'].stop_command, 'brake')
+    def test_stop_action_brake(self):
+        self._param['motor'].stop_action = 'brake'
+        self.assertEqual(self._param['motor'].stop_action, 'brake')
 
-    def test_stop_command_hold(self):
-        self._param['motor'].stop_command = 'hold'
-        self.assertEqual(self._param['motor'].stop_command, 'hold')
+    def test_stop_action_hold(self):
+        self._param['motor'].stop_action = 'hold'
+        self.assertEqual(self._param['motor'].stop_action, 'hold')
 
     def test_time_sp_after_reset(self):
-        self._param['motor'].stop_command = 'hold'
+        self._param['motor'].stop_action = 'hold'
         self._param['motor'].command = 'reset'
-        self.assertEqual(self._param['motor'].stop_command, 'coast')
+        self.assertEqual(self._param['motor'].stop_action, 'coast')
 
 class TestTachoMotorStopCommandsValue(ptc.ParameterizedTestCase):
 
-    def test_stop_commands_value(self):
-        self.assertTrue(set(self._param['motor'].stop_commands) == {'coast'
+    def test_stop_actions_value(self):
+        self.assertTrue(set(self._param['motor'].stop_actions) == {'coast'
                                                                    ,'brake'
                                                                    ,'hold'})
 
-    def test_stop_commands_value_is_read_only(self):
+    def test_stop_actions_value_is_read_only(self):
         with self.assertRaises(AttributeError):
-            self._param['motor'].stop_commands = "ThisShouldNotWork"
+            self._param['motor'].stop_actions = "ThisShouldNotWork"
 
 class TestTachoMotorTimeSpValue(ptc.ParameterizedTestCase):
 

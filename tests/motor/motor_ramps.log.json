@@ -3,7 +3,7 @@
         "subtitle": "Positive and Negative Ramps", 
         "name": "run-direct-test", 
         "title": "Test Large EV3 Motor Operation", 
-        "notes": "ramp_up_sp:1000\nramp_down_sp:2000\ntime_sp: 2000\nspeed_sp: +/- 900\nstop_command: coast", 
+        "notes": "ramp_up_sp:1000\nramp_down_sp:2000\ntime_sp: 2000\nspeed_sp: +/- 900\nstop_action: coast", 
         "interval": 10, 
         "max_time": 8000, 
         "ports": {

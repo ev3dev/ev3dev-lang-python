@@ -70,7 +70,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(m.speed,                    0)
         self.assertEqual(m.speed_sp,                 0)
         self.assertEqual(m.state,                    ['running'])
-        self.assertEqual(m.stop_command,             'coast')
+        self.assertEqual(m.stop_action,             'coast')
         self.assertEqual(m.time_sp,                  1000)
 
         with self.assertRaises(Exception):

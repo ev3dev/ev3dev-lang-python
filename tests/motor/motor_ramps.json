@@ -2,7 +2,7 @@
     "meta": {
         "title": "Test Large EV3 Motor Operation",
         "subtitle": "Positive and Negative Ramps",
-        "notes": "ramp_up_sp:1000\nramp_down_sp:2000\ntime_sp: 2000\nspeed_sp: +/- 900\nstop_command: coast",
+        "notes": "ramp_up_sp:1000\nramp_down_sp:2000\ntime_sp: 2000\nspeed_sp: +/- 900\nstop_action: coast",
         "interval": 10,
         "name": "run-direct-test", 
         "max_time": 8000, 
