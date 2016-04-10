@@ -134,6 +134,6 @@ if __name__ == '__main__':
 
     suite = unittest.TestSuite()
 
-    AddTachoMotorMotionTestsToSuite(suite, pistorms_params)
+    AddTachoMotorMotionTestsToSuite(suite, ev3_params)
 
     unittest.TextTestRunner(verbosity=1,buffer=True ).run(suite)

@@ -222,7 +222,7 @@ class TestTachoMotorPositionPValue(ptc.ParameterizedTestCase):
 
         self._param['motor'].command = 'reset'
 
-        if self._param['hold_pid']:
+        if self._param.has_key('hold_pid'):
             expected = self._param['hold_pid']['kP']
         else:
              expected = motor_info[self._param['motor'].driver_name]['position_p']
@@ -247,7 +247,7 @@ class TestTachoMotorPositionIValue(ptc.ParameterizedTestCase):
 
         self._param['motor'].command = 'reset'
 
-        if self._param['hold_pid']:
+        if self._param.has_key('hold_pid'):
             expected = self._param['hold_pid']['kI']
         else:
              expected = motor_info[self._param['motor'].driver_name]['position_i']
@@ -272,7 +272,7 @@ class TestTachoMotorPositionDValue(ptc.ParameterizedTestCase):
 
         self._param['motor'].command = 'reset'
 
-        if self._param['hold_pid']:
+        if self._param.has_key('hold_pid'):
             expected = self._param['hold_pid']['kD']
         else:
              expected = motor_info[self._param['motor'].driver_name]['position_d']
@@ -484,7 +484,7 @@ class TestTachoMotorSpeedPValue(ptc.ParameterizedTestCase):
 
         self._param['motor'].command = 'reset'
 
-        if self._param['speed_pid']:
+        if self._param.has_key('speed_pid'):
             expected = self._param['speed_pid']['kP']
         else:
              expected = motor_info[self._param['motor'].driver_name]['speed_p']
@@ -509,7 +509,7 @@ class TestTachoMotorSpeedIValue(ptc.ParameterizedTestCase):
 
         self._param['motor'].command = 'reset'
 
-        if self._param['speed_pid']:
+        if self._param.has_key('speed_pid'):
             expected = self._param['speed_pid']['kI']
         else:
              expected = motor_info[self._param['motor'].driver_name]['speed_i']
@@ -534,7 +534,7 @@ class TestTachoMotorSpeedDValue(ptc.ParameterizedTestCase):
 
         self._param['motor'].command = 'reset'
 
-        if self._param['speed_pid']:
+        if self._param.has_key('speed_pid'):
             expected = self._param['speed_pid']['kD']
         else:
              expected = motor_info[self._param['motor'].driver_name]['speed_d']
@@ -661,7 +661,7 @@ pistorms_params = {
     'speed_pid': { 'kP': 1000, 'kI': 60, 'kD': 0 },
     'hold_pid': { 'kP': 20000, 'kI': 0, 'kD': 0 },
 }
-paramsA = pistorms_params
+paramsA = ev3_params
 paramsA['motor'].command = 'reset'
 
 suite = unittest.TestSuite()
