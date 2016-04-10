@@ -78,7 +78,7 @@ def backup():
     # `run-timed` command will return immediately, so we will have to wait
     # until both motors are stopped before continuing.
     for m in motors:
-        m.stop(stop_command='brake')
+        m.stop(stop_action='brake')
         m.run_timed(duty_cycle_sp=-50, time_sp=1500)
 
     # When motor is stopped, its `state` attribute returns empty list.
