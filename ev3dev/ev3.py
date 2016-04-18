@@ -55,12 +55,11 @@ class Leds(object):
     LEFT = ( red_left, green_left, )
     RIGHT = ( red_right, green_right, )
 
-    BLACK = ( 0, 0, )
     RED = ( 1, 0, )
     GREEN = ( 0, 1, )
     AMBER = ( 1, 1, )
     ORANGE = ( 1, 0.5, )
-    YELLOW = ( 0.1, 1, )
+    YELLOW = ( 0.5, 1, )
 
     @staticmethod
     def set_color(group, color, pct=1):
