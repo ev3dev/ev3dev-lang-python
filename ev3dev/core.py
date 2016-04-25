@@ -45,52 +45,6 @@ from subprocess import Popen
 INPUT_AUTO = ''
 OUTPUT_AUTO = ''
 
-# remove# -----------------------------------------------------------------------------
-# remove# Attribute reader/writer with cached file access
-# removeclass FileCache(object):
-# remove    def __init__(self):
-# remove        self._cache = {}
-# remove
-# remove    def __del__(self):
-# remove        for f in self._cache.values():
-# remove            f.close()
-# remove
-# remove    def file_handle(self, path):
-# remove        """Manages the file handle cache and opening the files in the correct mode"""
-# remove
-# remove        if path not in self._cache:
-# remove            mode = stat.S_IMODE(os.stat(path)[stat.ST_MODE])
-# remove
-# remove            r_ok = mode & stat.S_IRGRP
-# remove            w_ok = mode & stat.S_IWGRP
-# remove
-# remove            if r_ok and w_ok:
-# remove                mode = 'ab+'
-# remove            elif w_ok:
-# remove                mode = 'ab'
-# remove            else:
-# remove                mode = 'rb'
-# remove
-# remove            f = open(path, mode, 0)
-# remove            self._cache[path] = f
-# remove        else:
-# remove            f = self._cache[path]
-# remove
-# remove        return f
-# remove
-# remove    def read(self, path):
-# remove        f = self.file_handle(path)
-# remove
-# remove        f.seek(0)
-# remove        return f.read().decode().strip()
-# remove
-# remove    def write(self, path, value):
-# remove        f = self.file_handle(path)
-# remove
-# remove        f.seek(0)
-# remove        f.write(value.encode())
-# remove
-# remove
 # -----------------------------------------------------------------------------
 def list_device_names(class_path, name_pattern, **kwargs):
     """
@@ -162,7 +116,6 @@ class Device(object):
         """
 
         classpath = abspath(Device.DEVICE_ROOT_PATH + '/' + class_name)
-# remove       self._attribute_cache = FileCache()
         self.kwargs = kwargs
 
         def get_index(file):
@@ -193,17 +146,6 @@ class Device(object):
         else:
             return self.__class__.__name__
 
-#   def _matches(self, attribute, pattern):
-#       """Test if attribute value matches pattern (that is, if pattern is a
-#       substring of attribute value).  If pattern is a list, then a match with
-#       any one entry is enough.
-#       """
-#       value = self._get_attribute(attribute)
-#       if isinstance(pattern, list):
-#           return any([value.find(pat) >= 0 for pat in pattern])
-#       else:
-#           return value.find(pattern) >= 0
-
     def _attribute_file_open( self, name ):
         path = self._path + '/' + name
         mode = stat.S_IMODE(os.stat(path)[stat.ST_MODE])
@@ -230,7 +172,7 @@ class Device(object):
             raise Exception('Device is not connected')
 
     def _set_attribute(self, attribute, name, value):
-        """Device attribute getter"""
+        """Device attribute setter"""
         if self.connected:
             if None == attribute:
                 attribute = self._attribute_file_open( name )
@@ -314,9 +256,9 @@ class Motor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+
         if address is not None:
             kwargs['address'] = address
-
         super(Motor, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
         self._address = None
@@ -875,8 +817,6 @@ class LargeMotor(Motor):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if address is not None:
-            kwargs['address'] = address
 
         super(LargeMotor, self).__init__(address, name_pattern, name_exact, **kwargs)
 
@@ -894,8 +834,6 @@ class MediumMotor(Motor):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if address is not None:
-            kwargs['address'] = address
 
         super(MediumMotor, self).__init__(address, name_pattern, name_exact, **kwargs)
 
@@ -913,8 +851,6 @@ class NxtMotor(Motor):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if address is not None:
-            kwargs['address'] = address
 
         super(NxtMotor, self).__init__(address, name_pattern, name_exact, **kwargs)
 
@@ -932,8 +868,6 @@ class FirgelliL1250Motor(Motor):
     SYSTEM_DEVICE_NAME_CONVENTION = 'linear*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if address is not None:
-            kwargs['address'] = address
 
         super(FirgelliL1250Motor, self).__init__(address, name_pattern, name_exact, **kwargs)
 
@@ -951,8 +885,6 @@ class FirgelliL12100Motor(Motor):
     SYSTEM_DEVICE_NAME_CONVENTION = 'linear*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if address is not None:
-            kwargs['address'] = address
 
         super(FirgelliL12100Motor, self).__init__(address, name_pattern, name_exact, **kwargs)
 
@@ -972,9 +904,9 @@ class DcMotor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+
         if address is not None:
             kwargs['address'] = address
-
         super(DcMotor, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
         self._address = None
@@ -1229,9 +1161,9 @@ class ServoMotor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+
         if address is not None:
             kwargs['address'] = address
-
         super(ServoMotor, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
         self._address = None
@@ -1446,9 +1378,9 @@ class Sensor(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+
         if address is not None:
             kwargs['address'] = address
-
         super(Sensor, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
         self._address = None
@@ -1646,8 +1578,6 @@ class I2cSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if address is not None:
-            kwargs['address'] = address
 
         super(I2cSensor, self).__init__(address, name_pattern, name_exact, **kwargs)
 
@@ -1695,9 +1625,7 @@ class TouchSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if address is not None:
-            kwargs['address'] = address
-        super(TouchSensor, self).__init__(address, name_pattern, name_exact, **kwargs)
+        super(TouchSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
 
 
     # Button state
@@ -1723,9 +1651,7 @@ class ColorSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if address is not None:
-            kwargs['address'] = address
-        super(ColorSensor, self).__init__(address, name_pattern, name_exact, **kwargs)
+        super(ColorSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-color'], **kwargs)
 
 
     # Reflected light. Red LED on.
@@ -1805,9 +1731,7 @@ class UltrasonicSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if address is not None:
-            kwargs['address'] = address
-        super(UltrasonicSensor, self).__init__(address, name_pattern, name_exact, **kwargs)
+        super(UltrasonicSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-us', 'lego-nxt-us'], **kwargs)
 
 
     # Continuous measurement in centimeters.
@@ -1861,9 +1785,7 @@ class GyroSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if address is not None:
-            kwargs['address'] = address
-        super(GyroSensor, self).__init__(address, name_pattern, name_exact, **kwargs)
+        super(GyroSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-gyro'], **kwargs)
 
 
     # Angle
@@ -1908,9 +1830,7 @@ class InfraredSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if address is not None:
-            kwargs['address'] = address
-        super(InfraredSensor, self).__init__(address, name_pattern, name_exact, **kwargs)
+        super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
 
 
     # Proximity
@@ -1948,9 +1868,7 @@ class SoundSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if address is not None:
-            kwargs['address'] = address
-        super(SoundSensor, self).__init__(address, name_pattern, name_exact, **kwargs)
+        super(SoundSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-nxt-sound'], **kwargs)
 
 
     # Sound pressure level. Flat weighting
@@ -1987,9 +1905,7 @@ class LightSensor(Sensor):
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        if address is not None:
-            kwargs['address'] = address
-        super(LightSensor, self).__init__(address, name_pattern, name_exact, **kwargs)
+        super(LightSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-nxt-light'], **kwargs)
 
 
     # Reflected light. LED on
@@ -2031,9 +1947,9 @@ class Led(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+
         if address is not None:
             kwargs['address'] = address
-
         super(Led, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
         self._max_brightness = None
@@ -2346,9 +2262,9 @@ class PowerSupply(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+
         if address is not None:
             kwargs['address'] = address
-
         super(PowerSupply, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
         self._measured_current = None
@@ -2459,9 +2375,9 @@ class LegoPort(Device):
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+
         if address is not None:
             kwargs['address'] = address
-
         super(LegoPort, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
         self._address = None
