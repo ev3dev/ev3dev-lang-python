@@ -1543,12 +1543,12 @@ class TouchSensor(Sensor):
     MODE_TOUCH = 'TOUCH'
 
 
-    def is_pressed():
+    def is_pressed(self):
         """
         A boolean indicating whether the current touch sensor is being
         pressed.
         """
-        self.mode = MODE_TOUCH
+        self.mode = self.MODE_TOUCH
         return self.value(0)
 
 
@@ -1583,21 +1583,21 @@ class ColorSensor(Sensor):
     MODE_RGB_RAW = 'RGB-RAW'
 
 
-    def reflected_light_intensity():
+    def reflected_light_intensity(self):
         """
         Reflected light intensity as a percentage. Light on sensor is red.
         """
-        self.mode = MODE_COL_REFLECT
+        self.mode = self.MODE_COL_REFLECT
         return self.value(0)
 
-    def ambient_light_intensity():
+    def ambient_light_intensity(self):
         """
         Ambient light intensity. Light on sensor is dimly lit blue.
         """
-        self.mode = MODE_COL_AMBIENT
+        self.mode = self.MODE_COL_AMBIENT
         return self.value(0)
 
-    def color():
+    def color(self):
         """
         Color detected by the sensor, categorized by overall value.
           - 0: No color
@@ -1609,28 +1609,28 @@ class ColorSensor(Sensor):
           - 6: White
           - 7: Brown
         """
-        self.mode = MODE_COL_COLOR
+        self.mode = self.MODE_COL_COLOR
         return self.value(0)
 
-    def red():
+    def red(self):
         """
         Red component of the detected color, in the range 0-1020.
         """
-        self.mode = MODE_RGB_RAW
+        self.mode = self.MODE_RGB_RAW
         return self.value(0)
 
-    def green():
+    def green(self):
         """
         Green component of the detected color, in the range 0-1020.
         """
-        self.mode = MODE_RGB_RAW
+        self.mode = self.MODE_RGB_RAW
         return self.value(1)
 
-    def blue():
+    def blue(self):
         """
         Blue component of the detected color, in the range 0-1020.
         """
-        self.mode = MODE_RGB_RAW
+        self.mode = self.MODE_RGB_RAW
         return self.value(2)
 
 
@@ -1665,28 +1665,28 @@ class UltrasonicSensor(Sensor):
     MODE_US_SI_IN = 'US-SI-IN'
 
 
-    def distance_centimeters():
+    def distance_centimeters(self):
         """
         Measurement of the distance detected by the sensor,
         in centimeters.
         """
-        self.mode = MODE_US_DIST_CM
+        self.mode = self.MODE_US_DIST_CM
         return self.value(0)
 
-    def distance_inches():
+    def distance_inches(self):
         """
         Measurement of the distance detected by the sensor,
         in inches.
         """
-        self.mode = MODE_US_DIST_IN
+        self.mode = self.MODE_US_DIST_IN
         return self.value(0)
 
-    def other_sensor_present():
+    def other_sensor_present(self):
         """
         Value indicating whether another ultrasonic sensor could
         be heard nearby.
         """
-        self.mode = MODE_US_LISTEN
+        self.mode = self.MODE_US_LISTEN
         return self.value(0)
 
 
@@ -1721,19 +1721,19 @@ class GyroSensor(Sensor):
     MODE_GYRO_CAL = 'GYRO-CAL'
 
 
-    def angle():
+    def angle(self):
         """
         The number of degrees that the sensor has been rotated
         since it was put into this mode.
         """
-        self.mode = MODE_GYRO_ANG
+        self.mode = self.MODE_GYRO_ANG
         return self.value(0)
 
-    def rate():
+    def rate(self):
         """
         The rate at which the sensor is rotating, in degrees/second.
         """
-        self.mode = MODE_GYRO_RATE
+        self.mode = self.MODE_GYRO_RATE
         return self.value(0)
 
 
@@ -1768,12 +1768,12 @@ class InfraredSensor(Sensor):
     MODE_IR_CAL = 'IR-CAL'
 
 
-    def proximity():
+    def proximity(self):
         """
         A measurement of the distance between the sensor and the remote,
         as a percentage. 100% is approximately 70cm/27in.
         """
-        self.mode = MODE_IR_PROX
+        self.mode = self.MODE_IR_PROX
         return self.value(0)
 
 
@@ -1799,20 +1799,20 @@ class SoundSensor(Sensor):
     MODE_DBA = 'DBA'
 
 
-    def sound_pressure():
+    def sound_pressure(self):
         """
         A measurement of the measured sound pressure level, as a
         percent. Uses a flat weighting.
         """
-        self.mode = MODE_DB
+        self.mode = self.MODE_DB
         return self.value(0)
 
-    def sound_pressure_low():
+    def sound_pressure_low(self):
         """
         A measurement of the measured sound pressure level, as a
         percent. Uses A-weighting, which focuses on levels up to 55 dB.
         """
-        self.mode = MODE_DBA
+        self.mode = self.MODE_DBA
         return self.value(0)
 
 
@@ -1838,18 +1838,18 @@ class LightSensor(Sensor):
     MODE_AMBIENT = 'AMBIENT'
 
 
-    def reflected_light_intensity():
+    def reflected_light_intensity(self):
         """
         A measurement of the reflected light intensity, as a percentage.
         """
-        self.mode = MODE_REFLECT
+        self.mode = self.MODE_REFLECT
         return self.value(0)
 
-    def ambient_light_intensity():
+    def ambient_light_intensity(self):
         """
         A measurement of the ambient light intensity, as a percentage.
         """
-        self.mode = MODE_AMBIENT
+        self.mode = self.MODE_AMBIENT
         return self.value(0)
 
 
