@@ -24,7 +24,7 @@
 # -----------------------------------------------------------------------------
 
 # ~autogen autogen-header
-# Sections of the following code were auto-generated based on spec v1.1.0
+# Sections of the following code were auto-generated based on spec v1.2.0
 
 # ~autogen
 
@@ -269,7 +269,6 @@ class Motor(Device):
         self._driver_name = None
         self._duty_cycle = None
         self._duty_cycle_sp = None
-        self._encoder_polarity = None
         self._full_travel_count = None
         self._polarity = None
         self._position = None
@@ -286,8 +285,8 @@ class Motor(Device):
         self._speed_i = None
         self._speed_d = None
         self._state = None
-        self._stop_command = None
-        self._stop_commands = None
+        self._stop_action = None
+        self._stop_actions = None
         self._time_sp = None
 
 # ~autogen
@@ -390,22 +389,6 @@ class Motor(Device):
     @duty_cycle_sp.setter
     def duty_cycle_sp(self, value):
         self._duty_cycle_sp = self.set_attr_int(self._duty_cycle_sp, 'duty_cycle_sp', value)
-
-    @property
-    def encoder_polarity(self):
-        """
-        Sets the polarity of the rotary encoder. This is an advanced feature to all
-        use of motors that send inversed encoder signals to the EV3. This should
-        be set correctly by the driver of a device. It You only need to change this
-        value if you are using a unsupported device. Valid values are `normal` and
-        `inversed`.
-        """
-        self._encoder_polarity, value = self.get_attr_string(self._encoder_polarity, 'encoder_polarity')
-        return value
-
-    @encoder_polarity.setter
-    def encoder_polarity(self, value):
-        self._encoder_polarity = self.set_attr_string(self._encoder_polarity, 'encoder_polarity', value)
 
     @property
     def full_travel_count(self):
@@ -613,35 +596,35 @@ class Motor(Device):
         return value
 
     @property
-    def stop_command(self):
+    def stop_action(self):
         """
-        Reading returns the current stop command. Writing sets the stop command.
+        Reading returns the current stop action. Writing sets the stop action.
         The value determines the motors behavior when `command` is set to `stop`.
         Also, it determines the motors behavior when a run command completes. See
-        `stop_commands` for a list of possible values.
+        `stop_actions` for a list of possible values.
         """
-        self._stop_command, value = self.get_attr_string(self._stop_command, 'stop_command')
+        self._stop_action, value = self.get_attr_string(self._stop_action, 'stop_action')
         return value
 
-    @stop_command.setter
-    def stop_command(self, value):
-        self._stop_command = self.set_attr_string(self._stop_command, 'stop_command', value)
+    @stop_action.setter
+    def stop_action(self, value):
+        self._stop_action = self.set_attr_string(self._stop_action, 'stop_action', value)
 
     @property
-    def stop_commands(self):
+    def stop_actions(self):
         """
-        Returns a list of stop modes supported by the motor controller.
+        Returns a list of stop actions supported by the motor controller.
         Possible values are `coast`, `brake` and `hold`. `coast` means that power will
         be removed from the motor and it will freely coast to a stop. `brake` means
         that power will be removed from the motor and a passive electrical load will
         be placed on the motor. This is usually done by shorting the motor terminals
         together. This load will absorb the energy from the rotation of the motors and
         cause the motor to stop more quickly than coasting. `hold` does not remove
-        power from the motor. Instead it actively try to hold the motor at the current
+        power from the motor. Instead it actively tries to hold the motor at the current
         position. If an external force tries to turn the motor, the motor will 'push
         back' to maintain its position.
         """
-        self._stop_commands, value = self.get_attr_set(self._stop_commands, 'stop_commands')
+        self._stop_actions, value = self.get_attr_set(self._stop_actions, 'stop_actions')
         return value
 
     @property
@@ -814,7 +797,7 @@ class LargeMotor(Motor):
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
-    SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
+    SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
@@ -831,7 +814,7 @@ class MediumMotor(Motor):
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
-    SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
+    SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
@@ -848,7 +831,7 @@ class NxtMotor(Motor):
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
-    SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
+    SYSTEM_DEVICE_NAME_CONVENTION = '*'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
