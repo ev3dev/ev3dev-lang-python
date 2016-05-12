@@ -10,7 +10,7 @@ for prop in currentClass.systemProperties %}{%
     assign setter = 'string' %}{%
   endif %}
     @property
-    def {{prop_name}}(self):
+    def {{ prop_name }}(self):
         """{%
   for line in prop.description %}{%
       if line %}
@@ -20,7 +20,8 @@ for prop in currentClass.systemProperties %}{%
   endfor %}
         """{%
   if prop.readAccess %}
-        return self.get_attr_{{ getter }}('{{ prop.systemName }}'){%
+        self._{{ prop_name }}, value = self.get_attr_{{ getter }}(self._{{ prop_name }}, '{{prop.systemName}}')
+        return value{%
   else %}
         raise Exception("{{prop_name}} is a write-only property!"){%
   endif %}{%
@@ -28,7 +29,7 @@ for prop in currentClass.systemProperties %}{%
 
     @{{prop_name}}.setter
     def {{ prop_name }}(self, value):
-        self.set_attr_{{ setter }}('{{ prop.systemName }}', value){%
+        self._{{ prop_name }} = self.set_attr_{{ getter }}(self._{{ prop_name }}, '{{prop.systemName}}', value){%
 endif%}{% unless forloop.last %}
 {% endunless %}{%
 endfor %}

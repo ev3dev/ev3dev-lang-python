@@ -39,7 +39,14 @@ endfor %}
     SYSTEM_DEVICE_NAME_CONVENTION = '{{ device_name_convention }}'
 {% endif %}
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+{% if currentClass.inheritance %}
+        super({{ class_name }}, self).__init__(address, name_pattern, name_exact, **kwargs)
+{% else %}
         if address is not None:
             kwargs['address'] = address
-        Device.__init__(self, self.SYSTEM_CLASS_NAME, name_pattern, name_exact,{{ driver_name }} **kwargs)
-
+        super({{ class_name }}, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
+{% endif %}{%
+for prop in currentClass.systemProperties %}{%
+   assign prop_name = prop.name | downcase | underscore_spaces %}
+        self._{{ prop_name }} = None{%
+endfor %}
