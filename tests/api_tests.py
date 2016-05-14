@@ -60,7 +60,6 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(m.commands,                 ['run-forever', 'run-to-abs-pos', 'run-to-rel-pos', 'run-timed', 'run-direct', 'stop', 'reset'])
         self.assertEqual(m.duty_cycle,               0)
         self.assertEqual(m.duty_cycle_sp,            42)
-        self.assertEqual(m.encoder_polarity,         'normal')
         self.assertEqual(m.polarity,                 'normal')
         self.assertEqual(m.address,                  'outA')
         self.assertEqual(m.position,                 42)
@@ -70,7 +69,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(m.speed,                    0)
         self.assertEqual(m.speed_sp,                 0)
         self.assertEqual(m.state,                    ['running'])
-        self.assertEqual(m.stop_command,             'coast')
+        self.assertEqual(m.stop_action,              'coast')
         self.assertEqual(m.time_sp,                  1000)
 
         with self.assertRaises(Exception):
