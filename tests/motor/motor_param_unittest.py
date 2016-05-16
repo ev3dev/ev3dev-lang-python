@@ -6,6 +6,7 @@
 
 import unittest
 import time
+import sys
 import ev3dev.ev3 as ev3
 
 import parameterizedtestcase as ptc
@@ -491,6 +492,16 @@ class TestTachoMotorTimeSpValue(ptc.ParameterizedTestCase):
         self._param['motor'].command = 'reset'
         self.assertEqual(self._param['motor'].speed_d, 0)
 
+class TestTachoMotorDummy(ptc.ParameterizedTestCase):
+
+    def test_dummy_no_message(self):
+        try:
+            self.assertEqual(self._param['motor'].speed_d, 100, "Some clever error message {0}".format(self._param['motor'].speed_d))
+        except:
+           # Remove traceback info as we don't need it
+           unittest_exception = sys.exc_info()
+           raise unittest_exception[0], unittest_exception[1], unittest_exception[2].tb_next
+
 # Add all the tests to the suite - some tests apply only to certain drivers!
 
 def AddTachoMotorParameterTestsToSuite( suite, driver_name, params ):
@@ -521,6 +532,7 @@ def AddTachoMotorParameterTestsToSuite( suite, driver_name, params ):
     suite.addTest(ptc.ParameterizedTestCase.parameterize(TestTachoMotorStopActionValue, param=params))
     suite.addTest(ptc.ParameterizedTestCase.parameterize(TestTachoMotorStopActionsValue, param=params))
     suite.addTest(ptc.ParameterizedTestCase.parameterize(TestTachoMotorTimeSpValue, param=params))
+    suite.addTest(ptc.ParameterizedTestCase.parameterize(TestTachoMotorDummy, param=params))
 
 if __name__ == '__main__':
      for k in motor_info:
