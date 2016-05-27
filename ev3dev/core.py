@@ -2112,18 +2112,18 @@ class ButtonEVIO(ButtonBase):
     _buttons = {}
 
     def __init__(self):
-# remove       self._file_cache = FileCache()
+        self._file_cache = {}
         self._buffer_cache = {}
         for b in self._buttons:
-            self._button_file(self._buttons[b]['name'])
-            self._button_buffer(self._buttons[b]['name'])
+            name = self._buttons[b]['name']
+            if name not in self._file_cache:
+                self._file_cache[name] = open(name, 'rb', 0)
+                self._buffer_cache[name] = array.array('B', [0] * self.KEY_BUF_LEN)
 
     def _button_file(self, name):
-        return self._file_cache.file_handle(name)
+        return self._file_cache[name]
 
     def _button_buffer(self, name):
-        if name not in self._buffer_cache:
-            self._buffer_cache[name] = array.array('B', [0] * self.KEY_BUF_LEN)
         return self._buffer_cache[name]
 
     @property
