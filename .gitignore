@@ -1,6 +1,7 @@
 __pycache__
 *.pyc
 *.swp
+*.log
 dist
 *.egg-info
 RELEASE-VERSION
