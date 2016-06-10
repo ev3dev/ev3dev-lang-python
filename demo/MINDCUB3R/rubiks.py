@@ -31,6 +31,8 @@ class Rubiks(object):
 
     hold_cube_pos = 85
     rotate_speed = 400
+    flip_speed = 300
+    flip_speed_push = 400
     corner_to_edge_diff = 60
 
     def __init__(self):
@@ -208,7 +210,7 @@ class Rubiks(object):
         self.flipper.run_to_abs_pos(position_sp=190,
                                     # ramp_up_sp=200,
                                     # ramp_down_sp=0,
-                                    speed_sp=400)
+                                    speed_sp=self.flip_speed)
         self.flipper.wait_for_running()
         self.flipper.wait_for_position(180, stall_ok=True)
 
@@ -217,7 +219,7 @@ class Rubiks(object):
         self.flipper.run_to_abs_pos(position_sp=Rubiks.hold_cube_pos,
                                     # ramp_up_sp=200,
                                     # ramp_down_sp=400,
-                                    speed_sp=600)
+                                    speed_sp=self.flip_speed_push)
         self.flipper.wait_for_running()
         self.flipper.wait_for_position(Rubiks.hold_cube_pos, stall_ok=True)
 
