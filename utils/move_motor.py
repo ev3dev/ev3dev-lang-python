@@ -41,7 +41,9 @@ if not motor.connected:
 
 motor.reset()
 log.info("Motor %s, move to position %d" % (args.motor, args.degrees))
-motor.run_to_rel_pos(duty_cycle_sp=args.speed, position_sp=args.degrees)
+motor.run_to_rel_pos(speed_sp=args.speed,
+                     # ramp_down_sp=200,
+                     position_sp=args.degrees)
 motor.wait_for_running()
 log.info("Motor %s is running" % args.motor)
 motor.wait_for_stop()
