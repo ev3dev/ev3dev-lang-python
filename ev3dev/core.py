@@ -29,6 +29,7 @@
 # ~autogen
 
 import os
+import io
 import fnmatch
 import numbers
 import fcntl
@@ -64,8 +65,8 @@ def list_device_names(class_path, name_pattern, **kwargs):
     """
     def matches(attribute, pattern):
         try:
-            with open(attribute) as f:
-                value = f.read().strip()
+            with io.FileIO(attribute) as f:
+                value = f.read().strip().decode()
         except:
             return False
 
@@ -153,21 +154,22 @@ class Device(object):
         w_ok = mode & stat.S_IWGRP
             
         if r_ok and w_ok:
-            mode = 'ab+'
+            mode = 'r+'
         elif w_ok:
-            mode = 'ab'
+            mode = 'w'
         else:
-            mode = 'rb'
+            mode = 'r'
 
-        return open(path, mode, 0)
+        return io.FileIO(path, mode)
 
     def _get_attribute(self, attribute, name):
         """Device attribute getter"""
         if self.connected:
             if None == attribute:
                 attribute = self._attribute_file_open( name )
-            attribute.seek(0)
-            return attribute, attribute.read().strip()
+            else:
+                attribute.seek(0)
+            return attribute, attribute.read().strip().decode()
         else:
             raise Exception('Device is not connected')
 
@@ -176,8 +178,10 @@ class Device(object):
         if self.connected:
             if None == attribute:
                 attribute = self._attribute_file_open( name )
-            attribute.seek(0)
-            attribute.write(value)
+            else:
+                attribute.seek(0)
+            attribute.write(value.encode())
+            attribute.flush()
             return attribute
         else:
             raise Exception('Device is not connected')
@@ -187,13 +191,13 @@ class Device(object):
         return attribute, int(value)
 
     def set_attr_int(self, attribute, name, value):
-        return self._set_attribute(attribute, name, '{0:d}'.format(int(value)))
+        return self._set_attribute(attribute, name, str(int(value)))
 
     def get_attr_string(self, attribute, name):
         return self._get_attribute(attribute, name)
 
     def set_attr_string(self, attribute, name, value):
-        return self._set_attribute(attribute, name, "{0}".format(value))
+        return self._set_attribute(attribute, name, value)
 
     def get_attr_line(self, attribute, name):
         return self._get_attribute(attribute, name)
