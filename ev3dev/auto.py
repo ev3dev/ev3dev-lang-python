@@ -1,5 +1,4 @@
 import platform
-import sys
 
 # -----------------------------------------------------------------------------
 # Guess platform we are running on
