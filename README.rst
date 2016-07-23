@@ -46,7 +46,7 @@ loop and start the program.  Hit ``Ctrl-C`` to exit the loop.
       ev3.Leds.set_color(ev3.Leds.LEFT, (ev3.Leds.GREEN, ev3.Leds.RED)[ts.value()])
   
 Now plug a motor into the ``A`` port and paste this code into the terminal. This
-little program will run the motor at 75% power for 3 seconds.
+little program will run the motor at 500 RPM for 3 seconds.
 
 .. code-block:: python
 
