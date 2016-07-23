@@ -2,11 +2,6 @@ import platform
 import sys
 
 # -----------------------------------------------------------------------------
-
-if sys.version_info < (3,4):
-    raise SystemError('Must be using Python 3.4 or higher')
-
-# -----------------------------------------------------------------------------
 # Guess platform we are running on
 
 def current_platform():
