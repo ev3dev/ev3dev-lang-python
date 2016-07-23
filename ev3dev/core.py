@@ -326,17 +326,17 @@ class Motor(Device):
 
         - `run-forever` will cause the motor to run until another command is sent.
         - `run-to-abs-pos` will run to an absolute position specified by `position_sp`
-          and then stop using the command specified in `stop_command`.
+          and then stop using the action specified in `stop_action`.
         - `run-to-rel-pos` will run to a position relative to the current `position` value.
           The new position will be current `position` + `position_sp`. When the new
-          position is reached, the motor will stop using the command specified by `stop_command`.
+          position is reached, the motor will stop using the action specified by `stop_action`.
         - `run-timed` will run the motor for the amount of time specified in `time_sp`
-          and then stop the motor using the command specified by `stop_command`.
+          and then stop the motor using the action specified by `stop_action`.
         - `run-direct` will run the motor at the duty cycle specified by `duty_cycle_sp`.
           Unlike other run commands, changing `duty_cycle_sp` while running *will*
           take effect immediately.
         - `stop` will stop any of the run commands before they are complete using the
-          command specified by `stop_command`.
+          action specified by `stop_action`.
         - `reset` will reset all of the motor parameter attributes to their default value.
           This will also have the effect of stopping the motor.
         """
@@ -594,7 +594,7 @@ class Motor(Device):
     def state(self):
         """
         Reading returns a list of state flags. Possible flags are
-        `running`, `ramping` `holding` and `stalled`.
+        `running`, `ramping`, `holding`, `overloaded` and `stalled`.
         """
         self._state, value = self.get_attr_set(self._state, 'state')
         return value
@@ -653,17 +653,17 @@ class Motor(Device):
     COMMAND_RUN_FOREVER = 'run-forever'
 
     # Run to an absolute position specified by `position_sp` and then
-    # stop using the command specified in `stop_command`.
+    # stop using the action specified in `stop_action`.
     COMMAND_RUN_TO_ABS_POS = 'run-to-abs-pos'
 
     # Run to a position relative to the current `position` value.
     # The new position will be current `position` + `position_sp`.
     # When the new position is reached, the motor will stop using
-    # the command specified by `stop_command`.
+    # the action specified by `stop_action`.
     COMMAND_RUN_TO_REL_POS = 'run-to-rel-pos'
 
     # Run the motor for the amount of time specified in `time_sp`
-    # and then stop the motor using the command specified by `stop_command`.
+    # and then stop the motor using the action specified by `stop_action`.
     COMMAND_RUN_TIMED = 'run-timed'
 
     # Run the motor at the duty cycle specified by `duty_cycle_sp`.
@@ -672,7 +672,7 @@ class Motor(Device):
     COMMAND_RUN_DIRECT = 'run-direct'
 
     # Stop any of the run commands before they are complete using the
-    # command specified by `stop_command`.
+    # action specified by `stop_action`.
     COMMAND_STOP = 'stop'
 
     # Reset all of the motor parameter attributes to their default value.
@@ -693,19 +693,34 @@ class Motor(Device):
     # cause the motor to rotate counter-clockwise.
     POLARITY_INVERSED = 'inversed'
 
+    # Power is being sent to the motor.
+    STATE_RUNNING = 'running'
+
+    # The motor is ramping up or down and has not yet reached a constant output level.
+    STATE_RAMPING = 'ramping'
+
+    # The motor is not turning, but rather attempting to hold a fixed position.
+    STATE_HOLDING = 'holding'
+
+    # The motor is turning, but cannot reach its `speed_sp`.
+    STATE_OVERLOADED = 'overloaded'
+
+    # The motor is not turning when it should be.
+    STATE_STALLED = 'stalled'
+
     # Power will be removed from the motor and it will freely coast to a stop.
-    STOP_COMMAND_COAST = 'coast'
+    STOP_ACTION_COAST = 'coast'
 
     # Power will be removed from the motor and a passive electrical load will
     # be placed on the motor. This is usually done by shorting the motor terminals
     # together. This load will absorb the energy from the rotation of the motors and
     # cause the motor to stop more quickly than coasting.
-    STOP_COMMAND_BRAKE = 'brake'
+    STOP_ACTION_BRAKE = 'brake'
 
     # Does not remove power from the motor. Instead it actively try to hold the motor
     # at the current position. If an external force tries to turn the motor, the motor
-    # will ``push back`` to maintain its position.
-    STOP_COMMAND_HOLD = 'hold'
+    # will `push back` to maintain its position.
+    STOP_ACTION_HOLD = 'hold'
 
 
 # ~autogen
@@ -720,7 +735,7 @@ class Motor(Device):
 
     def run_to_abs_pos(self, **kwargs):
         """Run to an absolute position specified by `position_sp` and then
-        stop using the command specified in `stop_command`.
+        stop using the action specified in `stop_action`.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -730,7 +745,7 @@ class Motor(Device):
         """Run to a position relative to the current `position` value.
         The new position will be current `position` + `position_sp`.
         When the new position is reached, the motor will stop using
-        the command specified by `stop_command`.
+        the action specified by `stop_action`.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -738,7 +753,7 @@ class Motor(Device):
 
     def run_timed(self, **kwargs):
         """Run the motor for the amount of time specified in `time_sp`
-        and then stop the motor using the command specified by `stop_command`.
+        and then stop the motor using the action specified by `stop_action`.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -755,7 +770,7 @@ class Motor(Device):
 
     def stop(self, **kwargs):
         """Stop any of the run commands before they are complete using the
-        command specified by `stop_command`.
+        action specified by `stop_action`.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -906,8 +921,8 @@ class DcMotor(Device):
         self._ramp_down_sp = None
         self._ramp_up_sp = None
         self._state = None
-        self._stop_command = None
-        self._stop_commands = None
+        self._stop_action = None
+        self._stop_actions = None
         self._time_sp = None
 
 # ~autogen
@@ -1026,24 +1041,24 @@ class DcMotor(Device):
         return value
 
     @property
-    def stop_command(self):
+    def stop_action(self):
         """
-        Sets the stop command that will be used when the motor stops. Read
-        `stop_commands` to get the list of valid values.
+        Sets the stop action that will be used when the motor stops. Read
+        `stop_actions` to get the list of valid values.
         """
-        raise Exception("stop_command is a write-only property!")
+        raise Exception("stop_action is a write-only property!")
 
-    @stop_command.setter
-    def stop_command(self, value):
-        self._stop_command = self.set_attr_string(self._stop_command, 'stop_command', value)
+    @stop_action.setter
+    def stop_action(self, value):
+        self._stop_action = self.set_attr_string(self._stop_action, 'stop_action', value)
 
     @property
-    def stop_commands(self):
+    def stop_actions(self):
         """
-        Gets a list of stop commands. Valid values are `coast`
+        Gets a list of stop actions. Valid values are `coast`
         and `brake`.
         """
-        self._stop_commands, value = self.get_attr_set(self._stop_commands, 'stop_commands')
+        self._stop_actions, value = self.get_attr_set(self._stop_actions, 'stop_actions')
         return value
 
     @property
@@ -1068,7 +1083,7 @@ class DcMotor(Device):
     COMMAND_RUN_FOREVER = 'run-forever'
 
     # Run the motor for the amount of time specified in `time_sp`
-    # and then stop the motor using the command specified by `stop_command`.
+    # and then stop the motor using the action specified by `stop_action`.
     COMMAND_RUN_TIMED = 'run-timed'
 
     # Run the motor at the duty cycle specified by `duty_cycle_sp`.
@@ -1077,7 +1092,7 @@ class DcMotor(Device):
     COMMAND_RUN_DIRECT = 'run-direct'
 
     # Stop any of the run commands before they are complete using the
-    # command specified by `stop_command`.
+    # action specified by `stop_action`.
     COMMAND_STOP = 'stop'
 
     # With `normal` polarity, a positive duty cycle will
@@ -1089,13 +1104,13 @@ class DcMotor(Device):
     POLARITY_INVERSED = 'inversed'
 
     # Power will be removed from the motor and it will freely coast to a stop.
-    STOP_COMMAND_COAST = 'coast'
+    STOP_ACTION_COAST = 'coast'
 
     # Power will be removed from the motor and a passive electrical load will
     # be placed on the motor. This is usually done by shorting the motor terminals
     # together. This load will absorb the energy from the rotation of the motors and
     # cause the motor to stop more quickly than coasting.
-    STOP_COMMAND_BRAKE = 'brake'
+    STOP_ACTION_BRAKE = 'brake'
 
 
 # ~autogen
@@ -1110,7 +1125,7 @@ class DcMotor(Device):
 
     def run_timed(self, **kwargs):
         """Run the motor for the amount of time specified in `time_sp`
-        and then stop the motor using the command specified by `stop_command`.
+        and then stop the motor using the action specified by `stop_action`.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -1127,7 +1142,7 @@ class DcMotor(Device):
 
     def stop(self, **kwargs):
         """Stop any of the run commands before they are complete using the
-        command specified by `stop_command`.
+        action specified by `stop_action`.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
