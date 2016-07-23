@@ -2663,6 +2663,18 @@ class Screen(FbMem):
         """
         return self._draw
 
+    @property
+    def image(self):
+        """
+        Returns a handle to PIL.Image class that is backing the screen. This can
+        be accessed for blitting images to the screen.
+
+        Example::
+
+            screen.image.paste(picture, (0, 0))
+        """
+        return self._img
+
     def clear(self):
         """
         Clears the screen
