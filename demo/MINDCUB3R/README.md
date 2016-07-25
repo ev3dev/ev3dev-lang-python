@@ -3,7 +3,9 @@ Installation
 cd ~/ev3dev-lang-python/demo/MINDCUB3R/kociemba/ckociemba/
 
 # This can take a minute on an EV3
-make solve
+sudo apt-get update
+sudo apt-get install build-essential
+make
 sudo make install
 
 # The first time you run this it has to create a cache

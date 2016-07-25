@@ -114,6 +114,7 @@ class Rubiks(object):
                                       ramp_up_sp=0)
         self.turntable.wait_for_running()
         self.turntable.wait_for_position(final_pos)
+        self.turntable.wait_for_stop()
 
         if nb >= 1:
             for i in range(nb):
@@ -152,6 +153,7 @@ class Rubiks(object):
                                       ramp_up_sp=0)
         self.turntable.wait_for_running()
         self.turntable.wait_for_position(temp_pos)
+        self.turntable.wait_for_stop()
 
         self.turntable.run_to_abs_pos(position_sp=final_pos,
                                       speed_sp=int(Rubiks.rotate_speed/4),
@@ -159,6 +161,7 @@ class Rubiks(object):
                                       ramp_up_sp=0)
         self.turntable.wait_for_running()
         self.turntable.wait_for_position(final_pos, stall_ok=True)
+        self.turntable.wait_for_stop()
 
     def rotate_cube_blocked_1(self):
         self.rotate_cube_blocked(1, 1)
@@ -177,10 +180,12 @@ class Rubiks(object):
         if (current_position <= Rubiks.hold_cube_pos - 10 or
             current_position >= Rubiks.hold_cube_pos + 10):
             self.flipper.run_to_abs_pos(position_sp=Rubiks.hold_cube_pos,
-                                        # ramp_down_sp=400,
+                                        ramp_down_sp=400,
                                         speed_sp=speed)
             self.flipper.wait_for_running()
-            self.flipper.wait_for_position(Rubiks.hold_cube_pos, stall_ok=True)
+            self.flipper.wait_for_position(Rubiks.hold_cube_pos)
+            self.flipper.wait_for_stop()
+            sleep(0.05)
 
     def flipper_away(self, speed=300):
         """
@@ -188,16 +193,25 @@ class Rubiks(object):
         """
         log.info("flipper_away()")
         self.flipper.run_to_abs_pos(position_sp=0,
-                                    # ramp_down_sp=400,
+                                    ramp_down_sp=400,
                                     speed_sp=speed)
         self.flipper.wait_for_running()
 
         try:
             self.flipper.wait_for_position(0)
+            self.flipper.wait_for_stop()
         except MotorStall:
             self.flipper.stop()
 
     def flip(self):
+        """
+        Motors will sometimes stall if you call run_to_abs_pos() multiple
+        times back to back on the same motor. To avoid this we call a 50ms
+        sleep in flipper_hold_cube() and after each run_to_abs_pos() below.
+
+        We have to sleep after the 2nd run_to_abs_pos() because sometimes
+        flip() is called back to back.
+        """
         log.info("flip()")
 
         if self.shutdown:
@@ -208,20 +222,24 @@ class Rubiks(object):
 
         # Grab the cube and pull back
         self.flipper.run_to_abs_pos(position_sp=190,
-                                    # ramp_up_sp=200,
-                                    # ramp_down_sp=0,
+                                    ramp_up_sp=200,
+                                    ramp_down_sp=0,
                                     speed_sp=self.flip_speed)
         self.flipper.wait_for_running()
-        self.flipper.wait_for_position(180, stall_ok=True)
+        self.flipper.wait_for_position(190)
+        self.flipper.wait_for_stop()
+        sleep(0.05)
 
         # At this point the cube is at an angle, push it forward to
         # drop it back down in the turntable
         self.flipper.run_to_abs_pos(position_sp=Rubiks.hold_cube_pos,
-                                    # ramp_up_sp=200,
-                                    # ramp_down_sp=400,
+                                    ramp_up_sp=200,
+                                    ramp_down_sp=400,
                                     speed_sp=self.flip_speed_push)
         self.flipper.wait_for_running()
-        self.flipper.wait_for_position(Rubiks.hold_cube_pos, stall_ok=True)
+        self.flipper.wait_for_position(Rubiks.hold_cube_pos)
+        self.flipper.wait_for_stop()
+        sleep(0.05)
 
         transformation = [2, 4, 1, 3, 0, 5]
         self.apply_transformation(transformation)
@@ -233,6 +251,7 @@ class Rubiks(object):
                                      stop_action='hold')
         self.colorarm.wait_for_running()
         self.colorarm.wait_for_position(-750)
+        self.colorarm.wait_for_stop()
 
     def colorarm_corner(self, square_index):
         log.info("colorarm_corner(%d)" % square_index)
@@ -255,7 +274,7 @@ class Rubiks(object):
 
     def colorarm_edge(self, square_index):
         log.info("colorarm_edge(%d)" % square_index)
-        position_target = -650
+        position_target = -640
 
         if square_index == 2:
             pass
@@ -279,6 +298,7 @@ class Rubiks(object):
         self.colorarm.wait_for_running()
         try:
             self.colorarm.wait_for_position(0)
+            self.colorarm.wait_for_stop()
         except MotorStall:
             self.colorarm.stop()
 
@@ -288,6 +308,7 @@ class Rubiks(object):
                                      speed_sp=600)
         self.colorarm.wait_for_running()
         self.colorarm.wait_for_position(-400)
+        self.colorarm.wait_for_stop()
 
     def scan_middle(self, face_number):
         log.info("scan_middle() %d/6" % face_number)
@@ -351,7 +372,7 @@ class Rubiks(object):
         # The gear ratio is 3:1 so 1080 is one full rotation
         self.turntable.reset()
         self.turntable.run_to_abs_pos(position_sp=1080,
-                                      speed_sp=200,
+                                      speed_sp=Rubiks.rotate_speed,
                                       stop_action='hold')
 
         while True:
@@ -421,7 +442,7 @@ class Rubiks(object):
         if self.shutdown:
             return
 
-        log.info("RGB data:\n%s\n" % pformat(self.colors))
+        log.info("RGB json:\n%s\n" % json.dumps(self.colors))
         self.rgb_solver = RubiksColorSolver()
         self.rgb_solver.enter_scan_data(self.colors)
         self.cube_kociemba = self.rgb_solver.crunch_colors()
@@ -495,7 +516,6 @@ class Rubiks(object):
         if rub.shutdown:
             return
 
-        # dwalton - run k here
         output = Popen(['kociemba', ''.join(map(str, self.cube_kociemba))], stdout=PIPE).communicate()[0]
         actions = output.strip().split()
         self.run_kociemba_actions(actions)
@@ -554,7 +574,6 @@ if __name__ == '__main__':
         # Push the cube to the right so that it is in the expected
         # position when we begin scanning
         rub.flipper_hold_cube(100)
-        sleep(0.1)
         rub.flipper_away(100)
 
         rub.scan()

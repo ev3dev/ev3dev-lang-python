@@ -67,7 +67,7 @@ class MotorMixin(object):
                 break
             else:
                 prev_pos = pos
-                time.sleep(0.01)
+                time.sleep(0.001)
         else:
             raise MotorStartFail("%s: failed to start within %ds" % (self, timeout))
 
@@ -96,7 +96,7 @@ class MotorMixin(object):
             if stall_count >= 5:
                 break
             else:
-                time.sleep(0.01)
+                time.sleep(0.001)
         else:
             raise MotorStopFail("%s: failed to stop within %ds" % (self, timeout))
 
@@ -127,14 +127,15 @@ class MotorMixin(object):
             else:
                 stall_count = 0
 
-            if stall_count == 5:
+            if stall_count == 50:
                 if stall_ok:
+                    log.warning("%s: stalled at position %d, target was %d" % (self, pos, target_position))
                     break
                 else:
                     raise MotorStall("%s: stalled at position %d, target was %d" % (self, pos, target_position))
 
             prev_pos = pos
-            time.sleep(0.01)
+            time.sleep(0.001)
         else:
             raise MotorPositionFail("%s: failed to reach %s within %ss, current position %d" %
                                     (self, target_position, timeout, pos))
