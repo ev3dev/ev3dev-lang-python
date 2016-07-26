@@ -1,3 +1,11 @@
+python-ev3dev (0.7.0~rc1) stable; urgency=medium
+
+  * Drop python 2.x support.
+  * Performance improvements for reading/writing sysfs attributes.
+  * Updates for breaking ev3dev kernel changes.
+
+ -- David Lechner <david@lechnology.com>  Mon, 25 Jul 2016 21:13:43 -0500
+
 python-ev3dev (0.6.0) stable; urgency=medium
 
   [Ralph Hempel]
