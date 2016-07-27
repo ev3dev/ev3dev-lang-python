@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # The MIT License (MIT)
 #
 # Copyright (c) 2016 Laurens Valk (laurensvalk@gmail.com)
@@ -294,8 +294,8 @@ class GyroBalancer(Tank):
             ## Calibrate Gyro
             ##
             ########################################################################
-            print "-----------------------------------"
-            print "Calibrating..."
+            print("-----------------------------------")
+            print("Calibrating...")
 
             #As you hold the robot still, determine the average sensor value of 100 samples
             gyroRateCalibrateCount = 100
@@ -305,10 +305,10 @@ class GyroBalancer(Tank):
             gyroOffset = gyroOffset/gyroRateCalibrateCount
 
             # Print the result
-            print "GyroOffset: %s" % gyroOffset
-            print "-----------------------------------"
-            print "GO!"
-            print "-----------------------------------"
+            print("GyroOffset: %s" % gyroOffset)
+            print("-----------------------------------")
+            print("GO!")
+            print("-----------------------------------")
 
             ########################################################################
             ##

@@ -3,13 +3,13 @@ Maintainer: Ralph Hempel <rhempel@hempeldesigngroup.com>
 Section: python
 Priority: optional
 Standards-Version: 3.9.5
-Build-Depends: python-setuptools (>= 0.6b3), python-all (>= 3.4), debhelper (>= 9), dh-python
+Build-Depends: python3-setuptools (>= 0.6b3), python3-all (>= 3.4), debhelper (>= 9), dh-python
 VCS-Git: git://github.com/rhempel/ev3dev-lang-python.git
 VCS-Browser: https://github.com/rhempel/ev3dev-lang-python
 
-Package: python-ev3dev
+Package: python3-ev3dev
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}
+Depends: ${misc:Depends}, ${python3:Depends}
 Description: Python language bindings for ev3dev
  This package is a pure Python binding to the peripheral
  devices on hardware that is supported by ev3dev.org - a
