@@ -39,10 +39,14 @@ if not motor.connected:
     log.error("%s is not connected" % motor)
     sys.exit(1)
 
-motor.reset()
-log.info("Motor %s, move to position %d" % (args.motor, args.degrees))
-motor.run_to_rel_pos(duty_cycle_sp=args.speed, position_sp=args.degrees)
-motor.wait_for_running()
-log.info("Motor %s is running" % args.motor)
-motor.wait_for_stop()
-log.info("Motor %s stopped, final position %d" % (args.motor, motor.position))
+if args.degrees:
+    log.info("Motor %s, move to position %d, max speed %d" % (args.motor, args.degrees, motor.max_speed))
+    motor.run_to_rel_pos(speed_sp=args.speed,
+                         position_sp=args.degrees,
+                         # ramp_up_sp=500,
+                         # ramp_down_sp=500,
+                         stop_action='hold')
+    motor.wait_for_running()
+    motor.wait_for_stop()
+    motor.stop(stop_action='brake')
+    log.info("Motor %s stopped, final position %d" % (args.motor, motor.position))

@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
 import logging
+import os
 import sys
 import time
 import ev3dev.auto
 from ev3dev.auto import (RemoteControl, list_motors,
-                         INPUT_1, INPUT_2, INPUT_3,INPUT_4,
+                         INPUT_1, INPUT_2, INPUT_3, INPUT_4,
                          OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D)
 from math import pi
 from time import sleep
@@ -15,27 +16,129 @@ log = logging.getLogger(__name__)
 INPUTS = (INPUT_1, INPUT_2, INPUT_3, INPUT_4)
 OUTPUTS = (OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D)
 
-def wait_for(condition, timeout=1e5, interval=0.01):
-    tic = time.time() + timeout
-    done = condition()
-
-    while time.time() < tic and not done:
-        time.sleep(interval)
-        done = condition()
-
-    return done
-
 
 # =============
 # Motor classes
 # =============
+class MotorStartFail(Exception):
+    pass
+
+
+class MotorStopFail(Exception):
+    pass
+
+
+class MotorPositionFail(Exception):
+    pass
+
+
+class MotorStall(Exception):
+    pass
+
+
 class MotorMixin(object):
+    stop_mode_choices = (ev3dev.auto.Motor.STOP_COMMAND_COAST,
+                         ev3dev.auto.Motor.STOP_COMMAND_BRAKE,
+                         ev3dev.auto.Motor.STOP_COMMAND_HOLD)
 
-    def wait_for_running(self):
-        return wait_for(lambda: 'running' in self.state, 1)
+    shutdown = False
 
-    def wait_for_stop(self):
-        return wait_for(lambda: 'running' not in self.state, 1)
+    def running(self):
+        prev_pos = self.position
+        time.sleep(0.01)
+        pos = self.position
+        return True if pos != prev_pos else False
+
+    def wait_for_running(self, timeout=5):
+        """
+        timeout is in seconds
+        """
+        tic = time.time() + timeout
+        prev_pos = None
+
+        while time.time() < tic:
+
+            if self.shutdown:
+                break
+
+            pos = self.position
+
+            if prev_pos is not None and pos != prev_pos:
+                break
+            else:
+                prev_pos = pos
+                time.sleep(0.001)
+        else:
+            raise MotorStartFail("%s: failed to start within %ds" % (self, timeout))
+
+    def wait_for_stop(self, timeout=60):
+        """
+        timeout is in seconds
+        """
+        tic = time.time() + timeout
+        prev_pos = None
+        stall_count = 0
+
+        while time.time() < tic:
+            if self.shutdown:
+                break
+
+            pos = self.position
+            log.debug("%s: wait_for_stop() pos %s, prev_pos %s, stall_count %d" % (self, pos, prev_pos, stall_count))
+
+            if prev_pos is not None and pos == prev_pos:
+                stall_count += 1
+            else:
+                stall_count = 0
+
+            prev_pos = pos
+
+            if stall_count >= 5:
+                break
+            else:
+                time.sleep(0.001)
+        else:
+            raise MotorStopFail("%s: failed to stop within %ds" % (self, timeout))
+
+    def wait_for_position(self, target_position, delta=2, timeout=10, stall_ok=False):
+        """
+        delta is in degrees
+        timeout is in seconds
+        """
+        min_pos = target_position - delta
+        max_pos = target_position + delta
+        time_cutoff = time.time() + timeout
+        prev_pos = None
+        stall_count = 0
+
+        while time.time() < time_cutoff:
+
+            if self.shutdown:
+                break
+
+            pos = self.position
+            log.debug("%s: wait_for_pos() pos %d/%d, min_pos %d, max_pos %d" % (self, pos, target_position, min_pos, max_pos))
+
+            if pos >= min_pos and pos <= max_pos:
+                break
+
+            if prev_pos is not None and pos == prev_pos:
+                stall_count += 1
+            else:
+                stall_count = 0
+
+            if stall_count == 50:
+                if stall_ok:
+                    log.warning("%s: stalled at position %d, target was %d" % (self, pos, target_position))
+                    break
+                else:
+                    raise MotorStall("%s: stalled at position %d, target was %d" % (self, pos, target_position))
+
+            prev_pos = pos
+            time.sleep(0.001)
+        else:
+            raise MotorPositionFail("%s: failed to reach %s within %ss, current position %d" %
+                                    (self, target_position, timeout, pos))
 
 
 class LargeMotor(ev3dev.auto.LargeMotor, MotorMixin):
@@ -43,6 +146,24 @@ class LargeMotor(ev3dev.auto.LargeMotor, MotorMixin):
 
 
 class MediumMotor(ev3dev.auto.MediumMotor, MotorMixin):
+    pass
+
+
+class ColorSensorMixin(object):
+
+    def rgb(self):
+        """
+        Note that the mode for the ColorSensor must be set to MODE_RGB_RAW
+        """
+        # These values are on a scale of 0-1020, convert them to a normal 0-255 scale
+        red = int((self.value(0) * 255) / 1020)
+        green = int((self.value(1) * 255) / 1020)
+        blue = int((self.value(2) * 255) / 1020)
+
+        return (red, green, blue)
+
+
+class ColorSensor(ev3dev.auto.ColorSensor, ColorSensorMixin):
     pass
 
 
