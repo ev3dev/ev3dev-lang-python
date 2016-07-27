@@ -64,3 +64,8 @@ Screen
     :members:
     :show-inheritance:
 
+Lego Port
+---------
+
+.. autoclass:: LegoPort
+    :members:
