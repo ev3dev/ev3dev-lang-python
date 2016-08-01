@@ -1,10 +1,10 @@
 Files: debian/*
 License: MIT
-Copyright: 2015 Ralph Hempel <rhempel@hempeldesigngroup.com>
+Copyright: 2016 Ralph Hempel <rhempel@hempeldesigngroup.com>
 
 Files: *
 License: MIT
-Copyright: 2015 Ralph Hempel <rhempel@hempeldesigngroup.com>
+Copyright: 2016 Ralph Hempel <rhempel@hempeldesigngroup.com>
 Copyright: 2015 Denis Demidov <dennis.demidov@gmail.com>
 Copyright: 2015 Eric Pascual <eric@pobot.org>
 Copyright: 2015 Anton Vanhoucke <antonvh@gmail.com>

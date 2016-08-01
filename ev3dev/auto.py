@@ -2,6 +2,7 @@ import platform
 
 # -----------------------------------------------------------------------------
 # Guess platform we are running on
+
 def current_platform():
     machine = platform.machine()
     if machine == 'armv5tejl':
@@ -10,6 +11,8 @@ def current_platform():
         return 'brickpi'
     else:
         return 'unsupported'
+
+# -----------------------------------------------------------------------------
 
 if current_platform() == 'brickpi':
     from .brickpi import *

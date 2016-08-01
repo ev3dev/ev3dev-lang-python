@@ -1,17 +1,17 @@
 #!/usr/bin/make -f
 
-export PYBUILD_NAME=python-ev3dev
+export PYBUILD_NAME=python3-ev3dev
 
-VERSION=$(shell dpkg-parsechangelog | sed -rne 's,^Version: (.*),\1,p')
+VERSION=$(shell dpkg-parsechangelog | sed -rne 's,^Version: (.*),\1,p' | sed 's,~,,')
 
 %:
-	dh $@ --with python2 --buildsystem=pybuild
+	dh $@ --with python3 --buildsystem=pybuild
 
 override_dh_auto_configure:
-	echo VERSION > RELEASE-VERSION
+	echo $(VERSION) > RELEASE-VERSION
 	dh_auto_configure
 
 override_dh_auto_clean:
-	echo VERSION > RELEASE-VERSION
+	echo $(VERSION) > RELEASE-VERSION
 	dh_auto_clean
 	rm -f RELEASE-VERSION

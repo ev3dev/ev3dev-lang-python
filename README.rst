@@ -7,19 +7,19 @@ Python language bindings for ev3dev
     :target: http://python-ev3dev.readthedocs.org/en/latest/?badge=latest
     :alt: Documentation Status
 
-A Python library implementing unified interface for ev3dev_ devices.
+A Python3 library implementing unified interface for ev3dev_ devices.
 
 Example Code
 ------------
 
-To run these minimal examples, run the Python interpreter from
+To run these minimal examples, run the Python3 interpreter from
 the terminal like this: 
 
 .. code-block:: bash
 
-  robot@ev3dev:~$ python
-  Python 2.7.9 (default, Mar  1 2015, 13:52:09) 
-  [GCC 4.9.2] on linux2
+  robot@ev3dev:~/ev3dev-lang-python$ python3
+  Python 3.4.2 (default, Oct  8 2014, 14:47:30) 
+  [GCC 4.9.1] on linux
   Type "help", "copyright", "credits" or "license" for more information.
   >>>
 
@@ -46,18 +46,18 @@ loop and start the program.  Hit ``Ctrl-C`` to exit the loop.
       ev3.Leds.set_color(ev3.Leds.LEFT, (ev3.Leds.GREEN, ev3.Leds.RED)[ts.value()])
   
 Now plug a motor into the ``A`` port and paste this code into the terminal. This
-little program will run the motor at 75% power for 3 seconds.
+little program will run the motor at 500 RPM for 3 seconds.
 
 .. code-block:: python
 
   m = ev3.LargeMotor('outA')
-  m.run_timed(time_sp=3000, duty_cycle_sp=75)
+  m.run_timed(time_sp=3000, speed_sp=500)
 
 If you want to make your robot speak, then paste this code into the terminal:
 
 .. code-block:: python
 
-  ev3.Sound.speak('Welcome to the EV3DEV project!').wait()
+  ev3.Sound.speak('Welcome to the E V 3 dev project!').wait()
 
 To quit Python, just type ``exit()`` or ``Ctrl-D``.
 
@@ -109,20 +109,14 @@ The ev3dev-lang Project on GitHub
 Python2.x and Python3.x Compatibility
 -------------------------------------
 
-The ev3dev_ distribution comes with both python2_ and python3_ installed and
-this library is compatible with both versions.
+The ev3dev_ distribution comes with both python2_ and python3_ installed
+but this library is compatible only with Python3.
 
-Note that currently, the source is only installed in the default
-`Python 2.x`_ location - this will be addressed in the next package we
+Note that currently, the Python3 binding for ev3dev_ is not installed
+by default - this will be addressed in the next package we
 release.
 
-For `Python 2.x`_ programs, you import the binding like this:
-
-.. code-block:: python
-
-  from ev3dev.auto import *
-
-For `Python 3.x`_ the easiest way to work around the problem is
+The easiest way to work around the problem is
 to get your EV3 connected to the Internet and then:
 
 #. Update the package lists
