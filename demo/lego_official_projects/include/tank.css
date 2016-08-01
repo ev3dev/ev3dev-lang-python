@@ -1,0 +1,129 @@
+/* Entire Page - layout */
+
+body {
+    margin: 0px;
+    padding: 0;
+    background: #FFF;
+    font-family: 'Armata', sans-serif;
+    font-size: 12px;
+    color: #222;
+}
+
+.alignCenter{
+    width: 960px;
+    margin: 0px auto;
+}
+
+div#header {
+    padding-bottom: 70px;
+}
+
+div#controls {
+    float: left;
+    width: 450px;
+}
+
+img.button {
+    cursor: pointer;
+    border: 4px solid white;
+
+    /* rounded corners */
+    -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -khtml-border-radius: 20px;
+    border-radius: 20px;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+}
+
+img.button:hover {
+    border: 4px solid black;
+}
+
+img.button:active {
+    border: 4px solid red;
+}
+
+img#ArrowUp,
+img#ArrowDown {
+    margin-left: 137px;
+}
+
+img#ArrowLeft {
+}
+
+img.Clockwise {
+    width: 75px;
+    height: 75px;
+}
+
+img.CounterClockwise {
+    -moz-transform: scaleX(-1);
+    -o-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    filter: FlipH;
+    -ms-filter: "FlipH";
+    width: 75px;
+    height: 75px;
+}
+
+div#desktop-interface {
+    width: 520px;
+    float: left;
+    padding-top: 100px;
+    text-align: center;
+}
+
+div#mobile-interface {
+    width: 300px;
+    padding-left: 600px;
+    padding-top: 100px;
+    text-align: center;
+}
+
+div#medium-motor-spin {
+    width: 250px;
+    margin-left: 300px;
+    text-align: center;
+}
+
+div#desktop-medium-motor-spin {
+    width: 250px;
+    margin-left: 450px;
+    text-align: center;
+}
+
+div#tank-speed,
+div#medium-motor-speed {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+div#joystick-wrapper {
+    float: left; 
+    position: fixed;
+    top: 5px;
+    left: 10px;
+    width: 250px;
+    height: 250px;
+    -webkit-border-radius: 125px;
+    -moz-border-radius: 125px;
+    border-radius: 125px;
+    background: #848484;
+}
+
+div#joystick {
+    width: 50px;
+    height: 50px;
+    -webkit-border-radius: 25px;
+    -moz-border-radius: 25px;
+    border-radius: 25px;
+    background: black;
+    cursor: pointer;
+    position: relative;
+    top: 100px;
+    left: 100px
+}
+
