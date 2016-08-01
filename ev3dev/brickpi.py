@@ -29,10 +29,10 @@ An assortment of classes modeling specific features of the BrickPi.
 from .core import *
 
 
-OUTPUT_A = 'ttyAMA0:outA'
-OUTPUT_B = 'ttyAMA0:outB'
-OUTPUT_C = 'ttyAMA0:outC'
-OUTPUT_D = 'ttyAMA0:outD'
+OUTPUT_A = 'ttyAMA0:MA'
+OUTPUT_B = 'ttyAMA0:MB'
+OUTPUT_C = 'ttyAMA0:MC'
+OUTPUT_D = 'ttyAMA0:MD'
 
 INPUT_1 = 'in1'
 INPUT_2 = 'in2'
