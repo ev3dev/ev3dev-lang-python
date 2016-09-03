@@ -36,6 +36,9 @@ class TestAPI(unittest.TestCase):
         d = ev3.Device('lego-sensor', 'sensor*')
         self.assertTrue(d.connected)
 
+        d = ev3.Device('this-does-not-exist')
+        self.assertFalse(d.connected)
+
     def test_medium_motor(self):
         def dummy(self):
             pass
