@@ -57,6 +57,10 @@ OUTPUT_AUTO = ''
 
 # -----------------------------------------------------------------------------
 def list_device_names(class_path, name_pattern, **kwargs):
+
+    if not os.path.isdir(class_path):
+        return
+    
     """
     This is a generator function that lists names of all devices matching the
     provided parameters.

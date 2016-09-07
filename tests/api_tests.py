@@ -9,7 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from populate_arena import populate_arena
 from clean_arena    import clean_arena
 
-import ev3dev.ev3 as ev3
+import ev3dev.core as ev3
 
 ev3.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 
@@ -35,6 +35,9 @@ class TestAPI(unittest.TestCase):
 
         d = ev3.Device('lego-sensor', 'sensor*')
         self.assertTrue(d.connected)
+
+        d = ev3.Device('this-does-not-exist')
+        self.assertFalse(d.connected)
 
     def test_medium_motor(self):
         def dummy(self):
