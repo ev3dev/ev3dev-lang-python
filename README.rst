@@ -7,17 +7,52 @@ Python language bindings for ev3dev
     :target: http://python-ev3dev.readthedocs.org/en/latest/?badge=latest
     :alt: Documentation Status
 
-A Python3 library implementing unified interface for ev3dev_ devices.
+A Python3 library implementing an interface for ev3dev_ devices,
+letting you control motors, sensors, hardware buttons, LCD
+displays and more from Python code.
 
-Example Code
-------------
+If you haven't written code in Python before, you'll need to learn the language
+before you can use this library. **TODO: INSERT RESOURCES HERE**
 
-To run these minimal examples, run the Python3 interpreter from
-the terminal like this: 
+Getting Started
+---------------
+
+This library runs on ev3dev_. Before continuing, make sure that you have set up
+your EV3 or other ev3dev device as explained in the `ev3dev Getting Started guide`_.
+Make sure that you have a kernel version that includes `-10-ev3dev` or higher (a
+larger number). You can check the kernel version by selecting "About" in Brickman
+and scrolling down to the "kernel version". If you don't have a compatible version,
+upgrade the kernel first. **TODO: INSERT LINK HERE**
+
+Once you have booted ev3dev and connected to your EV3 (or Raspberry Pi / BeagleBone)
+via SSH, you will need to install the latest version of this library.
+
+To do so, run the following commands, which could take ten minutes or longer
+(you may be prompted to type the password; the default is `maker`):
 
 .. code-block:: bash
 
-  robot@ev3dev:~/ev3dev-lang-python$ python3
+   sudo apt-get update
+   sudo apt-get install python3-ev3dev
+
+Now that you have the latest version installed, you should be ready to start
+using ev3dev with Python. If you want to go through some basic usage examples,
+check out the `Usage Examples`_ section to try out motors, sensors and LEDs.
+Then look at `Writing Python Programs for Ev3dev`_ to see how you can save
+your Python code to a file.
+
+Make sure that you look at the `User Resources`_ section as well for links
+to documentation and larger examples.
+
+Usage Examples
+------------
+
+To run these minimal examples, run the Python3 interpreter from
+the terminal using the `python3` command: 
+
+.. code-block::
+
+  $ python3
   Python 3.4.2 (default, Oct  8 2014, 14:47:30) 
   [GCC 4.9.1] on linux
   Type "help", "copyright", "credits" or "license" for more information.
@@ -27,55 +62,90 @@ The ``>>>`` characters are the default prompt for Python. In the examples
 below, we have removed these characters so it's easier to cut and 
 paste the code into your session.
 
-Load the ev3dev-lang_ bindings:
+Required: Import the library
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
   import ev3dev.ev3 as ev3
 
-Now let's try our first program. This code will turn the left LED red
-whenever the touch sensor is pressed, and back to green when it's
-released. Plug a touch sensor into any sensor port and then paste in this
-code - you'll need to hit ``Enter`` after pasting to complete the
-loop and start the program.  Hit ``Ctrl-C`` to exit the loop.
+Controlling the LEDs with a touch sensor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This code will turn the left LED red whenever the touch sensor is pressed, and
+back to green when it's released. Plug a touch sensor into any sensor port and
+then paste in this code - you'll need to hit ``Enter`` after pasting to complete
+the loop and start the program.  Hit ``Ctrl-C`` to exit the loop.
 
 .. code-block:: python
 
   ts = ev3.TouchSensor()
   while True:
       ev3.Leds.set_color(ev3.Leds.LEFT, (ev3.Leds.GREEN, ev3.Leds.RED)[ts.value()])
-  
-Now plug a motor into the ``A`` port and paste this code into the terminal. This
-little program will run the motor at 500 RPM for 3 seconds.
+
+Running a motor
+~~~~~~~~~~~~~~~
+
+Now plug a motor into the ``A`` port and paste this code into the Python prompt.
+This little program will run the motor at 500 ticks per second (around 0.4
+rotations per second) for three seconds.
 
 .. code-block:: python
 
   m = ev3.LargeMotor('outA')
   m.run_timed(time_sp=3000, speed_sp=500)
 
-If you want to make your robot speak, then paste this code into the terminal:
+Using text-to-speech
+~~~~~~~~~~~~~~~~~~~~
+
+If you want to make your robot speak, you can use the `Sound.speak` method:
 
 .. code-block:: python
 
   ev3.Sound.speak('Welcome to the E V 3 dev project!').wait()
 
-To quit Python, just type ``exit()`` or ``Ctrl-D``.
+**To quit the Python REPL, just type** ``exit()`` **or press** ``Ctrl-D`` **.**
+
+Make sure to check out the `User Resources`_ section for more detailed
+information on these features and many others.
+
+Writing Python Programs for Ev3dev
+----------------------------------
+
+Every Python program should have a few basic parts. Use this template
+to get started:
+
+.. code-block:: python
+   
+   #!/usr/bin/env python3
+   from ev3dev.ev3 import *
+
+   # TODO: Add code here
+
+The first two lines should be included in every Python program you write
+for ev3dev. The first allows you to run this program from Brickman, while the
+second imports this library.
+
+When saving Python files, it is best to use the ``.py`` extension, e.g. ``my-file.py``.
 
 User Resources
 --------------
 
-Getting Started with ev3dev
-    If you got here as the result of looking for "how to program
-    LEGO MINDSTORMS EV3 using Python" then you might not be aware that
-    this is part of a much larger project called ev3dev_. Make sure
-    you read the `Getting Started`_ page
-    to become familiar with ev3dev_ first!
+Library Documentation
+    **Class documentation for this library can be found on** `our Read the Docs page`_ **.**
+    You can always go there to get information on how you can use this
+    library's functionality.
 
-Connecting the EV3 to the Internet
-    You can connect to an EV3 running ev3dev_ using USB, Wifi or
-    Bluetooth. The USB connection is a good starting point, and
-    the ev3dev_ site has `detailed instructions for USB connections`_
-    for Linux, Windows, and Mac computers.
+ev3dev.org
+    `ev3dev.org`_ is a great resource for finding guides and tutoials on
+    using ev3dev.
+
+Support
+    If you are having trouble using this library, please open an issue
+    at `our Issues tracker`_ so that we can help you. When opening an
+    issue, make sure to include as much information as possible about
+    what you are trying to do and what you have tried. The issue template
+    is in place to guide you through this process.
 
 Demo Robot
     Laurens Valk of robot-square_ has been kind enough to allow us to
@@ -116,42 +186,21 @@ Note that currently, the Python3 binding for ev3dev_ is not installed
 by default - this will be addressed in the next package we
 release.
 
-The easiest way to work around the problem is
-to get your EV3 connected to the Internet and then:
-
-#. Update the package lists
-#. Install the ``python3-pil`` package
-#. Use ``easy-install`` install ``python-ev3dev``
-
-.. code-block:: bash
-
-  sudo apt-get update
-  sudo apt-get install python3-pil
-  sudo python3 -m easy_install python-ev3dev
-
-You will be asked for the ``robot`` user's password to get ``sudo`` access
-to the system - the default password is ``maker``.
-
-Please be patient - a typical ``apt-get update`` will take about
-10 minutes - there's a LOT going on under the hood to sort out
-package dependencies.
-
-And now you can use ev3dev-lang-python_ under `Python 3.x`_.
-
-.. code-block:: python
-
-  from ev3dev.auto import *
-
-----
+Until then, you must follow the instructions at the top of this README to make
+sure that you have installed the newest version of the Python 3-based library.
 
 .. _ev3dev: http://ev3dev.org
+.. _ev3dev.org: ev3dev_
 .. _Getting Started: ev3dev-getting-started_
+.. _ev3dev Getting Started guide: ev3dev-getting-started_
 .. _ev3dev-getting-started: http://www.ev3dev.org/docs/getting-started/
 .. _detailed instructions for USB connections: ev3dev-usb-internet_ 
 .. _ev3dev-usb-internet: http://www.ev3dev.org/docs/tutorials/connecting-to-the-internet-via-usb/
+.. _our Read the Docs page: http://python-ev3dev.readthedocs.org/en/latest/
 .. _source repository for the generic API: ev3dev-lang_
 .. _ev3dev-lang: https://github.com/ev3dev/ev3dev-lang
 .. _ev3dev-lang-python: https://github.com/rhempel/ev3dev-lang-python
+.. _our Issues tracker: https://github.com/rhempel/ev3dev-lang-python/issues
 .. _this document: wrapper-specification_
 .. _wrapper-specification: https://github.com/ev3dev/ev3dev-lang/blob/develop/wrapper-specification.md
 .. _EXPLOR3R: demo-robot_
