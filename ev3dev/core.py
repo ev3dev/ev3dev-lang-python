@@ -41,7 +41,6 @@ import os
 import io
 import fnmatch
 import numbers
-import fcntl
 import array
 import mmap
 import ctypes
@@ -51,6 +50,14 @@ from os.path import abspath
 from PIL import Image, ImageDraw
 from struct import pack, unpack
 from subprocess import Popen
+
+try:
+    # This is a linux-specific module.
+    # It is required by the Button() class, but failure to import it may be
+    # safely ignored if one just needs to run API tests on Windows.
+    import fcntl
+except ImportError:
+    print("WARNING: Failed to import fcntl. Button class will be unuseable!")
 
 INPUT_AUTO = ''
 OUTPUT_AUTO = ''
