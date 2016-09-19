@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from EV3D4 import EV3D4WebControlled
 import logging

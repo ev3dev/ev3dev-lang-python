@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from itertools import permutations
 from math import atan2, cos, degrees, exp, factorial, radians, sin, sqrt

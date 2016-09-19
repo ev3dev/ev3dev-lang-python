@@ -47,7 +47,6 @@ import ctypes
 import re
 import stat
 from os.path import abspath
-from PIL import Image, ImageDraw
 from struct import pack, unpack
 from subprocess import Popen
 
@@ -2633,6 +2632,7 @@ class Screen(FbMem):
     """
 
     def __init__(self):
+        from PIL import Image, ImageDraw
         FbMem.__init__(self)
 
         self._img = Image.new(

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import logging
 import math
@@ -7,7 +7,7 @@ import re
 import sys
 import time
 import ev3dev.auto
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from ev3dev.auto import (RemoteControl, list_motors,
                          INPUT_1, INPUT_2, INPUT_3, INPUT_4,
                          OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D)
@@ -39,10 +39,6 @@ class MotorStall(Exception):
 
 
 class MotorMixin(object):
-    stop_mode_choices = (ev3dev.auto.Motor.STOP_COMMAND_COAST,
-                         ev3dev.auto.Motor.STOP_COMMAND_BRAKE,
-                         ev3dev.auto.Motor.STOP_COMMAND_HOLD)
-
     shutdown = False
 
     def running(self):
@@ -497,12 +493,18 @@ class RobotWebHandler(BaseHTTPRequestHandler):
 
                 # Open the static file requested and send it
                 if os.path.exists(filename):
-                    with open(filename) as fh:
-                        self.send_response(200)
-                        self.send_header('Content-type', mt)
-                        self.end_headers()
-                        self.wfile.write(fh.read())
-                        self.wfile.close()
+                    self.send_response(200)
+                    self.send_header('Content-type', mt)
+                    self.end_headers()
+
+                    if extension in ('gif', 'ico', 'jpg', 'png'):
+                        # Open in binary mode, do not encode
+                        with open(filename, mode='rb') as fh:
+                            self.wfile.write(fh.read())
+                    else:
+                        # Open as plain text and encode
+                        with open(filename, mode='r') as fh:
+                            self.wfile.write(fh.read().encode())
                 else:
                     log.error("404: %s not found" % self.path)
                     self.send_error(404, 'File Not Found: %s' % self.path)
