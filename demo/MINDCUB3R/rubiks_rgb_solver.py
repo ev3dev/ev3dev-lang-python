@@ -26,6 +26,9 @@ class LabColor(object):
     def __str__(self):
         return ("Lab (%s, %s, %s)" % (self.L, self.a, self.b))
 
+    def __lt__(self, other):
+        return delta_e_cie2000(self, other)
+
 
 def rgb2lab(inputColor):
     """
@@ -187,6 +190,9 @@ class Edge(object):
              self.square2.side, self.square2.position,
              self.square1.color.name, self.square2.color.name)
 
+    def __lt__(self, other):
+        return 0
+
     def colors_match(self, colorA, colorB):
         if (colorA in (self.square1.color, self.square2.color) and
             colorB in (self.square1.color, self.square2.color)):
@@ -343,7 +349,7 @@ class Square(object):
     def find_closest_match(self, crayon_box, debug=False, set_color=True):
         self.cie_data = []
 
-        for (color, color_obj) in crayon_box.iteritems():
+        for (color, color_obj) in crayon_box.items():
             distance = get_color_distance(self.rawcolor, color_obj)
             self.cie_data.append((distance, color_obj))
         self.cie_data = sorted(self.cie_data)
@@ -544,7 +550,7 @@ class RubiksColorSolver(object):
                 line_number = 6
                 prefix = '          '
 
-            for x in xrange(3):
+            for x in range(3):
                 data[line_number].append(prefix)
 
                 for color_name in (side.squares[side.min_pos + (x * 3)].color.name,
@@ -570,11 +576,11 @@ class RubiksColorSolver(object):
 
         color_to_num = {}
 
-        for side in self.sides.itervalues():
+        for side in self.sides.values():
             color_to_num[side.middle_square.color] = side.name
 
         for side in (self.sideU, self.sideR, self.sideF, self.sideD, self.sideL, self.sideB):
-            for x in xrange(side.min_pos, side.max_pos + 1):
+            for x in range(side.min_pos, side.max_pos + 1):
                 color = side.squares[x].color
                 data.append(color_to_num[color])
 
@@ -585,7 +591,7 @@ class RubiksColorSolver(object):
         Given a position on the cube return the CubeSide object
         that contians that position
         """
-        for side in self.sides.itervalues():
+        for side in self.sides.values():
             if position >= side.min_pos and position <= side.max_pos:
                 return side
         raise Exception("Could not find side for %d" % position)
@@ -597,14 +603,14 @@ class RubiksColorSolver(object):
     def enter_scan_data(self, scan_data):
         self.scan_data = scan_data
 
-        for (position, (red, green, blue)) in self.scan_data.iteritems():
+        for (position, (red, green, blue)) in self.scan_data.items():
             side = self.get_side(position)
             side.set_square(position, red, green, blue)
 
     def get_squares_with_color(self, target_color):
         squares = []
-        for side in self.sides.itervalues():
-            for square in side.squares.itervalues():
+        for side in self.sides.values():
+            for square in side.squares.values():
                 if square.color == target_color:
                     squares.append(square)
         return squares
@@ -684,14 +690,14 @@ class RubiksColorSolver(object):
     def identify_edge_squares(self):
         log.info('ID edge square colors')
 
-        for side in self.sides.itervalues():
+        for side in self.sides.values():
             for square in side.edge_squares:
                 square.find_closest_match(self.crayon_box)
 
     def identify_corner_squares(self):
         log.info('ID corner square colors')
 
-        for side in self.sides.itervalues():
+        for side in self.sides.values():
             for square in side.corner_squares:
                 square.find_closest_match(self.crayon_box)
 
@@ -837,13 +843,13 @@ class RubiksColorSolver(object):
                     scores_by_edge_pair[edge].append((distance, (colorA, colorB)))
 
             # For each edge keep the top two scores
-            for (edge, value) in scores_by_edge_pair.iteritems():
+            for (edge, value) in scores_by_edge_pair.items():
                 scores_by_edge_pair[edge] = sorted(value)[0:2]
 
             # Now compute the delta between the first place score and the second place score for each edge
             score_delta = []
 
-            for (edge, value) in scores_by_edge_pair.iteritems():
+            for (edge, value) in scores_by_edge_pair.items():
                 first_place_distance = value[0][0]
                 second_place_distance = value[1][0]
                 first_place_color = value[0][1]
@@ -946,13 +952,13 @@ class RubiksColorSolver(object):
                     scores_by_corner[corner].append((distance, (colorA, colorB, colorC)))
 
             # For each corner keep the top two scores
-            for (corner, value) in scores_by_corner.iteritems():
+            for (corner, value) in scores_by_corner.items():
                 scores_by_corner[corner] = sorted(value)[0:2]
 
             # Now compute the delta between the first place score and the second place score for each edge
             score_delta = []
 
-            for (corner, value) in scores_by_corner.iteritems():
+            for (corner, value) in scores_by_corner.items():
                 first_place_distance = value[0][0]
                 second_place_distance = value[1][0]
                 first_place_color = value[0][1]
@@ -1053,12 +1059,12 @@ if __name__ == '__main__':
         scan_data_str_keys = json.loads(args.rgb)
         scan_data = {}
 
-        for (key, value) in scan_data_str_keys.iteritems():
+        for (key, value) in scan_data_str_keys.items():
             scan_data[int(key)] = value
 
         cube.enter_scan_data(scan_data)
         kociemba = cube.crunch_colors()
-        print ''.join(map(str, kociemba))
+        print(''.join(map(str, kociemba)))
 
     except Exception as e:
         log.exception(e)

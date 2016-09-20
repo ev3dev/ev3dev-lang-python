@@ -4,7 +4,7 @@ from ev3dev.auto import OUTPUT_A, OUTPUT_B, OUTPUT_C, InfraredSensor
 from ev3dev.helper import LargeMotor, MediumMotor, ColorSensor, MotorStall
 from pprint import pformat
 from rubiks_rgb_solver import RubiksColorSolver
-from subprocess import check_output, Popen, PIPE
+from subprocess import check_output
 from time import sleep
 import json
 import logging
@@ -516,7 +516,7 @@ class Rubiks(object):
         if rub.shutdown:
             return
 
-        output = Popen(['kociemba', ''.join(map(str, self.cube_kociemba))], stdout=PIPE).communicate()[0]
+        output = check_output(['kociemba', ''.join(map(str, self.cube_kociemba))]).decode('ascii')
         actions = output.strip().split()
         self.run_kociemba_actions(actions)
         self.cube_done()
