@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 import random
-from facecube import FaceCube
-from cubiecube import CubieCube
-from coordcube import CoordCube
+from .facecube import FaceCube
+from .cubiecube import CubieCube
+from .coordcube import CoordCube
 
 def randomCube():
     """
@@ -29,4 +29,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.random:
-        print randomCube()
+        print(randomCube())

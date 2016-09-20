@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
-from search import Search
+from .search import Search
 
 '''
 Example Cube:
@@ -50,4 +50,4 @@ parser.add_argument('facelet', help='Facelet string', default=None)
 args = parser.parse_args()
 
 cube = Search()
-print cube.solution(args.facelet, maxDepth=21, timeOut=600, useSeparator='')
+print(cube.solution(args.facelet, maxDepth=21, timeOut=600, useSeparator=''))

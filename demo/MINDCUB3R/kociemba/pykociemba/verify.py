@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
-from facecube import FaceCube
-from color import colors
+from .facecube import FaceCube
+from .color import colors
 
 def verify(s):
     """
@@ -19,13 +19,13 @@ def verify(s):
     """
     count = [0] * 6     # new int[6]
     try:
-        for i in xrange(54):
+        for i in range(54):
             assert s[i] in colors
             count[colors[s[i]]] += 1
     except:
         return -1
 
-    for i in xrange(6):
+    for i in range(6):
         if count[i] != 9:
             return -1
 
@@ -39,4 +39,4 @@ if __name__ == '__main__':
     parser.add_argument('facelet', help='Facelet string', default=None)
     args = parser.parse_args()
 
-    print verify(args.facelet)
+    print(verify(args.facelet))
