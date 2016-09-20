@@ -35,7 +35,7 @@ class TRACK3RWithBallShooter(TRACK3R):
 
     def fire_ball(self, state):
         if state:
-            self.medium_motor.run_to_rel_pos(speed_sp=100, position_sp=3*360)
+            self.medium_motor.run_to_rel_pos(speed_sp=400, position_sp=3*360)
         else:
             self.medium_motor.stop()
 
@@ -61,6 +61,6 @@ class TRACK3RWithClaw(TRACK3R):
 
     def move_claw(self, state):
         if state:
-            self.medium_motor.run_to_rel_pos(speed_sp=40, position_sp=-75)
+            self.medium_motor.run_to_rel_pos(speed_sp=200, position_sp=-75)
         else:
-            self.medium_motor.run_to_rel_pos(speed_sp=40, position_sp=75)
+            self.medium_motor.run_to_rel_pos(speed_sp=200, position_sp=75)
