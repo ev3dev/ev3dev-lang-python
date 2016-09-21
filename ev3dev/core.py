@@ -61,6 +61,9 @@ except ImportError:
 INPUT_AUTO = ''
 OUTPUT_AUTO = ''
 
+# Keep the __version__ in sync with the package version in debian/changelog
+__version___ = '0.7.0'
+
 # -----------------------------------------------------------------------------
 def list_device_names(class_path, name_pattern, **kwargs):
 
