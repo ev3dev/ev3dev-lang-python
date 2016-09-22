@@ -12,23 +12,23 @@ letting you control motors, sensors, hardware buttons, LCD
 displays and more from Python code.
 
 If you haven't written code in Python before, you'll need to learn the language
-before you can use this library. **TODO: INSERT RESOURCES HERE**
+before you can use this library.
 
 Getting Started
 ---------------
 
 This library runs on ev3dev_. Before continuing, make sure that you have set up
 your EV3 or other ev3dev device as explained in the `ev3dev Getting Started guide`_.
-Make sure that you have a kernel version that includes `-10-ev3dev` or higher (a
+Make sure that you have a kernel version that includes ``-10-ev3dev`` or higher (a
 larger number). You can check the kernel version by selecting "About" in Brickman
 and scrolling down to the "kernel version". If you don't have a compatible version,
-upgrade the kernel first. **TODO: INSERT LINK HERE**
+`upgrade the kernel before continuing`_.
 
 Once you have booted ev3dev and connected to your EV3 (or Raspberry Pi / BeagleBone)
 via SSH, you will need to install the latest version of this library.
 
 To do so, run the following commands, which could take ten minutes or longer
-(you may be prompted to type the password; the default is `maker`):
+(you may be prompted to type the password; the default is ``maker``):
 
 .. code-block:: bash
 
@@ -48,7 +48,7 @@ Usage Examples
 ------------
 
 To run these minimal examples, run the Python3 interpreter from
-the terminal using the `python3` command: 
+the terminal using the ``python3`` command: 
 
 .. code-block::
 
@@ -194,6 +194,7 @@ sure that you have installed the newest version of the Python 3-based library.
 .. _Getting Started: ev3dev-getting-started_
 .. _ev3dev Getting Started guide: ev3dev-getting-started_
 .. _ev3dev-getting-started: http://www.ev3dev.org/docs/getting-started/
+.. _upgrade the kernel before continuing: http://www.ev3dev.org/docs/tutorials/upgrading-ev3dev/
 .. _detailed instructions for USB connections: ev3dev-usb-internet_ 
 .. _ev3dev-usb-internet: http://www.ev3dev.org/docs/tutorials/connecting-to-the-internet-via-usb/
 .. _our Read the Docs page: http://python-ev3dev.readthedocs.org/en/latest/
