@@ -1,27 +1,24 @@
-Installation
-===============
-cd ~/ev3dev-lang-python/demo/MINDCUB3R/kociemba/ckociemba/
+# MINDCUB3R
 
-# This can take a minute on an EV3
-sudo apt-get update
-sudo apt-get install build-essential
-make
-sudo make install
+### Installation
+This can take a minute on an EV3
+* cd ~/ev3dev-lang-python/demo/MINDCUB3R/kociemba/ckociemba/
+* sudo apt-get update
+* sudo apt-get install build-essential
+* make
+* sudo make install
 
-# The first time you run this it has to create a cache
-# directory, this takes about 30s on an EV3
+The first time you run this it creates a cache directory, this takes about 30s on an EV3
 
-cd ~/ev3dev-lang-python/demo/MINDCUB3R/
-kociemba DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD
+* cd ~/ev3dev-lang-python/demo/MINDCUB3R/
+* kociemba DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD
 
 
-Running
-=======
+### Running
 ./rubiks.py
 
 
-Credit
-======
+### Credit
 Much of rubiks.py and rubiks_rgb_solver.py were ported from
 https://github.com/cavenel/ev3dev_examples
 
