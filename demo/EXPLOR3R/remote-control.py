@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 # -----------------------------------------------------------------------------
 # Copyright (c) 2015 Denis Demidov <dennis.demidov@gmail.com>
