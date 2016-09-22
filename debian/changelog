@@ -1,10 +1,12 @@
-python-ev3dev (0.7.0~rc1) stable; urgency=medium
+python-ev3dev (0.7.0) stable; urgency=medium
 
   * Drop python 2.x support.
   * Performance improvements for reading/writing sysfs attributes.
-  * Updates for breaking ev3dev kernel changes.
+  * support for ev3dev -13-ev3dev kernels.
+  * Added ev3dev/helper.py with classes for Tanks, Motors, Web UI, etc.
+  * Added ev3dev/GyroBalancer.py for robots that use a gyroscope.
 
- -- David Lechner <david@lechnology.com>  Mon, 25 Jul 2016 21:13:43 -0500
+ -- David Lechner <david@lechnology.com>  Wed, 21 Sep 2016 21:13:43 -0500
 
 python-ev3dev (0.6.0) stable; urgency=medium
 
