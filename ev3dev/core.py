@@ -842,7 +842,7 @@ class LargeMotor(Motor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
-        super(LargeMotor, self).__init__(address, name_pattern, name_exact, **kwargs)
+        super(LargeMotor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-l-motor'], **kwargs)
 
 
 # ~autogen
@@ -859,7 +859,7 @@ class MediumMotor(Motor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
-        super(MediumMotor, self).__init__(address, name_pattern, name_exact, **kwargs)
+        super(MediumMotor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-m-motor'], **kwargs)
 
 
 # ~autogen
@@ -876,7 +876,7 @@ class NxtMotor(Motor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
-        super(NxtMotor, self).__init__(address, name_pattern, name_exact, **kwargs)
+        super(NxtMotor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-nxt-motor'], **kwargs)
 
 
 # ~autogen
@@ -893,7 +893,7 @@ class FirgelliL1250Motor(Motor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
-        super(FirgelliL1250Motor, self).__init__(address, name_pattern, name_exact, **kwargs)
+        super(FirgelliL1250Motor, self).__init__(address, name_pattern, name_exact, driver_name=['fi-l12-ev3-50'], **kwargs)
 
 
 # ~autogen
@@ -910,7 +910,7 @@ class FirgelliL12100Motor(Motor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
-        super(FirgelliL12100Motor, self).__init__(address, name_pattern, name_exact, **kwargs)
+        super(FirgelliL12100Motor, self).__init__(address, name_pattern, name_exact, driver_name=['fi-l12-ev3-100'], **kwargs)
 
 
 # ~autogen
@@ -1603,7 +1603,7 @@ class I2cSensor(Sensor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
-        super(I2cSensor, self).__init__(address, name_pattern, name_exact, **kwargs)
+        super(I2cSensor, self).__init__(address, name_pattern, name_exact, driver_name=['nxt-i2c-sensor'], **kwargs)
 
         self._fw_version = None
         self._poll_ms = None
