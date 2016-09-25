@@ -2814,9 +2814,10 @@ class Sound:
             return Popen('/usr/bin/aplay -q "%s"' % wav_file, stdout=n, shell=True)
 
     @staticmethod
-    def speak(text):
+    def speak(text, espeak_opts='-a 200 -s 130'):
         """
         Speak the given text aloud.
         """
         with open(os.devnull, 'w') as n:
-            return Popen('/usr/bin/espeak -a 200 --stdout "%s" | /usr/bin/aplay -q' % text, stdout=n, shell=True)
+            cmd_line = '/usr/bin/espeak --stdout {0} "{1}" | /usr/bin/aplay -q'.format(espeak_opts, text)
+            return Popen(cmd_line, stdout=n, shell=True)
