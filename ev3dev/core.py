@@ -880,12 +880,12 @@ class NxtMotor(Motor):
 
 
 # ~autogen
-# ~autogen generic-class classes.firgelli50Motor>currentClass
+# ~autogen generic-class classes.actuonix50Motor>currentClass
 
-class FirgelliL1250Motor(Motor):
+class ActuonixL1250Motor(Motor):
 
     """
-    Firgelli L12 50 linear servo motor
+    Actuonix L12 50 linear servo motor
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
@@ -893,16 +893,16 @@ class FirgelliL1250Motor(Motor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
-        super(FirgelliL1250Motor, self).__init__(address, name_pattern, name_exact, driver_name=['fi-l12-ev3-50'], **kwargs)
+        super(ActuonixL1250Motor, self).__init__(address, name_pattern, name_exact, driver_name=['act-l12-ev3-50'], **kwargs)
 
 
 # ~autogen
-# ~autogen generic-class classes.firgelli100Motor>currentClass
+# ~autogen generic-class classes.actuonix100Motor>currentClass
 
-class FirgelliL12100Motor(Motor):
+class ActuonixL12100Motor(Motor):
 
     """
-    Firgelli L12 100 linear servo motor
+    Actuonix L12 100 linear servo motor
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
@@ -910,7 +910,7 @@ class FirgelliL12100Motor(Motor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
-        super(FirgelliL12100Motor, self).__init__(address, name_pattern, name_exact, driver_name=['fi-l12-ev3-100'], **kwargs)
+        super(ActuonixL12100Motor, self).__init__(address, name_pattern, name_exact, driver_name=['act-l12-ev3-100'], **kwargs)
 
 
 # ~autogen
