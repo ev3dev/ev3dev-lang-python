@@ -45,12 +45,12 @@ Make sure that you look at the `User Resources`_ section as well for links
 to documentation and larger examples.
 
 Usage Examples
-------------
+--------------
 
 To run these minimal examples, run the Python3 interpreter from
 the terminal using the ``python3`` command: 
 
-.. code-block::
+.. code-block:: bash
 
   $ python3
   Python 3.4.2 (default, Oct  8 2014, 14:47:30) 
