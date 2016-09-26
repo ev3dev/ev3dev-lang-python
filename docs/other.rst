@@ -3,6 +3,45 @@ Other classes
 
 .. currentmodule:: ev3dev.core
 
+Remote Control
+--------------
+
+.. autoclass:: RemoteControl
+    :members:
+    :inherited-members:
+
+    .. rubric:: Event handlers
+
+    These will be called when state of the corresponding button is changed:
+
+    .. py:data:: on_red_up
+    .. py:data:: on_red_down
+    .. py:data:: on_blue_up
+    .. py:data:: on_blue_down
+    .. py:data:: on_beacon
+
+    .. rubric:: Member functions and properties
+
+Button
+------
+
+.. autoclass:: ev3dev.ev3.Button
+    :members:
+    :inherited-members:
+
+    .. rubric:: Event handlers
+
+    These will be called when state of the corresponding button is changed:
+
+    .. py:data:: on_up
+    .. py:data:: on_down
+    .. py:data:: on_left
+    .. py:data:: on_right
+    .. py:data:: on_enter
+    .. py:data:: on_backspace
+
+    .. rubric:: Member functions and properties
+
 Leds
 ----
 
@@ -43,13 +82,6 @@ Power Supply
 
 .. autoclass:: PowerSupply
     :members:
-
-Button
-------
-
-.. autoclass:: ev3dev.ev3.Button
-    :members:
-    :inherited-members:
 
 Sound
 -----
