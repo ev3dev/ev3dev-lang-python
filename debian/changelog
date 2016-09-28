@@ -7,6 +7,8 @@ python-ev3dev (0.7.0) stable; urgency=medium
   * Allow passing espeak options to Sound.speak
   * Make sure that device classes connect to devices of the right
     type (driver name)
+  * Fix fatal error due to calling an undefined function in
+    some property setters, such as LED triggers
 
   [Daniel Walton]
   * Add "__version__" property.
