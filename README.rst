@@ -22,21 +22,13 @@ your EV3 or other ev3dev device as explained in the `ev3dev Getting Started guid
 Make sure that you have a kernel version that includes ``-10-ev3dev`` or higher (a
 larger number). You can check the kernel version by selecting "About" in Brickman
 and scrolling down to the "kernel version". If you don't have a compatible version,
-`upgrade the kernel before continuing`_.
+`upgrade the kernel before continuing`_. Also note that if the ev3dev image you downloaded
+was created before September 2016, you probably don't have the most recent version of this
+library installed: see `Upgrading this Library`_ to upgrade it.
 
-Once you have booted ev3dev and connected to your EV3 (or Raspberry Pi / BeagleBone)
-via SSH, you will need to install the latest version of this library.
-
-To do so, run the following commands, which could take ten minutes or longer
-(you may be prompted to type the password; the default is ``maker``):
-
-.. code-block:: bash
-
-   sudo apt-get update
-   sudo apt-get install python3-ev3dev
-
-Now that you have the latest version installed, you should be ready to start
-using ev3dev with Python. If you want to go through some basic usage examples,
+Once you have booted ev3dev and `connected to your EV3 (or Raspberry Pi / BeagleBone)
+via SSH`_, you should be ready to start using ev3dev with Python: this library
+is included out-of-the-box. If you want to go through some basic usage examples,
 check out the `Usage Examples`_ section to try out motors, sensors and LEDs.
 Then look at `Writing Python Programs for Ev3dev`_ to see how you can save
 your Python code to a file.
@@ -158,6 +150,18 @@ Demo Code
     this language binding. The programs are designed to work with the
     `EXPLOR3R`_ robot.
 
+Upgrading this Library
+----------------------
+
+You can upgrade this library from the command line as follows. Make sure
+to type the password (the default is ``maker``) when prompted.
+
+.. code-block:: bash
+
+   sudo apt-get update
+   sudo apt-get install python3-ev3dev
+
+
 Developer Resources
 -------------------
 
@@ -196,6 +200,7 @@ sure that you have installed the newest version of the Python 3-based library.
 .. _ev3dev-getting-started: http://www.ev3dev.org/docs/getting-started/
 .. _upgrade the kernel before continuing: http://www.ev3dev.org/docs/tutorials/upgrading-ev3dev/
 .. _detailed instructions for USB connections: ev3dev-usb-internet_ 
+.. _connected to your EV3 (or Raspberry Pi / BeagleBone) via SSH: http://www.ev3dev.org/docs/tutorials/connecting-to-ev3dev-with-ssh/
 .. _ev3dev-usb-internet: http://www.ev3dev.org/docs/tutorials/connecting-to-the-internet-via-usb/
 .. _our Read the Docs page: http://python-ev3dev.readthedocs.org/en/latest/
 .. _source repository for the generic API: ev3dev-lang_
