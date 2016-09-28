@@ -2037,7 +2037,7 @@ class Led(Device):
 
     @trigger.setter
     def trigger(self, value):
-        self._trigger = self.set_attr_from_set(self._trigger, 'trigger', value)
+        self._trigger = self.set_attr_string(self._trigger, 'trigger', value)
 
     @property
     def delay_on(self):
