@@ -11,7 +11,8 @@ setup(
     license='MIT',
     url='https://github.com/rhempel/ev3dev-lang-python',
     include_package_data=True,
-    packages=['ev3dev'],
+    packages=['ev3dev', 'ev3dev.fonts'],
+    package_data={'': ['*.pil', '*.pbm']},
     install_requires=['Pillow']
     )
 
