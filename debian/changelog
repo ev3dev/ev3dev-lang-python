@@ -22,9 +22,10 @@ python-ev3dev (0.7.0) stable; urgency=medium
   * Fix bad division logic in display classes.
 
   [Kaelin Laundry]
-  * Fix fatal error when a requested sysfs device class hasn't been populated yet.
+  * Fix fatal error when a requested sysfs device class hasn't been
+    populated yet.
 
- -- Kaelin Laundry <wasabifan@outlook.com>  Sat, 25 Sep 2016 10:35:00 -0800
+ -- Kaelin Laundry <wasabifan@outlook.com>  Sun, 25 Sep 2016 10:35:00 -0800
 
 python-ev3dev (0.7.0~rc1) stable; urgency=medium
 
