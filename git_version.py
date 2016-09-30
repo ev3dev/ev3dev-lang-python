@@ -40,9 +40,8 @@ def read_release_version():
 
 
 def write_release_version(version):
-    f = open("RELEASE-VERSION", "w")
-    f.write("%s\n" % version)
-    f.close()
+    with open("RELEASE-VERSION", "w") as f:
+        f.write("%s\n" % version)
 
 
 def pep386adapt(version):
@@ -77,6 +76,10 @@ def git_version(abbrev=4):
     # RELEASE-VERSION file, update the file to be current.
     if version != release_version:
         write_release_version(version)
+
+    # Update the ev3dev/__version__.py
+    with open('ev3dev/version.py', 'w') as f:
+        f.write("__version__ = '{}'".format(version))
 
     # Finally, return the current version.
     return version

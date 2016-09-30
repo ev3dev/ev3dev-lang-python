@@ -61,15 +61,12 @@ except ImportError:
 INPUT_AUTO = ''
 OUTPUT_AUTO = ''
 
-# Keep the __version__ in sync with the package version in debian/changelog
-__version__ = '0.7.0'
-
 # -----------------------------------------------------------------------------
 def list_device_names(class_path, name_pattern, **kwargs):
 
     if not os.path.isdir(class_path):
         return
-    
+
     """
     This is a generator function that lists names of all devices matching the
     provided parameters.
@@ -174,7 +171,7 @@ class Device(object):
         mode = stat.S_IMODE(os.stat(path)[stat.ST_MODE])
         r_ok = mode & stat.S_IRGRP
         w_ok = mode & stat.S_IWGRP
-            
+
         if r_ok and w_ok:
             mode = 'r+'
         elif w_ok:
@@ -1420,7 +1417,7 @@ class Sensor(Device):
 # ~autogen
 
         self._value = [None,None,None,None,None,None,None,None]
-        
+
         self._bin_data_format = None
         self._bin_data = None
 
