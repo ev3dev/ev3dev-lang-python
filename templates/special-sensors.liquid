@@ -51,7 +51,7 @@ endfor %}
 {% for mapping in currentClass.sensorValueMappings %}{%
   assign name = mapping.name | downcase | underscore_spaces %}{%
   assign mode = mapping.requiredMode | upcase | underscore_non_wc %}
-    def {{ name }}(self):
+    def {{ name }}(self, set_mode=True):
         """{%
   for line in mapping.description %}{%
     if line %}
@@ -61,7 +61,8 @@ endfor %}
   endfor %}
         """
 
-        self.mode = self.MODE_{{ mode }}
+        if set_mode:
+            self.mode = self.MODE_{{ mode }}
 
         return {%
   for value_index in mapping.sourceValue
