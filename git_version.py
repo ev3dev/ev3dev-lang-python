@@ -26,21 +26,15 @@ def call_git_describe(abbrev=4):
 
 def read_release_version():
     try:
-        f = open("RELEASE-VERSION", "r")
-
-        try:
+        with open('{}/RELEASE-VERSION'.format(os.path.dirname(__file__)), 'r') as f:
             version = f.readlines()[0]
             return version.strip()
-
-        finally:
-            f.close()
-
     except:
         return None
 
 
 def write_release_version(version):
-    with open("RELEASE-VERSION", "w") as f:
+    with open('{}/RELEASE-VERSION'.format(os.path.dirname(__file__)), 'w') as f:
         f.write("%s\n" % version)
 
 
@@ -77,8 +71,8 @@ def git_version(abbrev=4):
     if version != release_version:
         write_release_version(version)
 
-    # Update the ev3dev/__version__.py
-    with open('ev3dev/version.py', 'w') as f:
+    # Update the ev3dev/version.py
+    with open('{}/ev3dev/version.py'.format(os.path.dirname(__file__)), 'w') as f:
         f.write("__version__ = '{}'".format(version))
 
     # Finally, return the current version.
