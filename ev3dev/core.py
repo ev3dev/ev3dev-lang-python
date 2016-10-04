@@ -1731,6 +1731,16 @@ class ColorSensor(Sensor):
 
         return self.value(0)
 
+    def raw(self, set_mode=True):
+        """
+        Red, green, and blue components of the detected color, in the range 0-1020.
+        """
+
+        if set_mode:
+            self.mode = self.MODE_RGB_RAW
+
+        return self.value(0), self.value(1), self.value(2)
+
     def red(self, set_mode=True):
         """
         Red component of the detected color, in the range 0-1020.
