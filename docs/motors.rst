@@ -23,6 +23,13 @@ Medium EV3 Motor
     :members:
     :show-inheritance:
 
+NXT Servo Motor
+---------------
+
+.. autoclass:: NxtMotor
+    :members:
+    :show-inheritance:
+
 DC Motor
 --------
 
