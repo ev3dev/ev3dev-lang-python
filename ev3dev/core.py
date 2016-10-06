@@ -831,7 +831,7 @@ def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
 class LargeMotor(Motor):
 
     """
-    EV3 large servo motor
+    EV3/NXT large servo motor
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
@@ -839,7 +839,7 @@ class LargeMotor(Motor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
-        super(LargeMotor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-l-motor'], **kwargs)
+        super(LargeMotor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-l-motor', 'lego-nxt-motor'], **kwargs)
 
 
 # ~autogen
@@ -857,23 +857,6 @@ class MediumMotor(Motor):
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
         super(MediumMotor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-m-motor'], **kwargs)
-
-
-# ~autogen
-# ~autogen generic-class classes.nxtMotor>currentClass
-
-class NxtMotor(Motor):
-
-    """
-    NXT servo motor
-    """
-
-    SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
-    SYSTEM_DEVICE_NAME_CONVENTION = '*'
-
-    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-
-        super(NxtMotor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-nxt-motor'], **kwargs)
 
 
 # ~autogen
