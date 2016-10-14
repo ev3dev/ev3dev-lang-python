@@ -83,7 +83,7 @@ while not button.any():
     rc.process()
 
     # Backup when bumped an obstacle
-    if ts.value():
+    if ts.is_pressed:
         Sound.speak('Oops, excuse me!')
 
         for motor in (lmotor, rmotor):

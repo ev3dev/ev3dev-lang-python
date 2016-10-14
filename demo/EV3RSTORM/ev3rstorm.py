@@ -146,7 +146,7 @@ class ev3rstorm:
 
         # Now that the event handlers are assigned,
         # lets enter the processing loop:
-        while not self.ts.is_pressed():
+        while not self.ts.is_pressed:
             rc1.process()
             rc2.process()
             time.sleep(0.1)

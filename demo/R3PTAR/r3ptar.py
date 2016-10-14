@@ -31,7 +31,7 @@ def hand_biter(done):
 
     while not done.is_set():
         # Wait until something (a hand?!) gets too close:
-        while s.proximity() > 30:
+        while s.proximity > 30:
             if done.is_set(): return
             time.sleep(0.1)
 

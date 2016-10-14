@@ -48,9 +48,6 @@ assert all([m.connected for m in motors]), \
 ir = InfraredSensor(); assert ir.connected
 ts = TouchSensor();    assert ts.connected
 
-# Put the infrared sensor into proximity mode.
-ir.mode = 'IR-PROX'
-
 # We will need to check EV3 buttons state.
 btn = Button()
 
@@ -112,7 +109,7 @@ def turn():
 start()
 while not btn.any():
 
-    if ts.value():
+    if ts.is_pressed:
         # We bumped an obstacle.
         # Back away, turn and go in other direction.
         backup()
@@ -121,7 +118,7 @@ while not btn.any():
 
     # Infrared sensor in proximity mode will measure distance to the closest
     # object in front of it.
-    distance = ir.value()
+    distance = ir.proximity
 
     if distance > 60:
         # Path is clear, run at full speed.
