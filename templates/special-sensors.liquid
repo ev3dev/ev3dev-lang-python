@@ -37,6 +37,7 @@ endfor %}
 {% endif %}
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super({{ class_name }}, self).__init__(address, name_pattern, name_exact,{{ driver_name }} **kwargs)
+        self.auto_mode = True
 
 {% for prop in currentClass.propertyValues %}{%
   assign className = currentClass.friendlyName | downcase | underscore_spaces %}{%
@@ -51,7 +52,8 @@ endfor %}
 {% for mapping in currentClass.sensorValueMappings %}{%
   assign name = mapping.name | downcase | underscore_spaces %}{%
   assign mode = mapping.requiredMode | upcase | underscore_non_wc %}
-    def {{ name }}(self, set_mode=True):
+    @property
+    def {{ name }}(self):
         """{%
   for line in mapping.description %}{%
     if line %}
@@ -61,7 +63,7 @@ endfor %}
   endfor %}
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_{{ mode }}
 
         return {%
