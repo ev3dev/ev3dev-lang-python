@@ -79,13 +79,18 @@ Running a motor
 ~~~~~~~~~~~~~~~
 
 Now plug a motor into the ``A`` port and paste this code into the Python prompt.
-This little program will run the motor at 500 ticks per second (around 0.4
-rotations per second) for three seconds.
+This little program will run the motor at 500 ticks per second, which on the EV3
+"large" motors equates to around 1.4 rotations per second, for three seconds
+(3000 milliseconds).
 
 .. code-block:: python
 
   m = ev3.LargeMotor('outA')
   m.run_timed(time_sp=3000, speed_sp=500)
+
+The units for ``speed_sp`` that you see above are in "tacho ticks" per second.
+On the large EV3 motor, these equate to one tick per degree, so this is 500
+degress per second.
 
 Using text-to-speech
 ~~~~~~~~~~~~~~~~~~~~
@@ -128,9 +133,15 @@ Library Documentation
     You can always go there to get information on how you can use this
     library's functionality.
 
+ev3python.com
+    One of our community members, @ndward, has put together a great website
+    with detailed guides on using this library which are targeted at beginners.
+    If you are just getting started with programming, we highly recommend
+    that you check it out at `ev3python.com`!
+
 ev3dev.org
-    `ev3dev.org`_ is a great resource for finding guides and tutoials on
-    using ev3dev.
+    `ev3dev.org`_ is a great resource for finding guides and tutorials on
+    using ev3dev, straight from the maintainers.
 
 Support
     If you are having trouble using this library, please open an issue
@@ -180,18 +191,14 @@ The ev3dev-lang Project on GitHub
     generate the binding. Only developers of the ev3dev-lang-python_ binding 
     would normally need to access this information.
 
-Python2.x and Python3.x Compatibility
+Python 2.x and Python 3.x Compatibility
 -------------------------------------
 
-The ev3dev_ distribution comes with both python2_ and python3_ installed
-but this library is compatible only with Python3.
+Some versions of the ev3dev_ distribution come with both `Python 2.x`_ and `Python 3.x`_ installed
+but this library is compatible only with Python 3.
 
-Note that currently, the Python3 binding for ev3dev_ is not installed
-by default - this will be addressed in the next package we
-release.
-
-Until then, you must follow the instructions at the top of this README to make
-sure that you have installed the newest version of the Python 3-based library.
+As of the 2016-10-17 ev3dev image, the version of this library which is included runs on
+Python 3 and this is the only version that will be supported from here forward.
 
 .. _ev3dev: http://ev3dev.org
 .. _ev3dev.org: ev3dev_
@@ -204,6 +211,7 @@ sure that you have installed the newest version of the Python 3-based library.
 .. _ev3dev-usb-internet: http://www.ev3dev.org/docs/tutorials/connecting-to-the-internet-via-usb/
 .. _our Read the Docs page: http://python-ev3dev.readthedocs.org/en/latest/
 .. _source repository for the generic API: ev3dev-lang_
+.. _ev3python.com: http://ev3python.com/
 .. _ev3dev-lang: https://github.com/ev3dev/ev3dev-lang
 .. _ev3dev-lang-python: https://github.com/rhempel/ev3dev-lang-python
 .. _our Issues tracker: https://github.com/rhempel/ev3dev-lang-python/issues
