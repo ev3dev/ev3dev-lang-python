@@ -11,6 +11,7 @@
    :maxdepth: 3
 
    spec
+   rpyc
 
 Indices and tables
 ==================
