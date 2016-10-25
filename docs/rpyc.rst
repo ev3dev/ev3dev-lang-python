@@ -42,7 +42,23 @@ use RPyC with ev3dev:
        m = ev3.LargeMotor('outA')
        m.run_timed(time_sp=1000, speed_sp=600)
 
-   You can run scripts like this from any intercative python environment, like
-   ipython shell/notebook, spyder, pycharm, etc.
+You can run scripts like this from any intercative python environment, like
+ipython shell/notebook, spyder, pycharm, etc.
+
+Some *advantages* of using RPyC with ev3dev are:
+
+* It uses much less resources than running ipython notebook on EV3; RPyC server
+  is lightweight, and only requires an IP connection to the EV3 once set up (no
+  ssh required).
+* The scripts you are working with are actually stored and edited on your
+  desktop PC, with your favorite editor/IDE.
+* Some robots may need much more computational power than what EV3 can give
+  you. A notable example is the Rubics cube solver: there is an algorithm that
+  provides almost optimal solution (in terms of number of cube rotations), but
+  it takes more RAM than is available on EV3. With RPYC, you could run the
+  heavy-duty computations on your desktop.
+
+The most obvious *disadvantage* is latency introduced by network connection.
+This may be a show stopper for robots where reaction speed is essential.
 
 .. _RPyC: http://rpyc.readthedocs.io/
