@@ -42,7 +42,7 @@ use RPyC with ev3dev:
        m = ev3.LargeMotor('outA')
        m.run_timed(time_sp=1000, speed_sp=600)
 
-You can run scripts like this from any intercative python environment, like
+You can run scripts like this from any interactive python environment, like
 ipython shell/notebook, spyder, pycharm, etc.
 
 Some *advantages* of using RPyC with ev3dev are:
