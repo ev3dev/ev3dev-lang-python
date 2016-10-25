@@ -3,8 +3,8 @@ Python language bindings for ev3dev
 
 .. image:: https://travis-ci.org/rhempel/ev3dev-lang-python.svg?branch=master
     :target: https://travis-ci.org/rhempel/ev3dev-lang-python
-.. image:: https://readthedocs.org/projects/python-ev3dev/badge/?version=latest
-    :target: http://python-ev3dev.readthedocs.org/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/python-ev3dev/badge/?version=stable
+    :target: http://python-ev3dev.readthedocs.org/en/latest/?badge=stable
     :alt: Documentation Status
 
 A Python3 library implementing an interface for ev3dev_ devices,
@@ -40,18 +40,18 @@ Usage Examples
 --------------
 
 To run these minimal examples, run the Python3 interpreter from
-the terminal using the ``python3`` command: 
+the terminal using the ``python3`` command:
 
 .. code-block:: bash
 
   $ python3
-  Python 3.4.2 (default, Oct  8 2014, 14:47:30) 
+  Python 3.4.2 (default, Oct  8 2014, 14:47:30)
   [GCC 4.9.1] on linux
   Type "help", "copyright", "credits" or "license" for more information.
   >>>
 
 The ``>>>`` characters are the default prompt for Python. In the examples
-below, we have removed these characters so it's easier to cut and 
+below, we have removed these characters so it's easier to cut and
 paste the code into your session.
 
 Required: Import the library
@@ -113,7 +113,7 @@ Every Python program should have a few basic parts. Use this template
 to get started:
 
 .. code-block:: python
-   
+
    #!/usr/bin/env python3
    from ev3dev.ev3 import *
 
@@ -188,7 +188,7 @@ The ev3dev Binding Specification
 
 The ev3dev-lang Project on GitHub
     The `source repository for the generic API`_ and the scripts to automatically
-    generate the binding. Only developers of the ev3dev-lang-python_ binding 
+    generate the binding. Only developers of the ev3dev-lang-python_ binding
     would normally need to access this information.
 
 Python 2.x and Python 3.x Compatibility
@@ -206,7 +206,7 @@ Python 3 and this is the only version that will be supported from here forward.
 .. _ev3dev Getting Started guide: ev3dev-getting-started_
 .. _ev3dev-getting-started: http://www.ev3dev.org/docs/getting-started/
 .. _upgrade the kernel before continuing: http://www.ev3dev.org/docs/tutorials/upgrading-ev3dev/
-.. _detailed instructions for USB connections: ev3dev-usb-internet_ 
+.. _detailed instructions for USB connections: ev3dev-usb-internet_
 .. _connected to your EV3 (or Raspberry Pi / BeagleBone) via SSH: http://www.ev3dev.org/docs/tutorials/connecting-to-ev3dev-with-ssh/
 .. _ev3dev-usb-internet: http://www.ev3dev.org/docs/tutorials/connecting-to-the-internet-via-usb/
 .. _our Read the Docs page: http://python-ev3dev.readthedocs.org/en/latest/
