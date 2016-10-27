@@ -63,11 +63,11 @@ def roll(motor, led_group, direction):
     def on_press(state):
         if state:
             # Roll when button is pressed
-            motor.run_forever(duty_cycle_sp=90*direction)
+            motor.run_forever(speed_sp=600*direction)
             Leds.set_color(led_group, direction > 0 and Leds.GREEN or Leds.RED)
         else:
             # Stop otherwise
-            motor.stop(stop_command='brake')
+            motor.stop(stop_action='brake')
             Leds.set(led_group, brightness_pct=0)
 
     return on_press
@@ -87,7 +87,7 @@ while not button.any():
         Sound.speak('Oops, excuse me!')
 
         for motor in (lmotor, rmotor):
-            motor.stop(stop_command='brake')
+            motor.stop(stop_action='brake')
 
         # Turn red lights on
         for led in (Leds.LEFT, Leds.RIGHT):
@@ -95,7 +95,7 @@ while not button.any():
 
         # Run both motors backwards for 0.5 seconds
         for motor in (lmotor, rmotor):
-            motor.run_timed(duty_cycle_sp=-90, time_sp=500)
+            motor.run_timed(speed_sp=-600, time_sp=500)
 
         # Wait 0.5 seconds while motors are rolling
         sleep(0.5)
