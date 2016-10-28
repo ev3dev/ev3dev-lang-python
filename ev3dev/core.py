@@ -46,6 +46,8 @@ import mmap
 import ctypes
 import re
 import stat
+import select
+import time
 from os.path import abspath
 from struct import pack, unpack
 from subprocess import Popen
@@ -313,6 +315,8 @@ class Motor(Device):
         self._time_sp = None
 
 # ~autogen
+
+        self._poll = None
 
 # ~autogen generic-get-set classes.motor>currentClass
 
@@ -805,6 +809,56 @@ class Motor(Device):
 
 
 # ~autogen
+
+    def wait(self, cond):
+        """
+        Blocks until cond(self.state) is True. The condition is checked when
+        there is an I/O event related to the state attribute.
+        """
+
+        if self._poll is None:
+            if self._state is None:
+                self._state = self._attribute_file_open('state')
+            self._poll = select.poll()
+            self._poll.register(self._state, select.POLLPRI)
+
+        while True:
+            # wait for an event
+            for _ in self._poll.poll():
+                if cond(self.state): return
+
+    def wait_until(self, s, timeout=None):
+        """
+        Blocks until s is in self.state, or timeout (in seconds) is expired.
+
+        Example::
+
+            m.wait_until('stalled')
+        """
+        tic = time.time()
+        def done(state):
+            if s in state:
+                return True
+            return (timeout is not None) and (time.time() > tic + timeout)
+
+        self.wait(done)
+
+    def wait_while(self, s, timeout=None):
+        """
+        Blocks while s is in self.state, or timeout (in seconds) is expired.
+
+        Example::
+
+            m.wait_while('running')
+        """
+        tic = time.time()
+
+        def done(state):
+            if s not in state:
+                return True
+            return (timeout is not None) and (time.time() > tic + timeout)
+
+        self.wait(done)
 
 def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     """
