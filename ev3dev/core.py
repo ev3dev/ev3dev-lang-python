@@ -1630,19 +1630,21 @@ class TouchSensor(Sensor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(TouchSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
+        self.auto_mode = True
 
 
     # Button state
     MODE_TOUCH = 'TOUCH'
 
 
-    def is_pressed(self, set_mode=True):
+    @property
+    def is_pressed(self):
         """
         A boolean indicating whether the current touch sensor is being
         pressed.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_TOUCH
 
         return self.value(0)
@@ -1658,6 +1660,7 @@ class ColorSensor(Sensor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(ColorSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-color'], **kwargs)
+        self.auto_mode = True
 
 
     # Reflected light. Red LED on.
@@ -1676,27 +1679,30 @@ class ColorSensor(Sensor):
     MODE_RGB_RAW = 'RGB-RAW'
 
 
-    def reflected_light_intensity(self, set_mode=True):
+    @property
+    def reflected_light_intensity(self):
         """
         Reflected light intensity as a percentage. Light on sensor is red.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_COL_REFLECT
 
         return self.value(0)
 
-    def ambient_light_intensity(self, set_mode=True):
+    @property
+    def ambient_light_intensity(self):
         """
         Ambient light intensity. Light on sensor is dimly lit blue.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_COL_AMBIENT
 
         return self.value(0)
 
-    def color(self, set_mode=True):
+    @property
+    def color(self):
         """
         Color detected by the sensor, categorized by overall value.
           - 0: No color
@@ -1709,47 +1715,51 @@ class ColorSensor(Sensor):
           - 7: Brown
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_COL_COLOR
 
         return self.value(0)
 
-    def raw(self, set_mode=True):
+    @property
+    def raw(self):
         """
         Red, green, and blue components of the detected color, in the range 0-1020.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_RGB_RAW
 
         return self.value(0), self.value(1), self.value(2)
 
-    def red(self, set_mode=True):
+    @property
+    def red(self):
         """
         Red component of the detected color, in the range 0-1020.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_RGB_RAW
 
         return self.value(0)
 
-    def green(self, set_mode=True):
+    @property
+    def green(self):
         """
         Green component of the detected color, in the range 0-1020.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_RGB_RAW
 
         return self.value(1)
 
-    def blue(self, set_mode=True):
+    @property
+    def blue(self):
         """
         Blue component of the detected color, in the range 0-1020.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_RGB_RAW
 
         return self.value(2)
@@ -1765,6 +1775,7 @@ class UltrasonicSensor(Sensor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(UltrasonicSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-us', 'lego-nxt-us'], **kwargs)
+        self.auto_mode = True
 
 
     # Continuous measurement in centimeters.
@@ -1783,35 +1794,38 @@ class UltrasonicSensor(Sensor):
     MODE_US_SI_IN = 'US-SI-IN'
 
 
-    def distance_centimeters(self, set_mode=True):
+    @property
+    def distance_centimeters(self):
         """
         Measurement of the distance detected by the sensor,
         in centimeters.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_US_DIST_CM
 
         return self.value(0)
 
-    def distance_inches(self, set_mode=True):
+    @property
+    def distance_inches(self):
         """
         Measurement of the distance detected by the sensor,
         in inches.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_US_DIST_IN
 
         return self.value(0)
 
-    def other_sensor_present(self, set_mode=True):
+    @property
+    def other_sensor_present(self):
         """
         Value indicating whether another ultrasonic sensor could
         be heard nearby.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_US_LISTEN
 
         return self.value(0)
@@ -1827,6 +1841,7 @@ class GyroSensor(Sensor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(GyroSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-gyro'], **kwargs)
+        self.auto_mode = True
 
 
     # Angle
@@ -1845,33 +1860,36 @@ class GyroSensor(Sensor):
     MODE_GYRO_CAL = 'GYRO-CAL'
 
 
-    def angle(self, set_mode=True):
+    @property
+    def angle(self):
         """
         The number of degrees that the sensor has been rotated
         since it was put into this mode.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_GYRO_ANG
 
         return self.value(0)
 
-    def rate(self, set_mode=True):
+    @property
+    def rate(self):
         """
         The rate at which the sensor is rotating, in degrees/second.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_GYRO_RATE
 
         return self.value(0)
 
-    def rate_and_angle(self, set_mode=True):
+    @property
+    def rate_and_angle(self):
         """
         Angle (degrees) and Rotational Speed (degrees/second).
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_GYRO_G_A
 
         return self.value(0), self.value(1)
@@ -1887,6 +1905,7 @@ class InfraredSensor(Sensor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
+        self.auto_mode = True
 
 
     # Proximity
@@ -1905,13 +1924,14 @@ class InfraredSensor(Sensor):
     MODE_IR_CAL = 'IR-CAL'
 
 
-    def proximity(self, set_mode=True):
+    @property
+    def proximity(self):
         """
         A measurement of the distance between the sensor and the remote,
         as a percentage. 100% is approximately 70cm/27in.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_IR_PROX
 
         return self.value(0)
@@ -1927,6 +1947,7 @@ class SoundSensor(Sensor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(SoundSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-nxt-sound'], **kwargs)
+        self.auto_mode = True
 
 
     # Sound pressure level. Flat weighting
@@ -1936,24 +1957,26 @@ class SoundSensor(Sensor):
     MODE_DBA = 'DBA'
 
 
-    def sound_pressure(self, set_mode=True):
+    @property
+    def sound_pressure(self):
         """
         A measurement of the measured sound pressure level, as a
         percent. Uses a flat weighting.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_DB
 
         return self.value(0)
 
-    def sound_pressure_low(self, set_mode=True):
+    @property
+    def sound_pressure_low(self):
         """
         A measurement of the measured sound pressure level, as a
         percent. Uses A-weighting, which focuses on levels up to 55 dB.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_DBA
 
         return self.value(0)
@@ -1969,6 +1992,7 @@ class LightSensor(Sensor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(LightSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-nxt-light'], **kwargs)
+        self.auto_mode = True
 
 
     # Reflected light. LED on
@@ -1978,22 +2002,24 @@ class LightSensor(Sensor):
     MODE_AMBIENT = 'AMBIENT'
 
 
-    def reflected_light_intensity(self, set_mode=True):
+    @property
+    def reflected_light_intensity(self):
         """
         A measurement of the reflected light intensity, as a percentage.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_REFLECT
 
         return self.value(0)
 
-    def ambient_light_intensity(self, set_mode=True):
+    @property
+    def ambient_light_intensity(self):
         """
         A measurement of the ambient light intensity, as a percentage.
         """
 
-        if set_mode:
+        if self.auto_mode:
             self.mode = self.MODE_AMBIENT
 
         return self.value(0)
