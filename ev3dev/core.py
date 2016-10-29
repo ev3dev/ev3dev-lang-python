@@ -810,7 +810,7 @@ class Motor(Device):
 
 # ~autogen
 
-    def wait(self, cond, hold_for=0.1, timeout=None):
+    def wait(self, cond, hold_for=100, timeout=None):
         """
         Blocks until ``cond(self.state)`` is ``True`` for at least ``hold_for``
         milliseconds.  The condition is checked when there is an I/O event
@@ -853,7 +853,7 @@ class Motor(Device):
         """
         self.wait(lambda state: s in state, hold_for, timeout)
 
-    def wait_while(self, s, hold_for=0.1, timeout=None):
+    def wait_while(self, s, hold_for=100, timeout=None):
         """
         Blocks until ``s`` is not in ``self.state`` for at least ``hold_for``
         milliseconds.  The condition is checked when there is an I/O event
