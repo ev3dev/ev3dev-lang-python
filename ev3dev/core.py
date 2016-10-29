@@ -813,9 +813,9 @@ class Motor(Device):
     def wait(self, cond, hold_for=0.1, timeout=None):
         """
         Blocks until ``cond(self.state)`` is ``True`` for at least ``hold_for``
-        seconds.  The condition is checked when there is an I/O event related
-        to the ``state`` attribute.  Exits early when ``timeout`` (in seconds)
-        is reached.
+        milliseconds.  The condition is checked when there is an I/O event
+        related to the ``state`` attribute.  Exits early when ``timeout`` (in
+        milliseconds) is reached.
         """
 
         tic = time.time()
@@ -828,23 +828,23 @@ class Motor(Device):
 
         while True:
             # wait for an event
-            for _ in self._poll.poll(None if timeout is None else timeout * 1000):
-                if timeout is not None and time.time() >= tic + timeout:
+            for _ in self._poll.poll(None if timeout is None else timeout):
+                if timeout is not None and time.time() >= tic + timeout / 1000:
                     return
                 if cond(self.state):
                     if hold_for is None:
                         return
                     else:
-                        time.sleep(hold_for)
+                        time.sleep(hold_for / 1000)
                         if cond(self.state): return
 
 
-    def wait_until(self, s, hold_for=0.1, timeout=None):
+    def wait_until(self, s, hold_for=100, timeout=None):
         """
         Blocks until ``s`` is in ``self.state`` for at least ``hold_for``
-        seconds.  The condition is checked when there is an I/O event related
-        to the ``state`` attribute.  Exits early when ``timeout`` (in seconds)
-        is reached.
+        milliseconds.  The condition is checked when there is an I/O event
+        related to the ``state`` attribute.  Exits early when ``timeout`` (in
+        milliseconds) is reached.
 
         Example::
 
@@ -855,9 +855,9 @@ class Motor(Device):
     def wait_while(self, s, hold_for=0.1, timeout=None):
         """
         Blocks until ``s`` is not in ``self.state`` for at least ``hold_for``
-        seconds.  The condition is checked when there is an I/O event related
-        to the ``state`` attribute.  Exits early when ``timeout`` (in seconds)
-        is reached.
+        milliseconds.  The condition is checked when there is an I/O event
+        related to the ``state`` attribute.  Exits early when ``timeout`` (in
+        milliseconds) is reached.
 
         Example::
 
