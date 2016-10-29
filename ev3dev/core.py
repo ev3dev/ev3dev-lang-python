@@ -816,6 +816,9 @@ class Motor(Device):
         milliseconds.  The condition is checked when there is an I/O event
         related to the ``state`` attribute.  Exits early when ``timeout`` (in
         milliseconds) is reached.
+
+        Returns ``True`` if the condition is met, and ``False`` if the timeout
+        is reached.
         """
 
         tic = time.time()
@@ -830,14 +833,14 @@ class Motor(Device):
             self._poll.poll(None if timeout is None else timeout)
 
             if timeout is not None and time.time() >= tic + timeout / 1000:
-                return
+                return False
 
             if cond(self.state):
                 if hold_for is None:
-                    return
+                    return True
                 else:
                     time.sleep(hold_for / 1000)
-                    if cond(self.state): return
+                    if cond(self.state): return True
 
 
     def wait_until(self, s, hold_for=100, timeout=None):
@@ -847,11 +850,14 @@ class Motor(Device):
         related to the ``state`` attribute.  Exits early when ``timeout`` (in
         milliseconds) is reached.
 
+        Returns ``True`` if the condition is met, and ``False`` if the timeout
+        is reached.
+
         Example::
 
             m.wait_until('stalled')
         """
-        self.wait(lambda state: s in state, hold_for, timeout)
+        return self.wait(lambda state: s in state, hold_for, timeout)
 
     def wait_while(self, s, hold_for=100, timeout=None):
         """
@@ -860,11 +866,14 @@ class Motor(Device):
         related to the ``state`` attribute.  Exits early when ``timeout`` (in
         milliseconds) is reached.
 
+        Returns ``True`` if the condition is met, and ``False`` if the timeout
+        is reached.
+
         Example::
 
             m.wait_while('running')
         """
-        self.wait(lambda state: s not in state, hold_for, timeout)
+        return self.wait(lambda state: s not in state, hold_for, timeout)
 
 def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     """
