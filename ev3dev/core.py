@@ -827,16 +827,17 @@ class Motor(Device):
             self._poll.register(self._state, select.POLLPRI)
 
         while True:
-            # wait for an event
-            for _ in self._poll.poll(None if timeout is None else timeout):
-                if timeout is not None and time.time() >= tic + timeout / 1000:
+            self._poll.poll(None if timeout is None else timeout)
+
+            if timeout is not None and time.time() >= tic + timeout / 1000:
+                return
+
+            if cond(self.state):
+                if hold_for is None:
                     return
-                if cond(self.state):
-                    if hold_for is None:
-                        return
-                    else:
-                        time.sleep(hold_for / 1000)
-                        if cond(self.state): return
+                else:
+                    time.sleep(hold_for / 1000)
+                    if cond(self.state): return
 
 
     def wait_until(self, s, hold_for=100, timeout=None):
