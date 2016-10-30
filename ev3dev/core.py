@@ -750,7 +750,7 @@ class Motor(Device):
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
-        self.command = 'run-forever'
+        self.command = self.COMMAND_RUN_FOREVER
 
     def run_to_abs_pos(self, **kwargs):
         """Run to an absolute position specified by `position_sp` and then
@@ -758,7 +758,7 @@ class Motor(Device):
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
-        self.command = 'run-to-abs-pos'
+        self.command = self.COMMAND_RUN_TO_ABS_POS
 
     def run_to_rel_pos(self, **kwargs):
         """Run to a position relative to the current `position` value.
@@ -768,7 +768,7 @@ class Motor(Device):
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
-        self.command = 'run-to-rel-pos'
+        self.command = self.COMMAND_RUN_TO_REL_POS
 
     def run_timed(self, **kwargs):
         """Run the motor for the amount of time specified in `time_sp`
@@ -776,7 +776,7 @@ class Motor(Device):
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
-        self.command = 'run-timed'
+        self.command = self.COMMAND_RUN_TIMED
 
     def run_direct(self, **kwargs):
         """Run the motor at the duty cycle specified by `duty_cycle_sp`.
@@ -785,7 +785,7 @@ class Motor(Device):
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
-        self.command = 'run-direct'
+        self.command = self.COMMAND_RUN_DIRECT
 
     def stop(self, **kwargs):
         """Stop any of the run commands before they are complete using the
@@ -793,7 +793,7 @@ class Motor(Device):
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
-        self.command = 'stop'
+        self.command = self.COMMAND_STOP
 
     def reset(self, **kwargs):
         """Reset all of the motor parameter attributes to their default value.
@@ -801,7 +801,7 @@ class Motor(Device):
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
-        self.command = 'reset'
+        self.command = self.COMMAND_RESET
 
 
 # ~autogen
@@ -1123,7 +1123,7 @@ class DcMotor(Device):
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
-        self.command = 'run-forever'
+        self.command = self.COMMAND_RUN_FOREVER
 
     def run_timed(self, **kwargs):
         """Run the motor for the amount of time specified in `time_sp`
@@ -1131,7 +1131,7 @@ class DcMotor(Device):
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
-        self.command = 'run-timed'
+        self.command = self.COMMAND_RUN_TIMED
 
     def run_direct(self, **kwargs):
         """Run the motor at the duty cycle specified by `duty_cycle_sp`.
@@ -1140,7 +1140,7 @@ class DcMotor(Device):
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
-        self.command = 'run-direct'
+        self.command = self.COMMAND_RUN_DIRECT
 
     def stop(self, **kwargs):
         """Stop any of the run commands before they are complete using the
@@ -1148,7 +1148,7 @@ class DcMotor(Device):
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
-        self.command = 'stop'
+        self.command = self.COMMAND_STOP
 
 
 # ~autogen
@@ -1346,14 +1346,14 @@ class ServoMotor(Device):
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
-        self.command = 'run'
+        self.command = self.COMMAND_RUN
 
     def float(self, **kwargs):
         """Remove power from the motor.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
-        self.command = 'float'
+        self.command = self.COMMAND_FLOAT
 
 
 # ~autogen
