@@ -46,6 +46,8 @@ import mmap
 import ctypes
 import re
 import stat
+import select
+import time
 from os.path import abspath
 from struct import pack, unpack
 from subprocess import Popen
@@ -313,6 +315,8 @@ class Motor(Device):
         self._time_sp = None
 
 # ~autogen
+
+        self._poll = None
 
 # ~autogen generic-get-set classes.motor>currentClass
 
@@ -805,6 +809,64 @@ class Motor(Device):
 
 
 # ~autogen
+
+    def wait(self, cond, timeout=None):
+        """
+        Blocks until ``cond(self.state)`` is ``True``.  The condition is
+        checked when there is an I/O event related to the ``state`` attribute.
+        Exits early when ``timeout`` (in milliseconds) is reached.
+
+        Returns ``True`` if the condition is met, and ``False`` if the timeout
+        is reached.
+        """
+
+        tic = time.time()
+
+        if self._poll is None:
+            if self._state is None:
+                self._state = self._attribute_file_open('state')
+            self._poll = select.poll()
+            self._poll.register(self._state, select.POLLPRI)
+
+        while True:
+            self._poll.poll(None if timeout is None else timeout)
+
+            if timeout is not None and time.time() >= tic + timeout / 1000:
+                return False
+
+            if cond(self.state):
+                return True
+
+
+    def wait_until(self, s, timeout=None):
+        """
+        Blocks until ``s`` is in ``self.state``.  The condition is checked when
+        there is an I/O event related to the ``state`` attribute.  Exits early
+        when ``timeout`` (in milliseconds) is reached.
+
+        Returns ``True`` if the condition is met, and ``False`` if the timeout
+        is reached.
+
+        Example::
+
+            m.wait_until('stalled')
+        """
+        return self.wait(lambda state: s in state, timeout)
+
+    def wait_while(self, s, timeout=None):
+        """
+        Blocks until ``s`` is not in ``self.state``.  The condition is checked
+        when there is an I/O event related to the ``state`` attribute.  Exits
+        early when ``timeout`` (in milliseconds) is reached.
+
+        Returns ``True`` if the condition is met, and ``False`` if the timeout
+        is reached.
+
+        Example::
+
+            m.wait_while('running')
+        """
+        return self.wait(lambda state: s not in state, timeout)
 
 def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     """
