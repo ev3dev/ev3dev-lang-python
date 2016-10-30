@@ -810,12 +810,11 @@ class Motor(Device):
 
 # ~autogen
 
-    def wait(self, cond, hold_for=100, timeout=None):
+    def wait(self, cond, timeout=None):
         """
-        Blocks until ``cond(self.state)`` is ``True`` for at least ``hold_for``
-        milliseconds.  The condition is checked when there is an I/O event
-        related to the ``state`` attribute.  Exits early when ``timeout`` (in
-        milliseconds) is reached.
+        Blocks until ``cond(self.state)`` is ``True``.  The condition is
+        checked when there is an I/O event related to the ``state`` attribute.
+        Exits early when ``timeout`` (in milliseconds) is reached.
 
         Returns ``True`` if the condition is met, and ``False`` if the timeout
         is reached.
@@ -836,19 +835,14 @@ class Motor(Device):
                 return False
 
             if cond(self.state):
-                if hold_for is None:
-                    return True
-                else:
-                    time.sleep(hold_for / 1000)
-                    if cond(self.state): return True
+                return True
 
 
-    def wait_until(self, s, hold_for=100, timeout=None):
+    def wait_until(self, s, timeout=None):
         """
-        Blocks until ``s`` is in ``self.state`` for at least ``hold_for``
-        milliseconds.  The condition is checked when there is an I/O event
-        related to the ``state`` attribute.  Exits early when ``timeout`` (in
-        milliseconds) is reached.
+        Blocks until ``s`` is in ``self.state``.  The condition is checked when
+        there is an I/O event related to the ``state`` attribute.  Exits early
+        when ``timeout`` (in milliseconds) is reached.
 
         Returns ``True`` if the condition is met, and ``False`` if the timeout
         is reached.
@@ -857,14 +851,13 @@ class Motor(Device):
 
             m.wait_until('stalled')
         """
-        return self.wait(lambda state: s in state, hold_for, timeout)
+        return self.wait(lambda state: s in state, timeout)
 
-    def wait_while(self, s, hold_for=100, timeout=None):
+    def wait_while(self, s, timeout=None):
         """
-        Blocks until ``s`` is not in ``self.state`` for at least ``hold_for``
-        milliseconds.  The condition is checked when there is an I/O event
-        related to the ``state`` attribute.  Exits early when ``timeout`` (in
-        milliseconds) is reached.
+        Blocks until ``s`` is not in ``self.state``.  The condition is checked
+        when there is an I/O event related to the ``state`` attribute.  Exits
+        early when ``timeout`` (in milliseconds) is reached.
 
         Returns ``True`` if the condition is met, and ``False`` if the timeout
         is reached.
@@ -873,7 +866,7 @@ class Motor(Device):
 
             m.wait_while('running')
         """
-        return self.wait(lambda state: s not in state, hold_for, timeout)
+        return self.wait(lambda state: s not in state, timeout)
 
 def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     """
