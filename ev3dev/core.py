@@ -2146,6 +2146,8 @@ class Led(Device):
         self._triggers, value = self.get_attr_set(self._triggers, 'trigger')
         return value
 
+# ~autogen
+
     @property
     def trigger(self):
         """
@@ -2171,6 +2173,31 @@ class Led(Device):
     def trigger(self, value):
         self._trigger = self.set_attr_string(self._trigger, 'trigger', value)
 
+        # Workaround for ev3dev/ev3dev#225.
+        # When trigger is set to 'timer', we need to wait for 'delay_on' and
+        # 'delay_off' attributes to appear with correct permissions.
+        if value == 'timer':
+            for attr in ('delay_on', 'delay_off'):
+                path = self._path + '/' + attr
+
+                # Make sure the file has been created:
+                for _ in range(5):
+                    if os.path.exists(path):
+                        break
+                    time.sleep(0.2)
+                else:
+                    raise Exception('"{}" attribute has not been created'.format(attr))
+
+                # Make sure the file has correct permissions:
+                for _ in range(5):
+                    mode = stat.S_IMODE(os.stat(path)[stat.ST_MODE])
+                    if mode & stat.S_IRGRP and mode & stat.S_IWGRP:
+                        break
+                    time.sleep(0.2)
+                else:
+                    raise Exception('"{}" attribute has wrong permissions'.format(attr))
+
+
     @property
     def delay_on(self):
         """
@@ -2178,12 +2205,38 @@ class Led(Device):
         0 and the current brightness setting. The `on` time can
         be specified via `delay_on` attribute in milliseconds.
         """
-        self._delay_on, value = self.get_attr_int(self._delay_on, 'delay_on')
-        return value
+
+        # Workaround for ev3dev/ev3dev#225.
+        # 'delay_on' and 'delay_off' attributes are created when trigger is set
+        # to 'timer', and destroyed when it is set to anything else.
+        # This means the file cache may become outdated, and we may have to
+        # reopen the file.
+        for retry in (True, False):
+            try:
+                self._delay_on, value = self.get_attr_int(self._delay_on, 'delay_on')
+                return value
+            except OSError:
+                if retry:
+                    self._delay_on = None
+                else:
+                    raise
 
     @delay_on.setter
     def delay_on(self, value):
-        self._delay_on = self.set_attr_int(self._delay_on, 'delay_on', value)
+        # Workaround for ev3dev/ev3dev#225.
+        # 'delay_on' and 'delay_off' attributes are created when trigger is set
+        # to 'timer', and destroyed when it is set to anything else.
+        # This means the file cache may become outdated, and we may have to
+        # reopen the file.
+        for retry in (True, False):
+            try:
+                self._delay_on = self.set_attr_int(self._delay_on, 'delay_on', value)
+                return
+            except OSError:
+                if retry:
+                    self._delay_on = None
+                else:
+                    raise
 
     @property
     def delay_off(self):
@@ -2192,15 +2245,39 @@ class Led(Device):
         0 and the current brightness setting. The `off` time can
         be specified via `delay_off` attribute in milliseconds.
         """
-        self._delay_off, value = self.get_attr_int(self._delay_off, 'delay_off')
-        return value
+
+        # Workaround for ev3dev/ev3dev#225.
+        # 'delay_on' and 'delay_off' attributes are created when trigger is set
+        # to 'timer', and destroyed when it is set to anything else.
+        # This means the file cache may become outdated, and we may have to
+        # reopen the file.
+        for retry in (True, False):
+            try:
+                self._delay_off, value = self.get_attr_int(self._delay_off, 'delay_off')
+                return value
+            except OSError:
+                if retry:
+                    self._delay_off = None
+                else:
+                    raise
 
     @delay_off.setter
     def delay_off(self, value):
-        self._delay_off = self.set_attr_int(self._delay_off, 'delay_off', value)
+        # Workaround for ev3dev/ev3dev#225.
+        # 'delay_on' and 'delay_off' attributes are created when trigger is set
+        # to 'timer', and destroyed when it is set to anything else.
+        # This means the file cache may become outdated, and we may have to
+        # reopen the file.
+        for retry in (True, False):
+            try:
+                self._delay_off = self.set_attr_int(self._delay_off, 'delay_off', value)
+                return
+            except OSError:
+                if retry:
+                    self._delay_off = None
+                else:
+                    raise
 
-
-# ~autogen
 
     @property
     def brightness_pct(self):
