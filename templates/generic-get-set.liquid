@@ -1,6 +1,7 @@
 {% assign class_name = currentClass.friendlyName | downcase | underscore_spaces %}{%
 for prop in currentClass.systemProperties %}{%
   assign prop_name = prop.name | downcase | underscore_spaces %}{%
+  if class_name != 'led' or prop_name != 'trigger' and prop_name != 'delay_on' and prop_name != 'delay_off' %}{%
   assign getter = prop.type %}{%
   assign setter = prop.type %}{%
   if prop.type == 'string array' %}{%
@@ -32,5 +33,6 @@ for prop in currentClass.systemProperties %}{%
         self._{{ prop_name }} = self.set_attr_{{ setter }}(self._{{ prop_name }}, '{{prop.systemName}}', value){%
 endif%}{% unless forloop.last %}
 {% endunless %}{%
+endif %}{%
 endfor %}
 
