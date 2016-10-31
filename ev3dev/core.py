@@ -2211,12 +2211,12 @@ class Led(Device):
         # to 'timer', and destroyed when it is set to anything else.
         # This means the file cache may become outdated, and we may have to
         # reopen the file.
-        for i in range(2):
+        for retry in (True, False):
             try:
                 self._delay_on, value = self.get_attr_int(self._delay_on, 'delay_on')
                 return value
             except OSError:
-                if i == 0:
+                if retry:
                     self._delay_on = None
                 else:
                     raise
@@ -2228,12 +2228,12 @@ class Led(Device):
         # to 'timer', and destroyed when it is set to anything else.
         # This means the file cache may become outdated, and we may have to
         # reopen the file.
-        for i in range(2):
+        for retry in (True, False):
             try:
                 self._delay_on = self.set_attr_int(self._delay_on, 'delay_on', value)
                 return
             except OSError:
-                if i == 0:
+                if retry:
                     self._delay_on = None
                 else:
                     raise
@@ -2251,12 +2251,12 @@ class Led(Device):
         # to 'timer', and destroyed when it is set to anything else.
         # This means the file cache may become outdated, and we may have to
         # reopen the file.
-        for i in range(2):
+        for retry in (True, False):
             try:
                 self._delay_off, value = self.get_attr_int(self._delay_off, 'delay_off')
                 return value
             except OSError:
-                if i == 0:
+                if retry:
                     self._delay_off = None
                 else:
                     raise
@@ -2268,12 +2268,12 @@ class Led(Device):
         # to 'timer', and destroyed when it is set to anything else.
         # This means the file cache may become outdated, and we may have to
         # reopen the file.
-        for i in range(2):
+        for retry in (True, False):
             try:
                 self._delay_off = self.set_attr_int(self._delay_off, 'delay_off', value)
                 return
             except OSError:
-                if i == 0:
+                if retry:
                     self._delay_off = None
                 else:
                     raise
