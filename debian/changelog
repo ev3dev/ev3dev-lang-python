@@ -12,7 +12,8 @@ python-ev3dev (0.8.0) stable; urgency=medium
   * Provide waiting functions for motors.
   * Make implementation of Led timer-based trigger more robust.
 
- --
+ -- Denis Demidov <dennis.demidov@gmail.com>  Thu, 03 Nov 2016 19:18:49 +0300
+
 python-ev3dev (0.7.0) stable; urgency=medium
 
   [Denis Demidov]
