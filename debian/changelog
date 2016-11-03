@@ -1,5 +1,5 @@
 python-ev3dev (0.8.0) stable; urgency=medium
-  
+
   [Denis Demidov]
   * Add option to not set mode before reading sensor value
   * Return a tuple for multiple values from a sensor property
@@ -7,6 +7,10 @@ python-ev3dev (0.8.0) stable; urgency=medium
   * Merge NXTMotor functionality into LargeMotor class and remove NXTMotor
   * Distribute fonts from xfonts-75dpi in PIL format and expose them in
     code
+  * Replace special sensor methods with properties for the sake of consistency
+    (breaking change!)
+  * Provide waiting functions for motors.
+  * Make implementation of Led timer-based trigger more robust.
 
  --
 python-ev3dev (0.7.0) stable; urgency=medium
