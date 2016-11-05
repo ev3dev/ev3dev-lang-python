@@ -1,8 +1,7 @@
-Frequently-Asked Questions
+requently-Asked Questions
 ==========================
 
-When I try to run my Python file from the shell or Brickman,
-it throws errors or exits immediately
+When I try to run my Python file from the shell or Brickman, it throws errors or exits immediately
 -----
 
 This may occur if your file includes Windows-style line endings, which are often
