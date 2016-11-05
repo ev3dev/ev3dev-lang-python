@@ -92,6 +92,8 @@ The units for ``speed_sp`` that you see above are in "tacho ticks" per second.
 On the large EV3 motor, these equate to one tick per degree, so this is 500
 degress per second.
 
+
+
 Using text-to-speech
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -138,6 +140,10 @@ ev3python.com
     with detailed guides on using this library which are targeted at beginners.
     If you are just getting started with programming, we highly recommend
     that you check it out at `ev3python.com`!
+
+Frequently-Asked Questions
+    Experiencing an odd error or unsure of how to do something that seems
+    simple? Check our our `FAQ`_ to see if there's an existing answer.
 
 ev3dev.org
     `ev3dev.org`_ is a great resource for finding guides and tutorials on
@@ -212,6 +218,7 @@ Python 3 and this is the only version that will be supported from here forward.
 .. _our Read the Docs page: http://python-ev3dev.readthedocs.org/en/latest/
 .. _source repository for the generic API: ev3dev-lang_
 .. _ev3python.com: http://ev3python.com/
+.. _FAQ: http://python-ev3dev.readthedocs.io/en/latest/faq.html
 .. _ev3dev-lang: https://github.com/ev3dev/ev3dev-lang
 .. _ev3dev-lang-python: https://github.com/rhempel/ev3dev-lang-python
 .. _our Issues tracker: https://github.com/rhempel/ev3dev-lang-python/issues

@@ -1,4 +1,4 @@
-requently-Asked Questions
+Frequently-Asked Questions
 ==========================
 
 My script works when launched as ``python3 script.py`` but exits immediately or throws an error when launched from Brickman or as ``./script.py``
