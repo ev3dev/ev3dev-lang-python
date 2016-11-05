@@ -10,7 +10,7 @@ inserted by editors on Windows. To resolve this issue, open an SSH session and
 run the following command, replacing ``<file>`` with the name of the Python file
 you're using:
 
-.. code::
+.. code:: shell
 
     sed -i 's/\r//g' <file>
 
