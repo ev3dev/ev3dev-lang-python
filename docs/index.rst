@@ -12,6 +12,7 @@
 
    spec
    rpyc
+   faq
 
 Indices and tables
 ==================
