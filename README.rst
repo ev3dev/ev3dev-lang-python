@@ -176,7 +176,7 @@ to type the password (the default is ``maker``) when prompted.
 .. code-block:: bash
 
    sudo apt-get update
-   sudo apt-get install python3-ev3dev
+   sudo apt-get install --only-upgrade python3-ev3dev
 
 
 Developer Resources
