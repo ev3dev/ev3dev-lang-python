@@ -101,7 +101,7 @@ def turn():
     t = randint(250, 750)
 
     for m, p in zip(motors, power):
-        m.run_timed(speed_sp=p*750, time_sp=t)
+        m.run_timed(speed_sp = p * 750, time_sp = t)
 
     # Wait until both motors are stopped:
     while any(m.state for m in motors):
@@ -111,7 +111,7 @@ def turn():
 start()
 while not btn.any():
 
-    if ts.is_pressed():
+    if ts.is_pressed:
         # We bumped an obstacle.
         # Back away, turn and go in other direction.
         backup()
@@ -120,7 +120,7 @@ while not btn.any():
 
     # Infrared sensor in proximity mode will measure distance to the closest
     # object in front of it.
-    distance = ir.proximity()
+    distance = ir.proximity
 
     if distance > 60:
         # Path is clear, run at full speed.
