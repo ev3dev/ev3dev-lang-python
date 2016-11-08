@@ -66,9 +66,9 @@ def backup():
     Back away from an obstacle.
     """
 
-    # Sound backup alarm. 
+    # Sound backup alarm.
     Sound.tone([(1000, 500, 500)] * 3)
-    
+
     # Turn backup lights on:
     for light in (Leds.LEFT, Leds.RIGHT):
         Leds.set_color(light, Leds.RED)
