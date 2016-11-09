@@ -4,7 +4,7 @@ EV3D4 is designed to look like R2-D2 from Star Wars. There are two options for c
 **Building instructions**: https://www.lego.com/en-us/mindstorms/build-a-robot/ev3d4
 
 ### EV3D4RemoteControl
-If you are using EV3D4RemoteControl the only other file you need from ```demo/EV3D4/``` is EV3D4.py. The other files are only needed by EV3D4WebControl.
+If you are using EV3D4RemoteControl the only other file you need from `demo/EV3D4/` is EV3D4.py. The other files are only needed by EV3D4WebControl.
 
 EV3D4RemoteControl creates a child class of ev3dev/helper.py's RemoteControlledTank.
 
