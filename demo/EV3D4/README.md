@@ -43,5 +43,3 @@ accordingly.
 You can see a demo of the web interface below. Note that the demo is on a
 simple Tank robot, not EV3D4, but that doesn't really matter as EV3D4 is also
 just a Tank robot.
-
-**Demo Video**: https://www.youtube.com/watch?v=x5VauXr7W4A
