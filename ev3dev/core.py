@@ -874,7 +874,7 @@ class Motor(Device):
             immediately after starting the motor even if it is not actually
             being prevented from rotating. As a workaround, we recommend
             sleeping your code for around 100ms after starting a motor if you
-            are going to use this method to wait for it to be ``stalled``. A
+            are going to use this method to wait while it is ``stalled``. A
             fix for this has not yet been released.
 
         Returns ``True`` if the condition is met, and ``False`` if the timeout
