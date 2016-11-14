@@ -48,6 +48,8 @@ assert all([m.connected for m in motors]), \
 ir = InfraredSensor(); assert ir.connected
 ts = TouchSensor();    assert ts.connected
 
+print('Robot Starting')
+
 # We will need to check EV3 buttons state.
 btn = Button()
 
@@ -76,7 +78,7 @@ def backup():
     # until both motors are stopped before continuing.
     for m in motors:
         m.stop(stop_action='brake')
-        m.run_timed(duty_cycle_sp=-50, time_sp=1500)
+        m.run_timed(speed_sp=-500, time_sp=1500)
 
     # When motor is stopped, its `state` attribute returns empty list.
     # Wait until both motors are stopped:
@@ -99,7 +101,7 @@ def turn():
     t = randint(250, 750)
 
     for m, p in zip(motors, power):
-        m.run_timed(duty_cycle_sp=p*75, time_sp=t)
+        m.run_timed(speed_sp = p * 750, time_sp = t)
 
     # Wait until both motors are stopped:
     while any(m.state for m in motors):
@@ -122,10 +124,10 @@ while not btn.any():
 
     if distance > 60:
         # Path is clear, run at full speed.
-        dc = 90
+        dc = 95
     else:
         # Obstacle ahead, slow down.
-        dc = 40
+        dc = 30
 
     for m in motors:
         m.duty_cycle_sp = dc
