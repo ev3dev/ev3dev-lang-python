@@ -3048,3 +3048,9 @@ class Sound:
         with open(os.devnull, 'w') as n:
             cmd_line = '/usr/bin/espeak --stdout {0} "{1}" | /usr/bin/aplay -q'.format(espeak_opts, text)
             return Popen(cmd_line, stdout=n, shell=True)
+
+    @staticmethod
+    def set_volume(pct):
+        with open(os.devnull, 'w') as n:
+            cmd_line = '/usr/bin/amixer -q set Playback {0:d}%'.format(pct)
+            return Popen(cmd_line, stdout=n, shell=True)
