@@ -2980,7 +2980,7 @@ class Sound:
     @staticmethod
     def tone(*args):
         """
-        tone(tone_sequence):
+        .. rubric:: tone(tone_sequence)
 
         Play tone sequence. The tone_sequence parameter is a list of tuples,
         where each tuple contains up to three numbers. The first number is
@@ -3011,7 +3011,7 @@ class Sound:
                 (392.00, 300, 150), (311.13, 250, 100), (466.16, 25, 100), (392, 700)
                 ]).wait()
 
-        tone(frequency, duration):
+        .. rubric:: tone(frequency, duration)
 
         Play single tone of given frequency (Hz) and duration (milliseconds).
         """
