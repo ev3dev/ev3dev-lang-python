@@ -3054,7 +3054,7 @@ class Sound:
         """
         Sets the sound volume to the given percentage [0-100] by calling
         ``amixer -q set <channel> <pct>%``.
-        If channel is not specified, it tries to determine the default channel
+        If the channel is not specified, it tries to determine the default one
         by running ``amixer scontrols``. If that fails as well, it uses the
         ``Playback`` channel, as that is the only channel on the EV3.
         """
