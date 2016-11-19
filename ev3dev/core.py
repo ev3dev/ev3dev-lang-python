@@ -2973,7 +2973,7 @@ class Sound:
         See `beep man page`_ and google `linux beep music`_ for inspiration.
 
         .. _`beep man page`: https://linux.die.net/man/1/beep
-        .. _`linux beep music`: https://www.google.ru/search?q=linux+beep+music
+        .. _`linux beep music`: https://www.google.com/search?q=linux+beep+music
         """
         with open(os.devnull, 'w') as n:
             return Popen('/usr/bin/beep %s' % args, stdout=n, shell=True)
