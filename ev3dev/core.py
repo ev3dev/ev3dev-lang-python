@@ -50,7 +50,7 @@ import select
 import time
 from os.path import abspath
 from struct import pack, unpack
-from subprocess import Popen
+from subprocess import Popen, check_output
 
 try:
     # This is a linux-specific module.
@@ -3050,7 +3050,20 @@ class Sound:
             return Popen(cmd_line, stdout=n, shell=True)
 
     @staticmethod
-    def set_volume(pct):
-        with open(os.devnull, 'w') as n:
-            cmd_line = '/usr/bin/amixer -q set Playback {0:d}%'.format(pct)
-            return Popen(cmd_line, stdout=n, shell=True)
+    def set_volume(pct, channel=None):
+        if channel is None:
+            # Get default channel as the first one that pops up in
+            # 'amixer scontrols' output, which contains strings in the
+            # following format:
+            #
+            #     Simple mixer control 'Master',0
+            #     Simple mixer control 'Capture',0
+            out = check_output(['amixer', 'scontrols']).decode()
+            m = re.search("'(?P<channel>[^']+)'", out)
+            if m:
+                channel = m.group('channel')
+            else:
+                channel = 'Playback'
+
+        cmd_line = '/usr/bin/amixer -q set {0} {1:d}%'.format(channel, pct)
+        Popen(cmd_line, shell=True).wait()
