@@ -3051,6 +3051,13 @@ class Sound:
 
     @staticmethod
     def set_volume(pct, channel=None):
+        """
+        Sets the sound volume to the given percentage [0-100] by calling
+        ``amixer -q set <channel> <pct>%``.
+        If channel is not specified, it tries to determine the default channel
+        by running ``amixer scontrols``. If that fails as well, it uses the
+        ``Playback`` channel, as that is the only channel on the EV3.
+        """
         if channel is None:
             # Get default channel as the first one that pops up in
             # 'amixer scontrols' output, which contains strings in the
