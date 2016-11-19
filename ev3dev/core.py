@@ -2970,9 +2970,10 @@ class Sound:
     def beep(args=''):
         """
         Call beep command with the provided arguments (if any).
-        See `beep man page`_ and google 'linux beep music' for inspiration.
+        See `beep man page`_ and google `linux beep music`_ for inspiration.
 
-        .. _`beep man page`: http://manpages.debian.org/cgi-bin/man.cgi?query=beep
+        .. _`beep man page`: https://linux.die.net/man/1/beep
+        .. _`linux beep music`: https://www.google.ru/search?q=linux+beep+music
         """
         with open(os.devnull, 'w') as n:
             return Popen('/usr/bin/beep %s' % args, stdout=n, shell=True)
