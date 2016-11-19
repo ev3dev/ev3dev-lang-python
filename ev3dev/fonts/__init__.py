@@ -19,6 +19,10 @@ def load(name):
     `PIL.ImageFont <http://pillow.readthedocs.io/en/latest/reference/ImageFont.html>`_
     class.
     """
-    pil_file = pkg_resources.resource_filename('ev3dev.fonts', '{}.pil'.format(name))
-    pbm_file = pkg_resources.resource_filename('ev3dev.fonts', '{}.pbm'.format(name))
-    return ImageFont.load(pil_file)
+    try:
+        pil_file = pkg_resources.resource_filename('ev3dev.fonts', '{}.pil'.format(name))
+        pbm_file = pkg_resources.resource_filename('ev3dev.fonts', '{}.pbm'.format(name))
+        return ImageFont.load(pil_file)
+    except FileNotFoundError:
+        raise Exception('Failed to load font "{}". '.format(name) +
+        'Check ev3dev.fonts.available() for the list of available fonts')
