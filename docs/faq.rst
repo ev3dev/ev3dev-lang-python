@@ -2,7 +2,7 @@ Frequently-Asked Questions
 ==========================
 
 My script works when launched as ``python3 script.py`` but exits immediately or throws an error when launched from Brickman or as ``./script.py``
------
+-------------------------------------------------------------------------------------------------------------------------------------------------
 
 This may occur if your file includes Windows-style line endings, which are often
 inserted by editors on Windows. To resolve this issue, open an SSH session and

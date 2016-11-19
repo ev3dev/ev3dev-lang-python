@@ -2956,13 +2956,14 @@ class Sound:
     immediately after child process was spawned, without waiting for its
     completion), but you can call wait() on the returned result.
 
-    Examples:
+    Examples::
 
         # Play 'bark.wav', return immediately:
         Sound.play('bark.wav')
 
         # Introduce yourself, wait for completion:
         Sound.speak('Hello, I am Robot').wait()
+
     """
 
     @staticmethod

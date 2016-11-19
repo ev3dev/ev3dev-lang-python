@@ -198,7 +198,7 @@ The ev3dev-lang Project on GitHub
     would normally need to access this information.
 
 Python 2.x and Python 3.x Compatibility
--------------------------------------
+---------------------------------------
 
 Some versions of the ev3dev_ distribution come with both `Python 2.x`_ and `Python 3.x`_ installed
 but this library is compatible only with Python 3.
