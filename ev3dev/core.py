@@ -65,10 +65,6 @@ OUTPUT_AUTO = ''
 
 # -----------------------------------------------------------------------------
 def list_device_names(class_path, name_pattern, **kwargs):
-
-    if not os.path.isdir(class_path):
-        return
-
     """
     This is a generator function that lists names of all devices matching the
     provided parameters.
@@ -84,6 +80,10 @@ def list_device_names(class_path, name_pattern, **kwargs):
 	    is a list, then a match against any entry of the list is
 	    enough.
     """
+
+    if not os.path.isdir(class_path):
+        return
+
     def matches(attribute, pattern):
         try:
             with io.FileIO(attribute) as f:
