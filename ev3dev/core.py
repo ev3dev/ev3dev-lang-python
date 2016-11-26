@@ -2966,6 +2966,8 @@ class Sound:
 
     """
 
+    channel = None
+
     @staticmethod
     def beep(args=''):
         """
@@ -3052,15 +3054,8 @@ class Sound:
             return Popen(cmd_line, stdout=n, shell=True)
 
     @staticmethod
-    def set_volume(pct, channel=None):
-        """
-        Sets the sound volume to the given percentage [0-100] by calling
-        ``amixer -q set <channel> <pct>%``.
-        If the channel is not specified, it tries to determine the default one
-        by running ``amixer scontrols``. If that fails as well, it uses the
-        ``Playback`` channel, as that is the only channel on the EV3.
-        """
-        if channel is None:
+    def _get_channel():
+        if Sound.channel is None:
             # Get default channel as the first one that pops up in
             # 'amixer scontrols' output, which contains strings in the
             # following format:
@@ -3070,9 +3065,44 @@ class Sound:
             out = check_output(['amixer', 'scontrols']).decode()
             m = re.search("'(?P<channel>[^']+)'", out)
             if m:
-                channel = m.group('channel')
+                Sound.channel = m.group('channel')
             else:
-                channel = 'Playback'
+                Sound.channel = 'Playback'
+
+        return Sound.channel
+
+    @staticmethod
+    def set_volume(pct, channel=None):
+        """
+        Sets the sound volume to the given percentage [0-100] by calling
+        ``amixer -q set <channel> <pct>%``.
+        If the channel is not specified, it tries to determine the default one
+        by running ``amixer scontrols``. If that fails as well, it uses the
+        ``Playback`` channel, as that is the only channel on the EV3.
+        """
+
+        if channel is None:
+            channel = Sound._get_channel()
 
         cmd_line = '/usr/bin/amixer -q set {0} {1:d}%'.format(channel, pct)
         Popen(cmd_line, shell=True).wait()
+
+    @staticmethod
+    def get_volume(channel=None):
+        """
+        Gets the current sound volume by parsing the output of
+        ``amixer get <channel>``.
+        If the channel is not specified, it tries to determine the default one
+        by running ``amixer scontrols``. If that fails as well, it uses the
+        ``Playback`` channel, as that is the only channel on the EV3.
+        """
+
+        if channel is None:
+            channel = Sound._get_channel()
+
+        out = check_output(['amixer', 'get', channel]).decode()
+        m = re.search('\[(?P<volume>\d+)%\]', out)
+        if m:
+            return int(m.group('volume'))
+        else:
+            raise Exception('Failed to parse output of `amixer get {}`'.format(channel))
