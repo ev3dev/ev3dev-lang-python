@@ -1,5 +1,10 @@
 # ev3dev demo programs
 
+This folder contains a bunch of demo programs that you can use to help you in
+developing your own code. Breif descriptions of each demo are provided below;
+you can access the full source code and some more detailed information on each
+by opening the respective folders above.
+
 ### BALANC3R
 
 Laurens Valk's BALANC3R - This robot uses the gyro sensor to balance on two wheels. Use the IR remote to control BALANC3R
