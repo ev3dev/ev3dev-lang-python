@@ -28,7 +28,7 @@ use RPyC with ev3dev:
 
    .. code-block:: shell
 
-      chmod +x rpyc_classic.py
+      chmod +x rpyc_server.sh
 
    Launch the created file either from ssh session, or from brickman.
 
