@@ -9,21 +9,21 @@ processes and computers, so that remote objects can be manipulated as if they
 were local. Here are simple steps you need to follow in order to install and
 use RPyC with ev3dev:
 
-1. Install RPyC both on the EV3 and on your desktop PC. On the EV3 the following
-   command should work:
+1. Install RPyC both on the EV3 and on your desktop PC. For the EV3, enter the
+   following command at the command prompt (after you `connect with SSH`_):
 
    .. code-block:: shell
 
        sudo easy_install3 rpyc
 
-   On the desktop PC, it really depends on your operating system. In case its
+   On the desktop PC, it really depends on your operating system. In case it is
    some flavor of linux, you should be able to do
 
    .. code-block:: shell
 
        sudo pip3 install rpyc
 
-   In case its Windows, there is a win32 installer on the project's
+   In case it is Windows, there is a win32 installer on the project's
    `sourceforge page`_. Also, have a look at the `Download and Install`_ page
    on their site.
 
@@ -40,8 +40,9 @@ use RPyC with ev3dev:
 
       chmod +x rpyc_server.sh
 
-   Launch the created file either from ssh session (with ``./rpyc_server.sh``
-   command), or from brickman. It should output something like
+   Launch the created file either from SSH session (with
+   ``./rpyc_server.sh`` command), or from brickman. It should output something
+   like
 
    .. code-block:: none
 
@@ -83,3 +84,4 @@ This may be a show stopper for robots where reaction speed is essential.
 .. _RPyC: http://rpyc.readthedocs.io/
 .. _sourceforge page: http://sourceforge.net/projects/rpyc/files/main
 .. _Download and Install: http://rpyc.readthedocs.io/en/latest/install.html
+.. _connect with SSH: http://www.ev3dev.org/docs/tutorials/connecting-to-ev3dev-with-ssh/
