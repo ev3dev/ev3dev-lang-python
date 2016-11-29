@@ -9,13 +9,23 @@ processes and computers, so that remote objects can be manipulated as if they
 were local. Here are simple steps you need to follow in order to install and
 use RPyC with ev3dev:
 
-1. Install RPyC both on the EV3 and on your desktop PC with the following
-   command (depending on your operating system, you may need to use ``pip3`` or
-   ``pip`` on the PC instead of ``easy_install3``):
+1. Install RPyC both on the EV3 and on your desktop PC. On the EV3 the following
+   command should work:
 
    .. code-block:: shell
 
        sudo easy_install3 rpyc
+
+   On the desktop PC, it really depends on your operating system. In case its
+   some flavor of linux, you should be able to do
+
+   .. code-block:: shell
+
+       sudo pip3 install rpyc
+
+   In case its Windows, there is a win32 installer on the project's
+   `sourceforge page`_. Also, have a look at the `Download and Install`_ page
+   on their site.
 
 2. Create file ``rpyc_server.sh`` with the following contents on the EV3:
 
@@ -30,9 +40,18 @@ use RPyC with ev3dev:
 
       chmod +x rpyc_server.sh
 
-   Launch the created file either from ssh session, or from brickman.
+   Launch the created file either from ssh session (with ``./rpyc_server.sh``
+   command), or from brickman. It should output something like
 
-3. Now you are ready to connect to the RPyC server from your desktop PC:
+   .. code-block:: none
+
+      INFO:SLAVE/18812:server started on [0.0.0.0]:18812
+
+   and keep running.
+
+3. Now you are ready to connect to the RPyC server from your desktop PC. The
+   following python script should make a large motor connected to output port
+   ``A`` spin for a second.
 
    .. code-block:: py
 
@@ -62,3 +81,5 @@ The most obvious *disadvantage* is latency introduced by network connection.
 This may be a show stopper for robots where reaction speed is essential.
 
 .. _RPyC: http://rpyc.readthedocs.io/
+.. _sourceforge page: http://sourceforge.net/projects/rpyc/files/main
+.. _Download and Install: http://rpyc.readthedocs.io/en/latest/install.html
