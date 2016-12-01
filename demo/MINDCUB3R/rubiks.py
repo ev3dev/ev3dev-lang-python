@@ -3,7 +3,7 @@
 from ev3dev.auto import OUTPUT_A, OUTPUT_B, OUTPUT_C, InfraredSensor
 from ev3dev.helper import LargeMotor, MediumMotor, ColorSensor, MotorStall
 from pprint import pformat
-from rubiks_rgb_solver import RubiksColorSolver
+from rubikscolorresolver import RubiksColorSolver3x3x3
 from subprocess import check_output
 from time import sleep
 import json
@@ -443,7 +443,7 @@ class Rubiks(object):
             return
 
         log.info("RGB json:\n%s\n" % json.dumps(self.colors))
-        self.rgb_solver = RubiksColorSolver()
+        self.rgb_solver = RubiksColorSolver3x3x3()
         self.rgb_solver.enter_scan_data(self.colors)
         self.cube_kociemba = self.rgb_solver.crunch_colors()
         log.info("Final Colors (kociemba): %s" % ''.join(self.cube_kociemba))
@@ -534,7 +534,7 @@ class Rubiks(object):
             if self.shutdown:
                 break
 
-            dist = self.infrared_sensor.proximity()
+            dist = self.infrared_sensor.proximity
 
             # It is odd but sometimes when the cube is inserted
             # the IR sensor returns a value of 100...most of the

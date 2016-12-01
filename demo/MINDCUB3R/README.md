@@ -1,26 +1,13 @@
 # MINDCUB3R
 
 ### Installation
-This can take a minute on an EV3
-* cd ~/ev3dev-lang-python/demo/MINDCUB3R/kociemba/ckociemba/
-* sudo apt-get update
-* sudo apt-get install build-essential
-* make
-* sudo make install
-
-The first time you run this it creates a cache directory, this takes about 30s on an EV3
-
-* cd ~/ev3dev-lang-python/demo/MINDCUB3R/
-* kociemba DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD
-
+This can take several minutes on an EV3
+```
+sudo apt-get install build-essential python3-pip libffi-dev
+sudo pip3 install git+https://github.com/dwalton76/kociemba.git
+sudo pip3 install git+https://github.com/dwalton76/rubiks-color-resolver.git
+kociemba DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD
+```
 
 ### Running
 ./rubiks.py
-
-
-### Credit
-Much of rubiks.py and rubiks_rgb_solver.py were ported from
-https://github.com/cavenel/ev3dev_examples
-
-The kociemba code is from
-https://github.com/muodov/kociemba
