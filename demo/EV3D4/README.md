@@ -3,6 +3,8 @@ EV3D4 is designed to look like R2-D2 from Star Wars. There are two options for
 controlling EV3D4. The first is to use the IR remote to send commands to the IR
 sensor, run EV3D4RemoteControl.py to use this method. The second means of
 controlling EV3D4 is via a web browser, run EV3D4WebControl.py to use this method.
+You can run both of these from the Brickman interface or if logged in via ssh
+you can run them via ./EV3D4RemoteControl.py or ./EV3D4WebControl.py.
 
 **Building instructions**: https://www.lego.com/en-us/mindstorms/build-a-robot/ev3d4
 
