@@ -17,8 +17,8 @@ You may have noticed that the
 `kociemba DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD`
 step of the install looks a little odd. The "DRLUU..." string is a
 representation of the colors of each of the 54 squares of a 3x3x3 cube. So
-the D at the beginning means that square #1 is the same color as the middle
-square of the Down side (the bottom), the R means that square #2 is the same
+the D at the beginning means that square `#1` is the same color as the middle
+square of the Down side (the bottom), the R means that square `#2` is the same
 color as the middle square of the Right side, etc. The kociemba program takes
 that color data and returns a sequence of moves that can be used to solve the
 cube.
