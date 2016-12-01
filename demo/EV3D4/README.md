@@ -1,21 +1,20 @@
 # EV3D4
 EV3D4 is designed to look like R2-D2 from Star Wars. There are two options for
 controlling EV3D4. The first is to use the IR remote to send commands to the IR
-sensor, run EV3D4RemoteControl to use this method. The second means of
-controlling EV3D4 is via a web browser, run EV3D4WebControl to use this method.
+sensor, run EV3D4RemoteControl.py to use this method. The second means of
+controlling EV3D4 is via a web browser, run EV3D4WebControl.py to use this method.
+You can run both of these from the Brickman interface or if logged in via ssh
+you can run them via ./EV3D4RemoteControl.py or ./EV3D4WebControl.py.
 
 **Building instructions**: https://www.lego.com/en-us/mindstorms/build-a-robot/ev3d4
 
 ### EV3D4RemoteControl
-If you are using EV3D4RemoteControl the only other file you need from
-`demo/EV3D4/` is EV3D4.py. The other files are only needed by EV3D4WebControl.
-
-EV3D4RemoteControl creates a child class of ev3dev/helper.py's
+EV3D4RemoteControl.py creates a child class of ev3dev/helper.py's
 RemoteControlledTank.
 
 
 ### EV3D4WebControl
-EV3D4WebControl creates a child class of ev3dev/helper.py's WebControlledTank.
+EV3D4WebControl creates a child class of ev3dev/webserver.py's WebControlledTank.
 The WebControlledTank class runs a web server that serves the web pages,
 images, etc but it also services the AJAX calls made via the client. The user
 loads the initial web page at which point they choose the "Desktop interface"
