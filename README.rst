@@ -126,6 +126,9 @@ for ev3dev. The first allows you to run this program from Brickman, while the
 second imports this library.
 
 When saving Python files, it is best to use the ``.py`` extension, e.g. ``my-file.py``.
+Your program must be executable. To mark a program as executable run `chmod +x my-file.py`
+You can then run ``my-file.py`` via the Brickman File Browser or you can run it from the
+command line via ``$ ./my-file.py``
 
 User Resources
 --------------
