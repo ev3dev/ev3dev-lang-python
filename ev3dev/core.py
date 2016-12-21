@@ -1580,6 +1580,7 @@ class Sensor(Device):
         self._value = [None,None,None,None,None,None,None,None]
 
         self._bin_data_format = None
+        self._bin_data_size = None
         self._bin_data = None
 
     __slots__ = [
@@ -1598,6 +1599,7 @@ class Sensor(Device):
 # ~autogen
     '_value',
     '_bin_data_format',
+    '_bin_data_size',
     '_bin_data',
     ]
 
@@ -1746,7 +1748,7 @@ class Sensor(Device):
             (28,)
         """
 
-        if '_bin_data_size' not in self.__dict__:
+        if self._bin_data_size == None:
             self._bin_data_size = {
                     "u8":     1,
                     "s8":     1,
