@@ -960,6 +960,12 @@ class LargeMotor(Motor):
 
 
 # ~autogen
+    __slots__ = [
+# ~autogen generic-class-slots classes.largeMotor>currentClass
+
+
+# ~autogen
+    ]
 # ~autogen generic-class classes.mediumMotor>currentClass
 
 class MediumMotor(Motor):
@@ -977,6 +983,12 @@ class MediumMotor(Motor):
 
 
 # ~autogen
+    __slots__ = [
+# ~autogen generic-class-slots classes.mediumMotor>currentClass
+
+
+# ~autogen
+    ]
 # ~autogen generic-class classes.actuonix50Motor>currentClass
 
 class ActuonixL1250Motor(Motor):
@@ -994,6 +1006,12 @@ class ActuonixL1250Motor(Motor):
 
 
 # ~autogen
+    __slots__ = [
+# ~autogen generic-class-slots classes.actuonix50Motor>currentClass
+
+
+# ~autogen
+    ]
 # ~autogen generic-class classes.actuonix100Motor>currentClass
 
 class ActuonixL12100Motor(Motor):
@@ -1011,6 +1029,12 @@ class ActuonixL12100Motor(Motor):
 
 
 # ~autogen
+    __slots__ = [
+# ~autogen generic-class-slots classes.actuonix100Motor>currentClass
+
+
+# ~autogen
+    ]
 # ~autogen generic-class classes.dcMotor>currentClass
 
 class DcMotor(Device):
