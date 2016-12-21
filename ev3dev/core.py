@@ -1798,6 +1798,8 @@ class TouchSensor(Sensor):
     Touch Sensor
     """
 
+    __slots__ = ['auto_mode']
+
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
@@ -1827,6 +1829,8 @@ class ColorSensor(Sensor):
     """
     LEGO EV3 color sensor.
     """
+
+    __slots__ = ['auto_mode']
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
@@ -1943,6 +1947,8 @@ class UltrasonicSensor(Sensor):
     LEGO EV3 ultrasonic sensor.
     """
 
+    __slots__ = ['auto_mode']
+
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
@@ -2009,6 +2015,8 @@ class GyroSensor(Sensor):
     LEGO EV3 gyro sensor.
     """
 
+    __slots__ = ['auto_mode']
+
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
@@ -2073,6 +2081,8 @@ class InfraredSensor(Sensor):
     LEGO EV3 infrared sensor.
     """
 
+    __slots__ = ['auto_mode']
+
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
@@ -2114,6 +2124,8 @@ class SoundSensor(Sensor):
     """
     LEGO NXT Sound Sensor
     """
+
+    __slots__ = ['auto_mode']
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
@@ -2159,6 +2171,8 @@ class LightSensor(Sensor):
     """
     LEGO NXT Light Sensor
     """
+
+    __slots__ = ['auto_mode']
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
