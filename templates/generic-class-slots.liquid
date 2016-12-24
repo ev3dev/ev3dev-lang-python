@@ -1,0 +1,4 @@
+{% for prop in currentClass.systemProperties %}{%
+   assign prop_name = prop.name | downcase | underscore_spaces %}
+    '_{{ prop_name }}',{%
+endfor %}

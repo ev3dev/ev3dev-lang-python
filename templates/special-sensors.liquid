@@ -28,6 +28,8 @@ for line in currentClass.description %}{%
 {%  endif %}{%
 endfor %}
     """
+
+    __slots__ = ['auto_mode']
 {% if currentClass.inheritance %}
     SYSTEM_CLASS_NAME = {{ base_class }}.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = {{ base_class }}.SYSTEM_DEVICE_NAME_CONVENTION
