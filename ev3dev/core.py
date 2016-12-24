@@ -108,6 +108,8 @@ def list_device_names(class_path, name_pattern, **kwargs):
 class Device(object):
     """The ev3dev device base class"""
 
+    __slots__ = ['_path', 'connected', '_device_index', 'kwargs']
+
     DEVICE_ROOT_PATH = '/sys/class'
 
     _DEVICE_INDEX = re.compile(r'^.*(?P<idx>\d+)$')
@@ -317,6 +319,41 @@ class Motor(Device):
 # ~autogen
 
         self._poll = None
+
+    __slots__ = [
+# ~autogen generic-class-slots classes.motor>currentClass
+
+    '_address',
+    '_command',
+    '_commands',
+    '_count_per_rot',
+    '_count_per_m',
+    '_driver_name',
+    '_duty_cycle',
+    '_duty_cycle_sp',
+    '_full_travel_count',
+    '_polarity',
+    '_position',
+    '_position_p',
+    '_position_i',
+    '_position_d',
+    '_position_sp',
+    '_max_speed',
+    '_speed',
+    '_speed_sp',
+    '_ramp_up_sp',
+    '_ramp_down_sp',
+    '_speed_p',
+    '_speed_i',
+    '_speed_d',
+    '_state',
+    '_stop_action',
+    '_stop_actions',
+    '_time_sp',
+
+# ~autogen
+    '_poll',
+    ]
 
 # ~autogen generic-get-set classes.motor>currentClass
 
@@ -923,6 +960,12 @@ class LargeMotor(Motor):
 
 
 # ~autogen
+    __slots__ = [
+# ~autogen generic-class-slots classes.largeMotor>currentClass
+
+
+# ~autogen
+    ]
 # ~autogen generic-class classes.mediumMotor>currentClass
 
 class MediumMotor(Motor):
@@ -940,6 +983,12 @@ class MediumMotor(Motor):
 
 
 # ~autogen
+    __slots__ = [
+# ~autogen generic-class-slots classes.mediumMotor>currentClass
+
+
+# ~autogen
+    ]
 # ~autogen generic-class classes.actuonix50Motor>currentClass
 
 class ActuonixL1250Motor(Motor):
@@ -957,6 +1006,12 @@ class ActuonixL1250Motor(Motor):
 
 
 # ~autogen
+    __slots__ = [
+# ~autogen generic-class-slots classes.actuonix50Motor>currentClass
+
+
+# ~autogen
+    ]
 # ~autogen generic-class classes.actuonix100Motor>currentClass
 
 class ActuonixL12100Motor(Motor):
@@ -974,6 +1029,12 @@ class ActuonixL12100Motor(Motor):
 
 
 # ~autogen
+    __slots__ = [
+# ~autogen generic-class-slots classes.actuonix100Motor>currentClass
+
+
+# ~autogen
+    ]
 # ~autogen generic-class classes.dcMotor>currentClass
 
 class DcMotor(Device):
@@ -1008,6 +1069,26 @@ class DcMotor(Device):
         self._time_sp = None
 
 # ~autogen
+
+    __slots__ = [
+# ~autogen generic-class-slots classes.dcMotor>currentClass
+
+    '_address',
+    '_command',
+    '_commands',
+    '_driver_name',
+    '_duty_cycle',
+    '_duty_cycle_sp',
+    '_polarity',
+    '_ramp_down_sp',
+    '_ramp_up_sp',
+    '_state',
+    '_stop_action',
+    '_stop_actions',
+    '_time_sp',
+
+# ~autogen
+    ]
 
 # ~autogen generic-get-set classes.dcMotor>currentClass
 
@@ -1263,6 +1344,23 @@ class ServoMotor(Device):
 
 # ~autogen
 
+    __slots__ = [
+# ~autogen generic-class-slots classes.servoMotor>currentClass
+
+    '_address',
+    '_command',
+    '_driver_name',
+    '_max_pulse_sp',
+    '_mid_pulse_sp',
+    '_min_pulse_sp',
+    '_polarity',
+    '_position_sp',
+    '_rate_sp',
+    '_state',
+
+# ~autogen
+    ]
+
 # ~autogen generic-get-set classes.servoMotor>currentClass
 
     @property
@@ -1482,7 +1580,28 @@ class Sensor(Device):
         self._value = [None,None,None,None,None,None,None,None]
 
         self._bin_data_format = None
+        self._bin_data_size = None
         self._bin_data = None
+
+    __slots__ = [
+# ~autogen generic-class-slots classes.sensor>currentClass
+
+    '_address',
+    '_command',
+    '_commands',
+    '_decimals',
+    '_driver_name',
+    '_mode',
+    '_modes',
+    '_num_values',
+    '_units',
+
+# ~autogen
+    '_value',
+    '_bin_data_format',
+    '_bin_data_size',
+    '_bin_data',
+    ]
 
 # ~autogen generic-get-set classes.sensor>currentClass
 
@@ -1629,7 +1748,7 @@ class Sensor(Device):
             (28,)
         """
 
-        if '_bin_data_size' not in self.__dict__:
+        if self._bin_data_size == None:
             self._bin_data_size = {
                     "u8":     1,
                     "s8":     1,
@@ -1705,6 +1824,8 @@ class TouchSensor(Sensor):
     Touch Sensor
     """
 
+    __slots__ = ['auto_mode']
+
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
@@ -1734,6 +1855,8 @@ class ColorSensor(Sensor):
     """
     LEGO EV3 color sensor.
     """
+
+    __slots__ = ['auto_mode']
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
@@ -1850,6 +1973,8 @@ class UltrasonicSensor(Sensor):
     LEGO EV3 ultrasonic sensor.
     """
 
+    __slots__ = ['auto_mode']
+
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
@@ -1916,6 +2041,8 @@ class GyroSensor(Sensor):
     LEGO EV3 gyro sensor.
     """
 
+    __slots__ = ['auto_mode']
+
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
@@ -1980,6 +2107,8 @@ class InfraredSensor(Sensor):
     LEGO EV3 infrared sensor.
     """
 
+    __slots__ = ['auto_mode']
+
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
@@ -2021,6 +2150,8 @@ class SoundSensor(Sensor):
     """
     LEGO NXT Sound Sensor
     """
+
+    __slots__ = ['auto_mode']
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
@@ -2066,6 +2197,8 @@ class LightSensor(Sensor):
     """
     LEGO NXT Light Sensor
     """
+
+    __slots__ = ['auto_mode']
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
@@ -2134,6 +2267,20 @@ class Led(Device):
         self._delay_off = None
 
 # ~autogen
+
+    __slots__ = [
+# ~autogen generic-class-slots classes.led>currentClass
+
+    '_max_brightness',
+    '_brightness',
+    '_triggers',
+    '_trigger',
+    '_delay_on',
+    '_delay_off',
+
+# ~autogen
+    ]
+
 # ~autogen generic-get-set classes.led>currentClass
 
     @property
@@ -2163,6 +2310,8 @@ class Led(Device):
         """
         self._triggers, value = self.get_attr_set(self._triggers, 'trigger')
         return value
+
+
 
 # ~autogen
 
@@ -2526,6 +2675,20 @@ class PowerSupply(Device):
         self._type = None
 
 # ~autogen
+
+    __slots__ = [
+# ~autogen generic-class-slots classes.powerSupply>currentClass
+
+    '_measured_current',
+    '_measured_voltage',
+    '_max_voltage',
+    '_min_voltage',
+    '_technology',
+    '_type',
+
+# ~autogen
+    ]
+
 # ~autogen generic-get-set classes.powerSupply>currentClass
 
     @property
@@ -2639,6 +2802,20 @@ class LegoPort(Device):
         self._status = None
 
 # ~autogen
+
+    __slots__ = [
+# ~autogen generic-class-slots classes.legoPort>currentClass
+
+    '_address',
+    '_driver_name',
+    '_modes',
+    '_mode',
+    '_set_device',
+    '_status',
+
+# ~autogen
+    ]
+
 # ~autogen generic-get-set classes.legoPort>currentClass
 
     @property
