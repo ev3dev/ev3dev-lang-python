@@ -1,18 +1,45 @@
 # MINDCUB3R
 
-### Installation
-This can take several minutes on an EV3
+## Installation
+### Installing kociemba
+The kociemba program produces a sequence of moves used to solve
+a 3x3x3 rubiks cube.
 ```
-sudo apt-get install build-essential python3-pip libffi-dev
-sudo pip3 install git+https://github.com/dwalton76/kociemba.git
-sudo pip3 install git+https://github.com/dwalton76/rubiks-color-resolver.git
-kociemba DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD
+$ sudo apt-get install build-essential libffi-dev
+$ cd ~/
+$ git clone https://github.com/dwalton76/kociemba.git
+$ cd ~/kociemba/kociemba/ckociemba/
+$ make
+$ sudo make install
 ```
 
-### Running
-./rubiks.py
+### Installing rubiks-color-resolver
+When the cube is scanned we get the RGB (red, green, blue) value for
+all 54 squares of a 3x3x3 cube.  rubiks-color-resolver analyzes those RGB
+values to determine which of the six possible cube colors is the color for
+each square.
+```
+$ sudo apt-get install python3-pip
+$ sudo pip3 install git+https://github.com/dwalton76/rubiks-color-resolver.git
+```
 
-### About kociemba
+### Installing the MINDCUB3R demo
+We must git clone the ev3dev-lang-python repository.  MINDCUB3R is included
+in the demo directory.
+```
+$ cd ~/
+$ git clone https://github.com/rhempel/ev3dev-lang-python.git
+$ cd ~/ev3dev-lang-python/demo/MINDCUB3R/
+$ kociemba DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD
+```
+
+## Running MINDCUB3R
+```
+$ cd ~/ev3dev-lang-python/demo/MINDCUB3R/
+$ ./rubiks.py
+```
+
+## About kociemba
 You may have noticed that the
 `kociemba DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD`
 step of the install looks a little odd. The "DRLUU..." string is a
@@ -24,9 +51,9 @@ that color data and returns a sequence of moves that can be used to solve the
 cube.
 
 ```
-robot@beaglebone[lego-crane-cuber]# kociemba DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD
+$ kociemba DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD
 D2 R' D' F2 B D R2 D2 R' F2 D' F2 U' B2 L2 U2 D R2 U
-robot@beaglebone[lego-crane-cuber]#
+$
 ```
 
 Running the kociemba program is part of the install process because the first
