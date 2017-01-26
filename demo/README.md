@@ -14,18 +14,19 @@ $ git clone https://github.com/rhempel/ev3dev-lang-python.git
 ```
 
 ## Running A Program
-There are two ways to run a program.  You can run a program from the command line
-or from the brickman interface.  Note that for both running from the command line
-and running from Brickman the program must be marked as an executable and the
-first line of the program must be `#!/usr/bin/env python3`.  To mark a program as
-executable run `chmod +x PROGRAM_NAME.py`.  All of the demo programs are already
-marked as executable and already have `#!/usr/bin/env python3` so you should be
-fine, we only mention it so you know to do these things when writing your own
-programs.
+There are two ways to run a program. You can run a program from the command line
+or from the brickman interface.
+
+Note that for both running from the command line and running from Brickman the
+program **must be marked as an executable** and the **first line of the program
+must be** `#!/usr/bin/env python3`. To mark a program as executable run
+`chmod +x PROGRAM_NAME.py`. All of the demo programs are already marked as
+executable and already have `#!/usr/bin/env python3` so you should be fine, we
+only mention it so you know to do these things when writing your own programs.
 
 ## Command Line
 To run one of the demo programs from the command line, cd to the directory and
-run the program via `./PROGRAM_NAME.py`.  Example:
+run the program via `./PROGRAM_NAME.py`. Example:
 ```
 $ cd ev3dev-lang-python/demo/R3PTAR/
 $ ./r3ptar.py
