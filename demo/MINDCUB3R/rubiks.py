@@ -3,7 +3,7 @@
 from ev3dev.auto import OUTPUT_A, OUTPUT_B, OUTPUT_C, InfraredSensor
 from ev3dev.helper import LargeMotor, MediumMotor, ColorSensor, MotorStall
 from pprint import pformat
-from rubikscolorresolver import RubiksColorSolver3x3x3
+from rubikscolorresolver import RubiksColorSolverGeneric
 from subprocess import check_output
 from time import sleep
 import json
@@ -443,9 +443,10 @@ class Rubiks(object):
             return
 
         log.info("RGB json:\n%s\n" % json.dumps(self.colors))
-        self.rgb_solver = RubiksColorSolver3x3x3()
+        self.rgb_solver = RubiksColorSolverGeneric(3)
         self.rgb_solver.enter_scan_data(self.colors)
-        self.cube_kociemba = self.rgb_solver.crunch_colors()
+        self.rgb_solver.crunch_colors()
+        self.cube_kociemba = self.rgb_solver.cube_for_kociemba_strict()
         log.info("Final Colors (kociemba): %s" % ''.join(self.cube_kociemba))
 
         # This is only used if you want to rotate the cube so U is on top, F is
