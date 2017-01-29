@@ -2555,7 +2555,7 @@ class ButtonEVIO(ButtonBase):
         for k, v in self._buttons.items():
             buf = self._buffer_cache[v['name']]
             bit = v['value']
-            if not bool(buf[int(bit / 8)] & 1 << bit % 8):
+            if bool(buf[int(bit / 8)] & 1 << bit % 8):
                 pressed += [k]
         return pressed
 
