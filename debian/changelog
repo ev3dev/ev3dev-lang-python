@@ -1,3 +1,32 @@
+python-ev3dev (0.8.1) stable; urgency=medium
+
+  [Kaelin Laundry]
+  * Documentation updates
+  
+  [Thomas Watson]
+  * Use speed instead of duty cycle in EXPLOR3R/auto-drive.py
+
+  [Denis Demidov]
+  * Provide Sound.set_volume(pct)
+  * Implement Sound.get_volume()
+  * Documentation updates
+
+  [Daniel Walton]
+  * Documentation updates
+  * Update utils to python3
+  * Clean up MINDCUB3R demo
+
+  [Pepijn de Vos]
+  * Check for non-existing device attributes
+
+  [Stefan Sauer]
+  * Fix inverted button logic for the latest kernel
+
+  [@craigsammisutherland]
+  * Added a function to list all the connected sensors
+
+ -- Denis Demidov <dennis.demidov@gmail.com>  Mon, 06 Feb 2017 09:27:21 +0300
+
 python-ev3dev (0.8.0) stable; urgency=medium
 
   [Denis Demidov]
