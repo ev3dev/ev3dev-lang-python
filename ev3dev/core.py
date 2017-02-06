@@ -930,18 +930,17 @@ def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
 
     Parameters:
 	name_pattern: pattern that device name should match.
-	    For example, 'sensor*' or 'motor*'. Default value: '*'.
+	    For example, 'motor*'. Default value: '*'.
 	keyword arguments: used for matching the corresponding device
 	    attributes. For example, driver_name='lego-ev3-l-motor', or
 	    address=['outB', 'outC']. When argument value
 	    is a list, then a match against any entry of the list is
 	    enough.
     """
-    classpath = abspath(Device.DEVICE_ROOT_PATH + '/' + Motor.SYSTEM_CLASS_NAME)
+    class_path = abspath(Device.DEVICE_ROOT_PATH + '/' + Motor.SYSTEM_CLASS_NAME)
 
     return (Motor(name_pattern=name, name_exact=True)
-            for name in list_device_names(classpath, name_pattern, **kwargs))
-
+            for name in list_device_names(class_path, name_pattern, **kwargs))
 
 # ~autogen generic-class classes.largeMotor>currentClass
 
@@ -1768,6 +1767,24 @@ class Sensor(Device):
         if fmt is None: return raw
 
         return unpack(fmt, raw)
+
+def list_sensors(name_pattern=Sensor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
+    """
+    This is a generator function that enumerates all sensors that match the
+    provided arguments.
+
+    Parameters:
+	name_pattern: pattern that device name should match.
+	    For example, 'sensor*'. Default value: '*'.
+	keyword arguments: used for matching the corresponding device
+	    attributes. For example, driver_name='lego-ev3-touch', or
+	    address=['in1', 'in3']. When argument value is a list, 
+        then a match against any entry of the list is enough.
+    """
+    class_path = abspath(Device.DEVICE_ROOT_PATH + '/' + Sensor.SYSTEM_CLASS_NAME)
+    return (Sensor(name_pattern=name, name_exact=True) 
+            for name in list_device_names(class_path, name_pattern, **kwargs))
+        
 
 # ~autogen generic-class classes.i2cSensor>currentClass
 
