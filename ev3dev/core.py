@@ -1898,7 +1898,10 @@ class ColorSensor(Sensor):
     # Raw Color Components. All LEDs rapidly cycling, appears white.
     MODE_RGB_RAW = 'RGB-RAW'
 
-    # Red color.
+    # No color.
+    COLOR_NOCOLOR = 0
+
+    # Black color.
     COLOR_BLACK = 1
 
     # Blue color.
