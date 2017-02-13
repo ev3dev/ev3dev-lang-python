@@ -29,7 +29,6 @@
 from textwrap import dedent
 import os
 
-from ev3dev import music
 from ev3dev.ev3 import Sound
 
 _HERE = os.path.dirname(__file__)
@@ -40,7 +39,7 @@ print(dedent("""
     far away...
 """))
 
-music.play_song((
+Sound.play_song((
     ('D4', 'e3'),
     ('D4', 'e3'),
     ('D4', 'e3'),
