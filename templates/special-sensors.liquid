@@ -47,8 +47,17 @@ endfor %}
   for value in prop.values %}{%
     for line in value.description %}
     # {{ line }}{%
-    endfor %}
-    {{ propName }}_{{ value.name | upcase | underscore_non_wc }} = '{{ value.name }}'
+    endfor %}{%
+    if value.value %}{%
+        if value.type == 'int' %}{%
+            capture val %}{{ value.value }}{% endcapture %}{%
+        else %}{%
+            capture val %}'{{ value.value }}'{% endcapture %}{%
+        endif %}{%
+    else %}{%
+        capture val %}'{{ value.name }}'{% endcapture %}{%
+    endif %}
+    {{ propName }}_{{ value.name | upcase | underscore_non_wc }} = {{ val }}
 {% endfor %}{%
 endfor %}
 {% for mapping in currentClass.sensorValueMappings %}{%
