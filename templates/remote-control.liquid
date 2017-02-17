@@ -15,8 +15,9 @@ class RemoteControl(ButtonBase):
 endfor %}
             }
 {% for b in currentClass.buttons %}
-    on_{{ b.name | downcase | underscore_spaces }} = None{%
-endfor %}
+    #: Handles ``{{ b.name }}`` events.
+    on_{{ b.name | downcase | underscore_spaces }} = None
+{% endfor %}
 {% for b in currentClass.buttons %}{%
     assign name = b.name | downcase | underscore_spaces %}
     @property

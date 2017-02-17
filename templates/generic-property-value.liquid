@@ -3,7 +3,7 @@
   assign propName = prop.propertyName | upcase | underscore_spaces %}{%
   for value in prop.values %}{%
     for line in value.description %}
-    # {{ line }}{%
+    #: {{ line }}{%
     endfor %}
     {{ propName }}_{{ value.name | upcase | underscore_non_wc }} = '{{ value.name }}'
 {% endfor %}{%

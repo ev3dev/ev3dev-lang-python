@@ -709,77 +709,77 @@ class Motor(Device):
 # ~autogen
 # ~autogen generic-property-value classes.motor>currentClass
 
-    # Run the motor until another command is sent.
+    #: Run the motor until another command is sent.
     COMMAND_RUN_FOREVER = 'run-forever'
 
-    # Run to an absolute position specified by `position_sp` and then
-    # stop using the action specified in `stop_action`.
+    #: Run to an absolute position specified by `position_sp` and then
+    #: stop using the action specified in `stop_action`.
     COMMAND_RUN_TO_ABS_POS = 'run-to-abs-pos'
 
-    # Run to a position relative to the current `position` value.
-    # The new position will be current `position` + `position_sp`.
-    # When the new position is reached, the motor will stop using
-    # the action specified by `stop_action`.
+    #: Run to a position relative to the current `position` value.
+    #: The new position will be current `position` + `position_sp`.
+    #: When the new position is reached, the motor will stop using
+    #: the action specified by `stop_action`.
     COMMAND_RUN_TO_REL_POS = 'run-to-rel-pos'
 
-    # Run the motor for the amount of time specified in `time_sp`
-    # and then stop the motor using the action specified by `stop_action`.
+    #: Run the motor for the amount of time specified in `time_sp`
+    #: and then stop the motor using the action specified by `stop_action`.
     COMMAND_RUN_TIMED = 'run-timed'
 
-    # Run the motor at the duty cycle specified by `duty_cycle_sp`.
-    # Unlike other run commands, changing `duty_cycle_sp` while running *will*
-    # take effect immediately.
+    #: Run the motor at the duty cycle specified by `duty_cycle_sp`.
+    #: Unlike other run commands, changing `duty_cycle_sp` while running *will*
+    #: take effect immediately.
     COMMAND_RUN_DIRECT = 'run-direct'
 
-    # Stop any of the run commands before they are complete using the
-    # action specified by `stop_action`.
+    #: Stop any of the run commands before they are complete using the
+    #: action specified by `stop_action`.
     COMMAND_STOP = 'stop'
 
-    # Reset all of the motor parameter attributes to their default value.
-    # This will also have the effect of stopping the motor.
+    #: Reset all of the motor parameter attributes to their default value.
+    #: This will also have the effect of stopping the motor.
     COMMAND_RESET = 'reset'
 
-    # Sets the normal polarity of the rotary encoder.
+    #: Sets the normal polarity of the rotary encoder.
     ENCODER_POLARITY_NORMAL = 'normal'
 
-    # Sets the inversed polarity of the rotary encoder.
+    #: Sets the inversed polarity of the rotary encoder.
     ENCODER_POLARITY_INVERSED = 'inversed'
 
-    # With `normal` polarity, a positive duty cycle will
-    # cause the motor to rotate clockwise.
+    #: With `normal` polarity, a positive duty cycle will
+    #: cause the motor to rotate clockwise.
     POLARITY_NORMAL = 'normal'
 
-    # With `inversed` polarity, a positive duty cycle will
-    # cause the motor to rotate counter-clockwise.
+    #: With `inversed` polarity, a positive duty cycle will
+    #: cause the motor to rotate counter-clockwise.
     POLARITY_INVERSED = 'inversed'
 
-    # Power is being sent to the motor.
+    #: Power is being sent to the motor.
     STATE_RUNNING = 'running'
 
-    # The motor is ramping up or down and has not yet reached a constant output level.
+    #: The motor is ramping up or down and has not yet reached a constant output level.
     STATE_RAMPING = 'ramping'
 
-    # The motor is not turning, but rather attempting to hold a fixed position.
+    #: The motor is not turning, but rather attempting to hold a fixed position.
     STATE_HOLDING = 'holding'
 
-    # The motor is turning, but cannot reach its `speed_sp`.
+    #: The motor is turning, but cannot reach its `speed_sp`.
     STATE_OVERLOADED = 'overloaded'
 
-    # The motor is not turning when it should be.
+    #: The motor is not turning when it should be.
     STATE_STALLED = 'stalled'
 
-    # Power will be removed from the motor and it will freely coast to a stop.
+    #: Power will be removed from the motor and it will freely coast to a stop.
     STOP_ACTION_COAST = 'coast'
 
-    # Power will be removed from the motor and a passive electrical load will
-    # be placed on the motor. This is usually done by shorting the motor terminals
-    # together. This load will absorb the energy from the rotation of the motors and
-    # cause the motor to stop more quickly than coasting.
+    #: Power will be removed from the motor and a passive electrical load will
+    #: be placed on the motor. This is usually done by shorting the motor terminals
+    #: together. This load will absorb the energy from the rotation of the motors and
+    #: cause the motor to stop more quickly than coasting.
     STOP_ACTION_BRAKE = 'brake'
 
-    # Does not remove power from the motor. Instead it actively try to hold the motor
-    # at the current position. If an external force tries to turn the motor, the motor
-    # will `push back` to maintain its position.
+    #: Does not remove power from the motor. Instead it actively try to hold the motor
+    #: at the current position. If an external force tries to turn the motor, the motor
+    #: will `push back` to maintain its position.
     STOP_ACTION_HOLD = 'hold'
 
 
@@ -1223,37 +1223,37 @@ class DcMotor(Device):
 # ~autogen
 # ~autogen generic-property-value classes.dcMotor>currentClass
 
-    # Run the motor until another command is sent.
+    #: Run the motor until another command is sent.
     COMMAND_RUN_FOREVER = 'run-forever'
 
-    # Run the motor for the amount of time specified in `time_sp`
-    # and then stop the motor using the action specified by `stop_action`.
+    #: Run the motor for the amount of time specified in `time_sp`
+    #: and then stop the motor using the action specified by `stop_action`.
     COMMAND_RUN_TIMED = 'run-timed'
 
-    # Run the motor at the duty cycle specified by `duty_cycle_sp`.
-    # Unlike other run commands, changing `duty_cycle_sp` while running *will*
-    # take effect immediately.
+    #: Run the motor at the duty cycle specified by `duty_cycle_sp`.
+    #: Unlike other run commands, changing `duty_cycle_sp` while running *will*
+    #: take effect immediately.
     COMMAND_RUN_DIRECT = 'run-direct'
 
-    # Stop any of the run commands before they are complete using the
-    # action specified by `stop_action`.
+    #: Stop any of the run commands before they are complete using the
+    #: action specified by `stop_action`.
     COMMAND_STOP = 'stop'
 
-    # With `normal` polarity, a positive duty cycle will
-    # cause the motor to rotate clockwise.
+    #: With `normal` polarity, a positive duty cycle will
+    #: cause the motor to rotate clockwise.
     POLARITY_NORMAL = 'normal'
 
-    # With `inversed` polarity, a positive duty cycle will
-    # cause the motor to rotate counter-clockwise.
+    #: With `inversed` polarity, a positive duty cycle will
+    #: cause the motor to rotate counter-clockwise.
     POLARITY_INVERSED = 'inversed'
 
-    # Power will be removed from the motor and it will freely coast to a stop.
+    #: Power will be removed from the motor and it will freely coast to a stop.
     STOP_ACTION_COAST = 'coast'
 
-    # Power will be removed from the motor and a passive electrical load will
-    # be placed on the motor. This is usually done by shorting the motor terminals
-    # together. This load will absorb the energy from the rotation of the motors and
-    # cause the motor to stop more quickly than coasting.
+    #: Power will be removed from the motor and a passive electrical load will
+    #: be placed on the motor. This is usually done by shorting the motor terminals
+    #: together. This load will absorb the energy from the rotation of the motors and
+    #: cause the motor to stop more quickly than coasting.
     STOP_ACTION_BRAKE = 'brake'
 
 
@@ -1482,18 +1482,18 @@ class ServoMotor(Device):
 # ~autogen
 # ~autogen generic-property-value classes.servoMotor>currentClass
 
-    # Drive servo to the position set in the `position_sp` attribute.
+    #: Drive servo to the position set in the `position_sp` attribute.
     COMMAND_RUN = 'run'
 
-    # Remove power from the motor.
+    #: Remove power from the motor.
     COMMAND_FLOAT = 'float'
 
-    # With `normal` polarity, a positive duty cycle will
-    # cause the motor to rotate clockwise.
+    #: With `normal` polarity, a positive duty cycle will
+    #: cause the motor to rotate clockwise.
     POLARITY_NORMAL = 'normal'
 
-    # With `inversed` polarity, a positive duty cycle will
-    # cause the motor to rotate counter-clockwise.
+    #: With `inversed` polarity, a positive duty cycle will
+    #: cause the motor to rotate counter-clockwise.
     POLARITY_INVERSED = 'inversed'
 
 
@@ -1833,7 +1833,7 @@ class TouchSensor(Sensor):
         self.auto_mode = True
 
 
-    # Button state
+    #: Button state
     MODE_TOUCH = 'TOUCH'
 
 
@@ -1865,43 +1865,43 @@ class ColorSensor(Sensor):
         self.auto_mode = True
 
 
-    # Reflected light. Red LED on.
+    #: Reflected light. Red LED on.
     MODE_COL_REFLECT = 'COL-REFLECT'
 
-    # Ambient light. Red LEDs off.
+    #: Ambient light. Red LEDs off.
     MODE_COL_AMBIENT = 'COL-AMBIENT'
 
-    # Color. All LEDs rapidly cycling, appears white.
+    #: Color. All LEDs rapidly cycling, appears white.
     MODE_COL_COLOR = 'COL-COLOR'
 
-    # Raw reflected. Red LED on
+    #: Raw reflected. Red LED on
     MODE_REF_RAW = 'REF-RAW'
 
-    # Raw Color Components. All LEDs rapidly cycling, appears white.
+    #: Raw Color Components. All LEDs rapidly cycling, appears white.
     MODE_RGB_RAW = 'RGB-RAW'
 
-    # No color.
+    #: No color.
     COLOR_NOCOLOR = 0
 
-    # Black color.
+    #: Black color.
     COLOR_BLACK = 1
 
-    # Blue color.
+    #: Blue color.
     COLOR_BLUE = 2
 
-    # Green color.
+    #: Green color.
     COLOR_GREEN = 3
 
-    # Yellow color.
+    #: Yellow color.
     COLOR_YELLOW = 4
 
-    # Red color.
+    #: Red color.
     COLOR_RED = 5
 
-    # White color.
+    #: White color.
     COLOR_WHITE = 6
 
-    # Brown color.
+    #: Brown color.
     COLOR_BROWN = 7
 
 
@@ -2006,19 +2006,19 @@ class UltrasonicSensor(Sensor):
         self.auto_mode = True
 
 
-    # Continuous measurement in centimeters.
+    #: Continuous measurement in centimeters.
     MODE_US_DIST_CM = 'US-DIST-CM'
 
-    # Continuous measurement in inches.
+    #: Continuous measurement in inches.
     MODE_US_DIST_IN = 'US-DIST-IN'
 
-    # Listen.
+    #: Listen.
     MODE_US_LISTEN = 'US-LISTEN'
 
-    # Single measurement in centimeters.
+    #: Single measurement in centimeters.
     MODE_US_SI_CM = 'US-SI-CM'
 
-    # Single measurement in inches.
+    #: Single measurement in inches.
     MODE_US_SI_IN = 'US-SI-IN'
 
 
@@ -2074,19 +2074,19 @@ class GyroSensor(Sensor):
         self.auto_mode = True
 
 
-    # Angle
+    #: Angle
     MODE_GYRO_ANG = 'GYRO-ANG'
 
-    # Rotational speed
+    #: Rotational speed
     MODE_GYRO_RATE = 'GYRO-RATE'
 
-    # Raw sensor value
+    #: Raw sensor value
     MODE_GYRO_FAS = 'GYRO-FAS'
 
-    # Angle and rotational speed
+    #: Angle and rotational speed
     MODE_GYRO_G_A = 'GYRO-G&A'
 
-    # Calibration ???
+    #: Calibration ???
     MODE_GYRO_CAL = 'GYRO-CAL'
 
 
@@ -2140,19 +2140,19 @@ class InfraredSensor(Sensor):
         self.auto_mode = True
 
 
-    # Proximity
+    #: Proximity
     MODE_IR_PROX = 'IR-PROX'
 
-    # IR Seeker
+    #: IR Seeker
     MODE_IR_SEEK = 'IR-SEEK'
 
-    # IR Remote Control
+    #: IR Remote Control
     MODE_IR_REMOTE = 'IR-REMOTE'
 
-    # IR Remote Control. State of the buttons is coded in binary
+    #: IR Remote Control. State of the buttons is coded in binary
     MODE_IR_REM_A = 'IR-REM-A'
 
-    # Calibration ???
+    #: Calibration ???
     MODE_IR_CAL = 'IR-CAL'
 
 
@@ -2184,10 +2184,10 @@ class SoundSensor(Sensor):
         self.auto_mode = True
 
 
-    # Sound pressure level. Flat weighting
+    #: Sound pressure level. Flat weighting
     MODE_DB = 'DB'
 
-    # Sound pressure level. A weighting
+    #: Sound pressure level. A weighting
     MODE_DBA = 'DBA'
 
 
@@ -2231,10 +2231,10 @@ class LightSensor(Sensor):
         self.auto_mode = True
 
 
-    # Reflected light. LED on
+    #: Reflected light. LED on
     MODE_REFLECT = 'REFLECT'
 
-    # Ambient light. LED off
+    #: Ambient light. LED off
     MODE_AMBIENT = 'AMBIENT'
 
 
@@ -2604,11 +2604,21 @@ class RemoteControl(ButtonBase):
             11: ['blue_up', 'blue_down']
             }
 
+    #: Handles ``Red Up`` events.
     on_red_up = None
+
+    #: Handles ``Red Down`` events.
     on_red_down = None
+
+    #: Handles ``Blue Up`` events.
     on_blue_up = None
+
+    #: Handles ``Blue Down`` events.
     on_blue_down = None
+
+    #: Handles ``Beacon`` events.
     on_beacon = None
+
 
     @property
     def red_up(self):
