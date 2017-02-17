@@ -46,7 +46,7 @@ endfor %}
   assign propName = prop.propertyName | upcase | underscore_spaces %}{%
   for value in prop.values %}{%
     for line in value.description %}
-    # {{ line }}{%
+    #: {{ line }}{%
     endfor %}{%
     if value.value %}{%
         if value.type == 'int' %}{%
