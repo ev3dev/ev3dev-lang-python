@@ -881,15 +881,6 @@ class Motor(Device):
         there is an I/O event related to the ``state`` attribute.  Exits early
         when ``timeout`` (in milliseconds) is reached.
 
-        .. warning::
-            In ev3dev kernel release cycles 16 and earlier, there is a bug
-            which causes the ``state`` attribute to include ``stalled``
-            immediately after starting the motor even if it is not actually
-            being prevented from rotating. As a workaround, we recommend
-            sleeping your code for around 100ms after starting a motor if you
-            are going to use this method to wait for it to be ``stalled``. A
-            fix for this has not yet been released.
-
         Returns ``True`` if the condition is met, and ``False`` if the timeout
         is reached.
 
@@ -904,15 +895,6 @@ class Motor(Device):
         Blocks until ``s`` is not in ``self.state``.  The condition is checked
         when there is an I/O event related to the ``state`` attribute.  Exits
         early when ``timeout`` (in milliseconds) is reached.
-
-        .. warning::
-            In ev3dev kernel release cycles 16 and earlier, there is a bug
-            which causes the ``state`` attribute to include ``stalled``
-            immediately after starting the motor even if it is not actually
-            being prevented from rotating. As a workaround, we recommend
-            sleeping your code for around 100ms after starting a motor if you
-            are going to use this method to wait while it is ``stalled``. A
-            fix for this has not yet been released.
 
         Returns ``True`` if the condition is met, and ``False`` if the timeout
         is reached.
