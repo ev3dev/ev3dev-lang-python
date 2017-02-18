@@ -3184,6 +3184,14 @@ class Sound:
         # Introduce yourself, wait for completion:
         Sound.speak('Hello, I am Robot').wait()
 
+        # Play a small song
+        Sound.play_song((
+            ('D4', 'e3'),
+            ('D4', 'e3'),
+            ('D4', 'e3'),
+            ('G4', 'h'),
+            ('D5', 'h')
+        ))
     """
 
     channel = None
@@ -3339,8 +3347,10 @@ class Sound:
 
         It supports symbolic notes (e.g. ``A4``, ``D#3``, ``Gb5``) and durations (e.g. ``q``, ``h``).
 
-        Accepted note symbols and values are defined by the :py:attr:`NOTES` and :py:attr:`NOTE_VALUES`
-        dictionaries. The value can be suffixed by modifiers:
+        For an exhaustive list of accepted note symbols and values, have a look at the :py:attr:`_NOTE_FREQUENCIES`
+        and :py:attr:`_NOTE_VALUES` private dictionaries in the source code.
+
+        The value can be suffixed by modifiers:
 
         - a *divider* introduced by a ``/`` to obtain triplets for instance
           (e.g. ``q/3`` for a triplet of eight note)
@@ -3405,21 +3415,21 @@ class Sound:
             Returns:
                 str: the arguments to be passed to the beep command
             """
-            freq = Sound.NOTE_FREQUENCIES[note.upper()]
+            freq = Sound._NOTE_FREQUENCIES[note.upper()]
             if '/' in value:
                 base, factor = value.split('/')
-                duration = meas_duration * Sound.NOTE_VALUES[base] / float(factor)
+                duration = meas_duration * Sound._NOTE_VALUES[base] / float(factor)
             elif '*' in value:
                 base, factor = value.split('*')
-                duration = meas_duration * Sound.NOTE_VALUES[base] * float(factor)
+                duration = meas_duration * Sound._NOTE_VALUES[base] * float(factor)
             elif value.endswith('.'):
                 base = value[:-1]
-                duration = meas_duration * Sound.NOTE_VALUES[base] * 1.5
+                duration = meas_duration * Sound._NOTE_VALUES[base] * 1.5
             elif value.endswith('3'):
                 base = value[:-1]
-                duration = meas_duration * Sound.NOTE_VALUES[base] * 2 / 3
+                duration = meas_duration * Sound._NOTE_VALUES[base] * 2 / 3
             else:
-                duration = meas_duration * Sound.NOTE_VALUES[value]
+                duration = meas_duration * Sound._NOTE_VALUES[value]
 
             return '-f %d -l %d -D %d' % (freq, duration, delay)
 
@@ -3433,7 +3443,7 @@ class Sound:
     #: standard US abbreviation and its octave number (e.g. ``C3``).
     #: Alterations use the ``#`` and ``b`` symbols, respectively for
     #: *sharp* and *flat*, between the note code and the octave number (e.g. ``D#4``, ``Gb5``).
-    NOTE_FREQUENCIES = _make_scales((
+    _NOTE_FREQUENCIES = _make_scales((
         ('C0', 16.35),
         ('C#0/Db0', 17.32),
         ('D0', 18.35),
@@ -3564,7 +3574,7 @@ class Sound:
     #: For instance, the note value of a eight triplet will be ``NOTE_VALUE['e'] / 3``.
     #: It is simpler however to user the ``3`` modifier of notes, as supported by the
     #: :py:meth:`Sound.play_song` method.
-    NOTE_VALUES = {
+    _NOTE_VALUES = {
         'w': 1.,
         'h': 1./2,
         'q': 1./4,
