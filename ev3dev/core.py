@@ -846,6 +846,40 @@ class Motor(Device):
 
 
 # ~autogen
+# ~autogen motor_states classes.motor>currentClass
+
+    @property
+    def is_running(self):
+        """Power is being sent to the motor.
+        """
+        return self.STATE_RUNNING in self.state
+
+    @property
+    def is_ramping(self):
+        """The motor is ramping up or down and has not yet reached a constant output level.
+        """
+        return self.STATE_RAMPING in self.state
+
+    @property
+    def is_holding(self):
+        """The motor is not turning, but rather attempting to hold a fixed position.
+        """
+        return self.STATE_HOLDING in self.state
+
+    @property
+    def is_overloaded(self):
+        """The motor is turning, but cannot reach its `speed_sp`.
+        """
+        return self.STATE_OVERLOADED in self.state
+
+    @property
+    def is_stalled(self):
+        """The motor is not turning when it should be.
+        """
+        return self.STATE_STALLED in self.state
+
+
+# ~autogen
 
     def wait(self, cond, timeout=None):
         """

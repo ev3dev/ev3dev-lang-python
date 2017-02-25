@@ -1,0 +1,13 @@
+{% assign class_name = currentClass.friendlyName | camel_case | capitalize %}{%
+for prop in currentClass.propertyValues %}{%
+    if prop.propertyName == "State" %}{%
+        for state in prop.values %}
+    @property
+    def is_{{ state.name }}(self):
+        """{%
+        for line in state.description %}{{line}}
+        {% endfor %}"""
+        return self.STATE_{{ state.name | upcase }} in self.state
+{% endfor %}{%
+endif %}{%
+endfor %}
