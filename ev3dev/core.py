@@ -2716,6 +2716,42 @@ class RemoteControl(ButtonBase):
         return RemoteControl._BUTTON_VALUES.get(self._sensor.value(self._channel), [])
 
 
+class BeaconSeeker(object):
+    """
+    Seeks EV3 Remote Controller in beacon mode.
+    """
+
+    def __init__(self, sensor=None, channel=1):
+        self._sensor  = InfraredSensor() if sensor is None else sensor
+        self._channel = max(1, min(4, channel)) - 1
+
+        if self._sensor.connected:
+            self._sensor.mode = 'IR-SEEK'
+
+    @property
+    def heading(self):
+        """
+        Returns heading (-25, 25) to the beacon on the given channel.
+        """
+        return self._sensor.value(self._channel * 2)
+
+    @property
+    def distance(self):
+        """
+        Returns distance (0, 100) to the beacon on the given channel.
+        Returns -128 when beacon is not found.
+        """
+        return self._sensor.value(self._channel * 2 + 1)
+
+    @property
+    def heading_and_distance(self):
+        """
+        Returns heading and distance to the beacon on the given channel as a
+        tuple.
+        """
+        return self._sensor.value(self._channel * 2), self._sensor.value(self._channel * 2 + 1)
+
+
 # ~autogen generic-class classes.powerSupply>currentClass
 
 class PowerSupply(Device):
