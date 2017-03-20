@@ -45,12 +45,13 @@ import array
 import mmap
 import ctypes
 import re
-import stat
 import select
+import shlex
+import stat
 import time
 from os.path import abspath
 from struct import pack, unpack
-from subprocess import Popen, check_output
+from subprocess import Popen, check_output, PIPE
 
 try:
     # This is a linux-specific module.
@@ -1794,13 +1795,13 @@ def list_sensors(name_pattern=Sensor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
 	    For example, 'sensor*'. Default value: '*'.
 	keyword arguments: used for matching the corresponding device
 	    attributes. For example, driver_name='lego-ev3-touch', or
-	    address=['in1', 'in3']. When argument value is a list, 
+	    address=['in1', 'in3']. When argument value is a list,
         then a match against any entry of the list is enough.
     """
     class_path = abspath(Device.DEVICE_ROOT_PATH + '/' + Sensor.SYSTEM_CLASS_NAME)
-    return (Sensor(name_pattern=name, name_exact=True) 
+    return (Sensor(name_pattern=name, name_exact=True)
             for name in list_device_names(class_path, name_pattern, **kwargs))
-        
+
 
 # ~autogen generic-class classes.i2cSensor>currentClass
 
@@ -3276,7 +3277,7 @@ class Sound:
         .. _`linux beep music`: https://www.google.com/search?q=linux+beep+music
         """
         with open(os.devnull, 'w') as n:
-            return Popen('/usr/bin/beep %s' % args, stdout=n, shell=True)
+            return Popen(shlex.split('/usr/bin/beep %s' % args), stdout=n)
 
     @staticmethod
     def tone(*args):
@@ -3340,7 +3341,7 @@ class Sound:
         Play wav file.
         """
         with open(os.devnull, 'w') as n:
-            return Popen('/usr/bin/aplay -q "%s"' % wav_file, stdout=n, shell=True)
+            return Popen(shlex.split('/usr/bin/aplay -q "%s"' % wav_file), stdout=n)
 
     @staticmethod
     def speak(text, espeak_opts='-a 200 -s 130'):
@@ -3348,8 +3349,10 @@ class Sound:
         Speak the given text aloud.
         """
         with open(os.devnull, 'w') as n:
-            cmd_line = '/usr/bin/espeak --stdout {0} "{1}" | /usr/bin/aplay -q'.format(espeak_opts, text)
-            return Popen(cmd_line, stdout=n, shell=True)
+            cmd_line = '/usr/bin/espeak --stdout {0} "{1}"'.format(espeak_opts, text)
+            espeak = Popen(shlex.split(cmd_line), stdout=PIPE)
+            play = Popen(['/usr/bin/aplay', '-q'], stdin=espeak.stdout, stdout=n)
+            return espeak
 
     @staticmethod
     def _get_channel():
@@ -3387,7 +3390,7 @@ class Sound:
             channel = Sound._get_channel()
 
         cmd_line = '/usr/bin/amixer -q set {0} {1:d}%'.format(channel, pct)
-        Popen(cmd_line, shell=True).wait()
+        Popen(shlex.split(cmd_line)).wait()
 
     @staticmethod
     def get_volume(channel=None):
