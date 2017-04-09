@@ -1939,6 +1939,17 @@ class ColorSensor(Sensor):
     #: Brown color.
     COLOR_BROWN = 7
 
+    #: Tuple of all colors
+    COLORS = (
+        'nocolor',
+        'black',
+        'blue',
+        'green',
+        'yellow',
+        'red',
+        'white',
+        'brown',
+    )
 
     @property
     def reflected_light_intensity(self):
