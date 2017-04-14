@@ -1872,6 +1872,11 @@ class TouchSensor(Sensor):
     MODE_TOUCH = 'TOUCH'
 
 
+    MODES = (
+      'TOUCH',
+    )
+
+
     @property
     def is_pressed(self):
         """
@@ -1938,6 +1943,26 @@ class ColorSensor(Sensor):
 
     #: Brown color.
     COLOR_BROWN = 7
+
+
+    MODES = (
+      'COL-REFLECT',
+      'COL-AMBIENT',
+      'COL-COLOR',
+      'REF-RAW',
+      'RGB-RAW',
+    )
+
+    COLORS = (
+      'NoColor',
+      'Black',
+      'Blue',
+      'Green',
+      'Yellow',
+      'Red',
+      'White',
+      'Brown',
+    )
 
 
     @property
@@ -2057,6 +2082,15 @@ class UltrasonicSensor(Sensor):
     MODE_US_SI_IN = 'US-SI-IN'
 
 
+    MODES = (
+      'US-DIST-CM',
+      'US-DIST-IN',
+      'US-LISTEN',
+      'US-SI-CM',
+      'US-SI-IN',
+    )
+
+
     @property
     def distance_centimeters(self):
         """
@@ -2125,6 +2159,15 @@ class GyroSensor(Sensor):
     MODE_GYRO_CAL = 'GYRO-CAL'
 
 
+    MODES = (
+      'GYRO-ANG',
+      'GYRO-RATE',
+      'GYRO-FAS',
+      'GYRO-G&A',
+      'GYRO-CAL',
+    )
+
+
     @property
     def angle(self):
         """
@@ -2191,6 +2234,15 @@ class InfraredSensor(Sensor):
     MODE_IR_CAL = 'IR-CAL'
 
 
+    MODES = (
+      'IR-PROX',
+      'IR-SEEK',
+      'IR-REMOTE',
+      'IR-REM-A',
+      'IR-CAL',
+    )
+
+
     @property
     def proximity(self):
         """
@@ -2224,6 +2276,12 @@ class SoundSensor(Sensor):
 
     #: Sound pressure level. A weighting
     MODE_DBA = 'DBA'
+
+
+    MODES = (
+      'DB',
+      'DBA',
+    )
 
 
     @property
@@ -2271,6 +2329,12 @@ class LightSensor(Sensor):
 
     #: Ambient light. LED off
     MODE_AMBIENT = 'AMBIENT'
+
+
+    MODES = (
+      'REFLECT',
+      'AMBIENT',
+    )
 
 
     @property
