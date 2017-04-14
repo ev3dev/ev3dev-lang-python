@@ -60,6 +60,14 @@ endfor %}
     {{ propName }}_{{ value.name | upcase | underscore_non_wc }} = {{ val }}
 {% endfor %}{%
 endfor %}
+{% for prop in currentClass.propertyValues %}{%
+assign propName = prop.propertyName | upcase | underscore_spaces%}
+    {{ propName }}S = ({%
+    for value in prop.values %}
+      '{{ value.name }}',{%
+    endfor %}
+    )
+{%endfor %}
 {% for mapping in currentClass.sensorValueMappings %}{%
   assign name = mapping.name | downcase | underscore_spaces %}{%
   assign mode = mapping.requiredMode | upcase | underscore_non_wc %}
