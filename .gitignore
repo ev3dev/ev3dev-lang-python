@@ -7,3 +7,4 @@ dist
 RELEASE-VERSION
 ev3dev/version.py
 build
+.idea

@@ -45,12 +45,13 @@ import array
 import mmap
 import ctypes
 import re
-import stat
 import select
+import shlex
+import stat
 import time
 from os.path import abspath
 from struct import pack, unpack
-from subprocess import Popen, check_output
+from subprocess import Popen, check_output, PIPE
 
 try:
     # This is a linux-specific module.
@@ -709,77 +710,77 @@ class Motor(Device):
 # ~autogen
 # ~autogen generic-property-value classes.motor>currentClass
 
-    # Run the motor until another command is sent.
+    #: Run the motor until another command is sent.
     COMMAND_RUN_FOREVER = 'run-forever'
 
-    # Run to an absolute position specified by `position_sp` and then
-    # stop using the action specified in `stop_action`.
+    #: Run to an absolute position specified by `position_sp` and then
+    #: stop using the action specified in `stop_action`.
     COMMAND_RUN_TO_ABS_POS = 'run-to-abs-pos'
 
-    # Run to a position relative to the current `position` value.
-    # The new position will be current `position` + `position_sp`.
-    # When the new position is reached, the motor will stop using
-    # the action specified by `stop_action`.
+    #: Run to a position relative to the current `position` value.
+    #: The new position will be current `position` + `position_sp`.
+    #: When the new position is reached, the motor will stop using
+    #: the action specified by `stop_action`.
     COMMAND_RUN_TO_REL_POS = 'run-to-rel-pos'
 
-    # Run the motor for the amount of time specified in `time_sp`
-    # and then stop the motor using the action specified by `stop_action`.
+    #: Run the motor for the amount of time specified in `time_sp`
+    #: and then stop the motor using the action specified by `stop_action`.
     COMMAND_RUN_TIMED = 'run-timed'
 
-    # Run the motor at the duty cycle specified by `duty_cycle_sp`.
-    # Unlike other run commands, changing `duty_cycle_sp` while running *will*
-    # take effect immediately.
+    #: Run the motor at the duty cycle specified by `duty_cycle_sp`.
+    #: Unlike other run commands, changing `duty_cycle_sp` while running *will*
+    #: take effect immediately.
     COMMAND_RUN_DIRECT = 'run-direct'
 
-    # Stop any of the run commands before they are complete using the
-    # action specified by `stop_action`.
+    #: Stop any of the run commands before they are complete using the
+    #: action specified by `stop_action`.
     COMMAND_STOP = 'stop'
 
-    # Reset all of the motor parameter attributes to their default value.
-    # This will also have the effect of stopping the motor.
+    #: Reset all of the motor parameter attributes to their default value.
+    #: This will also have the effect of stopping the motor.
     COMMAND_RESET = 'reset'
 
-    # Sets the normal polarity of the rotary encoder.
+    #: Sets the normal polarity of the rotary encoder.
     ENCODER_POLARITY_NORMAL = 'normal'
 
-    # Sets the inversed polarity of the rotary encoder.
+    #: Sets the inversed polarity of the rotary encoder.
     ENCODER_POLARITY_INVERSED = 'inversed'
 
-    # With `normal` polarity, a positive duty cycle will
-    # cause the motor to rotate clockwise.
+    #: With `normal` polarity, a positive duty cycle will
+    #: cause the motor to rotate clockwise.
     POLARITY_NORMAL = 'normal'
 
-    # With `inversed` polarity, a positive duty cycle will
-    # cause the motor to rotate counter-clockwise.
+    #: With `inversed` polarity, a positive duty cycle will
+    #: cause the motor to rotate counter-clockwise.
     POLARITY_INVERSED = 'inversed'
 
-    # Power is being sent to the motor.
+    #: Power is being sent to the motor.
     STATE_RUNNING = 'running'
 
-    # The motor is ramping up or down and has not yet reached a constant output level.
+    #: The motor is ramping up or down and has not yet reached a constant output level.
     STATE_RAMPING = 'ramping'
 
-    # The motor is not turning, but rather attempting to hold a fixed position.
+    #: The motor is not turning, but rather attempting to hold a fixed position.
     STATE_HOLDING = 'holding'
 
-    # The motor is turning, but cannot reach its `speed_sp`.
+    #: The motor is turning, but cannot reach its `speed_sp`.
     STATE_OVERLOADED = 'overloaded'
 
-    # The motor is not turning when it should be.
+    #: The motor is not turning when it should be.
     STATE_STALLED = 'stalled'
 
-    # Power will be removed from the motor and it will freely coast to a stop.
+    #: Power will be removed from the motor and it will freely coast to a stop.
     STOP_ACTION_COAST = 'coast'
 
-    # Power will be removed from the motor and a passive electrical load will
-    # be placed on the motor. This is usually done by shorting the motor terminals
-    # together. This load will absorb the energy from the rotation of the motors and
-    # cause the motor to stop more quickly than coasting.
+    #: Power will be removed from the motor and a passive electrical load will
+    #: be placed on the motor. This is usually done by shorting the motor terminals
+    #: together. This load will absorb the energy from the rotation of the motors and
+    #: cause the motor to stop more quickly than coasting.
     STOP_ACTION_BRAKE = 'brake'
 
-    # Does not remove power from the motor. Instead it actively try to hold the motor
-    # at the current position. If an external force tries to turn the motor, the motor
-    # will `push back` to maintain its position.
+    #: Does not remove power from the motor. Instead it actively try to hold the motor
+    #: at the current position. If an external force tries to turn the motor, the motor
+    #: will `push back` to maintain its position.
     STOP_ACTION_HOLD = 'hold'
 
 
@@ -846,6 +847,40 @@ class Motor(Device):
 
 
 # ~autogen
+# ~autogen motor_states classes.motor>currentClass
+
+    @property
+    def is_running(self):
+        """Power is being sent to the motor.
+        """
+        return self.STATE_RUNNING in self.state
+
+    @property
+    def is_ramping(self):
+        """The motor is ramping up or down and has not yet reached a constant output level.
+        """
+        return self.STATE_RAMPING in self.state
+
+    @property
+    def is_holding(self):
+        """The motor is not turning, but rather attempting to hold a fixed position.
+        """
+        return self.STATE_HOLDING in self.state
+
+    @property
+    def is_overloaded(self):
+        """The motor is turning, but cannot reach its `speed_sp`.
+        """
+        return self.STATE_OVERLOADED in self.state
+
+    @property
+    def is_stalled(self):
+        """The motor is not turning when it should be.
+        """
+        return self.STATE_STALLED in self.state
+
+
+# ~autogen
 
     def wait(self, cond, timeout=None):
         """
@@ -881,15 +916,6 @@ class Motor(Device):
         there is an I/O event related to the ``state`` attribute.  Exits early
         when ``timeout`` (in milliseconds) is reached.
 
-        .. warning::
-            In ev3dev kernel release cycles 16 and earlier, there is a bug
-            which causes the ``state`` attribute to include ``stalled``
-            immediately after starting the motor even if it is not actually
-            being prevented from rotating. As a workaround, we recommend
-            sleeping your code for around 100ms after starting a motor if you
-            are going to use this method to wait for it to be ``stalled``. A
-            fix for this has not yet been released.
-
         Returns ``True`` if the condition is met, and ``False`` if the timeout
         is reached.
 
@@ -904,15 +930,6 @@ class Motor(Device):
         Blocks until ``s`` is not in ``self.state``.  The condition is checked
         when there is an I/O event related to the ``state`` attribute.  Exits
         early when ``timeout`` (in milliseconds) is reached.
-
-        .. warning::
-            In ev3dev kernel release cycles 16 and earlier, there is a bug
-            which causes the ``state`` attribute to include ``stalled``
-            immediately after starting the motor even if it is not actually
-            being prevented from rotating. As a workaround, we recommend
-            sleeping your code for around 100ms after starting a motor if you
-            are going to use this method to wait while it is ``stalled``. A
-            fix for this has not yet been released.
 
         Returns ``True`` if the condition is met, and ``False`` if the timeout
         is reached.
@@ -1241,37 +1258,37 @@ class DcMotor(Device):
 # ~autogen
 # ~autogen generic-property-value classes.dcMotor>currentClass
 
-    # Run the motor until another command is sent.
+    #: Run the motor until another command is sent.
     COMMAND_RUN_FOREVER = 'run-forever'
 
-    # Run the motor for the amount of time specified in `time_sp`
-    # and then stop the motor using the action specified by `stop_action`.
+    #: Run the motor for the amount of time specified in `time_sp`
+    #: and then stop the motor using the action specified by `stop_action`.
     COMMAND_RUN_TIMED = 'run-timed'
 
-    # Run the motor at the duty cycle specified by `duty_cycle_sp`.
-    # Unlike other run commands, changing `duty_cycle_sp` while running *will*
-    # take effect immediately.
+    #: Run the motor at the duty cycle specified by `duty_cycle_sp`.
+    #: Unlike other run commands, changing `duty_cycle_sp` while running *will*
+    #: take effect immediately.
     COMMAND_RUN_DIRECT = 'run-direct'
 
-    # Stop any of the run commands before they are complete using the
-    # action specified by `stop_action`.
+    #: Stop any of the run commands before they are complete using the
+    #: action specified by `stop_action`.
     COMMAND_STOP = 'stop'
 
-    # With `normal` polarity, a positive duty cycle will
-    # cause the motor to rotate clockwise.
+    #: With `normal` polarity, a positive duty cycle will
+    #: cause the motor to rotate clockwise.
     POLARITY_NORMAL = 'normal'
 
-    # With `inversed` polarity, a positive duty cycle will
-    # cause the motor to rotate counter-clockwise.
+    #: With `inversed` polarity, a positive duty cycle will
+    #: cause the motor to rotate counter-clockwise.
     POLARITY_INVERSED = 'inversed'
 
-    # Power will be removed from the motor and it will freely coast to a stop.
+    #: Power will be removed from the motor and it will freely coast to a stop.
     STOP_ACTION_COAST = 'coast'
 
-    # Power will be removed from the motor and a passive electrical load will
-    # be placed on the motor. This is usually done by shorting the motor terminals
-    # together. This load will absorb the energy from the rotation of the motors and
-    # cause the motor to stop more quickly than coasting.
+    #: Power will be removed from the motor and a passive electrical load will
+    #: be placed on the motor. This is usually done by shorting the motor terminals
+    #: together. This load will absorb the energy from the rotation of the motors and
+    #: cause the motor to stop more quickly than coasting.
     STOP_ACTION_BRAKE = 'brake'
 
 
@@ -1500,18 +1517,18 @@ class ServoMotor(Device):
 # ~autogen
 # ~autogen generic-property-value classes.servoMotor>currentClass
 
-    # Drive servo to the position set in the `position_sp` attribute.
+    #: Drive servo to the position set in the `position_sp` attribute.
     COMMAND_RUN = 'run'
 
-    # Remove power from the motor.
+    #: Remove power from the motor.
     COMMAND_FLOAT = 'float'
 
-    # With `normal` polarity, a positive duty cycle will
-    # cause the motor to rotate clockwise.
+    #: With `normal` polarity, a positive duty cycle will
+    #: cause the motor to rotate clockwise.
     POLARITY_NORMAL = 'normal'
 
-    # With `inversed` polarity, a positive duty cycle will
-    # cause the motor to rotate counter-clockwise.
+    #: With `inversed` polarity, a positive duty cycle will
+    #: cause the motor to rotate counter-clockwise.
     POLARITY_INVERSED = 'inversed'
 
 
@@ -1778,13 +1795,13 @@ def list_sensors(name_pattern=Sensor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
 	    For example, 'sensor*'. Default value: '*'.
 	keyword arguments: used for matching the corresponding device
 	    attributes. For example, driver_name='lego-ev3-touch', or
-	    address=['in1', 'in3']. When argument value is a list, 
+	    address=['in1', 'in3']. When argument value is a list,
         then a match against any entry of the list is enough.
     """
     class_path = abspath(Device.DEVICE_ROOT_PATH + '/' + Sensor.SYSTEM_CLASS_NAME)
-    return (Sensor(name_pattern=name, name_exact=True) 
+    return (Sensor(name_pattern=name, name_exact=True)
             for name in list_device_names(class_path, name_pattern, **kwargs))
-        
+
 
 # ~autogen generic-class classes.i2cSensor>currentClass
 
@@ -1851,8 +1868,13 @@ class TouchSensor(Sensor):
         self.auto_mode = True
 
 
-    # Button state
+    #: Button state
     MODE_TOUCH = 'TOUCH'
+
+
+    MODES = (
+      'TOUCH',
+    )
 
 
     @property
@@ -1883,20 +1905,64 @@ class ColorSensor(Sensor):
         self.auto_mode = True
 
 
-    # Reflected light. Red LED on.
+    #: Reflected light. Red LED on.
     MODE_COL_REFLECT = 'COL-REFLECT'
 
-    # Ambient light. Red LEDs off.
+    #: Ambient light. Red LEDs off.
     MODE_COL_AMBIENT = 'COL-AMBIENT'
 
-    # Color. All LEDs rapidly cycling, appears white.
+    #: Color. All LEDs rapidly cycling, appears white.
     MODE_COL_COLOR = 'COL-COLOR'
 
-    # Raw reflected. Red LED on
+    #: Raw reflected. Red LED on
     MODE_REF_RAW = 'REF-RAW'
 
-    # Raw Color Components. All LEDs rapidly cycling, appears white.
+    #: Raw Color Components. All LEDs rapidly cycling, appears white.
     MODE_RGB_RAW = 'RGB-RAW'
+
+    #: No color.
+    COLOR_NOCOLOR = 0
+
+    #: Black color.
+    COLOR_BLACK = 1
+
+    #: Blue color.
+    COLOR_BLUE = 2
+
+    #: Green color.
+    COLOR_GREEN = 3
+
+    #: Yellow color.
+    COLOR_YELLOW = 4
+
+    #: Red color.
+    COLOR_RED = 5
+
+    #: White color.
+    COLOR_WHITE = 6
+
+    #: Brown color.
+    COLOR_BROWN = 7
+
+
+    MODES = (
+      'COL-REFLECT',
+      'COL-AMBIENT',
+      'COL-COLOR',
+      'REF-RAW',
+      'RGB-RAW',
+    )
+
+    COLORS = (
+      'NoColor',
+      'Black',
+      'Blue',
+      'Green',
+      'Yellow',
+      'Red',
+      'White',
+      'Brown',
+    )
 
 
     @property
@@ -2000,20 +2066,29 @@ class UltrasonicSensor(Sensor):
         self.auto_mode = True
 
 
-    # Continuous measurement in centimeters.
+    #: Continuous measurement in centimeters.
     MODE_US_DIST_CM = 'US-DIST-CM'
 
-    # Continuous measurement in inches.
+    #: Continuous measurement in inches.
     MODE_US_DIST_IN = 'US-DIST-IN'
 
-    # Listen.
+    #: Listen.
     MODE_US_LISTEN = 'US-LISTEN'
 
-    # Single measurement in centimeters.
+    #: Single measurement in centimeters.
     MODE_US_SI_CM = 'US-SI-CM'
 
-    # Single measurement in inches.
+    #: Single measurement in inches.
     MODE_US_SI_IN = 'US-SI-IN'
+
+
+    MODES = (
+      'US-DIST-CM',
+      'US-DIST-IN',
+      'US-LISTEN',
+      'US-SI-CM',
+      'US-SI-IN',
+    )
 
 
     @property
@@ -2068,20 +2143,29 @@ class GyroSensor(Sensor):
         self.auto_mode = True
 
 
-    # Angle
+    #: Angle
     MODE_GYRO_ANG = 'GYRO-ANG'
 
-    # Rotational speed
+    #: Rotational speed
     MODE_GYRO_RATE = 'GYRO-RATE'
 
-    # Raw sensor value
+    #: Raw sensor value
     MODE_GYRO_FAS = 'GYRO-FAS'
 
-    # Angle and rotational speed
+    #: Angle and rotational speed
     MODE_GYRO_G_A = 'GYRO-G&A'
 
-    # Calibration ???
+    #: Calibration ???
     MODE_GYRO_CAL = 'GYRO-CAL'
+
+
+    MODES = (
+      'GYRO-ANG',
+      'GYRO-RATE',
+      'GYRO-FAS',
+      'GYRO-G&A',
+      'GYRO-CAL',
+    )
 
 
     @property
@@ -2134,20 +2218,29 @@ class InfraredSensor(Sensor):
         self.auto_mode = True
 
 
-    # Proximity
+    #: Proximity
     MODE_IR_PROX = 'IR-PROX'
 
-    # IR Seeker
+    #: IR Seeker
     MODE_IR_SEEK = 'IR-SEEK'
 
-    # IR Remote Control
+    #: IR Remote Control
     MODE_IR_REMOTE = 'IR-REMOTE'
 
-    # IR Remote Control. State of the buttons is coded in binary
+    #: IR Remote Control. State of the buttons is coded in binary
     MODE_IR_REM_A = 'IR-REM-A'
 
-    # Calibration ???
+    #: Calibration ???
     MODE_IR_CAL = 'IR-CAL'
+
+
+    MODES = (
+      'IR-PROX',
+      'IR-SEEK',
+      'IR-REMOTE',
+      'IR-REM-A',
+      'IR-CAL',
+    )
 
 
     @property
@@ -2178,11 +2271,17 @@ class SoundSensor(Sensor):
         self.auto_mode = True
 
 
-    # Sound pressure level. Flat weighting
+    #: Sound pressure level. Flat weighting
     MODE_DB = 'DB'
 
-    # Sound pressure level. A weighting
+    #: Sound pressure level. A weighting
     MODE_DBA = 'DBA'
+
+
+    MODES = (
+      'DB',
+      'DBA',
+    )
 
 
     @property
@@ -2225,11 +2324,17 @@ class LightSensor(Sensor):
         self.auto_mode = True
 
 
-    # Reflected light. LED on
+    #: Reflected light. LED on
     MODE_REFLECT = 'REFLECT'
 
-    # Ambient light. LED off
+    #: Ambient light. LED off
     MODE_AMBIENT = 'AMBIENT'
+
+
+    MODES = (
+      'REFLECT',
+      'AMBIENT',
+    )
 
 
     @property
@@ -2598,11 +2703,21 @@ class RemoteControl(ButtonBase):
             11: ['blue_up', 'blue_down']
             }
 
+    #: Handles ``Red Up`` events.
     on_red_up = None
+
+    #: Handles ``Red Down`` events.
     on_red_down = None
+
+    #: Handles ``Blue Up`` events.
     on_blue_up = None
+
+    #: Handles ``Blue Down`` events.
     on_blue_down = None
+
+    #: Handles ``Beacon`` events.
     on_beacon = None
+
 
     @property
     def red_up(self):
@@ -2664,6 +2779,42 @@ class RemoteControl(ButtonBase):
         Returns list of currently pressed buttons.
         """
         return RemoteControl._BUTTON_VALUES.get(self._sensor.value(self._channel), [])
+
+
+class BeaconSeeker(object):
+    """
+    Seeks EV3 Remote Controller in beacon mode.
+    """
+
+    def __init__(self, sensor=None, channel=1):
+        self._sensor  = InfraredSensor() if sensor is None else sensor
+        self._channel = max(1, min(4, channel)) - 1
+
+        if self._sensor.connected:
+            self._sensor.mode = 'IR-SEEK'
+
+    @property
+    def heading(self):
+        """
+        Returns heading (-25, 25) to the beacon on the given channel.
+        """
+        return self._sensor.value(self._channel * 2)
+
+    @property
+    def distance(self):
+        """
+        Returns distance (0, 100) to the beacon on the given channel.
+        Returns -128 when beacon is not found.
+        """
+        return self._sensor.value(self._channel * 2 + 1)
+
+    @property
+    def heading_and_distance(self):
+        """
+        Returns heading and distance to the beacon on the given channel as a
+        tuple.
+        """
+        return self._sensor.value(self._channel * 2), self._sensor.value(self._channel * 2 + 1)
 
 
 # ~autogen generic-class classes.powerSupply>currentClass
@@ -3139,6 +3290,16 @@ class Screen(FbMem):
             raise Exception("Not supported")
 
 
+def _make_scales(notes):
+    """ Utility function used by Sound class for building the note frequencies table """
+    res = dict()
+    for note, freq in notes:
+        freq = round(freq)
+        for n in note.split('/'):
+            res[n] = freq
+    return res
+
+
 class Sound:
     """
     Sound-related functions. The class has only static methods and is not
@@ -3158,6 +3319,14 @@ class Sound:
         # Introduce yourself, wait for completion:
         Sound.speak('Hello, I am Robot').wait()
 
+        # Play a small song
+        Sound.play_song((
+            ('D4', 'e3'),
+            ('D4', 'e3'),
+            ('D4', 'e3'),
+            ('G4', 'h'),
+            ('D5', 'h')
+        ))
     """
 
     channel = None
@@ -3172,7 +3341,7 @@ class Sound:
         .. _`linux beep music`: https://www.google.com/search?q=linux+beep+music
         """
         with open(os.devnull, 'w') as n:
-            return Popen('/usr/bin/beep %s' % args, stdout=n, shell=True)
+            return Popen(shlex.split('/usr/bin/beep %s' % args), stdout=n)
 
     @staticmethod
     def tone(*args):
@@ -3236,7 +3405,7 @@ class Sound:
         Play wav file.
         """
         with open(os.devnull, 'w') as n:
-            return Popen('/usr/bin/aplay -q "%s"' % wav_file, stdout=n, shell=True)
+            return Popen(shlex.split('/usr/bin/aplay -q "%s"' % wav_file), stdout=n)
 
     @staticmethod
     def speak(text, espeak_opts='-a 200 -s 130'):
@@ -3244,11 +3413,17 @@ class Sound:
         Speak the given text aloud.
         """
         with open(os.devnull, 'w') as n:
-            cmd_line = '/usr/bin/espeak --stdout {0} "{1}" | /usr/bin/aplay -q'.format(espeak_opts, text)
-            return Popen(cmd_line, stdout=n, shell=True)
+            cmd_line = '/usr/bin/espeak --stdout {0} "{1}"'.format(espeak_opts, text)
+            espeak = Popen(shlex.split(cmd_line), stdout=PIPE)
+            play = Popen(['/usr/bin/aplay', '-q'], stdin=espeak.stdout, stdout=n)
+            return espeak
 
     @staticmethod
     def _get_channel():
+        """
+        :return: the detected sound channel
+        :rtype: str
+        """
         if Sound.channel is None:
             # Get default channel as the first one that pops up in
             # 'amixer scontrols' output, which contains strings in the
@@ -3279,7 +3454,7 @@ class Sound:
             channel = Sound._get_channel()
 
         cmd_line = '/usr/bin/amixer -q set {0} {1:d}%'.format(channel, pct)
-        Popen(cmd_line, shell=True).wait()
+        Popen(shlex.split(cmd_line)).wait()
 
     @staticmethod
     def get_volume(channel=None):
@@ -3300,3 +3475,248 @@ class Sound:
             return int(m.group('volume'))
         else:
             raise Exception('Failed to parse output of `amixer get {}`'.format(channel))
+
+    @classmethod
+    def play_song(cls, song, tempo=120, delay=50):
+        """ Plays a song provided as a list of tuples containing the note name and its
+        value using music conventional notation instead of numerical values for frequency
+        and duration.
+
+        It supports symbolic notes (e.g. ``A4``, ``D#3``, ``Gb5``) and durations (e.g. ``q``, ``h``).
+
+        For an exhaustive list of accepted note symbols and values, have a look at the :py:attr:`_NOTE_FREQUENCIES`
+        and :py:attr:`_NOTE_VALUES` private dictionaries in the source code.
+
+        The value can be suffixed by modifiers:
+
+        - a *divider* introduced by a ``/`` to obtain triplets for instance
+          (e.g. ``q/3`` for a triplet of eight note)
+        - a *multiplier* introduced by ``*`` (e.g. ``*1.5`` is a dotted note).
+
+        Shortcuts exist for common modifiers:
+
+        - ``3`` produces a triplet member note. For instance `e3` gives a triplet of eight notes,
+          i.e. 3 eight notes in the duration of a single quarter. You must ensure that 3 triplets
+          notes are defined in sequence to match the count, otherwise the result will not be the
+          expected one.
+        - ``.`` produces a dotted note, i.e. which duration is one and a half the base one. Double dots
+          are not currently supported.
+
+        Example::
+
+            >>> # A long time ago in a galaxy far,
+            >>> # far away...
+            >>> Sound.play_song((
+            >>>     ('D4', 'e3'),      # intro anacrouse
+            >>>     ('D4', 'e3'),
+            >>>     ('D4', 'e3'),
+            >>>     ('G4', 'h'),       # meas 1
+            >>>     ('D5', 'h'),
+            >>>     ('C5', 'e3'),      # meas 2
+            >>>     ('B4', 'e3'),
+            >>>     ('A4', 'e3'),
+            >>>     ('G5', 'h'),
+            >>>     ('D5', 'q'),
+            >>>     ('C5', 'e3'),      # meas 3
+            >>>     ('B4', 'e3'),
+            >>>     ('A4', 'e3'),
+            >>>     ('G5', 'h'),
+            >>>     ('D5', 'q'),
+            >>>     ('C5', 'e3'),      # meas 4
+            >>>     ('B4', 'e3'),
+            >>>     ('C5', 'e3'),
+            >>>     ('A4', 'h.'),
+            >>> ))
+
+        .. important::
+
+            Only 4/4 signature songs are supported with respect to note durations.
+
+        Args:
+            song (iterable[tuple(str, str)]): the song
+            tempo (int): the song tempo, given in quarters per minute
+            delay (int): delay in ms between notes
+
+        Returns:
+            subprocess.Popen: the spawn subprocess
+        """
+        meas_duration = 60000 / tempo * 4
+
+        def beep_args(note, value):
+            """ Builds the arguments string for producing a beep matching
+            the requested note and value.
+
+            Args:
+                note (str): the note note and octave
+                value (str): the note value expression
+            Returns:
+                str: the arguments to be passed to the beep command
+            """
+            freq = Sound._NOTE_FREQUENCIES[note.upper()]
+            if '/' in value:
+                base, factor = value.split('/')
+                duration = meas_duration * Sound._NOTE_VALUES[base] / float(factor)
+            elif '*' in value:
+                base, factor = value.split('*')
+                duration = meas_duration * Sound._NOTE_VALUES[base] * float(factor)
+            elif value.endswith('.'):
+                base = value[:-1]
+                duration = meas_duration * Sound._NOTE_VALUES[base] * 1.5
+            elif value.endswith('3'):
+                base = value[:-1]
+                duration = meas_duration * Sound._NOTE_VALUES[base] * 2 / 3
+            else:
+                duration = meas_duration * Sound._NOTE_VALUES[value]
+
+            return '-f %d -l %d -D %d' % (freq, duration, delay)
+
+        return Sound.beep(' -n '.join(
+            [beep_args(note, value) for note, value in song]
+        ))
+
+    #: Note frequencies.
+    #:
+    #: This dictionary gives the rounded frequency of a note specified by its
+    #: standard US abbreviation and its octave number (e.g. ``C3``).
+    #: Alterations use the ``#`` and ``b`` symbols, respectively for
+    #: *sharp* and *flat*, between the note code and the octave number (e.g. ``D#4``, ``Gb5``).
+    _NOTE_FREQUENCIES = _make_scales((
+        ('C0', 16.35),
+        ('C#0/Db0', 17.32),
+        ('D0', 18.35),
+        ('D#0/Eb0', 19.45),     # expanded in one entry per symbol by _make_scales
+        ('E0', 20.60),
+        ('F0', 21.83),
+        ('F#0/Gb0', 23.12),
+        ('G0', 24.50),
+        ('G#0/Ab0', 25.96),
+        ('A0', 27.50),
+        ('A#0/Bb0', 29.14),
+        ('B0', 30.87),
+        ('C1', 32.70),
+        ('C#1/Db1', 34.65),
+        ('D1', 36.71),
+        ('D#1/Eb1', 38.89),
+        ('E1', 41.20),
+        ('F1', 43.65),
+        ('F#1/Gb1', 46.25),
+        ('G1', 49.00),
+        ('G#1/Ab1', 51.91),
+        ('A1', 55.00),
+        ('A#1/Bb1', 58.27),
+        ('B1', 61.74),
+        ('C2', 65.41),
+        ('C#2/Db2', 69.30),
+        ('D2', 73.42),
+        ('D#2/Eb2', 77.78),
+        ('E2', 82.41),
+        ('F2', 87.31),
+        ('F#2/Gb2', 92.50),
+        ('G2', 98.00),
+        ('G#2/Ab2', 103.83),
+        ('A2', 110.00),
+        ('A#2/Bb2', 116.54),
+        ('B2', 123.47),
+        ('C3', 130.81),
+        ('C#3/Db3', 138.59),
+        ('D3', 146.83),
+        ('D#3/Eb3', 155.56),
+        ('E3', 164.81),
+        ('F3', 174.61),
+        ('F#3/Gb3', 185.00),
+        ('G3', 196.00),
+        ('G#3/Ab3', 207.65),
+        ('A3', 220.00),
+        ('A#3/Bb3', 233.08),
+        ('B3', 246.94),
+        ('C4', 261.63),
+        ('C#4/Db4', 277.18),
+        ('D4', 293.66),
+        ('D#4/Eb4', 311.13),
+        ('E4', 329.63),
+        ('F4', 349.23),
+        ('F#4/Gb4', 369.99),
+        ('G4', 392.00),
+        ('G#4/Ab4', 415.30),
+        ('A4', 440.00),
+        ('A#4/Bb4', 466.16),
+        ('B4', 493.88),
+        ('C5', 523.25),
+        ('C#5/Db5', 554.37),
+        ('D5', 587.33),
+        ('D#5/Eb5', 622.25),
+        ('E5', 659.25),
+        ('F5', 698.46),
+        ('F#5/Gb5', 739.99),
+        ('G5', 783.99),
+        ('G#5/Ab5', 830.61),
+        ('A5', 880.00),
+        ('A#5/Bb5', 932.33),
+        ('B5', 987.77),
+        ('C6', 1046.50),
+        ('C#6/Db6', 1108.73),
+        ('D6', 1174.66),
+        ('D#6/Eb6', 1244.51),
+        ('E6', 1318.51),
+        ('F6', 1396.91),
+        ('F#6/Gb6', 1479.98),
+        ('G6', 1567.98),
+        ('G#6/Ab6', 1661.22),
+        ('A6', 1760.00),
+        ('A#6/Bb6', 1864.66),
+        ('B6', 1975.53),
+        ('C7', 2093.00),
+        ('C#7/Db7', 2217.46),
+        ('D7', 2349.32),
+        ('D#7/Eb7', 2489.02),
+        ('E7', 2637.02),
+        ('F7', 2793.83),
+        ('F#7/Gb7', 2959.96),
+        ('G7', 3135.96),
+        ('G#7/Ab7', 3322.44),
+        ('A7', 3520.00),
+        ('A#7/Bb7', 3729.31),
+        ('B7', 3951.07),
+        ('C8', 4186.01),
+        ('C#8/Db8', 4434.92),
+        ('D8', 4698.63),
+        ('D#8/Eb8', 4978.03),
+        ('E8', 5274.04),
+        ('F8', 5587.65),
+        ('F#8/Gb8', 5919.91),
+        ('G8', 6271.93),
+        ('G#8/Ab8', 6644.88),
+        ('A8', 7040.00),
+        ('A#8/Bb8', 7458.62),
+        ('B8', 7902.13)
+    ))
+
+    #: Common note values.
+    #:
+    #: See https://en.wikipedia.org/wiki/Note_value
+    #:
+    #: This dictionary provides the multiplier to be applied to de whole note duration
+    #: to obtain subdivisions, given the corresponding symbolic identifier:
+    #:
+    #:  = ===============================
+    #:  w whole note (UK: semibreve)
+    #:  h half note (UK: minim)
+    #:  q quarter note (UK: crotchet)
+    #:  e eight note (UK: quaver)
+    #:  s sixteenth note (UK: semiquaver)
+    #:  = ===============================
+    #:
+    #:
+    #: Triplets can be obtained by dividing the corresponding reference by 3.
+    #: For instance, the note value of a eight triplet will be ``NOTE_VALUE['e'] / 3``.
+    #: It is simpler however to user the ``3`` modifier of notes, as supported by the
+    #: :py:meth:`Sound.play_song` method.
+    _NOTE_VALUES = {
+        'w': 1.,
+        'h': 1./2,
+        'q': 1./4,
+        'e': 1./8,
+        's': 1./16,
+    }
+
+

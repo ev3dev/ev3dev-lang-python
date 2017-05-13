@@ -22,6 +22,13 @@ Remote Control
 
     .. rubric:: Member functions and properties
 
+Beacon Seeker
+-------------
+
+.. autoclass:: BeaconSeeker
+    :members:
+    :inherited-members:
+
 Button
 ------
 
