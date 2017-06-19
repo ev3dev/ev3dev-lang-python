@@ -142,7 +142,7 @@ ev3python.com
     One of our community members, @ndward, has put together a great website
     with detailed guides on using this library which are targeted at beginners.
     If you are just getting started with programming, we highly recommend
-    that you check it out at `ev3python.com`!
+    that you check it out at `ev3python.com`_!
 
 Frequently-Asked Questions
     Experiencing an odd error or unsure of how to do something that seems
