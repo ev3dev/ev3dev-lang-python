@@ -909,6 +909,8 @@ class Motor(Device):
             if cond(self.state):
                 return True
 
+    def wait_until_not_moving(self, timeout=None):
+        return self.wait(lambda state: self.STATE_RUNNING not in state or self.STATE_STALLED in state, timeout)
 
     def wait_until(self, s, timeout=None):
         """
