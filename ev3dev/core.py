@@ -909,6 +909,21 @@ class Motor(Device):
             if cond(self.state):
                 return True
 
+    def wait_until_not_moving(self, timeout=None):
+        """
+        Blocks until ``running`` is not in ``self.state`` or ``stalled`` is in
+        ``self.state``.  The condition is checked when there is an I/O event
+        related to the ``state`` attribute.  Exits early when ``timeout``
+        (in milliseconds) is reached.
+
+        Returns ``True`` if the condition is met, and ``False`` if the timeout
+        is reached.
+
+        Example::
+
+            m.wait_until_not_moving()
+        """
+        return self.wait(lambda state: self.STATE_RUNNING not in state or self.STATE_STALLED in state, timeout)
 
     def wait_until(self, s, timeout=None):
         """
