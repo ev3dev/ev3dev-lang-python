@@ -1613,6 +1613,7 @@ class Sensor(Device):
         self._bin_data_format = None
         self._bin_data_size = None
         self._bin_data = None
+        self._mode_scale = {}
 
     __slots__ = [
 # ~autogen generic-class-slots classes.sensor>currentClass
@@ -1632,7 +1633,20 @@ class Sensor(Device):
     '_bin_data_format',
     '_bin_data_size',
     '_bin_data',
+    '_mode_scale'
     ]
+
+    def _scale(self, mode):
+        """
+        Returns value scaling coefficient for the given mode.
+        """
+        if self._mode_scale.contains(mode):
+            scale = self._mode_scale[mode]
+        else:
+            scale = 10**(-self.decimals)
+            self._mode_scale[mode] = scale
+
+        return scale
 
 # ~autogen generic-get-set classes.sensor>currentClass
 
@@ -2116,7 +2130,7 @@ class UltrasonicSensor(Sensor):
         if self.auto_mode:
             self.mode = self.MODE_US_DIST_CM
 
-        return self.value(0)
+        return self.value(0) * self._scale('US_DIST_CM')
 
     @property
     def distance_inches(self):
@@ -2128,7 +2142,7 @@ class UltrasonicSensor(Sensor):
         if self.auto_mode:
             self.mode = self.MODE_US_DIST_IN
 
-        return self.value(0)
+        return self.value(0) * self._scale('US_DIST_IN')
 
     @property
     def other_sensor_present(self):
@@ -2309,7 +2323,7 @@ class SoundSensor(Sensor):
         if self.auto_mode:
             self.mode = self.MODE_DB
 
-        return self.value(0)
+        return self.value(0) * self._scale('DB')
 
     @property
     def sound_pressure_low(self):
@@ -2321,7 +2335,7 @@ class SoundSensor(Sensor):
         if self.auto_mode:
             self.mode = self.MODE_DBA
 
-        return self.value(0)
+        return self.value(0) * self._scale('DBA')
 
 class LightSensor(Sensor):
 
@@ -2361,7 +2375,7 @@ class LightSensor(Sensor):
         if self.auto_mode:
             self.mode = self.MODE_REFLECT
 
-        return self.value(0)
+        return self.value(0) * self._scale('REFLECT')
 
     @property
     def ambient_light_intensity(self):
@@ -2372,7 +2386,7 @@ class LightSensor(Sensor):
         if self.auto_mode:
             self.mode = self.MODE_AMBIENT
 
-        return self.value(0)
+        return self.value(0) * self._scale('AMBIENT')
 
 
 # ~autogen

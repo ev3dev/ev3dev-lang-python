@@ -87,7 +87,7 @@ assign propName = prop.propertyName | upcase | underscore_spaces%}
 
         return {%
   for value_index in mapping.sourceValue
-  %}self.value({{ value_index }}){% unless forloop.last %}, {% endunless %}{%
+  %}self.value({{ value_index }}){% if mapping.type contains 'float' %} * self._scale('{{ mode }}'){% endif %}{% unless forloop.last %}, {% endunless %}{%
   endfor %}
 {% endfor %}{%
 endfor %}
