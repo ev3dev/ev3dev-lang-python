@@ -1640,7 +1640,7 @@ class Sensor(Device):
         """
         Returns value scaling coefficient for the given mode.
         """
-        if self._mode_scale.contains(mode):
+        if mode in self._mode_scale:
             scale = self._mode_scale[mode]
         else:
             scale = 10**(-self.decimals)
