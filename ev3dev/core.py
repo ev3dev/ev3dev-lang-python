@@ -204,11 +204,30 @@ class Device(object):
                 attribute = self._attribute_file_open( name )
             else:
                 attribute.seek(0)
-            attribute.write(value.encode())
-            attribute.flush()
+
+            try:
+                attribute.write(value.encode())
+                attribute.flush()
+            except Exception as ex:
+                _raise_friendly_access_error(ex, name)
             return attribute
         else:
             raise Exception('Device is not connected')
+
+    def _raise_friendly_access_error(driver_error, attribute):
+        if not isinstance(driver_error, OSError):
+            raise driver_error
+
+        if driver_error.errno == errno.EINVAL:
+            if attribute == "speed_sp":
+                try:
+                    max_speed = self.max_speed
+                except AttributeError, Exception:
+                    raise Exception("The given speed value was out of range")
+                else:
+                    raise Exception("The given speed value was out of range. Max speed: " + str(max_speed))
+            raise Exception("One or more arguments were out of range or invalid")
+        raise driver_error
 
     def get_attr_int(self, attribute, name):
         attribute, value = self._get_attribute(attribute, name)
