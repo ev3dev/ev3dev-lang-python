@@ -222,7 +222,7 @@ class Device(object):
             if attribute == "speed_sp":
                 try:
                     max_speed = self.max_speed
-                except AttributeError, Exception:
+                except (AttributeError, Exception):
                     raise Exception("The given speed value was out of range")
                 else:
                     raise Exception("The given speed value was out of range. Max speed: " + str(max_speed))
