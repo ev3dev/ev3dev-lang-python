@@ -223,10 +223,10 @@ class Device(object):
                 try:
                     max_speed = self.max_speed
                 except (AttributeError, Exception):
-                    raise Exception("The given speed value was out of range")
+                    raise ValueError("The given speed value was out of range")
                 else:
-                    raise Exception("The given speed value was out of range. Max speed: " + str(max_speed))
-            raise Exception("One or more arguments were out of range or invalid")
+                    raise ValueError("The given speed value was out of range. Max speed: " + str(max_speed))
+            raise ValueError("One or more arguments were out of range or invalid")
         raise driver_error
 
     def get_attr_int(self, attribute, name):
