@@ -7,6 +7,7 @@ import re
 import sys
 import time
 import ev3dev.auto
+from collections import OrderedDict
 from ev3dev.auto import (RemoteControl, list_motors,
                          INPUT_1, INPUT_2, INPUT_3, INPUT_4,
                          OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D)
@@ -144,6 +145,171 @@ class LargeMotor(ev3dev.auto.LargeMotor, MotorMixin):
 
 class MediumMotor(ev3dev.auto.MediumMotor, MotorMixin):
     pass
+
+
+class MotorSet(object):
+    """
+    motor_specs is a dictionary such as
+    {
+        OUTPUT_A : LargeMotor,
+        OUTPUT_B : MediumMotor,
+    }
+    """
+
+    def __init__(self, motor_specs, desc=None):
+
+        for motor_port in motor_specs.keys():
+            if motor_port not in OUTPUTS:
+                log.error("%s in an invalid motor, choices are %s" % (motor_port, ', '.join(OUTPUTS)))
+                sys.exit(1)
+
+        self.motors = OrderedDict()
+        for motor_port in sorted(motor_specs.keys()):
+            motor_class = motor_specs[motor_port]
+            self.motors[motor_port] = motor_class(motor_port)
+
+        self.desc = desc
+        self.verify_connected()
+
+    def __str__(self):
+
+        if self.desc:
+            return self.desc
+        else:
+            return self.__class__.__name__
+
+    def verify_connected(self):
+        for motor in self.motors.values():
+            if not motor.connected:
+                log.error("%s: %s is not connected" % (self, motor))
+                sys.exit(1)
+
+    def set_args(self, **kwargs):
+        motors = kwargs.get('motors', self.motors.values())
+
+        for motor in motors:
+            for key in kwargs:
+                if key != 'motors':
+                    setattr(motor, key, kwargs[key])
+
+    def _run_command(self, **kwargs):
+        motors = kwargs.get('motors', self.motors.values())
+
+        for motor in motors:
+            for key in kwargs:
+                if key not in ('motors', 'commands'):
+                    log.info("%s: %s set %s to %s" % (self, motor, key, kwargs[key]))
+                    setattr(motor, key, kwargs[key])
+
+        for motor in motors:
+            motor.command = kwargs['command']
+            log.info("%s: %s command %s" % (self, motor, kwargs['command']))
+
+    def run_forever(self, **kwargs):
+        kwargs['command'] = ev3dev.auto.LargeMotor.COMMAND_RUN_FOREVER
+        self._run_command(**kwargs)
+
+    def run_to_abs_pos(self, **kwargs):
+        kwargs['command'] = ev3dev.auto.LargeMotor.COMMAND_RUN_TO_ABS_POS
+        self._run_command(**kwargs)
+
+    def run_to_rel_pos(self, **kwargs):
+        kwargs['command'] = ev3dev.auto.LargeMotor.COMMAND_RUN_TO_REL_POS
+        self._run_command(**kwargs)
+
+    def run_timed(self, **kwargs):
+        kwargs['command'] = ev3dev.auto.LargeMotor.COMMAND_RUN_TIMED
+        self._run_command(**kwargs)
+
+    def run_direct(self, **kwargs):
+        kwargs['command'] = ev3dev.auto.LargeMotor.COMMAND_RUN_DIRECT
+        self._run_command(**kwargs)
+
+    def reset(self, motors=None):
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            motor.reset()
+
+    def stop(self, motors=None):
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            motor.stop()
+
+    def _is_state(self, motors, state):
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            if state not in motor.state:
+                return False
+
+        return True
+
+    @property
+    def is_running(self, motors=None):
+        return self._is_state(motors, ev3dev.auto.LargeMotor.STATE_RUNNING)
+
+    @property
+    def is_ramping(self, motors=None):
+        return self._is_state(motors, ev3dev.auto.LargeMotor.STATE_RAMPING)
+
+    @property
+    def is_holding(self, motors=None):
+        return self._is_state(motors, ev3dev.auto.LargeMotor.STATE_HOLDING)
+
+    @property
+    def is_overloaded(self, motors=None):
+        return self._is_state(motors, ev3dev.auto.LargeMotor.STATE_OVERLOADED)
+
+    @property
+    def is_stalled(self):
+        return self._is_state(motors, ev3dev.auto.LargeMotor.STATE_STALLED)
+
+    def wait(self, cond, timeout=None, motors=None):
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            motor.wait(cond, timeout)
+
+    def wait_until_not_moving(self, timeout=None, motors=None):
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            motor.wait_until_not_moving(timeout)
+
+    def wait_until(self, s, timeout=None, motors=None):
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            motor.wait_until(s, timeout)
+
+    def wait_while(self, s, timeout=None, motors=None):
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            motor.wait_while(s, timeout)
+
+
+class LargeMotorPair(MotorSet):
+
+    def __init__(self, left_motor, right_motor, desc=None):
+        motor_specs = {
+            left_motor : LargeMotor,
+            right_motor : LargeMotor,
+        }
+        MotorSet.__init__(self, motor_specs, desc)
+
+
+class MediumMotorPair(MotorSet):
+
+    def __init__(self, left_motor, right_motor, desc=None):
+        motor_specs = {
+            left_motor : MediumMotor,
+            right_motor : MediumMotor,
+        }
+        MotorSet.__init__(self, motor_specs, desc)
+
 
 
 class ColorSensorMixin(object):
