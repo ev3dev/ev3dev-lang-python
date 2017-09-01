@@ -218,10 +218,10 @@ Python 3 and this is the only version that will be supported from here forward.
 .. _detailed instructions for USB connections: ev3dev-usb-internet_
 .. _connected to your EV3 (or Raspberry Pi / BeagleBone) via SSH: http://www.ev3dev.org/docs/tutorials/connecting-to-ev3dev-with-ssh/
 .. _ev3dev-usb-internet: http://www.ev3dev.org/docs/tutorials/connecting-to-the-internet-via-usb/
-.. _our Read the Docs page: http://python-ev3dev.readthedocs.org/en/latest/
+.. _our Read the Docs page: http://python-ev3dev.readthedocs.org/en/stable/
 .. _source repository for the generic API: ev3dev-lang_
 .. _ev3python.com: http://ev3python.com/
-.. _FAQ: http://python-ev3dev.readthedocs.io/en/latest/faq.html
+.. _FAQ: http://python-ev3dev.readthedocs.io/en/stable/faq.html
 .. _ev3dev-lang: https://github.com/ev3dev/ev3dev-lang
 .. _ev3dev-lang-python: https://github.com/rhempel/ev3dev-lang-python
 .. _our Issues tracker: https://github.com/rhempel/ev3dev-lang-python/issues
