@@ -57,9 +57,18 @@ paste the code into your session.
 Required: Import the library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+If you are using an EV3 brick (which is the case for most users), add the
+following to the top of your file:
+
 .. code-block:: python
 
   import ev3dev.ev3 as ev3
+
+If you are using a BrickPi, use this line:
+
+.. code-block:: python
+
+  import ev3dev.brickpi as ev3
 
 Controlling the LEDs with a touch sensor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
