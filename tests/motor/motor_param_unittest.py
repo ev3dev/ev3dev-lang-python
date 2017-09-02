@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Based on the parameterized  test case technique described here:
 #
@@ -10,6 +10,7 @@ import sys
 import ev3dev.ev3 as ev3
 
 import parameterizedtestcase as ptc
+import os
 
 from motor_info import motor_info
 
@@ -495,12 +496,13 @@ class TestTachoMotorTimeSpValue(ptc.ParameterizedTestCase):
 class TestTachoMotorDummy(ptc.ParameterizedTestCase):
 
     def test_dummy_no_message(self):
+
         try:
             self.assertEqual(self._param['motor'].speed_d, 100, "Some clever error message {0}".format(self._param['motor'].speed_d))
-        except:
+        except Exception:
            # Remove traceback info as we don't need it
            unittest_exception = sys.exc_info()
-           raise unittest_exception[0], unittest_exception[1], unittest_exception[2].tb_next
+           print("%s,%s,%s" % (unittest_exception[0], unittest_exception[1], unittest_exception[2].tb_next))
 
 # Add all the tests to the suite - some tests apply only to certain drivers!
 
@@ -535,8 +537,26 @@ def AddTachoMotorParameterTestsToSuite( suite, driver_name, params ):
     suite.addTest(ptc.ParameterizedTestCase.parameterize(TestTachoMotorDummy, param=params))
 
 if __name__ == '__main__':
-     for k in motor_info:
-        file = open('/sys/class/lego-port/port4/set_device', 'w')
+    port_for_outA = None
+
+    # which port has outA?
+    for filename in os.listdir('/sys/class/lego-port/'):
+        address_filename = '/sys/class/lego-port/%s/address' % filename
+
+        if os.path.exists(address_filename):
+            with open(address_filename, 'r') as fh:
+                for line in fh:
+                    if line.rstrip().endswith(':outA'):
+                        port_for_outA = filename
+                        break
+
+        if port_for_outA:
+            break
+    else:
+        raise Exception("Could not find port /sys/class/lego-port/ for outA")
+
+    for k in motor_info:
+        file = open('/sys/class/lego-port/%s/set_device' % port_for_outA, 'w')
         file.write('{0}\n'.format(k))
         file.close()
         time.sleep(0.5)
@@ -548,4 +568,3 @@ if __name__ == '__main__':
         AddTachoMotorParameterTestsToSuite( suite, k, params )
         print( '-------------------- TESTING {0} --------------'.format(k))
         unittest.TextTestRunner(verbosity=1,buffer=True ).run(suite)
-
