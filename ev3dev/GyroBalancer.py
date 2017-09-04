@@ -29,7 +29,7 @@ import math
 import time
 from collections import deque
 from ev3dev.auto import *
-from ev3dev.helper import Tank
+from ev3dev.helper import LargeMotorPair
 
 
 log = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ def SetDuty(motorDutyFileHandle, duty):
     FastWrite(motorDutyFileHandle, duty)
 
 
-class GyroBalancer(Tank):
+class GyroBalancer(LargeMotorPair):
     """
     Base class for a robot that stands on two wheels and uses a gyro sensor
     to keep its balance.
@@ -77,7 +77,7 @@ class GyroBalancer(Tank):
                  gainMotorAngleErrorAccumulated,  # For every radian x s of accumulated motor angle,          apply this amount of duty cycle
                  left_motor=OUTPUT_D,
                  right_motor=OUTPUT_A):
-        Tank.__init__(self, left_motor, right_motor)
+        LargeMotorPair.__init__(self, left_motor, right_motor)
 
         # magic numbers
         self.gainGyroAngle                  = gainGyroAngle

@@ -190,7 +190,20 @@ class MotorSet(object):
         for motor in motors:
             for key in kwargs:
                 if key != 'motors':
-                    setattr(motor, key, kwargs[key])
+                    try:
+                        setattr(motor, key, kwargs[key])
+                    except AttributeError as e:
+                        log.error("%s %s cannot set %s to %s" % (self, motor, key, kwargs[key]))
+                        raise e
+
+    def set_polarity(self, polarity, motors=None):
+        valid_choices = ('normal', 'inversed')
+        assert polarity in valid_choices,\
+            "%s is an invalid polarity choice, must be %s" % (polarity, ', '.join(valid_choices))
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            motor.polarity = polarity
 
     def _run_command(self, **kwargs):
         motors = kwargs.get('motors', self.motors.values())
@@ -291,25 +304,58 @@ class MotorSet(object):
             motor.wait_while(s, timeout)
 
 
-class LargeMotorPair(MotorSet):
+class MotorPair(MotorSet):
+
+    def __init__(self, motor_specs, desc=None):
+        MotorSet.__init__(self, motor_specs, desc)
+        (self.left_motor, self.right_motor) = self.motors.values()
+        self.max_speed = self.left_motor.max_speed
+
+    def set_speed_ratio(self, left_motor_ratio, right_motor_ratio, set_right=True):
+        """
+        Set the speeds of the left_motor vs right_motor by ratio
+        """
+
+        # Set the right_motor speed relative to the left_motor_speed
+        if set_right:
+            self.right_motor.speed_sp = int((self.left_motor.speed_sp * left_motor_ratio) / right_motor_ratio)
+        else:
+            self.left_motor.speed_sp = int((self.right_motor.speed_sp * right_motor_ratio) / left_motor_ratio)
+
+    def set_speed_percentage(self, left_motor_percentage, right_motor_percentage):
+        """
+        Set the speeds of the left_motor vs right_motor by percentage of their maximum speed
+        """
+
+        # Convert left_motor_percentage and right_motor_percentage to fractions
+        if left_motor_percentage > 1:
+            left_motor_percentage = left_motor_percentage / 100.0
+
+        if right_motor_percentage > 1:
+            right_motor_percentage = right_motor_percentage / 100.0
+
+        self.left_motor.speed_sp = int(self.max_speed * left_motor_percentage)
+        self.right_motor.speed_sp = int(self.max_speed * right_motor_percentage)
+
+
+class LargeMotorPair(MotorPair):
 
     def __init__(self, left_motor, right_motor, desc=None):
         motor_specs = {
             left_motor : LargeMotor,
             right_motor : LargeMotor,
         }
-        MotorSet.__init__(self, motor_specs, desc)
+        MotorPair.__init__(self, motor_specs, desc)
 
 
-class MediumMotorPair(MotorSet):
+class MediumMotorPair(MotorPair):
 
     def __init__(self, left_motor, right_motor, desc=None):
         motor_specs = {
             left_motor : MediumMotor,
             right_motor : MediumMotor,
         }
-        MotorSet.__init__(self, motor_specs, desc)
-
+        MotorPair.__init__(self, motor_specs, desc)
 
 
 class ColorSensorMixin(object):
@@ -333,57 +379,34 @@ class ColorSensor(ev3dev.auto.ColorSensor, ColorSensorMixin):
 # ============
 # Tank classes
 # ============
-class Tank(object):
+class Tank(LargeMotorPair):
+    """
+    This class is here for backwards compatibility for anyone who was using
+    this library before the days of LargeMotorPair. We wrote the Tank class
+    first, then LargeMotorPair.  All future work will be in the MotorSet,
+    MotorPair, etc classes
+    """
 
-    def __init__(self, left_motor, right_motor, polarity='normal', name='Tank'):
-
-        for motor in (left_motor, right_motor):
-            if motor not in OUTPUTS:
-                log.error("%s in an invalid motor, choices are %s" % (motor, ', '.join(OUTPUTS)))
-                sys.exit(1)
-
-        self.left_motor = LargeMotor(left_motor)
-        self.right_motor = LargeMotor(right_motor)
-
-        for x in (self.left_motor, self.right_motor):
-            if not x.connected:
-                log.error("%s is not connected" % x)
-                sys.exit(1)
-
-        self.left_motor.reset()
-        self.right_motor.reset()
-        self.speed_sp = 400
-        self.left_motor.speed_sp = self.speed_sp
-        self.right_motor.speed_sp = self.speed_sp
+    def __init__(self, left_motor_port, right_motor_port, polarity='normal', name='Tank'):
+        LargeMotorPair.__init__(self, left_motor_port, right_motor_port, name)
         self.set_polarity(polarity)
-        self.name = name
-
-    def __str__(self):
-        return self.name
-
-    def set_polarity(self, polarity):
-        valid_choices = ('normal', 'inversed')
-        assert polarity in valid_choices,\
-            "%s is an invalid polarity choice, must be %s" % (polarity, ', '.join(valid_choices))
-
-        self.left_motor.polarity = polarity
-        self.right_motor.polarity = polarity
+        self.speed_sp = 400
 
 
-class RemoteControlledTank(Tank):
+class RemoteControlledTank(LargeMotorPair):
 
-    def __init__(self, left_motor, right_motor, polarity='inversed'):
-        Tank.__init__(self, left_motor, right_motor, polarity)
+    def __init__(self, left_motor_port, right_motor_port, polarity='inversed', speed=400):
+        LargeMotorPair.__init__(self, left_motor_port, right_motor_port)
+        self.set_polarity(polarity)
+
+        left_motor = self.motors[left_motor_port]
+        right_motor = self.motors[right_motor_port]
+        self.speed_sp = speed
         self.remote = RemoteControl(channel=1)
-
-        if not self.remote.connected:
-            log.error("%s is not connected" % self.remote)
-            sys.exit(1)
-
-        self.remote.on_red_up = self.make_move(self.left_motor, self.speed_sp)
-        self.remote.on_red_down = self.make_move(self.left_motor, self.speed_sp * -1)
-        self.remote.on_blue_up = self.make_move(self.right_motor, self.speed_sp)
-        self.remote.on_blue_down = self.make_move(self.right_motor, self.speed_sp * -1)
+        self.remote.on_red_up = self.make_move(left_motor, self.speed_sp)
+        self.remote.on_red_down = self.make_move(left_motor, self.speed_sp* -1)
+        self.remote.on_blue_up = self.make_move(right_motor, self.speed_sp)
+        self.remote.on_blue_down = self.make_move(right_motor, self.speed_sp * -1)
 
     def make_move(self, motor, dc_sp):
         def move(state):
@@ -403,9 +426,7 @@ class RemoteControlledTank(Tank):
         # Exit cleanly so that all motors are stopped
         except (KeyboardInterrupt, Exception) as e:
             log.exception(e)
-
-            for motor in list_motors():
-                motor.stop()
+            self.stop()
 
 
 # =====================
