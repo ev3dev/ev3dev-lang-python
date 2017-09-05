@@ -211,12 +211,12 @@ class MotorSet(object):
         for motor in motors:
             for key in kwargs:
                 if key not in ('motors', 'commands'):
-                    log.info("%s: %s set %s to %s" % (self, motor, key, kwargs[key]))
+                    log.debug("%s: %s set %s to %s" % (self, motor, key, kwargs[key]))
                     setattr(motor, key, kwargs[key])
 
         for motor in motors:
             motor.command = kwargs['command']
-            log.info("%s: %s command %s" % (self, motor, kwargs['command']))
+            log.debug("%s: %s command %s" % (self, motor, kwargs['command']))
 
     def run_forever(self, **kwargs):
         kwargs['command'] = ev3dev.auto.LargeMotor.COMMAND_RUN_FOREVER
@@ -311,28 +311,56 @@ class MotorPair(MotorSet):
         (self.left_motor, self.right_motor) = self.motors.values()
         self.max_speed = self.left_motor.max_speed
 
-    def set_speed_ratio(self, left_motor_ratio, right_motor_ratio, set_right=True):
+    def set_speed_steering(self, direction, power=100):
         """
-        Set the speeds of the left_motor vs right_motor by ratio
+        Set the speed_sp for each motor in a pair to achieve the specified steering
+
+        direction [-100, 100]:
+            * -100 means turn left as fast as possible,
+            *  0   means drive in a straight line, and
+            *  100 means turn right as fast as possible.
+
+        power: the power that should be applied to the outmost motor (the one
+               rotating faster). The power of the other motor will be computed
+               automatically.
         """
 
-        # Set the right_motor speed relative to the left_motor_speed
-        if set_right:
-            self.right_motor.speed_sp = int((self.left_motor.speed_sp * left_motor_ratio) / right_motor_ratio)
+        assert direction >= -100 and direction <= 100,\
+            "%s is an invalid direction, must be between -100 and 100 (inclusive)" % direction
+
+        left_power = power
+        right_power = power
+        speed = (50 - abs(float(direction))) / 50
+
+        if direction >= 0:
+            right_power *= speed
         else:
-            self.left_motor.speed_sp = int((self.right_motor.speed_sp * right_motor_ratio) / left_motor_ratio)
+            left_power *= speed
+
+        left_power = int(left_power)
+        right_power = int(right_power)
+        log.debug("%s: direction %d, power %d, speed %d, left_power %d, right_power %d" %
+            (self, direction, power, speed, left_power, right_power))
+
+        self.left_motor.speed_sp = int(left_power)
+        self.right_motor.speed_sp = int(right_power)
 
     def set_speed_percentage(self, left_motor_percentage, right_motor_percentage):
         """
-        Set the speeds of the left_motor vs right_motor by percentage of their maximum speed
+        Set the speeds of the left_motor vs right_motor by percentage of
+        their maximum speed.  The minimum valid percentage is -100, the
+        maximum is 100.
         """
 
-        # Convert left_motor_percentage and right_motor_percentage to fractions
-        if left_motor_percentage > 1:
-            left_motor_percentage = left_motor_percentage / 100.0
+        assert left_motor_percentage >= -100 and left_motor_percentage <= 100,\
+            "%s is an invalid percentage, must be between -100 and 100 (inclusive)" % left_motor_percentage
 
-        if right_motor_percentage > 1:
-            right_motor_percentage = right_motor_percentage / 100.0
+        assert right_motor_percentage >= -100 and right_motor_percentage <= 100,\
+            "%s is an invalid percentage, must be between -100 and 100 (inclusive)" % right_motor_percentage
+
+        # Convert left_motor_percentage and right_motor_percentage to fractions
+        left_motor_percentage = left_motor_percentage / 100.0
+        right_motor_percentage = right_motor_percentage / 100.0
 
         self.left_motor.speed_sp = int(self.max_speed * left_motor_percentage)
         self.right_motor.speed_sp = int(self.max_speed * right_motor_percentage)
