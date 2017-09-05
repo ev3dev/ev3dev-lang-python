@@ -142,7 +142,7 @@ class Device(object):
 
         def get_index(file):
             match = Device._DEVICE_INDEX.match(file)
-            if match :
+            if match:
                 return int(match.group(1))
             else:
                 return None
