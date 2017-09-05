@@ -19,9 +19,9 @@ python-ev3dev (1.0.0) stable; urgency=medium
   [Daniel Walton]
   * Add wait_until_not_moving for motors
 
- -- TODO
+ -- Denis Demidov <dennis.demidov@gmail.com>  Tue, 05 Sep 2017 16:50:20 +0300
 
- python-ev3dev (0.8.1) stable; urgency=medium
+python-ev3dev (0.8.1) stable; urgency=medium
 
   [Kaelin Laundry]
   * Documentation updates
