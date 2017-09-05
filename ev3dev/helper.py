@@ -311,7 +311,7 @@ class MotorPair(MotorSet):
         (self.left_motor, self.right_motor) = self.motors.values()
         self.max_speed = self.left_motor.max_speed
 
-    def set_speed_steering(self, direction, power=100):
+    def set_speed_steering(self, direction, speed_outer_motor=100):
         """
         Set the speed_sp for each motor in a pair to achieve the specified steering
 
@@ -320,30 +320,31 @@ class MotorPair(MotorSet):
             *  0   means drive in a straight line, and
             *  100 means turn right as fast as possible.
 
-        power: the power that should be applied to the outmost motor (the one
-               rotating faster). The power of the other motor will be computed
-               automatically.
+        speed_outer_motor:
+            The speed that should be applied to the outmost motor (the one
+            rotating faster). The speed of the other motor will be computed
+            automatically.
         """
 
         assert direction >= -100 and direction <= 100,\
             "%s is an invalid direction, must be between -100 and 100 (inclusive)" % direction
 
-        left_power = power
-        right_power = power
+        left_speed = speed_outer_motor
+        right_speed = speed_outer_motor
         speed = (50 - abs(float(direction))) / 50
 
         if direction >= 0:
-            right_power *= speed
+            right_speed *= speed
         else:
-            left_power *= speed
+            left_speed *= speed
 
-        left_power = int(left_power)
-        right_power = int(right_power)
-        log.debug("%s: direction %d, power %d, speed %d, left_power %d, right_power %d" %
-            (self, direction, power, speed, left_power, right_power))
+        left_speed = int(left_speed)
+        right_speed = int(right_speed)
+        self.left_motor.speed_sp = left_speed
+        self.right_motor.speed_sp = right_speed
 
-        self.left_motor.speed_sp = int(left_power)
-        self.right_motor.speed_sp = int(right_power)
+        log.debug("%s: direction %d, %s speed %d, %s speed %d" %
+            (self, direction, self.left_motor, left_speed, self.right_motor, right_speed))
 
     def set_speed_percentage(self, left_motor_percentage, right_motor_percentage):
         """
