@@ -49,6 +49,7 @@ import select
 import shlex
 import stat
 import time
+import errno
 from os.path import abspath
 from struct import pack, unpack
 from subprocess import Popen, check_output, PIPE
@@ -209,12 +210,12 @@ class Device(object):
                 attribute.write(value.encode())
                 attribute.flush()
             except Exception as ex:
-                _raise_friendly_access_error(ex, name)
+                self._raise_friendly_access_error(ex, name)
             return attribute
         else:
             raise Exception('Device is not connected')
 
-    def _raise_friendly_access_error(driver_error, attribute):
+    def _raise_friendly_access_error(self, driver_error, attribute):
         if not isinstance(driver_error, OSError):
             raise driver_error
 
@@ -223,10 +224,10 @@ class Device(object):
                 try:
                     max_speed = self.max_speed
                 except (AttributeError, Exception):
-                    raise ValueError("The given speed value was out of range")
+                    raise ValueError("The given speed value was out of range") from driver_error
                 else:
-                    raise ValueError("The given speed value was out of range. Max speed: " + str(max_speed))
-            raise ValueError("One or more arguments were out of range or invalid")
+                    raise ValueError("The given speed value was out of range. Max speed: +/-" + str(max_speed)) from driver_error
+            raise ValueError("One or more arguments were out of range or invalid") from driver_error
         raise driver_error
 
     def get_attr_int(self, attribute, name):
