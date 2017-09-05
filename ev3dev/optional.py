@@ -44,57 +44,58 @@ class FbMem(object):
     FB_VISUAL_MONO01 = 0
     FB_VISUAL_MONO10 = 1
 
-    class FixScreenInfo(ctypes.Structure):
+    if optional_enabled:
+        class FixScreenInfo(ctypes.Structure):
 
-        """The fb_fix_screeninfo from fb.h."""
-
-        _fields_ = [
-            ('id_name', ctypes.c_char * 16),
-            ('smem_start', ctypes.c_ulong),
-            ('smem_len', ctypes.c_uint32),
-            ('type', ctypes.c_uint32),
-            ('type_aux', ctypes.c_uint32),
-            ('visual', ctypes.c_uint32),
-            ('xpanstep', ctypes.c_uint16),
-            ('ypanstep', ctypes.c_uint16),
-            ('ywrapstep', ctypes.c_uint16),
-            ('line_length', ctypes.c_uint32),
-            ('mmio_start', ctypes.c_ulong),
-            ('mmio_len', ctypes.c_uint32),
-            ('accel', ctypes.c_uint32),
-            ('reserved', ctypes.c_uint16 * 3),
-        ]
-
-    class VarScreenInfo(ctypes.Structure):
-
-        class FbBitField(ctypes.Structure):
-
-            """The fb_bitfield struct from fb.h."""
+            """The fb_fix_screeninfo from fb.h."""
 
             _fields_ = [
-                ('offset', ctypes.c_uint32),
-                ('length', ctypes.c_uint32),
-                ('msb_right', ctypes.c_uint32),
+                ('id_name', ctypes.c_char * 16),
+                ('smem_start', ctypes.c_ulong),
+                ('smem_len', ctypes.c_uint32),
+                ('type', ctypes.c_uint32),
+                ('type_aux', ctypes.c_uint32),
+                ('visual', ctypes.c_uint32),
+                ('xpanstep', ctypes.c_uint16),
+                ('ypanstep', ctypes.c_uint16),
+                ('ywrapstep', ctypes.c_uint16),
+                ('line_length', ctypes.c_uint32),
+                ('mmio_start', ctypes.c_ulong),
+                ('mmio_len', ctypes.c_uint32),
+                ('accel', ctypes.c_uint32),
+                ('reserved', ctypes.c_uint16 * 3),
             ]
 
-        """The fb_var_screeninfo struct from fb.h."""
+        class VarScreenInfo(ctypes.Structure):
 
-        _fields_ = [
-            ('xres', ctypes.c_uint32),
-            ('yres', ctypes.c_uint32),
-            ('xres_virtual', ctypes.c_uint32),
-            ('yres_virtual', ctypes.c_uint32),
-            ('xoffset', ctypes.c_uint32),
-            ('yoffset', ctypes.c_uint32),
+            class FbBitField(ctypes.Structure):
 
-            ('bits_per_pixel', ctypes.c_uint32),
-            ('grayscale', ctypes.c_uint32),
+                """The fb_bitfield struct from fb.h."""
 
-            ('red', FbBitField),
-            ('green', FbBitField),
-            ('blue', FbBitField),
-            ('transp', FbBitField),
-        ]
+                _fields_ = [
+                    ('offset', ctypes.c_uint32),
+                    ('length', ctypes.c_uint32),
+                    ('msb_right', ctypes.c_uint32),
+                ]
+
+            """The fb_var_screeninfo struct from fb.h."""
+
+            _fields_ = [
+                ('xres', ctypes.c_uint32),
+                ('yres', ctypes.c_uint32),
+                ('xres_virtual', ctypes.c_uint32),
+                ('yres_virtual', ctypes.c_uint32),
+                ('xoffset', ctypes.c_uint32),
+                ('yoffset', ctypes.c_uint32),
+
+                ('bits_per_pixel', ctypes.c_uint32),
+                ('grayscale', ctypes.c_uint32),
+
+                ('red', FbBitField),
+                ('green', FbBitField),
+                ('blue', FbBitField),
+                ('transp', FbBitField),
+            ]
 
     def __init__(self, fbdev=None):
         """Create the FbMem framebuffer memory object."""
@@ -161,6 +162,9 @@ class Screen(FbMem):
     """
 
     def __init__(self):
+        if not optional_enabled:
+            raise NotImplementedError("The screen module isn't supported on your Python implementation.")
+        
         from PIL import Image, ImageDraw
         FbMem.__init__(self)
 
@@ -283,6 +287,11 @@ class Sound:
         ))
     """
 
+    @staticmethod
+    def _raise_if_unsupported():
+        if not optional_enabled:
+            raise NotImplementedError("The screen module isn't supported on your Python implementation.")
+
     channel = None
 
     @staticmethod
@@ -294,6 +303,7 @@ class Sound:
         .. _`beep man page`: https://linux.die.net/man/1/beep
         .. _`linux beep music`: https://www.google.com/search?q=linux+beep+music
         """
+        Sound._raise_if_unsupported()
         with open(os.devnull, 'w') as n:
             return Popen(shlex.split('/usr/bin/beep %s' % args), stdout=n)
 
@@ -335,6 +345,7 @@ class Sound:
 
         Play single tone of given frequency (Hz) and duration (milliseconds).
         """
+        Sound._raise_if_unsupported()
         def play_tone_sequence(tone_sequence):
             def beep_args(frequency=None, duration=None, delay=None):
                 args = ''
@@ -358,6 +369,7 @@ class Sound:
         """
         Play wav file.
         """
+        Sound._raise_if_unsupported()
         with open(os.devnull, 'w') as n:
             return Popen(shlex.split('/usr/bin/aplay -q "%s"' % wav_file), stdout=n)
 
@@ -366,6 +378,7 @@ class Sound:
         """
         Speak the given text aloud.
         """
+        Sound._raise_if_unsupported()
         with open(os.devnull, 'w') as n:
             cmd_line = '/usr/bin/espeak --stdout {0} "{1}"'.format(espeak_opts, text)
             espeak = Popen(shlex.split(cmd_line), stdout=PIPE)
@@ -403,6 +416,7 @@ class Sound:
         by running ``amixer scontrols``. If that fails as well, it uses the
         ``Playback`` channel, as that is the only channel on the EV3.
         """
+        Sound._raise_if_unsupported()
 
         if channel is None:
             channel = Sound._get_channel()
@@ -419,6 +433,7 @@ class Sound:
         by running ``amixer scontrols``. If that fails as well, it uses the
         ``Playback`` channel, as that is the only channel on the EV3.
         """
+        Sound._raise_if_unsupported()
 
         if channel is None:
             channel = Sound._get_channel()
@@ -495,7 +510,6 @@ class Sound:
             subprocess.Popen: the spawn subprocess
         """
         Sound._raise_if_unsupported()
-
         meas_duration = 60000 / tempo * 4
 
         def beep_args(note, value):
