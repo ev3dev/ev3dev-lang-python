@@ -313,7 +313,10 @@ class MotorPair(MotorSet):
 
     def set_speed_steering(self, direction, speed_outer_motor=100):
         """
-        Set the speed_sp for each motor in a pair to achieve the specified steering
+        Set the speed_sp for each motor in a pair to achieve the specified
+        steering. Note that calling this function alone will not make the
+        motors move, it only sets the speed. A run_* function must be called
+        afterwards to make the motors move.
 
         direction [-100, 100]:
             * -100 means turn left as fast as possible,
@@ -351,6 +354,10 @@ class MotorPair(MotorSet):
         Set the speeds of the left_motor vs right_motor by percentage of
         their maximum speed.  The minimum valid percentage is -100, the
         maximum is 100.
+
+        Note that calling this function alone will not make the motors move, it
+        only sets the speed. A run_* function must be called afterwards to make
+        the motors move.
         """
 
         assert left_motor_percentage >= -100 and left_motor_percentage <= 100,\
