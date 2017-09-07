@@ -1,3 +1,26 @@
+python-ev3dev (1.0.0) stable; urgency=medium
+
+  [Denis Demidov]
+  * Add constants for color values to color sensor class
+  * Update documentation on motors
+  * Add getters to check state of motors
+  * Implement BeaconSeeker class
+  * Fix scaling of floating-point values from sensors
+
+  [Eric Pascual]
+  * Add Sound.play_song method
+
+  [Stefan Sauer]
+  * Make sound commands cancelable
+
+  [Maximilian Nöthe]
+  * Add tuples for sensor modes
+
+  [Daniel Walton]
+  * Add wait_until_not_moving for motors
+
+ -- Denis Demidov <dennis.demidov@gmail.com>  Tue, 05 Sep 2017 16:50:20 +0300
+
 python-ev3dev (0.8.1) stable; urgency=medium
 
   [Kaelin Laundry]
