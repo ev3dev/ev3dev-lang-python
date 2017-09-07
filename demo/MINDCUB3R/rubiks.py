@@ -517,7 +517,15 @@ class Rubiks(object):
         if rub.shutdown:
             return
 
-        output = check_output(['kociemba', ''.join(map(str, self.cube_kociemba))]).decode('ascii')
+        cmd = ['kociemba', ''.join(map(str, self.cube_kociemba))]
+        output = check_output(cmd).decode('ascii')
+
+        if 'ERROR' in output:
+            msg = "'%s' returned the following error\n%s\n" % (' '.join(cmd), output)
+            log.error(msg)
+            print(msg)
+            sys.exit(1)
+
         actions = output.strip().split()
         self.run_kociemba_actions(actions)
         self.cube_done()
