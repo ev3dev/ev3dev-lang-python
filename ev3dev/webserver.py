@@ -7,7 +7,7 @@ import re
 import sys
 import time
 import ev3dev.auto
-from ev3dev.helper import Tank, list_motors
+from ev3dev.helper import LargeMotorPair, list_motors
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from time import sleep
 
@@ -576,13 +576,13 @@ class RobotWebServer(object):
                 motor.stop()
 
 
-class WebControlledTank(Tank):
+class WebControlledTank(LargeMotorPair):
     """
     A tank that is controlled via a web browser
     """
 
     def __init__(self, left_motor, right_motor, polarity='normal', port_number=8000):
-        Tank.__init__(self, left_motor, right_motor, polarity)
+        LargeMotorPair.__init__(self, left_motor, right_motor, polarity)
         self.www = RobotWebServer(self, TankWebHandler, port_number)
 
     def main(self):
