@@ -27,7 +27,7 @@ An assortment of classes modeling specific features of the EV3 brick.
 """
 
 from .core import *
-
+from .optional import *
 
 OUTPUT_A = 'outA'
 OUTPUT_B = 'outB'
