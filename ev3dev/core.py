@@ -42,6 +42,7 @@ import io
 import fnmatch
 import numbers
 import array
+import logging
 import mmap
 import ctypes
 import re
@@ -52,6 +53,8 @@ import time
 from os.path import abspath
 from struct import pack, unpack
 from subprocess import Popen, check_output, PIPE
+
+log = logging.getLogger(__name__)
 
 try:
     # This is a linux-specific module.
@@ -195,7 +198,8 @@ class Device(object):
                 attribute.seek(0)
             return attribute, attribute.read().strip().decode()
         else:
-            raise Exception('Device is not connected')
+            log.info("%s: path %s, attribute %s" % (self, self._path, name))
+            raise Exception("%s is not connected" % self)
 
     def _set_attribute(self, attribute, name, value):
         """Device attribute setter"""
@@ -208,7 +212,8 @@ class Device(object):
             attribute.flush()
             return attribute
         else:
-            raise Exception('Device is not connected')
+            log.info("%s: path %s, attribute %s" % (self, self._path, name))
+            raise Exception("%s is not connected" % self)
 
     def get_attr_int(self, attribute, name):
         attribute, value = self._get_attribute(attribute, name)
