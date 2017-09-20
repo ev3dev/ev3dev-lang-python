@@ -1818,6 +1818,12 @@ class MoveTank(MotorSet):
         self.right_motor = self.motors[right_motor_port]
         self.max_speed = self.left_motor.max_speed
 
+    def _block(self):
+        self.left_motor.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
+        self.right_motor.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
+        self.left_motor.wait_until_not_moving()
+        self.right_motor.wait_until_not_moving()
+
     def on_for_rotations(self, left_power, right_power, rotations, brake=True, block=True):
         """
         Rotate the motor at 'left_power & right_power' for 'rotations'
@@ -1843,10 +1849,7 @@ class MoveTank(MotorSet):
         self.right_motor.run_to_abs_pos()
 
         if block:
-            self.left_motor.wait_until('running', timeout=self.left_motor.wait_for_running_timeout_ms)
-            self.right_motor.wait_until('running', timeout=self.right_motor.wait_for_running_timeout_ms)
-            self.left_motor.wait_until_not_moving()
-            self.right_motor.wait_until_not_moving()
+            self._block()
 
     def on_for_degrees(self, left_power, right_power, degrees, brake=True, block=True):
         """
@@ -1873,10 +1876,7 @@ class MoveTank(MotorSet):
         self.right_motor.run_to_abs_pos()
 
         if block:
-            self.left_motor.wait_until('running', timeout=self.left_motor.wait_for_running_timeout_ms)
-            self.right_motor.wait_until('running', timeout=self.right_motor.wait_for_running_timeout_ms)
-            self.left_motor.wait_until_not_moving()
-            self.right_motor.wait_until_not_moving()
+            self._block()
 
     def on_for_seconds(self, left_power, right_power, seconds, brake=True, block=True):
         """
@@ -1896,10 +1896,7 @@ class MoveTank(MotorSet):
         self.right_motor.run_timed()
 
         if block:
-            self.left_motor.wait_until('running', timeout=self.left_motor.wait_for_running_timeout_ms)
-            self.right_motor.wait_until('running', timeout=self.right_motor.wait_for_running_timeout_ms)
-            self.left_motor.wait_until_not_moving()
-            self.right_motor.wait_until_not_moving()
+            self._block()
 
     def on(self, left_power, right_power):
         """
@@ -1919,22 +1916,11 @@ class MoveTank(MotorSet):
         self.right_motor.stop()
 
 
-class MoveSteering(MotorSet):
+class MoveSteering(MoveTank):
 
-    def __init__(self, left_motor_port, right_motor_port, desc=None, motor_class=LargeMotor):
-        motor_specs = {
-            left_motor_port : motor_class,
-            right_motor_port : motor_class,
-        }
-
-        MotorSet.__init__(self, motor_specs, desc)
-        self.left_motor = self.motors[left_motor_port]
-        self.right_motor = self.motors[right_motor_port]
-        self.max_speed = self.left_motor.max_speed
-
-    def set_speed_steering(self, steering, power):
+    def get_speed_steering(self, steering, power):
         """
-        Set the speed_sp for each motor in a pair to achieve the specified
+        Calculate the speed_sp for each motor in a pair to achieve the specified
         steering. Note that calling this function alone will not make the
         motors move, it only sets the speed. A run_* function must be called
         afterwards to make the motors move.
@@ -1964,97 +1950,26 @@ class MoveSteering(MotorSet):
 
         left_speed = int(left_speed)
         right_speed = int(right_speed)
-        self.left_motor.speed_sp = left_speed
-        self.right_motor.speed_sp = right_speed
-
         log.debug("%s: steering %d, %s speed %d, %s speed %d" %
             (self, steering, self.left_motor, left_speed, self.right_motor, right_speed))
 
+        return (left_speed, right_speed)
+
     def on_for_rotations(self, steering, power, rotations, brake=True, block=True):
-
-        # Set all parameters
-        self.set_speed_steering(steering, power)
-
-        if self.left_motor.speed_sp > self.right_motor.speed_sp:
-            left_rotations = rotations
-            right_rotations = float(self.right_motor.speed_sp / self.left_motor.speed_sp) * rotations
-        else:
-            left_rotations = float(self.left_motor.speed_sp / self.right_motor.speed_sp) * rotations
-            right_rotations = rotations
-
-        self.left_motor._set_position_rotations(self.left_motor.speed_sp, left_rotations)
-        self.left_motor._set_brake(brake)
-        self.right_motor._set_position_rotations(self.right_motor.speed_sp, right_rotations)
-        self.right_motor._set_brake(brake)
-
-        # Start the motors
-        self.left_motor.run_to_abs_pos()
-        self.right_motor.run_to_abs_pos()
-
-        if block:
-            self.left_motor.wait_until('running', timeout=self.left_motor.wait_for_running_timeout_ms)
-            self.right_motor.wait_until('running', timeout=self.right_motor.wait_for_running_timeout_ms)
-            self.left_motor.wait_until_not_moving()
-            self.right_motor.wait_until_not_moving()
+        (left_power, right_power) = self.get_speed_steering(steering, power)
+        MoveTank.on_for_rotations(self, left_power, right_power, rotations, brake, block)
 
     def on_for_degrees(self, steering, power, degrees, brake=True, block=True):
-
-        # Set all parameters
-        self.set_speed_steering(steering, power)
-
-        if self.left_motor.speed_sp > self.right_motor.speed_sp:
-            left_degrees = degrees
-            right_degrees = float(self.right_motor.speed_sp / self.left_motor.speed_sp) * degrees
-        else:
-            left_degrees = float(self.left_motor.speed_sp / self.right_motor.speed_sp) * degrees
-            right_degrees = degrees
-
-        self.left_motor._set_position_degrees(self.left_motor.speed_sp, left_degrees)
-        self.left_motor._set_brake(brake)
-        self.right_motor._set_position_degrees(self.right_motor.speed_sp, right_degrees)
-        self.right_motor._set_brake(brake)
-
-        # Start the motors
-        self.left_motor.run_to_abs_pos()
-        self.right_motor.run_to_abs_pos()
-
-        if block:
-            self.left_motor.wait_until('running', timeout=self.left_motor.wait_for_running_timeout_ms)
-            self.right_motor.wait_until('running', timeout=self.right_motor.wait_for_running_timeout_ms)
-            self.left_motor.wait_until_not_moving()
-            self.right_motor.wait_until_not_moving()
+        (left_power, right_power) = self.get_speed_steering(steering, power)
+        MoveTank.on_for_degrees(self, left_power, right_power, degrees, brake, block)
 
     def on_for_seconds(self, steering, power, seconds, brake=True, block=True):
-
-        # Set all parameters
-        self.set_speed_steering(steering, power)
-        self.left_motor.time_sp = int(seconds * 1000)
-        self.left_motor._set_brake(brake)
-        self.right_motor.time_sp = int(seconds * 1000)
-        self.right_motor._set_brake(brake)
-
-        # Start the motors
-        self.left_motor.run_timed()
-        self.right_motor.run_timed()
-
-        if block:
-            self.left_motor.wait_until('running', timeout=self.left_motor.wait_for_running_timeout_ms)
-            self.right_motor.wait_until('running', timeout=self.right_motor.wait_for_running_timeout_ms)
-            self.left_motor.wait_until_not_moving()
-            self.right_motor.wait_until_not_moving()
+        (left_power, right_power) = self.get_speed_steering(steering, power)
+        MoveTank.on_for_seconds(self, left_power, right_power, seconds, brake, block)
 
     def on(self, steering, power):
-        self.set_speed_steering(steering, power)
-
-        # Start the motors
-        self.left_motor.run_forever()
-        self.right_motor.run_forever()
-
-    def off(self, brake=True):
-        self.left_motor._set_brake(brake)
-        self.right_motor._set_brake(brake)
-        self.left_motor.stop()
-        self.right_motor.stop()
+        (left_power, right_power) = self.get_speed_steering(steering, power)
+        MoveTank.on(self, left_power, right_power)
 
 
 # ~autogen generic-class classes.sensor>currentClass
