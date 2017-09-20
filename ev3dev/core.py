@@ -1938,6 +1938,11 @@ class TouchSensor(Sensor):
 
         return self.value(0)
 
+    @property
+    def is_released(self):
+        return not self.is_pressed
+
+
 class ColorSensor(Sensor):
 
     """
