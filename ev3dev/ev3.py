@@ -44,9 +44,6 @@ class Leds(object):
     """
     The EV3 LEDs.
     """
-
-# ~autogen led-colors platforms.ev3.led>currentClass
-
     red_left = Led(name_pattern='led0:red:brick-status')
     red_right = Led(name_pattern='led1:red:brick-status')
     green_left = Led(name_pattern='led0:green:brick-status')
@@ -100,14 +97,10 @@ class Leds(object):
         Leds.green_right.brightness = 0
 
 
-# ~autogen
-
 class Button(ButtonEVIO):
     """
     EV3 Buttons
     """
-
-# ~autogen button-property platforms.ev3.button>currentClass
 
     @staticmethod
     def on_up(state):
@@ -214,6 +207,3 @@ class Button(ButtonEVIO):
         Check if 'backspace' button is pressed.
         """
         return 'backspace' in self.buttons_pressed
-
-
-# ~autogen

@@ -18,7 +18,7 @@ The classes derive from :py:class:`Sensor` and provide helper functions
 specific to the corresponding sensor type. Each of the functions makes
 sure the sensor is in the required mode and then returns the specified value.
 
-.. ~autogen doc-special-sensor-classes
+..
 
 Touch Sensor
 ########################
@@ -84,5 +84,5 @@ Light Sensor
 
 
 
-.. ~autogen
+..
 
