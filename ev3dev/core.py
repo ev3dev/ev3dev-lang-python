@@ -969,8 +969,10 @@ class Motor(Device):
             self.position_sp = self.position - int(rotations * self.count_per_rot)
 
     def _set_position_degrees(self, max_speed_pct, degrees):
-        rotations = float(degrees / self.count_per_rot)
-        self._set_position_rotations(max_speed_pct, rotations)
+        if max_speed_pct > 0:
+            self.position_sp = self.position + int((degrees * self.count_per_rot)/360)
+        else:
+            self.position_sp = self.position - int((degrees * self.count_per_rot)/360)
 
     def _set_brake(self, brake):
         if brake:
