@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import unittest, sys, os
 
 FAKE_SYS = os.path.join(os.path.dirname(__file__), 'fake-sys')
