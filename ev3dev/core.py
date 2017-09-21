@@ -23,19 +23,10 @@
 # THE SOFTWARE.
 # -----------------------------------------------------------------------------
 
-# ~autogen autogen-header
-# Sections of the following code were auto-generated based on spec v1.2.0
-
-# ~autogen
-
-# -----------------------------------------------------------------------------
-
 import sys
 
 if sys.version_info < (3,4):
     raise SystemError('Must be using Python 3.4 or higher')
-
-# -----------------------------------------------------------------------------
 
 import os
 import io
@@ -284,7 +275,6 @@ def list_devices(class_name, name_pattern, **kwargs):
     return (Device(class_name, name, name_exact=True)
             for name in list_device_names(classpath, name_pattern, **kwargs))
 
-# ~autogen generic-class classes.motor>currentClass
 
 class Motor(Device):
 
@@ -336,14 +326,9 @@ class Motor(Device):
         self._stop_action = None
         self._stop_actions = None
         self._time_sp = None
-
-# ~autogen
-
         self._poll = None
 
     __slots__ = [
-# ~autogen generic-class-slots classes.motor>currentClass
-
     '_address',
     '_command',
     '_commands',
@@ -371,12 +356,8 @@ class Motor(Device):
     '_stop_action',
     '_stop_actions',
     '_time_sp',
-
-# ~autogen
     '_poll',
     ]
-
-# ~autogen generic-get-set classes.motor>currentClass
 
     @property
     def address(self):
@@ -726,10 +707,6 @@ class Motor(Device):
     def time_sp(self, value):
         self._time_sp = self.set_attr_int(self._time_sp, 'time_sp', value)
 
-
-# ~autogen
-# ~autogen generic-property-value classes.motor>currentClass
-
     #: Run the motor until another command is sent.
     COMMAND_RUN_FOREVER = 'run-forever'
 
@@ -803,10 +780,6 @@ class Motor(Device):
     #: will `push back` to maintain its position.
     STOP_ACTION_HOLD = 'hold'
 
-
-# ~autogen
-# ~autogen motor_commands classes.motor>currentClass
-
     def run_forever(self, **kwargs):
         """Run the motor until another command is sent.
         """
@@ -865,10 +838,6 @@ class Motor(Device):
             setattr(self, key, kwargs[key])
         self.command = self.COMMAND_RESET
 
-
-# ~autogen
-# ~autogen motor_states classes.motor>currentClass
-
     @property
     def is_running(self):
         """Power is being sent to the motor.
@@ -898,9 +867,6 @@ class Motor(Device):
         """The motor is not turning when it should be.
         """
         return self.STATE_STALLED in self.state
-
-
-# ~autogen
 
     def wait(self, cond, timeout=None):
         """
@@ -994,8 +960,6 @@ def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     return (Motor(name_pattern=name, name_exact=True)
             for name in list_device_names(class_path, name_pattern, **kwargs))
 
-# ~autogen generic-class classes.largeMotor>currentClass
-
 class LargeMotor(Motor):
 
     """
@@ -1004,20 +968,12 @@ class LargeMotor(Motor):
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
+    __slots__ = []
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
         super(LargeMotor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-l-motor', 'lego-nxt-motor'], **kwargs)
 
-
-# ~autogen
-    __slots__ = [
-# ~autogen generic-class-slots classes.largeMotor>currentClass
-
-
-# ~autogen
-    ]
-# ~autogen generic-class classes.mediumMotor>currentClass
 
 class MediumMotor(Motor):
 
@@ -1027,20 +983,12 @@ class MediumMotor(Motor):
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
+    __slots__ = []
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
         super(MediumMotor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-m-motor'], **kwargs)
 
-
-# ~autogen
-    __slots__ = [
-# ~autogen generic-class-slots classes.mediumMotor>currentClass
-
-
-# ~autogen
-    ]
-# ~autogen generic-class classes.actuonix50Motor>currentClass
 
 class ActuonixL1250Motor(Motor):
 
@@ -1050,20 +998,12 @@ class ActuonixL1250Motor(Motor):
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = 'linear*'
+    __slots__ = []
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
         super(ActuonixL1250Motor, self).__init__(address, name_pattern, name_exact, driver_name=['act-l12-ev3-50'], **kwargs)
 
-
-# ~autogen
-    __slots__ = [
-# ~autogen generic-class-slots classes.actuonix50Motor>currentClass
-
-
-# ~autogen
-    ]
-# ~autogen generic-class classes.actuonix100Motor>currentClass
 
 class ActuonixL12100Motor(Motor):
 
@@ -1073,20 +1013,12 @@ class ActuonixL12100Motor(Motor):
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = 'linear*'
+    __slots__ = []
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
         super(ActuonixL12100Motor, self).__init__(address, name_pattern, name_exact, driver_name=['act-l12-ev3-100'], **kwargs)
 
-
-# ~autogen
-    __slots__ = [
-# ~autogen generic-class-slots classes.actuonix100Motor>currentClass
-
-
-# ~autogen
-    ]
-# ~autogen generic-class classes.dcMotor>currentClass
 
 class DcMotor(Device):
 
@@ -1098,6 +1030,21 @@ class DcMotor(Device):
 
     SYSTEM_CLASS_NAME = 'dc-motor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
+    __slots__ = [
+    '_address',
+    '_command',
+    '_commands',
+    '_driver_name',
+    '_duty_cycle',
+    '_duty_cycle_sp',
+    '_polarity',
+    '_ramp_down_sp',
+    '_ramp_up_sp',
+    '_state',
+    '_stop_action',
+    '_stop_actions',
+    '_time_sp',
+    ]
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
@@ -1118,30 +1065,6 @@ class DcMotor(Device):
         self._stop_action = None
         self._stop_actions = None
         self._time_sp = None
-
-# ~autogen
-
-    __slots__ = [
-# ~autogen generic-class-slots classes.dcMotor>currentClass
-
-    '_address',
-    '_command',
-    '_commands',
-    '_driver_name',
-    '_duty_cycle',
-    '_duty_cycle_sp',
-    '_polarity',
-    '_ramp_down_sp',
-    '_ramp_up_sp',
-    '_state',
-    '_stop_action',
-    '_stop_actions',
-    '_time_sp',
-
-# ~autogen
-    ]
-
-# ~autogen generic-get-set classes.dcMotor>currentClass
 
     @property
     def address(self):
@@ -1289,10 +1212,6 @@ class DcMotor(Device):
     def time_sp(self, value):
         self._time_sp = self.set_attr_int(self._time_sp, 'time_sp', value)
 
-
-# ~autogen
-# ~autogen generic-property-value classes.dcMotor>currentClass
-
     #: Run the motor until another command is sent.
     COMMAND_RUN_FOREVER = 'run-forever'
 
@@ -1325,10 +1244,6 @@ class DcMotor(Device):
     #: together. This load will absorb the energy from the rotation of the motors and
     #: cause the motor to stop more quickly than coasting.
     STOP_ACTION_BRAKE = 'brake'
-
-
-# ~autogen
-# ~autogen motor_commands classes.dcMotor>currentClass
 
     def run_forever(self, **kwargs):
         """Run the motor until another command is sent.
@@ -1363,9 +1278,6 @@ class DcMotor(Device):
         self.command = self.COMMAND_STOP
 
 
-# ~autogen
-# ~autogen generic-class classes.servoMotor>currentClass
-
 class ServoMotor(Device):
 
     """
@@ -1375,6 +1287,18 @@ class ServoMotor(Device):
 
     SYSTEM_CLASS_NAME = 'servo-motor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'motor*'
+    __slots__ = [
+    '_address',
+    '_command',
+    '_driver_name',
+    '_max_pulse_sp',
+    '_mid_pulse_sp',
+    '_min_pulse_sp',
+    '_polarity',
+    '_position_sp',
+    '_rate_sp',
+    '_state',
+    ]
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
@@ -1392,27 +1316,6 @@ class ServoMotor(Device):
         self._position_sp = None
         self._rate_sp = None
         self._state = None
-
-# ~autogen
-
-    __slots__ = [
-# ~autogen generic-class-slots classes.servoMotor>currentClass
-
-    '_address',
-    '_command',
-    '_driver_name',
-    '_max_pulse_sp',
-    '_mid_pulse_sp',
-    '_min_pulse_sp',
-    '_polarity',
-    '_position_sp',
-    '_rate_sp',
-    '_state',
-
-# ~autogen
-    ]
-
-# ~autogen generic-get-set classes.servoMotor>currentClass
 
     @property
     def address(self):
@@ -1548,10 +1451,6 @@ class ServoMotor(Device):
         self._state, value = self.get_attr_set(self._state, 'state')
         return value
 
-
-# ~autogen
-# ~autogen generic-property-value classes.servoMotor>currentClass
-
     #: Drive servo to the position set in the `position_sp` attribute.
     COMMAND_RUN = 'run'
 
@@ -1565,10 +1464,6 @@ class ServoMotor(Device):
     #: With `inversed` polarity, a positive duty cycle will
     #: cause the motor to rotate counter-clockwise.
     POLARITY_INVERSED = 'inversed'
-
-
-# ~autogen
-# ~autogen motor_commands classes.servoMotor>currentClass
 
     def run(self, **kwargs):
         """Drive servo to the position set in the `position_sp` attribute.
@@ -1584,9 +1479,6 @@ class ServoMotor(Device):
             setattr(self, key, kwargs[key])
         self.command = self.COMMAND_FLOAT
 
-
-# ~autogen
-# ~autogen generic-class classes.sensor>currentClass
 
 class Sensor(Device):
 
@@ -1609,6 +1501,22 @@ class Sensor(Device):
 
     SYSTEM_CLASS_NAME = 'lego-sensor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
+    __slots__ = [
+    '_address',
+    '_command',
+    '_commands',
+    '_decimals',
+    '_driver_name',
+    '_mode',
+    '_modes',
+    '_num_values',
+    '_units',
+    '_value',
+    '_bin_data_format',
+    '_bin_data_size',
+    '_bin_data',
+    '_mode_scale'
+    ]
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
@@ -1625,36 +1533,12 @@ class Sensor(Device):
         self._modes = None
         self._num_values = None
         self._units = None
-
-# ~autogen
-
         self._value = [None,None,None,None,None,None,None,None]
 
         self._bin_data_format = None
         self._bin_data_size = None
         self._bin_data = None
         self._mode_scale = {}
-
-    __slots__ = [
-# ~autogen generic-class-slots classes.sensor>currentClass
-
-    '_address',
-    '_command',
-    '_commands',
-    '_decimals',
-    '_driver_name',
-    '_mode',
-    '_modes',
-    '_num_values',
-    '_units',
-
-# ~autogen
-    '_value',
-    '_bin_data_format',
-    '_bin_data_size',
-    '_bin_data',
-    '_mode_scale'
-    ]
 
     def _scale(self, mode):
         """
@@ -1667,8 +1551,6 @@ class Sensor(Device):
             self._mode_scale[mode] = scale
 
         return scale
-
-# ~autogen generic-get-set classes.sensor>currentClass
 
     @property
     def address(self):
@@ -1756,9 +1638,6 @@ class Sensor(Device):
         self._units, value = self.get_attr_string(self._units, 'units')
         return value
 
-
-# ~autogen
-
     def value(self, n=0):
         """
         Returns the value or values measured by the sensor. Check num_values to
@@ -1766,11 +1645,7 @@ class Sensor(Device):
         an error. The values are fixed point numbers, so check decimals to see
         if you need to divide to get the actual value.
         """
-#        if isinstance(n, numbers.Integral):
-#           n = '{0:d}'.format(n)
-#       elif isinstance(n, numbers.Real):
         if isinstance(n, numbers.Real):
-#           n = '{0:.0f}'.format(n)
             n = int(n)
         elif isinstance(n, str):
             n = int(n)
@@ -1852,8 +1727,6 @@ def list_sensors(name_pattern=Sensor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
             for name in list_device_names(class_path, name_pattern, **kwargs))
 
 
-# ~autogen generic-class classes.i2cSensor>currentClass
-
 class I2cSensor(Sensor):
 
     """
@@ -1869,9 +1742,6 @@ class I2cSensor(Sensor):
 
         self._fw_version = None
         self._poll_ms = None
-
-# ~autogen
-# ~autogen generic-get-set classes.i2cSensor>currentClass
 
     @property
     def fw_version(self):
@@ -1897,9 +1767,6 @@ class I2cSensor(Sensor):
     def poll_ms(self, value):
         self._poll_ms = self.set_attr_int(self._poll_ms, 'poll_ms', value)
 
-
-# ~autogen
-# ~autogen special-sensors
 
 class TouchSensor(Sensor):
 
@@ -2409,10 +2276,6 @@ class LightSensor(Sensor):
         return self.value(0) * self._scale('AMBIENT')
 
 
-# ~autogen
-
-# ~autogen generic-class classes.led>currentClass
-
 class Led(Device):
 
     """
@@ -2423,6 +2286,14 @@ class Led(Device):
 
     SYSTEM_CLASS_NAME = 'leds'
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
+    __slots__ = [
+    '_max_brightness',
+    '_brightness',
+    '_triggers',
+    '_trigger',
+    '_delay_on',
+    '_delay_off',
+    ]
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
@@ -2436,23 +2307,6 @@ class Led(Device):
         self._trigger = None
         self._delay_on = None
         self._delay_off = None
-
-# ~autogen
-
-    __slots__ = [
-# ~autogen generic-class-slots classes.led>currentClass
-
-    '_max_brightness',
-    '_brightness',
-    '_triggers',
-    '_trigger',
-    '_delay_on',
-    '_delay_off',
-
-# ~autogen
-    ]
-
-# ~autogen generic-get-set classes.led>currentClass
 
     @property
     def max_brightness(self):
@@ -2481,10 +2335,6 @@ class Led(Device):
         """
         self._triggers, value = self.get_attr_set(self._triggers, 'trigger')
         return value
-
-
-
-# ~autogen
 
     @property
     def trigger(self):
@@ -2534,7 +2384,6 @@ class Led(Device):
                     time.sleep(0.2)
                 else:
                     raise Exception('"{}" attribute has wrong permissions'.format(attr))
-
 
     @property
     def delay_on(self):
@@ -2731,7 +2580,6 @@ class ButtonEVIO(ButtonBase):
         return pressed
 
 
-# ~autogen remote-control specialSensorTypes.infraredSensor.remoteControl>currentClass
 class RemoteControl(ButtonBase):
     """
     EV3 Remote Controller
@@ -2803,9 +2651,6 @@ class RemoteControl(ButtonBase):
         """
         return 'beacon' in self.buttons_pressed
 
-
-# ~autogen
-
     def __init__(self, sensor=None, channel=1):
         if sensor is None:
             self._sensor = InfraredSensor()
@@ -2866,8 +2711,6 @@ class BeaconSeeker(object):
         return self._sensor.value(self._channel * 2), self._sensor.value(self._channel * 2 + 1)
 
 
-# ~autogen generic-class classes.powerSupply>currentClass
-
 class PowerSupply(Device):
 
     """
@@ -2877,6 +2720,14 @@ class PowerSupply(Device):
 
     SYSTEM_CLASS_NAME = 'power_supply'
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
+    __slots__ = [
+    '_measured_current',
+    '_measured_voltage',
+    '_max_voltage',
+    '_min_voltage',
+    '_technology',
+    '_type',
+    ]
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
@@ -2890,23 +2741,6 @@ class PowerSupply(Device):
         self._min_voltage = None
         self._technology = None
         self._type = None
-
-# ~autogen
-
-    __slots__ = [
-# ~autogen generic-class-slots classes.powerSupply>currentClass
-
-    '_measured_current',
-    '_measured_voltage',
-    '_max_voltage',
-    '_min_voltage',
-    '_technology',
-    '_type',
-
-# ~autogen
-    ]
-
-# ~autogen generic-get-set classes.powerSupply>currentClass
 
     @property
     def measured_current(self):
@@ -2952,9 +2786,6 @@ class PowerSupply(Device):
         self._type, value = self.get_attr_string(self._type, 'type')
         return value
 
-
-# ~autogen
-
     @property
     def measured_amps(self):
         """
@@ -2969,8 +2800,6 @@ class PowerSupply(Device):
         """
         return self.measured_voltage / 1e6
 
-
-# ~autogen generic-class classes.legoPort>currentClass
 
 class LegoPort(Device):
 
@@ -3004,6 +2833,14 @@ class LegoPort(Device):
 
     SYSTEM_CLASS_NAME = 'lego-port'
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
+    __slots__ = [
+    '_address',
+    '_driver_name',
+    '_modes',
+    '_mode',
+    '_set_device',
+    '_status',
+    ]
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
@@ -3017,23 +2854,6 @@ class LegoPort(Device):
         self._mode = None
         self._set_device = None
         self._status = None
-
-# ~autogen
-
-    __slots__ = [
-# ~autogen generic-class-slots classes.legoPort>currentClass
-
-    '_address',
-    '_driver_name',
-    '_modes',
-    '_mode',
-    '_set_device',
-    '_status',
-
-# ~autogen
-    ]
-
-# ~autogen generic-get-set classes.legoPort>currentClass
 
     @property
     def address(self):
@@ -3102,8 +2922,6 @@ class LegoPort(Device):
         self._status, value = self.get_attr_string(self._status, 'status')
         return value
 
-
-# ~autogen
 
 class FbMem(object):
 

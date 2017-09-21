@@ -44,9 +44,6 @@ class Leds(object):
     """
     The BrickPi LEDs.
     """
-
-# ~autogen led-colors platforms.brickpi.led>currentClass
-
     blue_led1 = Led(name_pattern='brickpi:led1:blue:ev3dev')
     blue_led2 = Led(name_pattern='brickpi:led2:blue:ev3dev')
 
@@ -90,6 +87,3 @@ class Leds(object):
         """
         Leds.blue_led1.brightness = 0
         Leds.blue_led2.brightness = 0
-
-
-# ~autogen
