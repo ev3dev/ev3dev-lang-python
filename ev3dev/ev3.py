@@ -44,10 +44,10 @@ class Leds(object):
     """
     The EV3 LEDs.
     """
-    red_left = Led(name_pattern='ev3:left:red:ev3dev')
-    red_right = Led(name_pattern='ev3:right:red:ev3dev')
-    green_left = Led(name_pattern='ev3:left:green:ev3dev')
-    green_right = Led(name_pattern='ev3:right:green:ev3dev')
+    red_left = Led(name_pattern='led0:red:brick-status')
+    red_right = Led(name_pattern='led1:red:brick-status')
+    green_left = Led(name_pattern='led0:green:brick-status')
+    green_right = Led(name_pattern='led1:green:brick-status')
 
     LEFT = ( red_left, green_left, )
     RIGHT = ( red_right, green_right, )
@@ -158,12 +158,12 @@ class Button(ButtonEVIO):
 
 
     _buttons = {
-            'up': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 103},
-            'down': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 108},
-            'left': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 105},
-            'right': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 106},
-            'enter': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 28},
-            'backspace': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 14},
+            'up': {'name': '/dev/input/by-path/platform-gpio_keys-event', 'value': 103},
+            'down': {'name': '/dev/input/by-path/platform-gpio_keys-event', 'value': 108},
+            'left': {'name': '/dev/input/by-path/platform-gpio_keys-event', 'value': 105},
+            'right': {'name': '/dev/input/by-path/platform-gpio_keys-event', 'value': 106},
+            'enter': {'name': '/dev/input/by-path/platform-gpio_keys-event', 'value': 28},
+            'backspace': {'name': '/dev/input/by-path/platform-gpio_keys-event', 'value': 14},
         }
 
     @property
