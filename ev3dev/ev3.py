@@ -44,13 +44,10 @@ class Leds(object):
     """
     The EV3 LEDs.
     """
-
-# ~autogen led-colors platforms.ev3.led>currentClass
-
-    red_left = Led(name_pattern='ev3:left:red:ev3dev')
-    red_right = Led(name_pattern='ev3:right:red:ev3dev')
-    green_left = Led(name_pattern='ev3:left:green:ev3dev')
-    green_right = Led(name_pattern='ev3:right:green:ev3dev')
+    red_left = Led(name_pattern='led0:red:brick-status')
+    red_right = Led(name_pattern='led1:red:brick-status')
+    green_left = Led(name_pattern='led0:green:brick-status')
+    green_right = Led(name_pattern='led1:green:brick-status')
 
     LEFT = ( red_left, green_left, )
     RIGHT = ( red_right, green_right, )
@@ -100,14 +97,10 @@ class Leds(object):
         Leds.green_right.brightness = 0
 
 
-# ~autogen
-
 class Button(ButtonEVIO):
     """
     EV3 Buttons
     """
-
-# ~autogen button-property platforms.ev3.button>currentClass
 
     @staticmethod
     def on_up(state):
@@ -165,12 +158,12 @@ class Button(ButtonEVIO):
 
 
     _buttons = {
-            'up': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 103},
-            'down': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 108},
-            'left': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 105},
-            'right': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 106},
-            'enter': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 28},
-            'backspace': {'name': '/dev/input/by-path/platform-gpio-keys.0-event', 'value': 14},
+            'up': {'name': '/dev/input/by-path/platform-gpio_keys-event', 'value': 103},
+            'down': {'name': '/dev/input/by-path/platform-gpio_keys-event', 'value': 108},
+            'left': {'name': '/dev/input/by-path/platform-gpio_keys-event', 'value': 105},
+            'right': {'name': '/dev/input/by-path/platform-gpio_keys-event', 'value': 106},
+            'enter': {'name': '/dev/input/by-path/platform-gpio_keys-event', 'value': 28},
+            'backspace': {'name': '/dev/input/by-path/platform-gpio_keys-event', 'value': 14},
         }
 
     @property
@@ -214,6 +207,3 @@ class Button(ButtonEVIO):
         Check if 'backspace' button is pressed.
         """
         return 'backspace' in self.buttons_pressed
-
-
-# ~autogen
