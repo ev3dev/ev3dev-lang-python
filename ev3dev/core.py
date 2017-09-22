@@ -33,7 +33,6 @@ import io
 import fnmatch
 import numbers
 import array
-import logging
 import mmap
 import ctypes
 import re
@@ -46,8 +45,6 @@ from os.path import abspath
 from struct import pack, unpack
 from subprocess import Popen, check_output, PIPE
 
-log = logging.getLogger(__name__)
-
 try:
     # This is a linux-specific module.
     # It is required by the Button() class, but failure to import it may be
@@ -58,6 +55,10 @@ except ImportError:
 
 INPUT_AUTO = ''
 OUTPUT_AUTO = ''
+
+# The number of milliseconds we wait for the state of a motor to
+# update to 'running' in the "on_for_XYZ" methods of the Motor class
+WAIT_RUNNING_TIMEOUT = 100
 
 # -----------------------------------------------------------------------------
 def list_device_names(class_path, name_pattern, **kwargs):
@@ -190,7 +191,7 @@ class Device(object):
                 attribute.seek(0)
             return attribute, attribute.read().strip().decode()
         else:
-            log.info("%s: path %s, attribute %s" % (self, self._path, name))
+            #log.info("%s: path %s, attribute %s" % (self, self._path, name))
             raise Exception("%s is not connected" % self)
 
     def _set_attribute(self, attribute, name, value):
@@ -208,7 +209,7 @@ class Device(object):
                 self._raise_friendly_access_error(ex, name)
             return attribute
         else:
-            log.info("%s: path %s, attribute %s" % (self, self._path, name))
+            #log.info("%s: path %s, attribute %s" % (self, self._path, name))
             raise Exception("%s is not connected" % self)
 
     def _raise_friendly_access_error(self, driver_error, attribute):
@@ -946,6 +947,91 @@ class Motor(Device):
         """
         return self.wait(lambda state: s not in state, timeout)
 
+    def _set_position_rotations(self, speed_pct, rotations):
+        if speed_pct > 0:
+            self.position_sp = self.position + int(rotations * self.count_per_rot)
+        else:
+            self.position_sp = self.position - int(rotations * self.count_per_rot)
+
+    def _set_position_degrees(self, speed_pct, degrees):
+        if speed_pct > 0:
+            self.position_sp = self.position + int((degrees * self.count_per_rot)/360)
+        else:
+            self.position_sp = self.position - int((degrees * self.count_per_rot)/360)
+
+    def _set_brake(self, brake):
+        if brake:
+            self.stop_action = self.STOP_ACTION_HOLD
+        else:
+            self.stop_action = self.STOP_ACTION_COAST
+
+    def on_for_rotations(self, speed_pct, rotations, brake=True, block=True):
+        """
+        Rotate the motor at 'speed' for 'rotations'
+        """
+        assert speed_pct >= -100 and speed_pct <= 100,\
+            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        self.speed_sp = int((speed_pct * self.max_speed) / 100)
+        self._set_position_rotations(speed_pct, rotations)
+        self._set_brake(brake)
+        self.run_to_abs_pos()
+
+        if block:
+            self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
+            self.wait_until_not_moving()
+
+    def on_for_degrees(self, speed_pct, degrees, brake=True, block=True):
+        """
+        Rotate the motor at 'speed' for 'degrees'
+        """
+        assert speed_pct >= -100 and speed_pct <= 100,\
+            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        self.speed_sp = int((speed_pct * self.max_speed) / 100)
+        self._set_position_degrees(speed_pct, degrees)
+        self._set_brake(brake)
+        self.run_to_abs_pos()
+
+        if block:
+            self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
+            self.wait_until_not_moving()
+
+    def on_for_seconds(self, speed_pct, seconds, brake=True, block=True):
+        """
+        Rotate the motor at 'speed' for 'seconds'
+        """
+        assert speed_pct >= -100 and speed_pct <= 100,\
+            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        self.speed_sp = int((speed_pct * self.max_speed) / 100)
+        self.time_sp = int(seconds * 1000)
+        self._set_brake(brake)
+        self.run_timed()
+
+        if block:
+            self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
+            self.wait_until_not_moving()
+
+    def on(self, speed_pct):
+        """
+        Rotate the motor at 'speed' for forever
+        """
+        assert speed_pct >= -100 and speed_pct <= 100,\
+            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        self.speed_sp = int((speed_pct * self.max_speed) / 100)
+        self.run_forever()
+
+    def off(self, brake=True):
+        self._set_brake(brake)
+        self.stop()
+
+    @property
+    def rotations(self):
+        return float(self.position / self.count_per_rot)
+
+    @property
+    def degrees(self):
+        return self.rotations * 360
+
+
 def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     """
     This is a generator function that enumerates all tacho motors that match
@@ -1483,6 +1569,343 @@ class ServoMotor(Device):
         for key in kwargs:
             setattr(self, key, kwargs[key])
         self.command = self.COMMAND_FLOAT
+
+
+class MotorSet(object):
+
+    def __init__(self, motor_specs, desc=None):
+        """
+        motor_specs is a dictionary such as
+        {
+            OUTPUT_A : LargeMotor,
+            OUTPUT_C : LargeMotor,
+        }
+        """
+        self.motors = {}
+        for motor_port in sorted(motor_specs.keys()):
+            motor_class = motor_specs[motor_port]
+            self.motors[motor_port] = motor_class(motor_port)
+
+        self.desc = desc
+        self.verify_connected()
+
+    def __str__(self):
+
+        if self.desc:
+            return self.desc
+        else:
+            return self.__class__.__name__
+
+    def verify_connected(self):
+        for motor in self.motors.values():
+            if not motor.connected:
+                #log.error("%s: %s is not connected" % (self, motor))
+                sys.exit(1)
+
+    def set_args(self, **kwargs):
+        motors = kwargs.get('motors', self.motors.values())
+
+        for motor in motors:
+            for key in kwargs:
+                if key != 'motors':
+                    try:
+                        setattr(motor, key, kwargs[key])
+                    except AttributeError as e:
+                        #log.error("%s %s cannot set %s to %s" % (self, motor, key, kwargs[key]))
+                        raise e
+
+    def set_polarity(self, polarity, motors=None):
+        valid_choices = (LargeMotor.POLARITY_NORMAL, LargeMotor.POLARITY_INVERSED)
+
+        assert polarity in valid_choices,\
+            "%s is an invalid polarity choice, must be %s" % (polarity, ', '.join(valid_choices))
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            motor.polarity = polarity
+
+    def _run_command(self, **kwargs):
+        motors = kwargs.get('motors', self.motors.values())
+
+        for motor in motors:
+            for key in kwargs:
+                if key not in ('motors', 'commands'):
+                    #log.debug("%s: %s set %s to %s" % (self, motor, key, kwargs[key]))
+                    setattr(motor, key, kwargs[key])
+
+        for motor in motors:
+            motor.command = kwargs['command']
+            #log.debug("%s: %s command %s" % (self, motor, kwargs['command']))
+
+    def run_forever(self, **kwargs):
+        kwargs['command'] = LargeMotor.COMMAND_RUN_FOREVER
+        self._run_command(**kwargs)
+
+    def run_to_abs_pos(self, **kwargs):
+        kwargs['command'] = LargeMotor.COMMAND_RUN_TO_ABS_POS
+        self._run_command(**kwargs)
+
+    def run_to_rel_pos(self, **kwargs):
+        kwargs['command'] = LargeMotor.COMMAND_RUN_TO_REL_POS
+        self._run_command(**kwargs)
+
+    def run_timed(self, **kwargs):
+        kwargs['command'] = LargeMotor.COMMAND_RUN_TIMED
+        self._run_command(**kwargs)
+
+    def run_direct(self, **kwargs):
+        kwargs['command'] = LargeMotor.COMMAND_RUN_DIRECT
+        self._run_command(**kwargs)
+
+    def reset(self, motors=None):
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            motor.reset()
+
+    def stop(self, motors=None):
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            motor.stop()
+
+    def _is_state(self, motors, state):
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            if state not in motor.state:
+                return False
+
+        return True
+
+    @property
+    def is_running(self, motors=None):
+        return self._is_state(motors, LargeMotor.STATE_RUNNING)
+
+    @property
+    def is_ramping(self, motors=None):
+        return self._is_state(motors, LargeMotor.STATE_RAMPING)
+
+    @property
+    def is_holding(self, motors=None):
+        return self._is_state(motors, LargeMotor.STATE_HOLDING)
+
+    @property
+    def is_overloaded(self, motors=None):
+        return self._is_state(motors, LargeMotor.STATE_OVERLOADED)
+
+    @property
+    def is_stalled(self):
+        return self._is_state(motors, LargeMotor.STATE_STALLED)
+
+    def wait(self, cond, timeout=None, motors=None):
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            motor.wait(cond, timeout)
+
+    def wait_until_not_moving(self, timeout=None, motors=None):
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            motor.wait_until_not_moving(timeout)
+
+    def wait_until(self, s, timeout=None, motors=None):
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            motor.wait_until(s, timeout)
+
+    def wait_while(self, s, timeout=None, motors=None):
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            motor.wait_while(s, timeout)
+
+
+class MoveTank(MotorSet):
+
+    def __init__(self, left_motor_port, right_motor_port, desc=None, motor_class=LargeMotor):
+        motor_specs = {
+            left_motor_port : motor_class,
+            right_motor_port : motor_class,
+        }
+
+        MotorSet.__init__(self, motor_specs, desc)
+        self.left_motor = self.motors[left_motor_port]
+        self.right_motor = self.motors[right_motor_port]
+        self.max_speed = self.left_motor.max_speed
+
+    def _block(self):
+        self.left_motor.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
+        self.right_motor.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
+        self.left_motor.wait_until_not_moving()
+        self.right_motor.wait_until_not_moving()
+
+    def _validate_speed_pct(self, left_speed_pct, right_speed_pct):
+        assert left_speed_pct >= -100 and left_speed_pct <= 100,\
+            "%s is an invalid left_speed_pct, must be between -100 and 100 (inclusive)" % left_speed_pct
+        assert right_speed_pct >= -100 and right_speed_pct <= 100,\
+            "%s is an invalid right_speed_pct, must be between -100 and 100 (inclusive)" % right_speed_pct
+        assert left_speed_pct or right_speed_pct,\
+            "Either left_speed_pct or right_speed_pct must be non-zero"
+
+    def on_for_rotations(self, left_speed_pct, right_speed_pct, rotations, brake=True, block=True):
+        """
+        Rotate the motor at 'left_speed & right_speed' for 'rotations'
+        """
+        self._validate_speed_pct(left_speed_pct, right_speed_pct)
+        left_speed = int((left_speed_pct * self.max_speed) / 100)
+        right_speed = int((right_speed_pct * self.max_speed) / 100)
+
+        if left_speed > right_speed:
+            left_rotations = rotations
+            right_rotations = float(right_speed / left_speed) * rotations
+        else:
+            left_rotations = float(left_speed / right_speed) * rotations
+            right_rotations = rotations
+
+        # Set all parameters
+        self.left_motor.speed_sp = left_speed
+        self.left_motor._set_position_rotations(left_speed, left_rotations)
+        self.left_motor._set_brake(brake)
+        self.right_motor.speed_sp = right_speed
+        self.right_motor._set_position_rotations(right_speed, right_rotations)
+        self.right_motor._set_brake(brake)
+
+        # Start the motors
+        self.left_motor.run_to_abs_pos()
+        self.right_motor.run_to_abs_pos()
+
+        if block:
+            self._block()
+
+    def on_for_degrees(self, left_speed_pct, right_speed_pct, degrees, brake=True, block=True):
+        """
+        Rotate the motor at 'left_speed & right_speed' for 'degrees'
+        """
+        self._validate_speed_pct(left_speed_pct, right_speed_pct)
+        left_speed = int((left_speed_pct * self.max_speed) / 100)
+        right_speed = int((right_speed_pct * self.max_speed) / 100)
+
+        if left_speed > right_speed:
+            left_degrees = degrees
+            right_degrees = float(right_speed / left_speed) * degrees
+        else:
+            left_degrees = float(left_speed / right_speed) * degrees
+            right_degrees = degrees
+
+        # Set all parameters
+        self.left_motor.speed_sp = left_speed
+        self.left_motor._set_position_degrees(left_speed, left_degrees)
+        self.left_motor._set_brake(brake)
+        self.right_motor.speed_sp = right_speed
+        self.right_motor._set_position_degrees(right_speed, right_degrees)
+        self.right_motor._set_brake(brake)
+
+        # Start the motors
+        self.left_motor.run_to_abs_pos()
+        self.right_motor.run_to_abs_pos()
+
+        if block:
+            self._block()
+
+    def on_for_seconds(self, left_speed_pct, right_speed_pct, seconds, brake=True, block=True):
+        """
+        Rotate the motor at 'left_speed & right_speed' for 'seconds'
+        """
+        self._validate_speed_pct(left_speed_pct, right_speed_pct)
+
+        # Set all parameters
+        self.left_motor.speed_sp = int((left_speed_pct * self.max_speed) / 100)
+        self.left_motor.time_sp = int(seconds * 1000)
+        self.left_motor._set_brake(brake)
+        self.right_motor.speed_sp = int((right_speed_pct * self.max_speed) / 100)
+        self.right_motor.time_sp = int(seconds * 1000)
+        self.right_motor._set_brake(brake)
+
+        # Start the motors
+        self.left_motor.run_timed()
+        self.right_motor.run_timed()
+
+        if block:
+            self._block()
+
+    def on(self, left_speed_pct, right_speed_pct):
+        """
+        Rotate the motor at 'left_speed & right_speed' for forever
+        """
+        self._validate_speed_pct(left_speed_pct, right_speed_pct)
+        self.left_motor.speed_sp = int((left_speed_pct * self.max_speed) / 100)
+        self.right_motor.speed_sp = int((right_speed_pct * self.max_speed) / 100)
+
+        # Start the motors
+        self.left_motor.run_forever()
+        self.right_motor.run_forever()
+
+    def off(self, brake=True):
+        self.left_motor._set_brake(brake)
+        self.right_motor._set_brake(brake)
+        self.left_motor.stop()
+        self.right_motor.stop()
+
+
+class MoveSteering(MoveTank):
+
+    def get_speed_steering(self, steering, speed_pct):
+        """
+        Calculate the speed_sp for each motor in a pair to achieve the specified
+        steering. Note that calling this function alone will not make the
+        motors move, it only sets the speed. A run_* function must be called
+        afterwards to make the motors move.
+
+        steering [-100, 100]:
+            * -100 means turn left as fast as possible,
+            *  0   means drive in a straight line, and
+            *  100 means turn right as fast as possible.
+
+        speed_pct:
+            The speed that should be applied to the outmost motor (the one
+            rotating faster). The speed of the other motor will be computed
+            automatically.
+        """
+
+        assert steering >= -100 and steering <= 100,\
+            "%s is an invalid steering, must be between -100 and 100 (inclusive)" % steering
+        assert speed_pct >= -100 and speed_pct <= 100,\
+            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+
+        left_speed = int((speed_pct * self.max_speed) / 100)
+        right_speed = left_speed
+        speed = (50 - abs(float(steering))) / 50
+
+        if steering >= 0:
+            right_speed *= speed
+        else:
+            left_speed *= speed
+
+        left_speed_pct = int((left_speed * 100) / self.left_motor.max_speed)
+        right_speed_pct = int((right_speed * 100) / self.right_motor.max_speed)
+        #log.debug("%s: steering %d, %s speed %d, %s speed %d" %
+        #    (self, steering, self.left_motor, left_speed_pct, self.right_motor, right_speed_pct))
+
+        return (left_speed_pct, right_speed_pct)
+
+    def on_for_rotations(self, steering, speed_pct, rotations, brake=True, block=True):
+        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
+        MoveTank.on_for_rotations(self, left_speed_pct, right_speed_pct, rotations, brake, block)
+
+    def on_for_degrees(self, steering, speed_pct, degrees, brake=True, block=True):
+        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
+        MoveTank.on_for_degrees(self, left_speed_pct, right_speed_pct, degrees, brake, block)
+
+    def on_for_seconds(self, steering, speed_pct, seconds, brake=True, block=True):
+        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
+        MoveTank.on_for_seconds(self, left_speed_pct, right_speed_pct, seconds, brake, block)
+
+    def on(self, steering, speed_pct):
+        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
+        MoveTank.on(self, left_speed_pct, right_speed_pct)
 
 
 class Sensor(Device):
