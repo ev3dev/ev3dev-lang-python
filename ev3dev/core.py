@@ -33,10 +33,8 @@ import io
 import fnmatch
 import numbers
 import array
-import logging
 import mmap
 import ctypes
-import logging
 import re
 import select
 import shlex
@@ -46,8 +44,6 @@ import errno
 from os.path import abspath
 from struct import pack, unpack
 from subprocess import Popen, check_output, PIPE
-
-log = logging.getLogger(__name__)
 
 try:
     # This is a linux-specific module.
@@ -195,7 +191,7 @@ class Device(object):
                 attribute.seek(0)
             return attribute, attribute.read().strip().decode()
         else:
-            log.info("%s: path %s, attribute %s" % (self, self._path, name))
+            #log.info("%s: path %s, attribute %s" % (self, self._path, name))
             raise Exception("%s is not connected" % self)
 
     def _set_attribute(self, attribute, name, value):
@@ -213,7 +209,7 @@ class Device(object):
                 self._raise_friendly_access_error(ex, name)
             return attribute
         else:
-            log.info("%s: path %s, attribute %s" % (self, self._path, name))
+            #log.info("%s: path %s, attribute %s" % (self, self._path, name))
             raise Exception("%s is not connected" % self)
 
     def _raise_friendly_access_error(self, driver_error, attribute):
@@ -1603,7 +1599,7 @@ class MotorSet(object):
     def verify_connected(self):
         for motor in self.motors.values():
             if not motor.connected:
-                log.error("%s: %s is not connected" % (self, motor))
+                #log.error("%s: %s is not connected" % (self, motor))
                 sys.exit(1)
 
     def set_args(self, **kwargs):
@@ -1615,7 +1611,7 @@ class MotorSet(object):
                     try:
                         setattr(motor, key, kwargs[key])
                     except AttributeError as e:
-                        log.error("%s %s cannot set %s to %s" % (self, motor, key, kwargs[key]))
+                        #log.error("%s %s cannot set %s to %s" % (self, motor, key, kwargs[key]))
                         raise e
 
     def set_polarity(self, polarity, motors=None):
@@ -1634,12 +1630,12 @@ class MotorSet(object):
         for motor in motors:
             for key in kwargs:
                 if key not in ('motors', 'commands'):
-                    log.debug("%s: %s set %s to %s" % (self, motor, key, kwargs[key]))
+                    #log.debug("%s: %s set %s to %s" % (self, motor, key, kwargs[key]))
                     setattr(motor, key, kwargs[key])
 
         for motor in motors:
             motor.command = kwargs['command']
-            log.debug("%s: %s command %s" % (self, motor, kwargs['command']))
+            #log.debug("%s: %s command %s" % (self, motor, kwargs['command']))
 
     def run_forever(self, **kwargs):
         kwargs['command'] = LargeMotor.COMMAND_RUN_FOREVER
@@ -1890,8 +1886,8 @@ class MoveSteering(MoveTank):
 
         left_speed_pct = int((left_speed * 100) / self.left_motor.max_speed)
         right_speed_pct = int((right_speed * 100) / self.right_motor.max_speed)
-        log.debug("%s: steering %d, %s speed %d, %s speed %d" %
-            (self, steering, self.left_motor, left_speed_pct, self.right_motor, right_speed_pct))
+        #log.debug("%s: steering %d, %s speed %d, %s speed %d" %
+        #    (self, steering, self.left_motor, left_speed_pct, self.right_motor, right_speed_pct))
 
         return (left_speed_pct, right_speed_pct)
 
