@@ -1779,24 +1779,20 @@ class TouchSensor(Sensor):
     Touch Sensor
     """
 
-    __slots__ = ['auto_mode']
+    __slots__ = ['auto_mode', '_poll', '_value0']
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
+    #: Button state
+    MODE_TOUCH = 'TOUCH'
+    MODES = ('TOUCH',)
+
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(TouchSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
         self.auto_mode = True
-
-
-    #: Button state
-    MODE_TOUCH = 'TOUCH'
-
-
-    MODES = (
-      'TOUCH',
-    )
-
+        self._poll = None
+        self._value0 = None
 
     @property
     def is_pressed(self):
@@ -1813,6 +1809,46 @@ class TouchSensor(Sensor):
     @property
     def is_released(self):
         return not self.is_pressed
+
+    def _wait(self, wait_for_press, timeout_ms):
+        tic = time.time()
+
+        if self._poll is None:
+            self._value0 = self._attribute_file_open('value0')
+            self._poll = select.poll()
+            self._poll.register(self._value0, select.POLLPRI)
+
+        while True:
+            self._poll.poll(timeout_ms)
+
+            if wait_for_press:
+                if self.is_pressed:
+                    return True
+            else:
+                if self.is_released:
+                    return True
+
+            if timeout_ms is not None and time.time() >= tic + timeout_ms / 1000:
+                return False
+
+    def wait_for_pressed(self, timeout_ms=None):
+        return self._wait(True, timeout_ms)
+
+    def wait_for_released(self, timeout_ms=None):
+        return self._wait(False, timeout_ms)
+
+    def wait_for_bump(self, timeout_ms=None):
+        """
+        Wait for the touch sensor to be pressed down and then released.
+        Both actions must happen within timeout_ms.
+        """
+        start_time = time.time()
+
+        if self.wait_for_pressed(timeout_ms):
+            timeout_ms -= int((time.time() - start_time) * 1000)
+            return self.wait_for_released(timeout_ms)
+
+        return False
 
 
 class ColorSensor(Sensor):
