@@ -2585,6 +2585,108 @@ class GyroSensor(Sensor):
         return self.value(0), self.value(1)
 
 
+class ButtonBase(object):
+    """
+    Abstract button interface.
+    """
+
+    def __str__(self):
+        return self.__class__.__name__
+
+    @staticmethod
+    def on_change(changed_buttons):
+        """
+        This handler is called by `process()` whenever state of any button has
+        changed since last `process()` call. `changed_buttons` is a list of
+        tuples of changed button names and their states.
+        """
+        pass
+
+    _state = set([])
+
+    def any(self):
+        """
+        Checks if any button is pressed.
+        """
+        return bool(self.buttons_pressed)
+
+    def check_buttons(self, buttons=[]):
+        """
+        Check if currently pressed buttons exactly match the given list.
+        """
+        return set(self.buttons_pressed) == set(buttons)
+
+    def process(self):
+        """
+        Check for currenly pressed buttons. If the new state differs from the
+        old state, call the appropriate button event handlers.
+        """
+        new_state = set(self.buttons_pressed)
+        old_state = self._state
+        self._state = new_state
+
+        state_diff = new_state.symmetric_difference(old_state)
+        for button in state_diff:
+            handler = getattr(self, 'on_' + button)
+            if handler is not None: handler(button in new_state)
+
+        if self.on_change is not None and state_diff:
+            self.on_change([(button, button in new_state) for button in state_diff])
+
+    @property
+    def buttons_pressed(self):
+        raise NotImplementedError()
+
+
+class ButtonEVIO(ButtonBase):
+
+    """
+    Provides a generic button reading mechanism that works with event interface
+    and may be adapted to platform specific implementations.
+
+    This implementation depends on the availability of the EVIOCGKEY ioctl
+    to be able to read the button state buffer. See Linux kernel source
+    in /include/uapi/linux/input.h for details.
+    """
+
+    KEY_MAX = 0x2FF
+    KEY_BUF_LEN = int((KEY_MAX + 7) / 8)
+    EVIOCGKEY = (2 << (14 + 8 + 8) | KEY_BUF_LEN << (8 + 8) | ord('E') << 8 | 0x18)
+
+    _buttons = {}
+
+    def __init__(self):
+        self._file_cache = {}
+        self._buffer_cache = {}
+        for b in self._buttons:
+            name = self._buttons[b]['name']
+            if name not in self._file_cache:
+                self._file_cache[name] = open(name, 'rb', 0)
+                self._buffer_cache[name] = array.array('B', [0] * self.KEY_BUF_LEN)
+
+    def _button_file(self, name):
+        return self._file_cache[name]
+
+    def _button_buffer(self, name):
+        return self._buffer_cache[name]
+
+    @property
+    def buttons_pressed(self):
+        """
+        Returns list of names of pressed buttons.
+        """
+        for b in self._buffer_cache:
+            fcntl.ioctl(self._button_file(b), self.EVIOCGKEY, self._buffer_cache[b])
+
+        pressed = []
+        for k, v in self._buttons.items():
+            buf = self._buffer_cache[v['name']]
+            bit = v['value']
+            if bool(buf[int(bit / 8)] & 1 << bit % 8):
+                pressed += [k]
+        return pressed
+
+
 class InfraredSensor(Sensor):
     """
     LEGO EV3 infrared sensor.
@@ -3070,108 +3172,6 @@ class Led(Device):
     @brightness_pct.setter
     def brightness_pct(self, value):
         self.brightness = value * self.max_brightness
-
-
-class ButtonBase(object):
-    """
-    Abstract button interface.
-    """
-
-    def __str__(self):
-        return self.__class__.__name__
-
-    @staticmethod
-    def on_change(changed_buttons):
-        """
-        This handler is called by `process()` whenever state of any button has
-        changed since last `process()` call. `changed_buttons` is a list of
-        tuples of changed button names and their states.
-        """
-        pass
-
-    _state = set([])
-
-    def any(self):
-        """
-        Checks if any button is pressed.
-        """
-        return bool(self.buttons_pressed)
-
-    def check_buttons(self, buttons=[]):
-        """
-        Check if currently pressed buttons exactly match the given list.
-        """
-        return set(self.buttons_pressed) == set(buttons)
-
-    def process(self):
-        """
-        Check for currenly pressed buttons. If the new state differs from the
-        old state, call the appropriate button event handlers.
-        """
-        new_state = set(self.buttons_pressed)
-        old_state = self._state
-        self._state = new_state
-
-        state_diff = new_state.symmetric_difference(old_state)
-        for button in state_diff:
-            handler = getattr(self, 'on_' + button)
-            if handler is not None: handler(button in new_state)
-
-        if self.on_change is not None and state_diff:
-            self.on_change([(button, button in new_state) for button in state_diff])
-
-    @property
-    def buttons_pressed(self):
-        raise NotImplementedError()
-
-
-class ButtonEVIO(ButtonBase):
-
-    """
-    Provides a generic button reading mechanism that works with event interface
-    and may be adapted to platform specific implementations.
-
-    This implementation depends on the availability of the EVIOCGKEY ioctl
-    to be able to read the button state buffer. See Linux kernel source
-    in /include/uapi/linux/input.h for details.
-    """
-
-    KEY_MAX = 0x2FF
-    KEY_BUF_LEN = int((KEY_MAX + 7) / 8)
-    EVIOCGKEY = (2 << (14 + 8 + 8) | KEY_BUF_LEN << (8 + 8) | ord('E') << 8 | 0x18)
-
-    _buttons = {}
-
-    def __init__(self):
-        self._file_cache = {}
-        self._buffer_cache = {}
-        for b in self._buttons:
-            name = self._buttons[b]['name']
-            if name not in self._file_cache:
-                self._file_cache[name] = open(name, 'rb', 0)
-                self._buffer_cache[name] = array.array('B', [0] * self.KEY_BUF_LEN)
-
-    def _button_file(self, name):
-        return self._file_cache[name]
-
-    def _button_buffer(self, name):
-        return self._buffer_cache[name]
-
-    @property
-    def buttons_pressed(self):
-        """
-        Returns list of names of pressed buttons.
-        """
-        for b in self._buffer_cache:
-            fcntl.ioctl(self._button_file(b), self.EVIOCGKEY, self._buffer_cache[b])
-
-        pressed = []
-        for k, v in self._buttons.items():
-            buf = self._buffer_cache[v['name']]
-            bit = v['value']
-            if bool(buf[int(bit / 8)] & 1 << bit % 8):
-                pressed += [k]
-        return pressed
 
 
 class PowerSupply(Device):
