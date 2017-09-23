@@ -2290,11 +2290,11 @@ class ColorSensor(Sensor):
 
 
     MODES = (
-      'COL-REFLECT',
-      'COL-AMBIENT',
-      'COL-COLOR',
-      'REF-RAW',
-      'RGB-RAW',
+      MODE_COL_REFLECT,
+      MODE_COL_AMBIENT,
+      MODE_COL_COLOR,
+      MODE_REF_RAW,
+      MODE_RGB_RAW
     )
 
     COLORS = (
