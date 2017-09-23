@@ -67,15 +67,15 @@ def list_device_names(class_path, name_pattern, **kwargs):
     provided parameters.
 
     Parameters:
-	class_path: class path of the device, a subdirectory of /sys/class.
-	    For example, '/sys/class/tacho-motor'.
-	name_pattern: pattern that device name should match.
-	    For example, 'sensor*' or 'motor*'. Default value: '*'.
-	keyword arguments: used for matching the corresponding device
-	    attributes. For example, address='outA', or
-	    driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
-	    is a list, then a match against any entry of the list is
-	    enough.
+        class_path: class path of the device, a subdirectory of /sys/class.
+            For example, '/sys/class/tacho-motor'.
+        name_pattern: pattern that device name should match.
+            For example, 'sensor*' or 'motor*'. Default value: '*'.
+        keyword arguments: used for matching the corresponding device
+            attributes. For example, address='outA', or
+            driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
+            is a list, then a match against any entry of the list is
+            enough.
     """
 
     if not os.path.isdir(class_path):
@@ -266,15 +266,15 @@ def list_devices(class_name, name_pattern, **kwargs):
     arguments.
 
     Parameters:
-	class_name: class name of the device, a subdirectory of /sys/class.
-	    For example, 'tacho-motor'.
-	name_pattern: pattern that device name should match.
-	    For example, 'sensor*' or 'motor*'. Default value: '*'.
-	keyword arguments: used for matching the corresponding device
-	    attributes. For example, address='outA', or
-	    driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
-	    is a list, then a match against any entry of the list is
-	    enough.
+        class_name: class name of the device, a subdirectory of /sys/class.
+            For example, 'tacho-motor'.
+        name_pattern: pattern that device name should match.
+            For example, 'sensor*' or 'motor*'. Default value: '*'.
+        keyword arguments: used for matching the corresponding device
+            attributes. For example, address='outA', or
+            driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
+            is a list, then a match against any entry of the list is
+            enough.
     """
     classpath = abspath(Device.DEVICE_ROOT_PATH + '/' + class_name)
 
@@ -1038,13 +1038,13 @@ def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     the provided arguments.
 
     Parameters:
-	name_pattern: pattern that device name should match.
-	    For example, 'motor*'. Default value: '*'.
-	keyword arguments: used for matching the corresponding device
-	    attributes. For example, driver_name='lego-ev3-l-motor', or
-	    address=['outB', 'outC']. When argument value
-	    is a list, then a match against any entry of the list is
-	    enough.
+        name_pattern: pattern that device name should match.
+            For example, 'motor*'. Default value: '*'.
+        keyword arguments: used for matching the corresponding device
+            attributes. For example, driver_name='lego-ev3-l-motor', or
+            address=['outB', 'outC']. When argument value
+            is a list, then a match against any entry of the list is
+            enough.
     """
     class_path = abspath(Device.DEVICE_ROOT_PATH + '/' + Motor.SYSTEM_CLASS_NAME)
 
@@ -2143,11 +2143,11 @@ def list_sensors(name_pattern=Sensor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     provided arguments.
 
     Parameters:
-	name_pattern: pattern that device name should match.
-	    For example, 'sensor*'. Default value: '*'.
-	keyword arguments: used for matching the corresponding device
-	    attributes. For example, driver_name='lego-ev3-touch', or
-	    address=['in1', 'in3']. When argument value is a list,
+        name_pattern: pattern that device name should match.
+            For example, 'sensor*'. Default value: '*'.
+        keyword arguments: used for matching the corresponding device
+            attributes. For example, driver_name='lego-ev3-touch', or
+            address=['in1', 'in3']. When argument value is a list,
         then a match against any entry of the list is enough.
     """
     class_path = abspath(Device.DEVICE_ROOT_PATH + '/' + Sensor.SYSTEM_CLASS_NAME)
@@ -2202,24 +2202,20 @@ class TouchSensor(Sensor):
     Touch Sensor
     """
 
-    __slots__ = ['auto_mode']
+    __slots__ = ['auto_mode', '_poll', '_value0']
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
+    #: Button state
+    MODE_TOUCH = 'TOUCH'
+    MODES = (MODE_TOUCH,)
+
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(TouchSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
         self.auto_mode = True
-
-
-    #: Button state
-    MODE_TOUCH = 'TOUCH'
-
-
-    MODES = (
-      'TOUCH',
-    )
-
+        self._poll = None
+        self._value0 = None
 
     @property
     def is_pressed(self):
@@ -2232,6 +2228,48 @@ class TouchSensor(Sensor):
             self.mode = self.MODE_TOUCH
 
         return self.value(0)
+
+    @property
+    def is_released(self):
+        return not self.is_pressed
+
+    def _wait(self, wait_for_press, timeout_ms):
+        tic = time.time()
+
+        if self._poll is None:
+            self._value0 = self._attribute_file_open('value0')
+            self._poll = select.poll()
+            self._poll.register(self._value0, select.POLLPRI)
+
+        while True:
+            self._poll.poll(timeout_ms)
+
+            if self.is_pressed == wait_for_press:
+                return True
+
+            if timeout_ms is not None and time.time() >= tic + timeout_ms / 1000:
+                return False
+
+    def wait_for_pressed(self, timeout_ms=None):
+        return self._wait(True, timeout_ms)
+
+    def wait_for_released(self, timeout_ms=None):
+        return self._wait(False, timeout_ms)
+
+    def wait_for_bump(self, timeout_ms=None):
+        """
+        Wait for the touch sensor to be pressed down and then released.
+        Both actions must happen within timeout_ms.
+        """
+        start_time = time.time()
+
+        if self.wait_for_pressed(timeout_ms):
+            if timeout_ms is not None:
+                timeout_ms -= int((time.time() - start_time) * 1000)
+            return self.wait_for_released(timeout_ms)
+
+        return False
+
 
 class ColorSensor(Sensor):
 
