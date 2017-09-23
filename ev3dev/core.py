@@ -1821,12 +1821,8 @@ class TouchSensor(Sensor):
         while True:
             self._poll.poll(timeout_ms)
 
-            if wait_for_press:
-                if self.is_pressed:
-                    return True
-            else:
-                if self.is_released:
-                    return True
+            if self.is_pressed == wait_for_press:
+                return True
 
             if timeout_ms is not None and time.time() >= tic + timeout_ms / 1000:
                 return False
