@@ -1845,7 +1845,8 @@ class TouchSensor(Sensor):
         start_time = time.time()
 
         if self.wait_for_pressed(timeout_ms):
-            timeout_ms -= int((time.time() - start_time) * 1000)
+            if timeout_ms is not None:
+                timeout_ms -= int((time.time() - start_time) * 1000)
             return self.wait_for_released(timeout_ms)
 
         return False
