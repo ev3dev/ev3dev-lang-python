@@ -2584,8 +2584,8 @@ class GyroSensor(Sensor):
 
         return self.value(0), self.value(1)
 
-class InfraredSensor(Sensor):
 
+class InfraredSensor(Sensor):
     """
     LEGO EV3 infrared sensor.
     """
@@ -2594,11 +2594,6 @@ class InfraredSensor(Sensor):
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
-
-    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
-        self.auto_mode = True
-
 
     #: Proximity
     MODE_IR_PROX = 'IR-PROX'
@@ -2615,15 +2610,17 @@ class InfraredSensor(Sensor):
     #: Calibration ???
     MODE_IR_CAL = 'IR-CAL'
 
-
     MODES = (
-      'IR-PROX',
-      'IR-SEEK',
-      'IR-REMOTE',
-      'IR-REM-A',
-      'IR-CAL',
+      MODE_IR_PROX,
+      MODE_IR_SEEK,
+      MODE_IR_REMOTE,
+      MODE_IR_REM_A,
+      MODE_IR_CAL
     )
 
+    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+        super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
+        self.auto_mode = True
 
     @property
     def proximity(self):
@@ -2636,6 +2633,137 @@ class InfraredSensor(Sensor):
             self.mode = self.MODE_IR_PROX
 
         return self.value(0)
+
+
+class RemoteControl(ButtonBase):
+    """
+    EV3 Remote Controller
+    """
+
+    _BUTTON_VALUES = {
+            0: [],
+            1: ['red_up'],
+            2: ['red_down'],
+            3: ['blue_up'],
+            4: ['blue_down'],
+            5: ['red_up', 'blue_up'],
+            6: ['red_up', 'blue_down'],
+            7: ['red_down', 'blue_up'],
+            8: ['red_down', 'blue_down'],
+            9: ['beacon'],
+            10: ['red_up', 'red_down'],
+            11: ['blue_up', 'blue_down']
+            }
+
+    #: Handles ``Red Up`` events.
+    on_red_up = None
+
+    #: Handles ``Red Down`` events.
+    on_red_down = None
+
+    #: Handles ``Blue Up`` events.
+    on_blue_up = None
+
+    #: Handles ``Blue Down`` events.
+    on_blue_down = None
+
+    #: Handles ``Beacon`` events.
+    on_beacon = None
+
+    def __init__(self, sensor=None, channel=1):
+        if sensor is None:
+            self._sensor = InfraredSensor()
+        else:
+            self._sensor = sensor
+
+        self._channel = max(1, min(4, channel)) - 1
+        self._state = set([])
+
+        if self._sensor.connected:
+            self._sensor.mode = 'IR-REMOTE'
+
+    @property
+    def red_up(self):
+        """
+        Checks if `red_up` button is pressed.
+        """
+        return 'red_up' in self.buttons_pressed
+
+    @property
+    def red_down(self):
+        """
+        Checks if `red_down` button is pressed.
+        """
+        return 'red_down' in self.buttons_pressed
+
+    @property
+    def blue_up(self):
+        """
+        Checks if `blue_up` button is pressed.
+        """
+        return 'blue_up' in self.buttons_pressed
+
+    @property
+    def blue_down(self):
+        """
+        Checks if `blue_down` button is pressed.
+        """
+        return 'blue_down' in self.buttons_pressed
+
+    @property
+    def beacon(self):
+        """
+        Checks if `beacon` button is pressed.
+        """
+        return 'beacon' in self.buttons_pressed
+
+    @property
+    def connected(self):
+        return self._sensor.connected
+
+    @property
+    def buttons_pressed(self):
+        """
+        Returns list of currently pressed buttons.
+        """
+        return RemoteControl._BUTTON_VALUES.get(self._sensor.value(self._channel), [])
+
+
+class BeaconSeeker(object):
+    """
+    Seeks EV3 Remote Controller in beacon mode.
+    """
+
+    def __init__(self, sensor=None, channel=1):
+        self._sensor  = InfraredSensor() if sensor is None else sensor
+        self._channel = max(1, min(4, channel)) - 1
+
+        if self._sensor.connected:
+            self._sensor.mode = 'IR-SEEK'
+
+    @property
+    def heading(self):
+        """
+        Returns heading (-25, 25) to the beacon on the given channel.
+        """
+        return self._sensor.value(self._channel * 2)
+
+    @property
+    def distance(self):
+        """
+        Returns distance (0, 100) to the beacon on the given channel.
+        Returns -128 when beacon is not found.
+        """
+        return self._sensor.value(self._channel * 2 + 1)
+
+    @property
+    def heading_and_distance(self):
+        """
+        Returns heading and distance to the beacon on the given channel as a
+        tuple.
+        """
+        return self._sensor.value(self._channel * 2), self._sensor.value(self._channel * 2 + 1)
+
 
 class SoundSensor(Sensor):
 
@@ -3044,137 +3172,6 @@ class ButtonEVIO(ButtonBase):
             if bool(buf[int(bit / 8)] & 1 << bit % 8):
                 pressed += [k]
         return pressed
-
-
-class RemoteControl(ButtonBase):
-    """
-    EV3 Remote Controller
-    """
-
-    _BUTTON_VALUES = {
-            0: [],
-            1: ['red_up'],
-            2: ['red_down'],
-            3: ['blue_up'],
-            4: ['blue_down'],
-            5: ['red_up', 'blue_up'],
-            6: ['red_up', 'blue_down'],
-            7: ['red_down', 'blue_up'],
-            8: ['red_down', 'blue_down'],
-            9: ['beacon'],
-            10: ['red_up', 'red_down'],
-            11: ['blue_up', 'blue_down']
-            }
-
-    #: Handles ``Red Up`` events.
-    on_red_up = None
-
-    #: Handles ``Red Down`` events.
-    on_red_down = None
-
-    #: Handles ``Blue Up`` events.
-    on_blue_up = None
-
-    #: Handles ``Blue Down`` events.
-    on_blue_down = None
-
-    #: Handles ``Beacon`` events.
-    on_beacon = None
-
-
-    @property
-    def red_up(self):
-        """
-        Checks if `red_up` button is pressed.
-        """
-        return 'red_up' in self.buttons_pressed
-
-    @property
-    def red_down(self):
-        """
-        Checks if `red_down` button is pressed.
-        """
-        return 'red_down' in self.buttons_pressed
-
-    @property
-    def blue_up(self):
-        """
-        Checks if `blue_up` button is pressed.
-        """
-        return 'blue_up' in self.buttons_pressed
-
-    @property
-    def blue_down(self):
-        """
-        Checks if `blue_down` button is pressed.
-        """
-        return 'blue_down' in self.buttons_pressed
-
-    @property
-    def beacon(self):
-        """
-        Checks if `beacon` button is pressed.
-        """
-        return 'beacon' in self.buttons_pressed
-
-    def __init__(self, sensor=None, channel=1):
-        if sensor is None:
-            self._sensor = InfraredSensor()
-        else:
-            self._sensor = sensor
-
-        self._channel = max(1, min(4, channel)) - 1
-        self._state = set([])
-
-        if self._sensor.connected:
-            self._sensor.mode = 'IR-REMOTE'
-
-    @property
-    def connected(self):
-        return self._sensor.connected
-
-    @property
-    def buttons_pressed(self):
-        """
-        Returns list of currently pressed buttons.
-        """
-        return RemoteControl._BUTTON_VALUES.get(self._sensor.value(self._channel), [])
-
-
-class BeaconSeeker(object):
-    """
-    Seeks EV3 Remote Controller in beacon mode.
-    """
-
-    def __init__(self, sensor=None, channel=1):
-        self._sensor  = InfraredSensor() if sensor is None else sensor
-        self._channel = max(1, min(4, channel)) - 1
-
-        if self._sensor.connected:
-            self._sensor.mode = 'IR-SEEK'
-
-    @property
-    def heading(self):
-        """
-        Returns heading (-25, 25) to the beacon on the given channel.
-        """
-        return self._sensor.value(self._channel * 2)
-
-    @property
-    def distance(self):
-        """
-        Returns distance (0, 100) to the beacon on the given channel.
-        Returns -128 when beacon is not found.
-        """
-        return self._sensor.value(self._channel * 2 + 1)
-
-    @property
-    def heading_and_distance(self):
-        """
-        Returns heading and distance to the beacon on the given channel as a
-        tuple.
-        """
-        return self._sensor.value(self._channel * 2), self._sensor.value(self._channel * 2 + 1)
 
 
 class PowerSupply(Device):
