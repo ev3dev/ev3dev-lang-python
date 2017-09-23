@@ -66,15 +66,15 @@ def list_device_names(class_path, name_pattern, **kwargs):
     provided parameters.
 
     Parameters:
-	class_path: class path of the device, a subdirectory of /sys/class.
-	    For example, '/sys/class/tacho-motor'.
-	name_pattern: pattern that device name should match.
-	    For example, 'sensor*' or 'motor*'. Default value: '*'.
-	keyword arguments: used for matching the corresponding device
-	    attributes. For example, address='outA', or
-	    driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
-	    is a list, then a match against any entry of the list is
-	    enough.
+        class_path: class path of the device, a subdirectory of /sys/class.
+            For example, '/sys/class/tacho-motor'.
+        name_pattern: pattern that device name should match.
+            For example, 'sensor*' or 'motor*'. Default value: '*'.
+        keyword arguments: used for matching the corresponding device
+            attributes. For example, address='outA', or
+            driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
+            is a list, then a match against any entry of the list is
+            enough.
     """
 
     if not os.path.isdir(class_path):
@@ -265,15 +265,15 @@ def list_devices(class_name, name_pattern, **kwargs):
     arguments.
 
     Parameters:
-	class_name: class name of the device, a subdirectory of /sys/class.
-	    For example, 'tacho-motor'.
-	name_pattern: pattern that device name should match.
-	    For example, 'sensor*' or 'motor*'. Default value: '*'.
-	keyword arguments: used for matching the corresponding device
-	    attributes. For example, address='outA', or
-	    driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
-	    is a list, then a match against any entry of the list is
-	    enough.
+        class_name: class name of the device, a subdirectory of /sys/class.
+            For example, 'tacho-motor'.
+        name_pattern: pattern that device name should match.
+            For example, 'sensor*' or 'motor*'. Default value: '*'.
+        keyword arguments: used for matching the corresponding device
+            attributes. For example, address='outA', or
+            driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
+            is a list, then a match against any entry of the list is
+            enough.
     """
     classpath = abspath(Device.DEVICE_ROOT_PATH + '/' + class_name)
 
@@ -952,13 +952,13 @@ def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     the provided arguments.
 
     Parameters:
-	name_pattern: pattern that device name should match.
-	    For example, 'motor*'. Default value: '*'.
-	keyword arguments: used for matching the corresponding device
-	    attributes. For example, driver_name='lego-ev3-l-motor', or
-	    address=['outB', 'outC']. When argument value
-	    is a list, then a match against any entry of the list is
-	    enough.
+        name_pattern: pattern that device name should match.
+            For example, 'motor*'. Default value: '*'.
+        keyword arguments: used for matching the corresponding device
+            attributes. For example, driver_name='lego-ev3-l-motor', or
+            address=['outB', 'outC']. When argument value
+            is a list, then a match against any entry of the list is
+            enough.
     """
     class_path = abspath(Device.DEVICE_ROOT_PATH + '/' + Motor.SYSTEM_CLASS_NAME)
 
@@ -1720,11 +1720,11 @@ def list_sensors(name_pattern=Sensor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     provided arguments.
 
     Parameters:
-	name_pattern: pattern that device name should match.
-	    For example, 'sensor*'. Default value: '*'.
-	keyword arguments: used for matching the corresponding device
-	    attributes. For example, driver_name='lego-ev3-touch', or
-	    address=['in1', 'in3']. When argument value is a list,
+        name_pattern: pattern that device name should match.
+            For example, 'sensor*'. Default value: '*'.
+        keyword arguments: used for matching the corresponding device
+            attributes. For example, driver_name='lego-ev3-touch', or
+            address=['in1', 'in3']. When argument value is a list,
         then a match against any entry of the list is enough.
     """
     class_path = abspath(Device.DEVICE_ROOT_PATH + '/' + Sensor.SYSTEM_CLASS_NAME)
