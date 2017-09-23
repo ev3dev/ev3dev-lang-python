@@ -147,24 +147,6 @@ class MediumMotor(ev3dev.auto.MediumMotor, MotorMixin):
     pass
 
 
-class ColorSensorMixin(object):
-
-    def rgb(self):
-        """
-        Note that the mode for the ColorSensor must be set to MODE_RGB_RAW
-        """
-        # These values are on a scale of 0-1020, convert them to a normal 0-255 scale
-        red = int((self.value(0) * 255) / 1020)
-        green = int((self.value(1) * 255) / 1020)
-        blue = int((self.value(2) * 255) / 1020)
-
-        return (red, green, blue)
-
-
-class ColorSensor(ev3dev.auto.ColorSensor, ColorSensorMixin):
-    pass
-
-
 # ============
 # Tank classes
 # ============

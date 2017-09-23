@@ -2362,6 +2362,17 @@ class ColorSensor(Sensor):
         return self.value(0), self.value(1), self.value(2)
 
     @property
+    def rgb(self):
+        """
+        Same as raw() but RGB values are scaled to 0-255
+        """
+        (red, green, blue) = self.raw
+
+        return (int((red * 255) / 1020),
+                int((green * 255) / 1020),
+                int((blue * 255) / 1020))
+
+    @property
     def red(self):
         """
         Red component of the detected color, in the range 0-1020.
