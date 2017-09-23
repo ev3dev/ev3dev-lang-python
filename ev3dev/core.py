@@ -2351,6 +2351,10 @@ class ColorSensor(Sensor):
         return self.value(0)
 
     @property
+    def color_name(self):
+        return self.COLORS[self.color]
+
+    @property
     def raw(self):
         """
         Red, green, and blue components of the detected color, in the range 0-1020.
