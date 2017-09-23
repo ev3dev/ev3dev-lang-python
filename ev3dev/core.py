@@ -1786,7 +1786,7 @@ class TouchSensor(Sensor):
 
     #: Button state
     MODE_TOUCH = 'TOUCH'
-    MODES = ('TOUCH',)
+    MODES = (MODE_TOUCH,)
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(TouchSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
