@@ -2752,7 +2752,6 @@ class InfraredSensor(Sensor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
-        self.mode = self.MODE_IR_PROX
 
     @property
     def proximity(self):
@@ -2826,7 +2825,6 @@ class InfraredSensor(Sensor):
         self.mode = self.MODE_IR_REMOTE
         raw_value = self.value(channel)
         channel = max(1, min(4, channel)) - 1
-        print("channel %d, raw_value: %s" % (channel, raw_value))
         return self._BUTTON_VALUES.get(self.value(channel), [])
 
 
