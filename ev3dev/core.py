@@ -2681,11 +2681,14 @@ class InfraredSensor(Sensor):
     def distance(self, channel=1):
         """
         Returns distance (0, 100) to the beacon on the given channel.
-        Returns -128 when beacon is not found.
+        Returns None when beacon is not found.
         """
         self.mode = self.MODE_IR_SEEK
         channel = self._normalize_channel(channel)
-        return self.value((channel * 2) + 1)
+        ret_value = self.value((channel * 2) + 1)
+
+        # The value will be -128 if no beacon is found, return None instead
+        return None if ret_value == -128 else ret_value
 
     def heading_and_distance(self, channel=1):
         """
