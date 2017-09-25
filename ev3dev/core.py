@@ -2618,6 +2618,10 @@ class InfraredSensor(Sensor):
       MODE_IR_CAL
     )
 
+    # The following are all of the various combinations of button presses for
+    # the remote control.  The key/index is the number that will be written in
+    # the attribute file to indicate what combination of buttons are currently
+    # pressed.
     _BUTTON_VALUES = {
             0: [],
             1: ['red_up'],
@@ -2651,6 +2655,11 @@ class InfraredSensor(Sensor):
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
 
+    def _normalize_channel(self, channel):
+        assert channel >= 1 and channel <= 4, "channel is %s, it must be 1, 2, 3, or 4" % channel
+        channel = max(1, min(4, channel)) - 1
+        return channel
+
     @property
     def proximity(self):
         """
@@ -2666,7 +2675,7 @@ class InfraredSensor(Sensor):
         Returns heading (-25, 25) to the beacon on the given channel.
         """
         self.mode = self.MODE_IR_SEEK
-        channel = max(1, min(4, channel)) - 1
+        channel = self._normalize_channel(channel)
         return self.value(channel * 2)
 
     def distance(self, channel=1):
@@ -2675,7 +2684,7 @@ class InfraredSensor(Sensor):
         Returns -128 when beacon is not found.
         """
         self.mode = self.MODE_IR_SEEK
-        channel = max(1, min(4, channel)) - 1
+        channel = self._normalize_channel(channel)
         return self.value((channel * 2) + 1)
 
     def heading_and_distance(self, channel=1):
@@ -2722,7 +2731,7 @@ class InfraredSensor(Sensor):
         """
         self.mode = self.MODE_IR_REMOTE
         raw_value = self.value(channel)
-        channel = max(1, min(4, channel)) - 1
+        channel = self._normalize_channel(channel)
         return self._BUTTON_VALUES.get(self.value(channel), [])
 
 
@@ -3186,7 +3195,7 @@ class BeaconSeeker(object):
 
     def __init__(self, sensor=None, channel=1):
         self._sensor  = InfraredSensor() if sensor is None else sensor
-        self._channel = max(1, min(4, channel)) - 1
+        self._channel = channel
         self._sensor.mode = InfraredSensor.MODE_IR_SEEK
 
     @property
