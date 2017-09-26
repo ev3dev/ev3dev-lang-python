@@ -109,7 +109,7 @@ class Device(object):
 
     DEVICE_ROOT_PATH = '/sys/class'
 
-    _DEVICE_INDEX = re.compile(r'^.*(?P<idx>\d+)$')
+    _DEVICE_INDEX = re.compile(r'^.*(\d+)$')
 
     def __init__(self, class_name, name_pattern='*', name_exact=False, **kwargs):
         """Spin through the Linux sysfs class for the device type and find
@@ -142,7 +142,7 @@ class Device(object):
         def get_index(file):
             match = Device._DEVICE_INDEX.match(file)
             if match:
-                return int(match.group('idx'))
+                return int(match.group(1))
             else:
                 return None
 
