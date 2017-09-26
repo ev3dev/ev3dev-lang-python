@@ -1599,7 +1599,7 @@ class MotorSet(object):
     def verify_connected(self):
         for motor in self.motors.values():
             if not motor.connected:
-                #log.error("%s: %s is not connected" % (self, motor))
+                print("%s: %s is not connected" % (self, motor))
                 sys.exit(1)
 
     def set_args(self, **kwargs):
@@ -2584,8 +2584,62 @@ class GyroSensor(Sensor):
 
         return self.value(0), self.value(1)
 
-class InfraredSensor(Sensor):
 
+class ButtonBase(object):
+    """
+    Abstract button interface.
+    """
+
+    def __str__(self):
+        return self.__class__.__name__
+
+    @staticmethod
+    def on_change(changed_buttons):
+        """
+        This handler is called by `process()` whenever state of any button has
+        changed since last `process()` call. `changed_buttons` is a list of
+        tuples of changed button names and their states.
+        """
+        pass
+
+    _state = set([])
+
+    def any(self):
+        """
+        Checks if any button is pressed.
+        """
+        return bool(self.buttons_pressed)
+
+    def check_buttons(self, buttons=[]):
+        """
+        Check if currently pressed buttons exactly match the given list.
+        """
+        return set(self.buttons_pressed) == set(buttons)
+
+    def process(self, new_state=None):
+        """
+        Check for currenly pressed buttons. If the new state differs from the
+        old state, call the appropriate button event handlers.
+        """
+        if new_state is None:
+            new_state = set(self.buttons_pressed)
+        old_state = self._state
+        self._state = new_state
+
+        state_diff = new_state.symmetric_difference(old_state)
+        for button in state_diff:
+            handler = getattr(self, 'on_' + button)
+            if handler is not None: handler(button in new_state)
+
+        if self.on_change is not None and state_diff:
+            self.on_change([(button, button in new_state) for button in state_diff])
+
+    @property
+    def buttons_pressed(self):
+        raise NotImplementedError()
+
+
+class InfraredSensor(Sensor, ButtonBase):
     """
     LEGO EV3 infrared sensor.
     """
@@ -2594,11 +2648,6 @@ class InfraredSensor(Sensor):
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
-
-    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
-        self.auto_mode = True
-
 
     #: Proximity
     MODE_IR_PROX = 'IR-PROX'
@@ -2615,15 +2664,55 @@ class InfraredSensor(Sensor):
     #: Calibration ???
     MODE_IR_CAL = 'IR-CAL'
 
-
     MODES = (
-      'IR-PROX',
-      'IR-SEEK',
-      'IR-REMOTE',
-      'IR-REM-A',
-      'IR-CAL',
+      MODE_IR_PROX,
+      MODE_IR_SEEK,
+      MODE_IR_REMOTE,
+      MODE_IR_REM_A,
+      MODE_IR_CAL
     )
 
+    # The following are all of the various combinations of button presses for
+    # the remote control.  The key/index is the number that will be written in
+    # the attribute file to indicate what combination of buttons are currently
+    # pressed.
+    _BUTTON_VALUES = {
+            0: [],
+            1: ['red_up'],
+            2: ['red_down'],
+            3: ['blue_up'],
+            4: ['blue_down'],
+            5: ['red_up', 'blue_up'],
+            6: ['red_up', 'blue_down'],
+            7: ['red_down', 'blue_up'],
+            8: ['red_down', 'blue_down'],
+            9: ['beacon'],
+            10: ['red_up', 'red_down'],
+            11: ['blue_up', 'blue_down']
+            }
+
+    #: Handles ``Red Up`` events.
+    on_red_up = None
+
+    #: Handles ``Red Down`` events.
+    on_red_down = None
+
+    #: Handles ``Blue Up`` events.
+    on_blue_up = None
+
+    #: Handles ``Blue Down`` events.
+    on_blue_down = None
+
+    #: Handles ``Beacon`` events.
+    on_beacon = None
+
+    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+        super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
+
+    def _normalize_channel(self, channel):
+        assert channel >= 1 and channel <= 4, "channel is %s, it must be 1, 2, 3, or 4" % channel
+        channel = max(1, min(4, channel)) - 1
+        return channel
 
     @property
     def proximity(self):
@@ -2631,11 +2720,83 @@ class InfraredSensor(Sensor):
         A measurement of the distance between the sensor and the remote,
         as a percentage. 100% is approximately 70cm/27in.
         """
-
-        if self.auto_mode:
-            self.mode = self.MODE_IR_PROX
-
+        self.mode = self.MODE_IR_PROX
         return self.value(0)
+
+    def heading(self, channel=1):
+        """
+        Returns heading (-25, 25) to the beacon on the given channel.
+        """
+        self.mode = self.MODE_IR_SEEK
+        channel = self._normalize_channel(channel)
+        return self.value(channel * 2)
+
+    def distance(self, channel=1):
+        """
+        Returns distance (0, 100) to the beacon on the given channel.
+        Returns None when beacon is not found.
+        """
+        self.mode = self.MODE_IR_SEEK
+        channel = self._normalize_channel(channel)
+        ret_value = self.value((channel * 2) + 1)
+
+        # The value will be -128 if no beacon is found, return None instead
+        return None if ret_value == -128 else ret_value
+
+    def heading_and_distance(self, channel=1):
+        """
+        Returns heading and distance to the beacon on the given channel as a
+        tuple.
+        """
+        return (self.heading(channel), self.distance(channel))
+
+    def red_up(self, channel=1):
+        """
+        Checks if `red_up` button is pressed.
+        """
+        return 'red_up' in self.buttons_pressed(channel)
+
+    def red_down(self, channel=1):
+        """
+        Checks if `red_down` button is pressed.
+        """
+        return 'red_down' in self.buttons_pressed(channel)
+
+    def blue_up(self, channel=1):
+        """
+        Checks if `blue_up` button is pressed.
+        """
+        return 'blue_up' in self.buttons_pressed(channel)
+
+    def blue_down(self, channel=1):
+        """
+        Checks if `blue_down` button is pressed.
+        """
+        return 'blue_down' in self.buttons_pressed(channel)
+
+    def beacon(self, channel=1):
+        """
+        Checks if `beacon` button is pressed.
+        """
+        return 'beacon' in self.buttons_pressed(channel)
+
+    def buttons_pressed(self, channel=1):
+        """
+        Returns list of currently pressed buttons.
+        """
+        self.mode = self.MODE_IR_REMOTE
+        channel = self._normalize_channel(channel)
+        return self._BUTTON_VALUES.get(self.value(channel), [])
+
+    def process(self, channel=1):
+        """
+        ButtonBase expects buttons_pressed to be a @property but we need to
+        pass 'channel' to our buttons_pressed. Get the new_state and pass
+        that to ButtonBase.process().
+        """
+        new_state = set(self.buttons_pressed(channel))
+        ButtonBase.process(self, new_state)
+
 
 class SoundSensor(Sensor):
 
@@ -2944,59 +3105,6 @@ class Led(Device):
         self.brightness = value * self.max_brightness
 
 
-class ButtonBase(object):
-    """
-    Abstract button interface.
-    """
-
-    def __str__(self):
-        return self.__class__.__name__
-
-    @staticmethod
-    def on_change(changed_buttons):
-        """
-        This handler is called by `process()` whenever state of any button has
-        changed since last `process()` call. `changed_buttons` is a list of
-        tuples of changed button names and their states.
-        """
-        pass
-
-    _state = set([])
-
-    def any(self):
-        """
-        Checks if any button is pressed.
-        """
-        return bool(self.buttons_pressed)
-
-    def check_buttons(self, buttons=[]):
-        """
-        Check if currently pressed buttons exactly match the given list.
-        """
-        return set(self.buttons_pressed) == set(buttons)
-
-    def process(self):
-        """
-        Check for currenly pressed buttons. If the new state differs from the
-        old state, call the appropriate button event handlers.
-        """
-        new_state = set(self.buttons_pressed)
-        old_state = self._state
-        self._state = new_state
-
-        state_diff = new_state.symmetric_difference(old_state)
-        for button in state_diff:
-            handler = getattr(self, 'on_' + button)
-            if handler is not None: handler(button in new_state)
-
-        if self.on_change is not None and state_diff:
-            self.on_change([(button, button in new_state) for button in state_diff])
-
-    @property
-    def buttons_pressed(self):
-        raise NotImplementedError()
-
-
 class ButtonEVIO(ButtonBase):
 
     """
@@ -3044,137 +3152,6 @@ class ButtonEVIO(ButtonBase):
             if bool(buf[int(bit / 8)] & 1 << bit % 8):
                 pressed += [k]
         return pressed
-
-
-class RemoteControl(ButtonBase):
-    """
-    EV3 Remote Controller
-    """
-
-    _BUTTON_VALUES = {
-            0: [],
-            1: ['red_up'],
-            2: ['red_down'],
-            3: ['blue_up'],
-            4: ['blue_down'],
-            5: ['red_up', 'blue_up'],
-            6: ['red_up', 'blue_down'],
-            7: ['red_down', 'blue_up'],
-            8: ['red_down', 'blue_down'],
-            9: ['beacon'],
-            10: ['red_up', 'red_down'],
-            11: ['blue_up', 'blue_down']
-            }
-
-    #: Handles ``Red Up`` events.
-    on_red_up = None
-
-    #: Handles ``Red Down`` events.
-    on_red_down = None
-
-    #: Handles ``Blue Up`` events.
-    on_blue_up = None
-
-    #: Handles ``Blue Down`` events.
-    on_blue_down = None
-
-    #: Handles ``Beacon`` events.
-    on_beacon = None
-
-
-    @property
-    def red_up(self):
-        """
-        Checks if `red_up` button is pressed.
-        """
-        return 'red_up' in self.buttons_pressed
-
-    @property
-    def red_down(self):
-        """
-        Checks if `red_down` button is pressed.
-        """
-        return 'red_down' in self.buttons_pressed
-
-    @property
-    def blue_up(self):
-        """
-        Checks if `blue_up` button is pressed.
-        """
-        return 'blue_up' in self.buttons_pressed
-
-    @property
-    def blue_down(self):
-        """
-        Checks if `blue_down` button is pressed.
-        """
-        return 'blue_down' in self.buttons_pressed
-
-    @property
-    def beacon(self):
-        """
-        Checks if `beacon` button is pressed.
-        """
-        return 'beacon' in self.buttons_pressed
-
-    def __init__(self, sensor=None, channel=1):
-        if sensor is None:
-            self._sensor = InfraredSensor()
-        else:
-            self._sensor = sensor
-
-        self._channel = max(1, min(4, channel)) - 1
-        self._state = set([])
-
-        if self._sensor.connected:
-            self._sensor.mode = 'IR-REMOTE'
-
-    @property
-    def connected(self):
-        return self._sensor.connected
-
-    @property
-    def buttons_pressed(self):
-        """
-        Returns list of currently pressed buttons.
-        """
-        return RemoteControl._BUTTON_VALUES.get(self._sensor.value(self._channel), [])
-
-
-class BeaconSeeker(object):
-    """
-    Seeks EV3 Remote Controller in beacon mode.
-    """
-
-    def __init__(self, sensor=None, channel=1):
-        self._sensor  = InfraredSensor() if sensor is None else sensor
-        self._channel = max(1, min(4, channel)) - 1
-
-        if self._sensor.connected:
-            self._sensor.mode = 'IR-SEEK'
-
-    @property
-    def heading(self):
-        """
-        Returns heading (-25, 25) to the beacon on the given channel.
-        """
-        return self._sensor.value(self._channel * 2)
-
-    @property
-    def distance(self):
-        """
-        Returns distance (0, 100) to the beacon on the given channel.
-        Returns -128 when beacon is not found.
-        """
-        return self._sensor.value(self._channel * 2 + 1)
-
-    @property
-    def heading_and_distance(self):
-        """
-        Returns heading and distance to the beacon on the given channel as a
-        tuple.
-        """
-        return self._sensor.value(self._channel * 2), self._sensor.value(self._channel * 2 + 1)
 
 
 class PowerSupply(Device):
