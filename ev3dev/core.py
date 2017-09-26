@@ -1599,7 +1599,7 @@ class MotorSet(object):
     def verify_connected(self):
         for motor in self.motors.values():
             if not motor.connected:
-                #log.error("%s: %s is not connected" % (self, motor))
+                print("%s: %s is not connected" % (self, motor))
                 sys.exit(1)
 
     def set_args(self, **kwargs):
@@ -2616,12 +2616,13 @@ class ButtonBase(object):
         """
         return set(self.buttons_pressed) == set(buttons)
 
-    def process(self):
+    def process(self, new_state=None):
         """
         Check for currenly pressed buttons. If the new state differs from the
         old state, call the appropriate button event handlers.
         """
-        new_state = set(self.buttons_pressed)
+        if new_state is None:
+            new_state = set(self.buttons_pressed)
         old_state = self._state
         self._state = new_state
 
@@ -2786,6 +2787,15 @@ class InfraredSensor(Sensor, ButtonBase):
         self.mode = self.MODE_IR_REMOTE
         channel = self._normalize_channel(channel)
         return self._BUTTON_VALUES.get(self.value(channel), [])
+
+    def process(self, channel=1):
+        """
+        ButtonBase expects buttons_pressed to be a @property but we need to
+        pass 'channel' to our buttons_pressed. Get the new_state and pass
+        that to ButtonBase.process().
+        """
+        new_state = set(self.buttons_pressed(channel))
+        ButtonBase.process(self, new_state)
 
 
 class SoundSensor(Sensor):
