@@ -2354,6 +2354,9 @@ class ColorSensor(Sensor):
 
     @property
     def color_name(self):
+        """
+        Returns NoColor, Black, Blue, etc
+        """
         return self.COLORS[self.color]
 
     @property
