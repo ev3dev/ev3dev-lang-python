@@ -2277,15 +2277,10 @@ class ColorSensor(Sensor):
     LEGO EV3 color sensor.
     """
 
-    __slots__ = ['auto_mode']
+    __slots__ = ['auto_mode', 'red_max', 'green_max', 'blue_max']
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
-
-    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(ColorSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-color'], **kwargs)
-        self.auto_mode = True
-
 
     #: Reflected light. Red LED on.
     MODE_COL_REFLECT = 'COL-REFLECT'
@@ -2326,13 +2321,12 @@ class ColorSensor(Sensor):
     #: Brown color.
     COLOR_BROWN = 7
 
-
     MODES = (
-      'COL-REFLECT',
-      'COL-AMBIENT',
-      'COL-COLOR',
-      'REF-RAW',
-      'RGB-RAW',
+      MODE_COL_REFLECT,
+      MODE_COL_AMBIENT,
+      MODE_COL_COLOR,
+      MODE_REF_RAW,
+      MODE_RGB_RAW
     )
 
     COLORS = (
@@ -2346,6 +2340,14 @@ class ColorSensor(Sensor):
       'Brown',
     )
 
+    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+        super(ColorSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-color'], **kwargs)
+        self.auto_mode = True
+
+        # See calibrate_white() for more details
+        self.red_max = 300
+        self.green_max = 300
+        self.blue_max = 300
 
     @property
     def reflected_light_intensity(self):
@@ -2389,15 +2391,59 @@ class ColorSensor(Sensor):
         return self.value(0)
 
     @property
+    def color_name(self):
+        """
+        Returns NoColor, Black, Blue, etc
+        """
+        return self.COLORS[self.color]
+
+    @property
     def raw(self):
         """
-        Red, green, and blue components of the detected color, in the range 0-1020.
+        Red, green, and blue components of the detected color, officially in the
+        range 0-1020 but the values returned will never be that high. We do not
+        yet know why the values returned are low, but pointing the color sensor
+        at a well lit sheet of white paper will return values in the 250-400 range.
+
+        If this is an issue, check out the rgb() and calibrate_white() methods.
         """
 
         if self.auto_mode:
             self.mode = self.MODE_RGB_RAW
 
         return self.value(0), self.value(1), self.value(2)
+
+    def calibrate_white(self):
+        """
+        The RGB raw values are on a scale of 0-1020 but you never see a value
+        anywhere close to 1020.  This function is designed to be called when
+        the sensor is placed over a white object in order to figure out what
+        are the maximum RGB values the robot can expect to see.  We will use
+        these maximum values to scale future raw values to a 0-255 range in
+        rgb().
+
+        If you never call this function red_max, green_max, and blue_max will
+        use a default value of 300.  This default was selected by measuring
+        the RGB values of a white sheet of paper in a well lit room.
+
+        Note that there are several variables that influence the maximum RGB
+        values detected by the color sensor
+        - the distance of the color sensor to the white object
+        - the amount of light in the room
+        - shadows that the robot casts on the sensor
+        """
+        (self.red_max, self.green_max, self.blue_max) = self.raw
+
+    @property
+    def rgb(self):
+        """
+        Same as raw() but RGB values are scaled to 0-255
+        """
+        (red, green, blue) = self.raw
+
+        return (min(int((red * 255) / self.red_max), 255),
+                min(int((green * 255) / self.green_max), 255),
+                min(int((blue * 255) / self.blue_max), 255))
 
     @property
     def red(self):
