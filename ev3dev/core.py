@@ -2362,7 +2362,12 @@ class ColorSensor(Sensor):
     @property
     def raw(self):
         """
-        Red, green, and blue components of the detected color, in the range 0-1020.
+        Red, green, and blue components of the detected color, officially in the
+        range 0-1020 but the values returned will never be that high. We do not
+        yet know why the values returned are low, but pointing the color sensor
+        at a well lit sheet of white paper will return values in the 250-400 range.
+
+        If this is an issue, check out the rgb() and calibrate_white() methods.
         """
 
         if self.auto_mode:
@@ -2383,7 +2388,7 @@ class ColorSensor(Sensor):
         use a default value of 300.  This default was selected by measuring
         the RGB values of a white sheet of paper in a well lit room.
 
-        Note that there are several variables that influene the maximum RGB
+        Note that there are several variables that influence the maximum RGB
         values detected by the color sensor
         - the distance of the color sensor to the white object
         - the amount of light in the room
