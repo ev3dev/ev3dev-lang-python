@@ -1,41 +1,37 @@
 
-"""
-Use platform.machine() to determine the platform type, cache the
-results in /tmp/current_platform so that we do not have to import
-platform and run platform.machine() each time someone imports ev3dev.auto
-"""
 import os
 
-filename = '/tmp/current_platform'
-current_platform = None
 
-if os.path.exists(filename):
-    with open(filename, 'r') as fh:
-        current_platform = fh.read().strip()
+def get_current_platform():
+    """
+    Look in /sys/class/board-info/ to determine the platform type
+    """
+    board_info_dir = '/sys/class/board-info/'
 
-if not current_platform:
-    import platform
+    for board in os.listdir(board_info_dir):
+        uevent_filename = os.path.join(board_info_dir, board, 'uevent')
 
-    def get_current_platform():
-        """
-        Guess platform we are running on
-        """
-        machine = platform.machine()
+        if os.path.exists(uevent_filename):
+            with open(uevent_filename, 'r') as fh:
+                for line in fh.readlines():
+                    (key, value) = line.strip().split('=')
 
-        if machine == 'armv5tejl':
-            return 'ev3'
-        elif machine == 'armv6l':
-            return 'brickpi'
-        else:
-            return 'unsupported'
+                    if key == 'BOARD_INFO_MODEL':
+                        if value == 'FatcatLab EVB':
+                            return 'evb'
+                        elif value == 'LEGO MINDSTORMS EV3':
+                            return 'ev3'
+                        elif value == 'TBD':
+                            return 'brickpi'
+    return None
 
-    current_platform = get_current_platform()
 
-    with open(filename, 'w') as fh:
-        fh.write(current_platform + '\n')
+current_platform = get_current_platform()
 
 if current_platform == 'brickpi':
     from .brickpi import *
+elif current_platform == 'evb':
+    from .evb import *
 else:
     # Import ev3 by default, so that it is covered by documentation.
     from .ev3 import *
