@@ -1,6 +1,6 @@
 
 """
-An assortment of classes modeling specific features of the EVB brick.
+An assortment of classes modeling specific features of the EVB.
 """
 
 from .core import *

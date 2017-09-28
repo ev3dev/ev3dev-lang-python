@@ -63,7 +63,9 @@ WAIT_RUNNING_TIMEOUT = 100
 
 def get_current_platform():
     """
-    Look in /sys/class/board-info/ to determine the platform type
+    Look in /sys/class/board-info/ to determine the platform type.
+
+    This can return 'ev3', 'evb', 'pistorms', 'brickpi' or 'brickpi3'.
     """
     board_info_dir = '/sys/class/board-info/'
 
