@@ -60,6 +60,44 @@ OUTPUT_AUTO = ''
 # update to 'running' in the "on_for_XYZ" methods of the Motor class
 WAIT_RUNNING_TIMEOUT = 100
 
+
+def get_current_platform():
+    """
+    Look in /sys/class/board-info/ to determine the platform type.
+
+    This can return 'ev3', 'evb', 'pistorms', 'brickpi' or 'brickpi3'.
+    """
+    board_info_dir = '/sys/class/board-info/'
+
+    for board in os.listdir(board_info_dir):
+        uevent_filename = os.path.join(board_info_dir, board, 'uevent')
+
+        if os.path.exists(uevent_filename):
+            with open(uevent_filename, 'r') as fh:
+                for line in fh.readlines():
+                    (key, value) = line.strip().split('=')
+
+                    if key == 'BOARD_INFO_MODEL':
+
+                        if value == 'LEGO MINDSTORMS EV3':
+                            return 'ev3'
+
+                        elif value in ('FatcatLab EVB', 'QuestCape'):
+                            return 'evb'
+
+                        elif value == 'PiStorms':
+                            return 'pistorms'
+
+                        # This is the same for both BrickPi and BrickPi+.
+                        # There is not a way to tell the difference.
+                        elif value == 'Dexter Industries BrickPi':
+                            return 'brickpi'
+
+                        elif value == 'Dexter Industries BrickPi3':
+                            return 'brickpi3'
+    return None
+
+
 # -----------------------------------------------------------------------------
 def list_device_names(class_path, name_pattern, **kwargs):
     """
