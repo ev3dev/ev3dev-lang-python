@@ -137,6 +137,22 @@ def list_device_names(class_path, name_pattern, **kwargs):
             if all([matches(path + '/' + k, kwargs[k]) for k in kwargs]):
                 yield f
 
+
+def file_open(path):
+    mode = stat.S_IMODE(os.stat(path)[stat.ST_MODE])
+    r_ok = mode & stat.S_IRGRP
+    w_ok = mode & stat.S_IWGRP
+
+    if r_ok and w_ok:
+        mode = 'r+'
+    elif w_ok:
+        mode = 'w'
+    else:
+        mode = 'r'
+
+    return io.FileIO(path, mode)
+
+
 # -----------------------------------------------------------------------------
 # Define the base class from which all other ev3dev classes are defined.
 
@@ -205,20 +221,8 @@ class Device(object):
         else:
             return self.__class__.__name__
 
-    def _attribute_file_open( self, name ):
-        path = self._path + '/' + name
-        mode = stat.S_IMODE(os.stat(path)[stat.ST_MODE])
-        r_ok = mode & stat.S_IRGRP
-        w_ok = mode & stat.S_IWGRP
-
-        if r_ok and w_ok:
-            mode = 'r+'
-        elif w_ok:
-            mode = 'w'
-        else:
-            mode = 'r'
-
-        return io.FileIO(path, mode)
+    def _attribute_file_open(self, name):
+        return file_open(os.path.join(self._path, name))
 
     def _get_attribute(self, attribute, name):
         """Device attribute getter"""
@@ -2674,6 +2678,12 @@ class ButtonBase(object):
     Abstract button interface.
     """
 
+    _state = set([])
+
+    def __init__(self):
+        self._poll = None
+        self._buttons_fh = None
+
     def __str__(self):
         return self.__class__.__name__
 
@@ -2685,8 +2695,6 @@ class ButtonBase(object):
         tuples of changed button names and their states.
         """
         pass
-
-    _state = set([])
 
     def any(self):
         """
@@ -2717,6 +2725,24 @@ class ButtonBase(object):
 
         if self.on_change is not None and state_diff:
             self.on_change([(button, button in new_state) for button in state_diff])
+
+    def process_forever(self):
+        """
+        Only call process() when _buttons_filename has been modified.
+
+        NOTE this is not 100% working yet
+        - POLLPRI blocks but doesn't fire when the file is touched
+        - POLLIN does not block
+        """
+
+        if self._poll is None:
+            self._buttons_fh = file_open(self._buttons_filename)
+            self._poll = select.poll()
+            self._poll.register(self._buttons_fh, select.POLLIN)
+
+        while True:
+            self._poll.poll()
+            self.process()
 
     @property
     def buttons_pressed(self):
@@ -3207,8 +3233,10 @@ class ButtonEVIO(ButtonBase):
     _buttons = {}
 
     def __init__(self):
+        ButtonBase.__init__(self)
         self._file_cache = {}
         self._buffer_cache = {}
+
         for b in self._buttons:
             name = self._buttons[b]['name']
             if name not in self._file_cache:
@@ -3233,9 +3261,71 @@ class ButtonEVIO(ButtonBase):
         for k, v in self._buttons.items():
             buf = self._buffer_cache[v['name']]
             bit = v['value']
+
             if bool(buf[int(bit / 8)] & 1 << bit % 8):
-                pressed += [k]
+                pressed.append(k)
+
         return pressed
+
+    def _wait(self, wait_for_button_press, wait_for_button_release, timeout_ms):
+        tic = time.time()
+
+        # wait_for_button_press/release can be a list of buttons or a string
+        # with the name of a single button.  If it is a string of a single
+        # button convert that to a list.
+        if isinstance(wait_for_button_press, str):
+            wait_for_button_press = [wait_for_button_press, ]
+
+        if isinstance(wait_for_button_release, str):
+            wait_for_button_release = [wait_for_button_release, ]
+
+        if self._poll is None:
+            self._buttons_fh = file_open(self._buttons_filename)
+            self._poll = select.poll()
+            self._poll.register(self._buttons_fh, select.POLLIN)
+
+        while True:
+            self._poll.poll(timeout_ms)
+
+            all_pressed = True
+            all_released = True
+            pressed = self.buttons_pressed
+
+            for button in wait_for_button_press:
+                if button not in pressed:
+                    all_pressed = False
+                    break
+
+            for button in wait_for_button_release:
+                if button in pressed:
+                    all_released = False
+                    break
+
+            if all_pressed and all_released:
+                return True
+
+            if timeout_ms is not None and time.time() >= tic + timeout_ms / 1000:
+                return False
+
+    def wait_for_pressed(self, buttons, timeout_ms=None):
+        return self._wait(buttons, [], timeout_ms)
+
+    def wait_for_released(self, buttons, timeout_ms=None):
+        return self._wait([], buttons, timeout_ms)
+
+    def wait_for_bump(self, buttons, timeout_ms=None):
+        """
+        Wait for the button to be pressed down and then released.
+        Both actions must happen within timeout_ms.
+        """
+        start_time = time.time()
+
+        if self.wait_for_pressed(buttons, timeout_ms):
+            if timeout_ms is not None:
+                timeout_ms -= int((time.time() - start_time) * 1000)
+            return self.wait_for_released(buttons, timeout_ms)
+
+        return False
 
 
 class PowerSupply(Device):

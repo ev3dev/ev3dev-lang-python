@@ -22,70 +22,28 @@ class Button(ButtonEVIO):
     EVB Buttons
     """
 
+    _buttons_filename = '/dev/input/by-path/platform-evb-buttons-event'
     _buttons = {
-            'up': {'name': '/dev/input/by-path/platform-evb-buttons-event', 'value': 103},
-            'down': {'name': '/dev/input/by-path/platform-evb-buttons-event', 'value': 108},
-            'left': {'name': '/dev/input/by-path/platform-evb-buttons-event', 'value': 105},
-            'right': {'name': '/dev/input/by-path/platform-evb-buttons-event', 'value': 106},
-            'enter': {'name': '/dev/input/by-path/platform-evb-buttons-event', 'value': 28},
-            'backspace': {'name': '/dev/input/by-path/platform-evb-buttons-event', 'value': 14},
+            'up': {'name': _buttons_filename, 'value': 103},
+            'down': {'name': _buttons_filename, 'value': 108},
+            'left': {'name': _buttons_filename, 'value': 105},
+            'right': {'name': _buttons_filename, 'value': 106},
+            'enter': {'name': _buttons_filename, 'value': 28},
+            'backspace': {'name': _buttons_filename, 'value': 14},
         }
 
+    '''
+    These handlers are called by `process()` whenever state of 'up', 'down',
+    etc buttons have changed since last `process()` call
+    '''
+    on_up = None
+    on_down = None
+    on_left = None
+    on_right = None
+    on_enter = None
+    on_backspace = None
+
     @property
-    @staticmethod
-    def on_up(state):
-        """
-        This handler is called by `process()` whenever state of 'up' button
-        has changed since last `process()` call. `state` parameter is the new
-        state of the button.
-        """
-        pass
-
-    @staticmethod
-    def on_down(state):
-        """
-        This handler is called by `process()` whenever state of 'down' button
-        has changed since last `process()` call. `state` parameter is the new
-        state of the button.
-        """
-        pass
-
-    @staticmethod
-    def on_left(state):
-        """
-        This handler is called by `process()` whenever state of 'left' button
-        has changed since last `process()` call. `state` parameter is the new
-        state of the button.
-        """
-        pass
-
-    @staticmethod
-    def on_right(state):
-        """
-        This handler is called by `process()` whenever state of 'right' button
-        has changed since last `process()` call. `state` parameter is the new
-        state of the button.
-        """
-        pass
-
-    @staticmethod
-    def on_enter(state):
-        """
-        This handler is called by `process()` whenever state of 'enter' button
-        has changed since last `process()` call. `state` parameter is the new
-        state of the button.
-        """
-        pass
-
-    @staticmethod
-    def on_backspace(state):
-        """
-        This handler is called by `process()` whenever state of 'backspace' button
-        has changed since last `process()` call. `state` parameter is the new
-        state of the button.
-        """
-        pass
-
     def up(self):
         """
         Check if 'up' button is pressed.
