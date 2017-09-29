@@ -1936,7 +1936,6 @@ class Sensor(Device):
     '_decimals',
     '_driver_name',
     '_mode',
-    '_mode_value',
     '_modes',
     '_num_values',
     '_units',
@@ -1959,7 +1958,6 @@ class Sensor(Device):
         self._decimals = None
         self._driver_name = None
         self._mode = None
-        self._mode_value = None
         self._modes = None
         self._num_values = None
         self._units = None
@@ -2035,26 +2033,12 @@ class Sensor(Device):
         Returns the current mode. Writing one of the values returned by `modes`
         sets the sensor to that mode.
         """
-        if self._mode_value is None:
-            self._mode, value = self.get_attr_string(self._mode, 'mode')
-            self._mode_value = value
-            return value
-        else:
-            return self._mode_value
+        self._mode, value = self.get_attr_string(self._mode, 'mode')
+        return value
 
     @mode.setter
     def mode(self, value):
-        """
-        This will be called often so we cache the current mode in
-        self._mode_value to avoid some file IO.
-        """
-
-        # If 'mode' is already set to 'value' there is nothing to do.
-        if value == self._mode_value:
-            return
-
         self._mode = self.set_attr_string(self._mode, 'mode', value)
-        self._mode_value = value
 
     @property
     def modes(self):
