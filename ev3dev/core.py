@@ -223,7 +223,7 @@ class Device(object):
     def _get_attribute(self, attribute, name):
         """Device attribute getter"""
         if self.connected:
-            if None == attribute:
+            if attribute is None:
                 attribute = self._attribute_file_open( name )
             else:
                 attribute.seek(0)
@@ -236,7 +236,7 @@ class Device(object):
         """Device attribute setter"""
         if self.connected:
             try:
-                if None == attribute:
+                if attribute is None:
                     attribute = self._attribute_file_open( name )
                 else:
                     attribute.seek(0)
@@ -263,8 +263,11 @@ class Device(object):
                 else:
                     raise ValueError("The given speed value was out of range. Max speed: +/-" + str(max_speed)) from driver_error
             raise ValueError("One or more arguments were out of range or invalid") from driver_error
-        elif driver_error.errno == errno.ENODEV:
-            raise Exception("The device is no longer connected") from driver_error
+        elif driver_error.errno == errno.ENODEV or driver_error.errno == errno.ENOENT:
+            # We will assume that a file-not-found error is the result of a disconnected device
+            # rather than a library error. If that isn't the case, at a minimum the underlying
+            # error info will be printed for debugging.
+            raise Exception("%s is no longer connected" % self) from driver_error
         raise driver_error
 
     def get_attr_int(self, attribute, name):
