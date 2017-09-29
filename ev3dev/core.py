@@ -232,7 +232,7 @@ class Device(object):
             #log.info("%s: path %s, attribute %s" % (self, self._path, name))
             raise Exception("%s is not connected" % self)
 
-    def _set_attribute(self, attribute, name, value):
+    def _set_attribute(self, attribute, name, value, raw=False):
         """Device attribute setter"""
         if self.connected:
             try:
@@ -241,7 +241,11 @@ class Device(object):
                 else:
                     attribute.seek(0)
 
-                attribute.write(value.encode())
+                if raw:
+                    attribute.write(value)
+                else:
+                    attribute.write(value.encode())
+
                 attribute.flush()
             except Exception as ex:
                 self._raise_friendly_access_error(ex, name)
@@ -276,6 +280,9 @@ class Device(object):
 
     def set_attr_int(self, attribute, name, value):
         return self._set_attribute(attribute, name, str(int(value)))
+
+    def set_attr_raw(self, attribute, name, value):
+        return self._set_attribute(attribute, name, value, True)
 
     def get_attr_string(self, attribute, name):
         return self._get_attribute(attribute, name)
@@ -2566,12 +2573,10 @@ class GyroSensor(Sensor):
     """
     LEGO EV3 gyro sensor.
     """
+    __slots__ = ['_direct',]
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
-
-    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(GyroSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-gyro'], **kwargs)
 
     #: Angle
     MODE_GYRO_ANG = 'GYRO-ANG'
@@ -2588,15 +2593,25 @@ class GyroSensor(Sensor):
     #: Calibration ???
     MODE_GYRO_CAL = 'GYRO-CAL'
 
+    # Newer versions of the Gyro sensor also have an additional second axis
+    # accessible via the TILT-ANGLE and TILT-RATE modes that is not usable
+    # using the official EV3-G blocks
+    MODE_TILT_ANG = 'TILT-ANGLE'
+    MODE_TILT_RATE = 'TILT-RATE'
 
     MODES = (
-      'GYRO-ANG',
-      'GYRO-RATE',
-      'GYRO-FAS',
-      'GYRO-G&A',
-      'GYRO-CAL',
+        MODE_GYRO_ANG,
+        MODE_GYRO_RATE,
+        MODE_GYRO_FAS,
+        MODE_GYRO_G_A,
+        MODE_GYRO_CAL,
+        MODE_TILT_ANG,
+        MODE_TILT_RATE,
     )
 
+    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+        super(GyroSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-gyro'], **kwargs)
+        self._direct = None
 
     @property
     def angle(self):
@@ -2622,6 +2637,29 @@ class GyroSensor(Sensor):
         """
         self.mode = self.MODE_GYRO_G_A
         return self.value(0), self.value(1)
+
+    @property
+    def tilt_angle(self):
+        self.mode = self.MODE_TILT_ANG
+        return self.value(0)
+
+    @property
+    def tilt_rate(self):
+        self.mode = self.MODE_TILT_RATE
+        return self.value(0)
+
+    @property
+    def direct(self):
+        raise Exception("direct is a write-only property!")
+
+    @direct.setter
+    def direct(self, value):
+        raw_value = pack('B', value)
+        self._direct = self.set_attr_raw(self._direct, 'direct', raw_value)
+
+    def reset(self):
+        self.mode = self.MODE_GYRO_ANG
+        self.direct = 17
 
 
 class ButtonBase(object):
