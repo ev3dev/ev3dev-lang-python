@@ -60,6 +60,44 @@ OUTPUT_AUTO = ''
 # update to 'running' in the "on_for_XYZ" methods of the Motor class
 WAIT_RUNNING_TIMEOUT = 100
 
+
+def get_current_platform():
+    """
+    Look in /sys/class/board-info/ to determine the platform type.
+
+    This can return 'ev3', 'evb', 'pistorms', 'brickpi' or 'brickpi3'.
+    """
+    board_info_dir = '/sys/class/board-info/'
+
+    for board in os.listdir(board_info_dir):
+        uevent_filename = os.path.join(board_info_dir, board, 'uevent')
+
+        if os.path.exists(uevent_filename):
+            with open(uevent_filename, 'r') as fh:
+                for line in fh.readlines():
+                    (key, value) = line.strip().split('=')
+
+                    if key == 'BOARD_INFO_MODEL':
+
+                        if value == 'LEGO MINDSTORMS EV3':
+                            return 'ev3'
+
+                        elif value in ('FatcatLab EVB', 'QuestCape'):
+                            return 'evb'
+
+                        elif value == 'PiStorms':
+                            return 'pistorms'
+
+                        # This is the same for both BrickPi and BrickPi+.
+                        # There is not a way to tell the difference.
+                        elif value == 'Dexter Industries BrickPi':
+                            return 'brickpi'
+
+                        elif value == 'Dexter Industries BrickPi3':
+                            return 'brickpi3'
+    return None
+
+
 # -----------------------------------------------------------------------------
 def list_device_names(class_path, name_pattern, **kwargs):
     """
@@ -67,15 +105,15 @@ def list_device_names(class_path, name_pattern, **kwargs):
     provided parameters.
 
     Parameters:
-	class_path: class path of the device, a subdirectory of /sys/class.
-	    For example, '/sys/class/tacho-motor'.
-	name_pattern: pattern that device name should match.
-	    For example, 'sensor*' or 'motor*'. Default value: '*'.
-	keyword arguments: used for matching the corresponding device
-	    attributes. For example, address='outA', or
-	    driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
-	    is a list, then a match against any entry of the list is
-	    enough.
+        class_path: class path of the device, a subdirectory of /sys/class.
+            For example, '/sys/class/tacho-motor'.
+        name_pattern: pattern that device name should match.
+            For example, 'sensor*' or 'motor*'. Default value: '*'.
+        keyword arguments: used for matching the corresponding device
+            attributes. For example, address='outA', or
+            driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
+            is a list, then a match against any entry of the list is
+            enough.
     """
 
     if not os.path.isdir(class_path):
@@ -109,7 +147,7 @@ class Device(object):
 
     DEVICE_ROOT_PATH = '/sys/class'
 
-    _DEVICE_INDEX = re.compile(r'^.*(?P<idx>\d+)$')
+    _DEVICE_INDEX = re.compile(r'^.*(\d+)$')
 
     def __init__(self, class_name, name_pattern='*', name_exact=False, **kwargs):
         """Spin through the Linux sysfs class for the device type and find
@@ -142,7 +180,7 @@ class Device(object):
         def get_index(file):
             match = Device._DEVICE_INDEX.match(file)
             if match:
-                return int(match.group('idx'))
+                return int(match.group(1))
             else:
                 return None
 
@@ -268,15 +306,15 @@ def list_devices(class_name, name_pattern, **kwargs):
     arguments.
 
     Parameters:
-	class_name: class name of the device, a subdirectory of /sys/class.
-	    For example, 'tacho-motor'.
-	name_pattern: pattern that device name should match.
-	    For example, 'sensor*' or 'motor*'. Default value: '*'.
-	keyword arguments: used for matching the corresponding device
-	    attributes. For example, address='outA', or
-	    driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
-	    is a list, then a match against any entry of the list is
-	    enough.
+        class_name: class name of the device, a subdirectory of /sys/class.
+            For example, 'tacho-motor'.
+        name_pattern: pattern that device name should match.
+            For example, 'sensor*' or 'motor*'. Default value: '*'.
+        keyword arguments: used for matching the corresponding device
+            attributes. For example, address='outA', or
+            driver_name=['lego-ev3-us', 'lego-nxt-us']. When argument value
+            is a list, then a match against any entry of the list is
+            enough.
     """
     classpath = abspath(Device.DEVICE_ROOT_PATH + '/' + class_name)
 
@@ -1040,13 +1078,13 @@ def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     the provided arguments.
 
     Parameters:
-	name_pattern: pattern that device name should match.
-	    For example, 'motor*'. Default value: '*'.
-	keyword arguments: used for matching the corresponding device
-	    attributes. For example, driver_name='lego-ev3-l-motor', or
-	    address=['outB', 'outC']. When argument value
-	    is a list, then a match against any entry of the list is
-	    enough.
+        name_pattern: pattern that device name should match.
+            For example, 'motor*'. Default value: '*'.
+        keyword arguments: used for matching the corresponding device
+            attributes. For example, driver_name='lego-ev3-l-motor', or
+            address=['outB', 'outC']. When argument value
+            is a list, then a match against any entry of the list is
+            enough.
     """
     class_path = abspath(Device.DEVICE_ROOT_PATH + '/' + Motor.SYSTEM_CLASS_NAME)
 
@@ -1601,7 +1639,7 @@ class MotorSet(object):
     def verify_connected(self):
         for motor in self.motors.values():
             if not motor.connected:
-                #log.error("%s: %s is not connected" % (self, motor))
+                print("%s: %s is not connected" % (self, motor))
                 sys.exit(1)
 
     def set_args(self, **kwargs):
@@ -2145,11 +2183,11 @@ def list_sensors(name_pattern=Sensor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     provided arguments.
 
     Parameters:
-	name_pattern: pattern that device name should match.
-	    For example, 'sensor*'. Default value: '*'.
-	keyword arguments: used for matching the corresponding device
-	    attributes. For example, driver_name='lego-ev3-touch', or
-	    address=['in1', 'in3']. When argument value is a list,
+        name_pattern: pattern that device name should match.
+            For example, 'sensor*'. Default value: '*'.
+        keyword arguments: used for matching the corresponding device
+            attributes. For example, driver_name='lego-ev3-touch', or
+            address=['in1', 'in3']. When argument value is a list,
         then a match against any entry of the list is enough.
     """
     class_path = abspath(Device.DEVICE_ROOT_PATH + '/' + Sensor.SYSTEM_CLASS_NAME)
@@ -2204,24 +2242,20 @@ class TouchSensor(Sensor):
     Touch Sensor
     """
 
-    __slots__ = ['auto_mode']
+    __slots__ = ['auto_mode', '_poll', '_value0']
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
+    #: Button state
+    MODE_TOUCH = 'TOUCH'
+    MODES = (MODE_TOUCH,)
+
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(TouchSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
         self.auto_mode = True
-
-
-    #: Button state
-    MODE_TOUCH = 'TOUCH'
-
-
-    MODES = (
-      'TOUCH',
-    )
-
+        self._poll = None
+        self._value0 = None
 
     @property
     def is_pressed(self):
@@ -2235,21 +2269,58 @@ class TouchSensor(Sensor):
 
         return self.value(0)
 
+    @property
+    def is_released(self):
+        return not self.is_pressed
+
+    def _wait(self, wait_for_press, timeout_ms):
+        tic = time.time()
+
+        if self._poll is None:
+            self._value0 = self._attribute_file_open('value0')
+            self._poll = select.poll()
+            self._poll.register(self._value0, select.POLLPRI)
+
+        while True:
+            self._poll.poll(timeout_ms)
+
+            if self.is_pressed == wait_for_press:
+                return True
+
+            if timeout_ms is not None and time.time() >= tic + timeout_ms / 1000:
+                return False
+
+    def wait_for_pressed(self, timeout_ms=None):
+        return self._wait(True, timeout_ms)
+
+    def wait_for_released(self, timeout_ms=None):
+        return self._wait(False, timeout_ms)
+
+    def wait_for_bump(self, timeout_ms=None):
+        """
+        Wait for the touch sensor to be pressed down and then released.
+        Both actions must happen within timeout_ms.
+        """
+        start_time = time.time()
+
+        if self.wait_for_pressed(timeout_ms):
+            if timeout_ms is not None:
+                timeout_ms -= int((time.time() - start_time) * 1000)
+            return self.wait_for_released(timeout_ms)
+
+        return False
+
+
 class ColorSensor(Sensor):
 
     """
     LEGO EV3 color sensor.
     """
 
-    __slots__ = ['auto_mode']
+    __slots__ = ['auto_mode', 'red_max', 'green_max', 'blue_max']
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
-
-    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(ColorSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-color'], **kwargs)
-        self.auto_mode = True
-
 
     #: Reflected light. Red LED on.
     MODE_COL_REFLECT = 'COL-REFLECT'
@@ -2290,13 +2361,12 @@ class ColorSensor(Sensor):
     #: Brown color.
     COLOR_BROWN = 7
 
-
     MODES = (
-      'COL-REFLECT',
-      'COL-AMBIENT',
-      'COL-COLOR',
-      'REF-RAW',
-      'RGB-RAW',
+      MODE_COL_REFLECT,
+      MODE_COL_AMBIENT,
+      MODE_COL_COLOR,
+      MODE_REF_RAW,
+      MODE_RGB_RAW
     )
 
     COLORS = (
@@ -2310,6 +2380,14 @@ class ColorSensor(Sensor):
       'Brown',
     )
 
+    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+        super(ColorSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-color'], **kwargs)
+        self.auto_mode = True
+
+        # See calibrate_white() for more details
+        self.red_max = 300
+        self.green_max = 300
+        self.blue_max = 300
 
     @property
     def reflected_light_intensity(self):
@@ -2353,15 +2431,59 @@ class ColorSensor(Sensor):
         return self.value(0)
 
     @property
+    def color_name(self):
+        """
+        Returns NoColor, Black, Blue, etc
+        """
+        return self.COLORS[self.color]
+
+    @property
     def raw(self):
         """
-        Red, green, and blue components of the detected color, in the range 0-1020.
+        Red, green, and blue components of the detected color, officially in the
+        range 0-1020 but the values returned will never be that high. We do not
+        yet know why the values returned are low, but pointing the color sensor
+        at a well lit sheet of white paper will return values in the 250-400 range.
+
+        If this is an issue, check out the rgb() and calibrate_white() methods.
         """
 
         if self.auto_mode:
             self.mode = self.MODE_RGB_RAW
 
         return self.value(0), self.value(1), self.value(2)
+
+    def calibrate_white(self):
+        """
+        The RGB raw values are on a scale of 0-1020 but you never see a value
+        anywhere close to 1020.  This function is designed to be called when
+        the sensor is placed over a white object in order to figure out what
+        are the maximum RGB values the robot can expect to see.  We will use
+        these maximum values to scale future raw values to a 0-255 range in
+        rgb().
+
+        If you never call this function red_max, green_max, and blue_max will
+        use a default value of 300.  This default was selected by measuring
+        the RGB values of a white sheet of paper in a well lit room.
+
+        Note that there are several variables that influence the maximum RGB
+        values detected by the color sensor
+        - the distance of the color sensor to the white object
+        - the amount of light in the room
+        - shadows that the robot casts on the sensor
+        """
+        (self.red_max, self.green_max, self.blue_max) = self.raw
+
+    @property
+    def rgb(self):
+        """
+        Same as raw() but RGB values are scaled to 0-255
+        """
+        (red, green, blue) = self.raw
+
+        return (min(int((red * 255) / self.red_max), 255),
+                min(int((green * 255) / self.green_max), 255),
+                min(int((blue * 255) / self.blue_max), 255))
 
     @property
     def red(self):
@@ -2548,8 +2670,62 @@ class GyroSensor(Sensor):
 
         return self.value(0), self.value(1)
 
-class InfraredSensor(Sensor):
 
+class ButtonBase(object):
+    """
+    Abstract button interface.
+    """
+
+    def __str__(self):
+        return self.__class__.__name__
+
+    @staticmethod
+    def on_change(changed_buttons):
+        """
+        This handler is called by `process()` whenever state of any button has
+        changed since last `process()` call. `changed_buttons` is a list of
+        tuples of changed button names and their states.
+        """
+        pass
+
+    _state = set([])
+
+    def any(self):
+        """
+        Checks if any button is pressed.
+        """
+        return bool(self.buttons_pressed)
+
+    def check_buttons(self, buttons=[]):
+        """
+        Check if currently pressed buttons exactly match the given list.
+        """
+        return set(self.buttons_pressed) == set(buttons)
+
+    def process(self, new_state=None):
+        """
+        Check for currenly pressed buttons. If the new state differs from the
+        old state, call the appropriate button event handlers.
+        """
+        if new_state is None:
+            new_state = set(self.buttons_pressed)
+        old_state = self._state
+        self._state = new_state
+
+        state_diff = new_state.symmetric_difference(old_state)
+        for button in state_diff:
+            handler = getattr(self, 'on_' + button)
+            if handler is not None: handler(button in new_state)
+
+        if self.on_change is not None and state_diff:
+            self.on_change([(button, button in new_state) for button in state_diff])
+
+    @property
+    def buttons_pressed(self):
+        raise NotImplementedError()
+
+
+class InfraredSensor(Sensor, ButtonBase):
     """
     LEGO EV3 infrared sensor.
     """
@@ -2558,11 +2734,6 @@ class InfraredSensor(Sensor):
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
-
-    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
-        self.auto_mode = True
-
 
     #: Proximity
     MODE_IR_PROX = 'IR-PROX'
@@ -2579,15 +2750,55 @@ class InfraredSensor(Sensor):
     #: Calibration ???
     MODE_IR_CAL = 'IR-CAL'
 
-
     MODES = (
-      'IR-PROX',
-      'IR-SEEK',
-      'IR-REMOTE',
-      'IR-REM-A',
-      'IR-CAL',
+      MODE_IR_PROX,
+      MODE_IR_SEEK,
+      MODE_IR_REMOTE,
+      MODE_IR_REM_A,
+      MODE_IR_CAL
     )
 
+    # The following are all of the various combinations of button presses for
+    # the remote control.  The key/index is the number that will be written in
+    # the attribute file to indicate what combination of buttons are currently
+    # pressed.
+    _BUTTON_VALUES = {
+            0: [],
+            1: ['red_up'],
+            2: ['red_down'],
+            3: ['blue_up'],
+            4: ['blue_down'],
+            5: ['red_up', 'blue_up'],
+            6: ['red_up', 'blue_down'],
+            7: ['red_down', 'blue_up'],
+            8: ['red_down', 'blue_down'],
+            9: ['beacon'],
+            10: ['red_up', 'red_down'],
+            11: ['blue_up', 'blue_down']
+            }
+
+    #: Handles ``Red Up`` events.
+    on_red_up = None
+
+    #: Handles ``Red Down`` events.
+    on_red_down = None
+
+    #: Handles ``Blue Up`` events.
+    on_blue_up = None
+
+    #: Handles ``Blue Down`` events.
+    on_blue_down = None
+
+    #: Handles ``Beacon`` events.
+    on_beacon = None
+
+    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+        super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
+
+    def _normalize_channel(self, channel):
+        assert channel >= 1 and channel <= 4, "channel is %s, it must be 1, 2, 3, or 4" % channel
+        channel = max(1, min(4, channel)) - 1
+        return channel
 
     @property
     def proximity(self):
@@ -2595,11 +2806,83 @@ class InfraredSensor(Sensor):
         A measurement of the distance between the sensor and the remote,
         as a percentage. 100% is approximately 70cm/27in.
         """
-
-        if self.auto_mode:
-            self.mode = self.MODE_IR_PROX
-
+        self.mode = self.MODE_IR_PROX
         return self.value(0)
+
+    def heading(self, channel=1):
+        """
+        Returns heading (-25, 25) to the beacon on the given channel.
+        """
+        self.mode = self.MODE_IR_SEEK
+        channel = self._normalize_channel(channel)
+        return self.value(channel * 2)
+
+    def distance(self, channel=1):
+        """
+        Returns distance (0, 100) to the beacon on the given channel.
+        Returns None when beacon is not found.
+        """
+        self.mode = self.MODE_IR_SEEK
+        channel = self._normalize_channel(channel)
+        ret_value = self.value((channel * 2) + 1)
+
+        # The value will be -128 if no beacon is found, return None instead
+        return None if ret_value == -128 else ret_value
+
+    def heading_and_distance(self, channel=1):
+        """
+        Returns heading and distance to the beacon on the given channel as a
+        tuple.
+        """
+        return (self.heading(channel), self.distance(channel))
+
+    def red_up(self, channel=1):
+        """
+        Checks if `red_up` button is pressed.
+        """
+        return 'red_up' in self.buttons_pressed(channel)
+
+    def red_down(self, channel=1):
+        """
+        Checks if `red_down` button is pressed.
+        """
+        return 'red_down' in self.buttons_pressed(channel)
+
+    def blue_up(self, channel=1):
+        """
+        Checks if `blue_up` button is pressed.
+        """
+        return 'blue_up' in self.buttons_pressed(channel)
+
+    def blue_down(self, channel=1):
+        """
+        Checks if `blue_down` button is pressed.
+        """
+        return 'blue_down' in self.buttons_pressed(channel)
+
+    def beacon(self, channel=1):
+        """
+        Checks if `beacon` button is pressed.
+        """
+        return 'beacon' in self.buttons_pressed(channel)
+
+    def buttons_pressed(self, channel=1):
+        """
+        Returns list of currently pressed buttons.
+        """
+        self.mode = self.MODE_IR_REMOTE
+        channel = self._normalize_channel(channel)
+        return self._BUTTON_VALUES.get(self.value(channel), [])
+
+    def process(self, channel=1):
+        """
+        ButtonBase expects buttons_pressed to be a @property but we need to
+        pass 'channel' to our buttons_pressed. Get the new_state and pass
+        that to ButtonBase.process().
+        """
+        new_state = set(self.buttons_pressed(channel))
+        ButtonBase.process(self, new_state)
+
 
 class SoundSensor(Sensor):
 
@@ -2908,59 +3191,6 @@ class Led(Device):
         self.brightness = value * self.max_brightness
 
 
-class ButtonBase(object):
-    """
-    Abstract button interface.
-    """
-
-    def __str__(self):
-        return self.__class__.__name__
-
-    @staticmethod
-    def on_change(changed_buttons):
-        """
-        This handler is called by `process()` whenever state of any button has
-        changed since last `process()` call. `changed_buttons` is a list of
-        tuples of changed button names and their states.
-        """
-        pass
-
-    _state = set([])
-
-    def any(self):
-        """
-        Checks if any button is pressed.
-        """
-        return bool(self.buttons_pressed)
-
-    def check_buttons(self, buttons=[]):
-        """
-        Check if currently pressed buttons exactly match the given list.
-        """
-        return set(self.buttons_pressed) == set(buttons)
-
-    def process(self):
-        """
-        Check for currenly pressed buttons. If the new state differs from the
-        old state, call the appropriate button event handlers.
-        """
-        new_state = set(self.buttons_pressed)
-        old_state = self._state
-        self._state = new_state
-
-        state_diff = new_state.symmetric_difference(old_state)
-        for button in state_diff:
-            handler = getattr(self, 'on_' + button)
-            if handler is not None: handler(button in new_state)
-
-        if self.on_change is not None and state_diff:
-            self.on_change([(button, button in new_state) for button in state_diff])
-
-    @property
-    def buttons_pressed(self):
-        raise NotImplementedError()
-
-
 class ButtonEVIO(ButtonBase):
 
     """
@@ -3008,137 +3238,6 @@ class ButtonEVIO(ButtonBase):
             if bool(buf[int(bit / 8)] & 1 << bit % 8):
                 pressed += [k]
         return pressed
-
-
-class RemoteControl(ButtonBase):
-    """
-    EV3 Remote Controller
-    """
-
-    _BUTTON_VALUES = {
-            0: [],
-            1: ['red_up'],
-            2: ['red_down'],
-            3: ['blue_up'],
-            4: ['blue_down'],
-            5: ['red_up', 'blue_up'],
-            6: ['red_up', 'blue_down'],
-            7: ['red_down', 'blue_up'],
-            8: ['red_down', 'blue_down'],
-            9: ['beacon'],
-            10: ['red_up', 'red_down'],
-            11: ['blue_up', 'blue_down']
-            }
-
-    #: Handles ``Red Up`` events.
-    on_red_up = None
-
-    #: Handles ``Red Down`` events.
-    on_red_down = None
-
-    #: Handles ``Blue Up`` events.
-    on_blue_up = None
-
-    #: Handles ``Blue Down`` events.
-    on_blue_down = None
-
-    #: Handles ``Beacon`` events.
-    on_beacon = None
-
-
-    @property
-    def red_up(self):
-        """
-        Checks if `red_up` button is pressed.
-        """
-        return 'red_up' in self.buttons_pressed
-
-    @property
-    def red_down(self):
-        """
-        Checks if `red_down` button is pressed.
-        """
-        return 'red_down' in self.buttons_pressed
-
-    @property
-    def blue_up(self):
-        """
-        Checks if `blue_up` button is pressed.
-        """
-        return 'blue_up' in self.buttons_pressed
-
-    @property
-    def blue_down(self):
-        """
-        Checks if `blue_down` button is pressed.
-        """
-        return 'blue_down' in self.buttons_pressed
-
-    @property
-    def beacon(self):
-        """
-        Checks if `beacon` button is pressed.
-        """
-        return 'beacon' in self.buttons_pressed
-
-    def __init__(self, sensor=None, channel=1):
-        if sensor is None:
-            self._sensor = InfraredSensor()
-        else:
-            self._sensor = sensor
-
-        self._channel = max(1, min(4, channel)) - 1
-        self._state = set([])
-
-        if self._sensor.connected:
-            self._sensor.mode = 'IR-REMOTE'
-
-    @property
-    def connected(self):
-        return self._sensor.connected
-
-    @property
-    def buttons_pressed(self):
-        """
-        Returns list of currently pressed buttons.
-        """
-        return RemoteControl._BUTTON_VALUES.get(self._sensor.value(self._channel), [])
-
-
-class BeaconSeeker(object):
-    """
-    Seeks EV3 Remote Controller in beacon mode.
-    """
-
-    def __init__(self, sensor=None, channel=1):
-        self._sensor  = InfraredSensor() if sensor is None else sensor
-        self._channel = max(1, min(4, channel)) - 1
-
-        if self._sensor.connected:
-            self._sensor.mode = 'IR-SEEK'
-
-    @property
-    def heading(self):
-        """
-        Returns heading (-25, 25) to the beacon on the given channel.
-        """
-        return self._sensor.value(self._channel * 2)
-
-    @property
-    def distance(self):
-        """
-        Returns distance (0, 100) to the beacon on the given channel.
-        Returns -128 when beacon is not found.
-        """
-        return self._sensor.value(self._channel * 2 + 1)
-
-    @property
-    def heading_and_distance(self):
-        """
-        Returns heading and distance to the beacon on the given channel as a
-        tuple.
-        """
-        return self._sensor.value(self._channel * 2), self._sensor.value(self._channel * 2 + 1)
 
 
 class PowerSupply(Device):

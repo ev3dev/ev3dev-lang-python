@@ -8,15 +8,10 @@ import sys
 import time
 import ev3dev.auto
 from collections import OrderedDict
-from ev3dev.auto import (RemoteControl, list_motors,
-                         INPUT_1, INPUT_2, INPUT_3, INPUT_4,
-                         OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D)
+from ev3dev.auto import InfraredSensor, MoveTank
 from time import sleep
 
 log = logging.getLogger(__name__)
-
-INPUTS = (INPUT_1, INPUT_2, INPUT_3, INPUT_4)
-OUTPUTS = (OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D)
 
 
 # =============
@@ -147,55 +142,24 @@ class MediumMotor(ev3dev.auto.MediumMotor, MotorMixin):
     pass
 
 
-class ColorSensorMixin(object):
-
-    def rgb(self):
-        """
-        Note that the mode for the ColorSensor must be set to MODE_RGB_RAW
-        """
-        # These values are on a scale of 0-1020, convert them to a normal 0-255 scale
-        red = int((self.value(0) * 255) / 1020)
-        green = int((self.value(1) * 255) / 1020)
-        blue = int((self.value(2) * 255) / 1020)
-
-        return (red, green, blue)
-
-
-class ColorSensor(ev3dev.auto.ColorSensor, ColorSensorMixin):
-    pass
-
-
 # ============
 # Tank classes
 # ============
-class Tank(LargeMotorPair):
-    """
-    This class is here for backwards compatibility for anyone who was using
-    this library before the days of LargeMotorPair. We wrote the Tank class
-    first, then LargeMotorPair.  All future work will be in the MotorSet,
-    MotorPair, etc classes
-    """
+class RemoteControlledTank(MoveTank):
 
-    def __init__(self, left_motor_port, right_motor_port, polarity='normal', name='Tank'):
-        LargeMotorPair.__init__(self, left_motor_port, right_motor_port, name)
-        self.set_polarity(polarity)
-        self.speed_sp = 400
-
-
-class RemoteControlledTank(LargeMotorPair):
-
-    def __init__(self, left_motor_port, right_motor_port, polarity='inversed', speed=400):
-        LargeMotorPair.__init__(self, left_motor_port, right_motor_port)
+    def __init__(self, left_motor_port, right_motor_port, polarity='inversed', speed=400, channel=1):
+        MoveTank.__init__(self, left_motor_port, right_motor_port)
         self.set_polarity(polarity)
 
         left_motor = self.motors[left_motor_port]
         right_motor = self.motors[right_motor_port]
         self.speed_sp = speed
-        self.remote = RemoteControl(channel=1)
+        self.remote = InfraredSensor()
         self.remote.on_red_up = self.make_move(left_motor, self.speed_sp)
         self.remote.on_red_down = self.make_move(left_motor, self.speed_sp* -1)
         self.remote.on_blue_up = self.make_move(right_motor, self.speed_sp)
         self.remote.on_blue_down = self.make_move(right_motor, self.speed_sp * -1)
+        self.channel = channel
 
     def make_move(self, motor, dc_sp):
         def move(state):
@@ -209,7 +173,7 @@ class RemoteControlledTank(LargeMotorPair):
 
         try:
             while True:
-                self.remote.process()
+                self.remote.process(self.channel)
                 time.sleep(0.01)
 
         # Exit cleanly so that all motors are stopped
