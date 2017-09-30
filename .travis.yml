@@ -1,9 +1,10 @@
 language: python
 python:
 - 3.4
-sudo: false
+sudo: true
 install:
 - pip install Pillow
+- sudo apt-get install --yes python3-evdev
 script:
 - ./tests/api_tests.py
 deploy:
