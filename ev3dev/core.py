@@ -232,7 +232,7 @@ class Device(object):
             #log.info("%s: path %s, attribute %s" % (self, self._path, name))
             raise Exception("%s is not connected" % self)
 
-    def _set_attribute(self, attribute, name, value, raw=False):
+    def _set_attribute(self, attribute, name, value):
         """Device attribute setter"""
         if self.connected:
             try:
@@ -241,11 +241,9 @@ class Device(object):
                 else:
                     attribute.seek(0)
 
-                if raw:
-                    attribute.write(value)
-                else:
-                    attribute.write(value.encode())
-
+                if isinstance(value, str):
+                    value = value.encode()
+                attribute.write(value)
                 attribute.flush()
             except Exception as ex:
                 self._raise_friendly_access_error(ex, name)
@@ -282,7 +280,7 @@ class Device(object):
         return self._set_attribute(attribute, name, str(int(value)))
 
     def set_attr_raw(self, attribute, name, value):
-        return self._set_attribute(attribute, name, value, True)
+        return self._set_attribute(attribute, name, value)
 
     def get_attr_string(self, attribute, name):
         return self._get_attribute(attribute, name)
@@ -2573,8 +2571,6 @@ class GyroSensor(Sensor):
     """
     LEGO EV3 gyro sensor.
     """
-    __slots__ = ['_direct',]
-
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
@@ -2648,18 +2644,9 @@ class GyroSensor(Sensor):
         self.mode = self.MODE_TILT_RATE
         return self.value(0)
 
-    @property
-    def direct(self):
-        raise Exception("direct is a write-only property!")
-
-    @direct.setter
-    def direct(self, value):
-        raw_value = pack('B', value)
-        self._direct = self.set_attr_raw(self._direct, 'direct', raw_value)
-
     def reset(self):
         self.mode = self.MODE_GYRO_ANG
-        self.direct = 17
+        self._direct = self.set_attr_raw(self._direct, 'direct', 17)
 
 
 class ButtonBase(object):
