@@ -139,21 +139,6 @@ def list_device_names(class_path, name_pattern, **kwargs):
                 yield f
 
 
-def file_open(path):
-    mode = stat.S_IMODE(os.stat(path)[stat.ST_MODE])
-    r_ok = mode & stat.S_IRGRP
-    w_ok = mode & stat.S_IWGRP
-
-    if r_ok and w_ok:
-        mode = 'r+'
-    elif w_ok:
-        mode = 'w'
-    else:
-        mode = 'r'
-
-    return io.FileIO(path, mode)
-
-
 # -----------------------------------------------------------------------------
 # Define the base class from which all other ev3dev classes are defined.
 
@@ -223,7 +208,19 @@ class Device(object):
             return self.__class__.__name__
 
     def _attribute_file_open(self, name):
-        return file_open(os.path.join(self._path, name))
+        path = os.path.join(self._path, name)
+        mode = stat.S_IMODE(os.stat(path)[stat.ST_MODE])
+        r_ok = mode & stat.S_IRGRP
+        w_ok = mode & stat.S_IWGRP
+
+        if r_ok and w_ok:
+            mode = 'r+'
+        elif w_ok:
+            mode = 'w'
+        else:
+            mode = 'r'
+
+        return io.FileIO(path, mode)
 
     def _get_attribute(self, attribute, name):
         """Device attribute getter"""
