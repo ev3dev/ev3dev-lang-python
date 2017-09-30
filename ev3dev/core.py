@@ -2668,7 +2668,9 @@ class ButtonBase(object):
         state_diff = new_state.symmetric_difference(old_state)
         for button in state_diff:
             handler = getattr(self, 'on_' + button)
-            if handler is not None: handler(button in new_state)
+
+            if handler is not None:
+                handler(button in new_state)
 
         if self.on_change is not None and state_diff:
             self.on_change([(button, button in new_state) for button in state_diff])
@@ -2728,20 +2730,36 @@ class InfraredSensor(Sensor, ButtonBase):
             11: ['blue_up', 'blue_down']
             }
 
-    #: Handles ``Red Up`` events.
-    on_red_up = None
+    _BUTTONS = ('red_up', 'red_down', 'blue_up', 'blue_down', 'beacon')
 
-    #: Handles ``Red Down`` events.
-    on_red_down = None
+    # See process() for an explanation on how to use these
+    #: Handles ``Red Up``, etc events on channel 1
+    on_red_up1 = None
+    on_red_down1 = None
+    on_blue_up1 = None
+    on_blue_down1 = None
+    on_beacon1 = None
 
-    #: Handles ``Blue Up`` events.
-    on_blue_up = None
+    #: Handles ``Red Up``, etc events on channel 2
+    on_red_up2 = None
+    on_red_down2 = None
+    on_blue_up2 = None
+    on_blue_down2 = None
+    on_beacon2 = None
 
-    #: Handles ``Blue Down`` events.
-    on_blue_down = None
+    #: Handles ``Red Up``, etc events on channel 3
+    on_red_up3 = None
+    on_red_down3 = None
+    on_blue_up3 = None
+    on_blue_down3 = None
+    on_beacon3 = None
 
-    #: Handles ``Beacon`` events.
-    on_beacon = None
+    #: Handles ``Red Up``, etc events on channel 4
+    on_red_up4 = None
+    on_red_down4 = None
+    on_blue_up4 = None
+    on_blue_down4 = None
+    on_beacon4 = None
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
@@ -2825,14 +2843,55 @@ class InfraredSensor(Sensor, ButtonBase):
         channel = self._normalize_channel(channel)
         return self._BUTTON_VALUES.get(self.value(channel), [])
 
-    def process(self, channel=1):
+    def process(self):
         """
-        ButtonBase expects buttons_pressed to be a @property but we need to
-        pass 'channel' to our buttons_pressed. Get the new_state and pass
-        that to ButtonBase.process().
+        Check for currenly pressed buttons. If the new state differs from the
+        old state, call the appropriate button event handlers.
+
+        To use the on_red_up1, etc handlers your program would do something like:
+
+        def red_up_channel_1_action(state):
+            print("red up on channel 1: %s" % state)
+
+        def blue_down_channel_4_action(state):
+            print("blue down on channel 4: %s" % state)
+
+        ir = InfraredSensor()
+        ir.on_red_up1 = red_up_channel_1_action
+        ir.on_blue_down4 = blue_down_channel_4_action
+
+        while True:
+            ir.process()
+            time.sleep(0.01)
         """
-        new_state = set(self.buttons_pressed(channel))
-        ButtonBase.process(self, new_state)
+        new_state = []
+        state_diff = []
+
+        for channel in range(1,5):
+
+            for button in self.buttons_pressed(channel):
+                new_state.append((button, channel))
+
+                # Key was not pressed before but now is pressed
+                if (button, channel) not in self._state:
+                    state_diff.append((button, channel))
+
+            # Key was pressed but is no longer pressed
+            for button in self._BUTTONS:
+                if (button, channel) not in new_state and (button, channel) in self._state:
+                    state_diff.append((button, channel))
+
+        old_state = self._state
+        self._state = new_state
+
+        for (button, channel) in state_diff:
+            handler = getattr(self, 'on_' + button + str(channel))
+
+            if handler is not None:
+                handler((button, channel) in new_state)
+
+        if self.on_change is not None and state_diff:
+            self.on_change([(button, channel, button in new_state) for (button, channel) in state_diff])
 
 
 class SoundSensor(Sensor):
