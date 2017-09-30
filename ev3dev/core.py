@@ -2270,8 +2270,11 @@ class TouchSensor(Sensor):
     def is_released(self):
         return not self.is_pressed
 
-    def _wait(self, wait_for_press, timeout_ms):
+    def _wait(self, wait_for_press, timeout_ms, sleep_ms):
         tic = time.time()
+
+        if sleep_ms:
+            sleep_ms = float(sleep_ms/1000)
 
         # The kernel does not supoort POLLPRI or POLLIN for sensors so we have
         # to drop into a loop and check often
@@ -2283,25 +2286,26 @@ class TouchSensor(Sensor):
             if timeout_ms is not None and time.time() >= tic + timeout_ms / 1000:
                 return False
 
-            time.sleep(0.01)
+            if sleep_ms:
+                time.sleep(sleep_ms)
 
-    def wait_for_pressed(self, timeout_ms=None):
-        return self._wait(True, timeout_ms)
+    def wait_for_pressed(self, timeout_ms=None, sleep_ms=10):
+        return self._wait(True, timeout_ms, sleep_ms)
 
-    def wait_for_released(self, timeout_ms=None):
-        return self._wait(False, timeout_ms)
+    def wait_for_released(self, timeout_ms=None, sleep_ms=10):
+        return self._wait(False, timeout_ms, sleep_ms)
 
-    def wait_for_bump(self, timeout_ms=None):
+    def wait_for_bump(self, timeout_ms=None, sleep_ms=10):
         """
         Wait for the touch sensor to be pressed down and then released.
         Both actions must happen within timeout_ms.
         """
         start_time = time.time()
 
-        if self.wait_for_pressed(timeout_ms):
+        if self.wait_for_pressed(timeout_ms, sleep_ms):
             if timeout_ms is not None:
                 timeout_ms -= int((time.time() - start_time) * 1000)
-            return self.wait_for_released(timeout_ms)
+            return self.wait_for_released(timeout_ms, sleep_ms)
 
         return False
 
