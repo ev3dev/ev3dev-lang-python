@@ -31,6 +31,7 @@ class Button(ButtonEVIO):
             'enter': {'name': _buttons_filename, 'value': 28},
             'backspace': {'name': _buttons_filename, 'value': 14},
         }
+    evdev_device_name = 'evb-input'
 
     '''
     These handlers are called by `process()` whenever state of 'up', 'down',
