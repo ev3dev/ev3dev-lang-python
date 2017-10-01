@@ -2920,7 +2920,7 @@ class InfraredSensor(Sensor, ButtonBase):
         Check for currenly pressed buttons. If the new state differs from the
         old state, call the appropriate button event handlers.
 
-        To use the on_top_left1, etc handlers your program would do something like:
+        To use the channel1_top_left, etc handlers your program would do something like:
 
         def top_left_channel_1_action(state):
             print("top left on channel 1: %s" % state)
