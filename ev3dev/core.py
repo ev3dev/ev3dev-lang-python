@@ -2806,32 +2806,32 @@ class InfraredSensor(Sensor, ButtonBase):
 
     # See process() for an explanation on how to use these
     #: Handles ``Red Up``, etc events on channel 1
-    channel1_top_left = None
-    channel1_bottom_left = None
-    channel1_top_right = None
-    channel1_bottom_right = None
-    channel1_beacon = None
+    on_channel1_top_left = None
+    on_channel1_bottom_left = None
+    on_channel1_top_right = None
+    on_channel1_bottom_right = None
+    on_channel1_beacon = None
 
     #: Handles ``Red Up``, etc events on channel 2
-    channel2_top_left = None
-    channel2_bottom_left = None
-    channel2_top_right = None
-    channel2_bottom_right = None
-    channel2_beacon = None
+    on_channel2_top_left = None
+    on_channel2_bottom_left = None
+    on_channel2_top_right = None
+    on_channel2_bottom_right = None
+    on_channel2_beacon = None
 
     #: Handles ``Red Up``, etc events on channel 3
-    channel3_top_left = None
-    channel3_bottom_left = None
-    channel3_top_right = None
-    channel3_bottom_right = None
-    channel3_beacon = None
+    on_channel3_top_left = None
+    on_channel3_bottom_left = None
+    on_channel3_top_right = None
+    on_channel3_bottom_right = None
+    on_channel3_beacon = None
 
     #: Handles ``Red Up``, etc events on channel 4
-    channel4_top_left = None
-    channel4_bottom_left = None
-    channel4_top_right = None
-    channel4_bottom_right = None
-    channel4_beacon = None
+    on_channel4_top_left = None
+    on_channel4_bottom_left = None
+    on_channel4_top_right = None
+    on_channel4_bottom_right = None
+    on_channel4_beacon = None
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
@@ -2920,7 +2920,7 @@ class InfraredSensor(Sensor, ButtonBase):
         Check for currenly pressed buttons. If the new state differs from the
         old state, call the appropriate button event handlers.
 
-        To use the channel1_top_left, etc handlers your program would do something like:
+        To use the on_channel1_top_left, etc handlers your program would do something like:
 
         def top_left_channel_1_action(state):
             print("top left on channel 1: %s" % state)
@@ -2929,8 +2929,8 @@ class InfraredSensor(Sensor, ButtonBase):
             print("bottom right on channel 4: %s" % state)
 
         ir = InfraredSensor()
-        ir.channel1_top_left = top_left_channel_1_action
-        ir.channel4_bottom_right = bottom_right_channel_4_action
+        ir.on_channel1_top_left = top_left_channel_1_action
+        ir.on_channel4_bottom_right = bottom_right_channel_4_action
 
         while True:
             ir.process()
@@ -2957,7 +2957,7 @@ class InfraredSensor(Sensor, ButtonBase):
         self._state = new_state
 
         for (button, channel) in state_diff:
-            handler = getattr(self, 'channel' + str(channel) + '_' + button )
+            handler = getattr(self, 'on_channel' + str(channel) + '_' + button )
 
             if handler is not None:
                 handler((button, channel) in new_state)
