@@ -41,6 +41,7 @@ import shlex
 import stat
 import time
 import errno
+import evdev
 from os.path import abspath
 from struct import pack, unpack
 from subprocess import Popen, check_output, PIPE
@@ -137,6 +138,7 @@ def list_device_names(class_path, name_pattern, **kwargs):
             if all([matches(path + '/' + k, kwargs[k]) for k in kwargs]):
                 yield f
 
+
 # -----------------------------------------------------------------------------
 # Define the base class from which all other ev3dev classes are defined.
 
@@ -205,8 +207,8 @@ class Device(object):
         else:
             return self.__class__.__name__
 
-    def _attribute_file_open( self, name ):
-        path = self._path + '/' + name
+    def _attribute_file_open(self, name):
+        path = os.path.join(self._path, name)
         mode = stat.S_IMODE(os.stat(path)[stat.ST_MODE])
         r_ok = mode & stat.S_IRGRP
         w_ok = mode & stat.S_IWGRP
@@ -2245,8 +2247,6 @@ class TouchSensor(Sensor):
     Touch Sensor
     """
 
-    __slots__ = ['_poll', '_value0']
-
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
@@ -2256,8 +2256,6 @@ class TouchSensor(Sensor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(TouchSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
-        self._poll = None
-        self._value0 = None
 
     @property
     def is_pressed(self):
@@ -2272,16 +2270,15 @@ class TouchSensor(Sensor):
     def is_released(self):
         return not self.is_pressed
 
-    def _wait(self, wait_for_press, timeout_ms):
+    def _wait(self, wait_for_press, timeout_ms, sleep_ms):
         tic = time.time()
 
-        if self._poll is None:
-            self._value0 = self._attribute_file_open('value0')
-            self._poll = select.poll()
-            self._poll.register(self._value0, select.POLLPRI)
+        if sleep_ms:
+            sleep_ms = float(sleep_ms/1000)
 
+        # The kernel does not supoort POLLPRI or POLLIN for sensors so we have
+        # to drop into a loop and check often
         while True:
-            self._poll.poll(timeout_ms)
 
             if self.is_pressed == wait_for_press:
                 return True
@@ -2289,23 +2286,26 @@ class TouchSensor(Sensor):
             if timeout_ms is not None and time.time() >= tic + timeout_ms / 1000:
                 return False
 
-    def wait_for_pressed(self, timeout_ms=None):
-        return self._wait(True, timeout_ms)
+            if sleep_ms:
+                time.sleep(sleep_ms)
 
-    def wait_for_released(self, timeout_ms=None):
-        return self._wait(False, timeout_ms)
+    def wait_for_pressed(self, timeout_ms=None, sleep_ms=10):
+        return self._wait(True, timeout_ms, sleep_ms)
 
-    def wait_for_bump(self, timeout_ms=None):
+    def wait_for_released(self, timeout_ms=None, sleep_ms=10):
+        return self._wait(False, timeout_ms, sleep_ms)
+
+    def wait_for_bump(self, timeout_ms=None, sleep_ms=10):
         """
         Wait for the touch sensor to be pressed down and then released.
         Both actions must happen within timeout_ms.
         """
         start_time = time.time()
 
-        if self.wait_for_pressed(timeout_ms):
+        if self.wait_for_pressed(timeout_ms, sleep_ms):
             if timeout_ms is not None:
                 timeout_ms -= int((time.time() - start_time) * 1000)
-            return self.wait_for_released(timeout_ms)
+            return self.wait_for_released(timeout_ms, sleep_ms)
 
         return False
 
@@ -2629,6 +2629,8 @@ class ButtonBase(object):
     Abstract button interface.
     """
 
+    _state = set([])
+
     def __str__(self):
         return self.__class__.__name__
 
@@ -2641,8 +2643,6 @@ class ButtonBase(object):
         """
         pass
 
-    _state = set([])
-
     def any(self):
         """
         Checks if any button is pressed.
@@ -2654,6 +2654,19 @@ class ButtonBase(object):
         Check if currently pressed buttons exactly match the given list.
         """
         return set(self.buttons_pressed) == set(buttons)
+
+    @property
+    def evdev_device(self):
+        """
+        Return our corresponding evdev device object
+        """
+        devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]
+
+        for device in devices:
+            if device.name == self.evdev_device_name:
+                return device
+
+        raise Exception("%s: could not find evdev device '%s'" % (self, self.evdev_device_name))
 
     def process(self, new_state=None):
         """
@@ -2673,9 +2686,68 @@ class ButtonBase(object):
         if self.on_change is not None and state_diff:
             self.on_change([(button, button in new_state) for button in state_diff])
 
+    def process_forever(self):
+        for event in self.evdev_device.read_loop():
+            if event.type == evdev.ecodes.EV_KEY:
+                self.process()
+
     @property
     def buttons_pressed(self):
         raise NotImplementedError()
+
+    def _wait(self, wait_for_button_press, wait_for_button_release, timeout_ms):
+        tic = time.time()
+
+        # wait_for_button_press/release can be a list of buttons or a string
+        # with the name of a single button.  If it is a string of a single
+        # button convert that to a list.
+        if isinstance(wait_for_button_press, str):
+            wait_for_button_press = [wait_for_button_press, ]
+
+        if isinstance(wait_for_button_release, str):
+            wait_for_button_release = [wait_for_button_release, ]
+
+        for event in self.evdev_device.read_loop():
+            if event.type == evdev.ecodes.EV_KEY:
+                all_pressed = True
+                all_released = True
+                pressed = self.buttons_pressed
+
+                for button in wait_for_button_press:
+                    if button not in pressed:
+                        all_pressed = False
+                        break
+
+                for button in wait_for_button_release:
+                    if button in pressed:
+                        all_released = False
+                        break
+
+                if all_pressed and all_released:
+                    return True
+
+                if timeout_ms is not None and time.time() >= tic + timeout_ms / 1000:
+                    return False
+
+    def wait_for_pressed(self, buttons, timeout_ms=None):
+        return self._wait(buttons, [], timeout_ms)
+
+    def wait_for_released(self, buttons, timeout_ms=None):
+        return self._wait([], buttons, timeout_ms)
+
+    def wait_for_bump(self, buttons, timeout_ms=None):
+        """
+        Wait for the button to be pressed down and then released.
+        Both actions must happen within timeout_ms.
+        """
+        start_time = time.time()
+
+        if self.wait_for_pressed(buttons, timeout_ms):
+            if timeout_ms is not None:
+                timeout_ms -= int((time.time() - start_time) * 1000)
+            return self.wait_for_released(buttons, timeout_ms)
+
+        return False
 
 
 class InfraredSensor(Sensor, ButtonBase):
@@ -3141,8 +3213,10 @@ class ButtonEVIO(ButtonBase):
     _buttons = {}
 
     def __init__(self):
+        ButtonBase.__init__(self)
         self._file_cache = {}
         self._buffer_cache = {}
+
         for b in self._buttons:
             name = self._buttons[b]['name']
             if name not in self._file_cache:
@@ -3167,8 +3241,10 @@ class ButtonEVIO(ButtonBase):
         for k, v in self._buttons.items():
             buf = self._buffer_cache[v['name']]
             bit = v['value']
+
             if bool(buf[int(bit / 8)] & 1 << bit % 8):
-                pressed += [k]
+                pressed.append(k)
+
         return pressed
 
 
