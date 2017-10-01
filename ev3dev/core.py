@@ -2789,49 +2789,49 @@ class InfraredSensor(Sensor, ButtonBase):
     # pressed.
     _BUTTON_VALUES = {
             0: [],
-            1: ['red_up'],
-            2: ['red_down'],
-            3: ['blue_up'],
-            4: ['blue_down'],
-            5: ['red_up', 'blue_up'],
-            6: ['red_up', 'blue_down'],
-            7: ['red_down', 'blue_up'],
-            8: ['red_down', 'blue_down'],
+            1: ['top_left'],
+            2: ['bottom_left'],
+            3: ['top_right'],
+            4: ['bottom_right'],
+            5: ['top_left', 'top_right'],
+            6: ['top_left', 'bottom_right'],
+            7: ['bottom_left', 'top_right'],
+            8: ['bottom_left', 'bottom_right'],
             9: ['beacon'],
-            10: ['red_up', 'red_down'],
-            11: ['blue_up', 'blue_down']
+            10: ['top_left', 'bottom_left'],
+            11: ['top_right', 'bottom_right']
             }
 
-    _BUTTONS = ('red_up', 'red_down', 'blue_up', 'blue_down', 'beacon')
+    _BUTTONS = ('top_left', 'bottom_left', 'top_right', 'bottom_right', 'beacon')
 
     # See process() for an explanation on how to use these
     #: Handles ``Red Up``, etc events on channel 1
-    on_red_up1 = None
-    on_red_down1 = None
-    on_blue_up1 = None
-    on_blue_down1 = None
-    on_beacon1 = None
+    channel1_top_left = None
+    channel1_bottom_left = None
+    channel1_top_right = None
+    channel1_bottom_right = None
+    channel1_beacon = None
 
     #: Handles ``Red Up``, etc events on channel 2
-    on_red_up2 = None
-    on_red_down2 = None
-    on_blue_up2 = None
-    on_blue_down2 = None
-    on_beacon2 = None
+    channel2_top_left = None
+    channel2_bottom_left = None
+    channel2_top_right = None
+    channel2_bottom_right = None
+    channel2_beacon = None
 
     #: Handles ``Red Up``, etc events on channel 3
-    on_red_up3 = None
-    on_red_down3 = None
-    on_blue_up3 = None
-    on_blue_down3 = None
-    on_beacon3 = None
+    channel3_top_left = None
+    channel3_bottom_left = None
+    channel3_top_right = None
+    channel3_bottom_right = None
+    channel3_beacon = None
 
     #: Handles ``Red Up``, etc events on channel 4
-    on_red_up4 = None
-    on_red_down4 = None
-    on_blue_up4 = None
-    on_blue_down4 = None
-    on_beacon4 = None
+    channel4_top_left = None
+    channel4_bottom_left = None
+    channel4_top_right = None
+    channel4_bottom_right = None
+    channel4_beacon = None
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
@@ -2877,29 +2877,29 @@ class InfraredSensor(Sensor, ButtonBase):
         """
         return (self.heading(channel), self.distance(channel))
 
-    def red_up(self, channel=1):
+    def top_left(self, channel=1):
         """
-        Checks if `red_up` button is pressed.
+        Checks if `top_left` button is pressed.
         """
-        return 'red_up' in self.buttons_pressed(channel)
+        return 'top_left' in self.buttons_pressed(channel)
 
-    def red_down(self, channel=1):
+    def bottom_left(self, channel=1):
         """
-        Checks if `red_down` button is pressed.
+        Checks if `bottom_left` button is pressed.
         """
-        return 'red_down' in self.buttons_pressed(channel)
+        return 'bottom_left' in self.buttons_pressed(channel)
 
-    def blue_up(self, channel=1):
+    def top_right(self, channel=1):
         """
-        Checks if `blue_up` button is pressed.
+        Checks if `top_right` button is pressed.
         """
-        return 'blue_up' in self.buttons_pressed(channel)
+        return 'top_right' in self.buttons_pressed(channel)
 
-    def blue_down(self, channel=1):
+    def bottom_right(self, channel=1):
         """
-        Checks if `blue_down` button is pressed.
+        Checks if `bottom_right` button is pressed.
         """
-        return 'blue_down' in self.buttons_pressed(channel)
+        return 'bottom_right' in self.buttons_pressed(channel)
 
     def beacon(self, channel=1):
         """
@@ -2920,17 +2920,17 @@ class InfraredSensor(Sensor, ButtonBase):
         Check for currenly pressed buttons. If the new state differs from the
         old state, call the appropriate button event handlers.
 
-        To use the on_red_up1, etc handlers your program would do something like:
+        To use the on_top_left1, etc handlers your program would do something like:
 
-        def red_up_channel_1_action(state):
-            print("red up on channel 1: %s" % state)
+        def top_left_channel_1_action(state):
+            print("top left on channel 1: %s" % state)
 
-        def blue_down_channel_4_action(state):
-            print("blue down on channel 4: %s" % state)
+        def bottom_right_channel_4_action(state):
+            print("bottom right on channel 4: %s" % state)
 
         ir = InfraredSensor()
-        ir.on_red_up1 = red_up_channel_1_action
-        ir.on_blue_down4 = blue_down_channel_4_action
+        ir.channel1_top_left = top_left_channel_1_action
+        ir.channel4_bottom_right = bottom_right_channel_4_action
 
         while True:
             ir.process()
@@ -2957,7 +2957,7 @@ class InfraredSensor(Sensor, ButtonBase):
         self._state = new_state
 
         for (button, channel) in state_diff:
-            handler = getattr(self, 'on_' + button + str(channel))
+            handler = getattr(self, 'channel' + str(channel) + '_' + button )
 
             if handler is not None:
                 handler((button, channel) in new_state)
