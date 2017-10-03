@@ -56,6 +56,9 @@ elif platform == 'brickpi':
 elif platform == 'brickpi3':
     from ev3dev._platform.brickpi3 import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
 
+else:
+    raise Exception("Unsupported platform '%s'" % platform)
+
 
 class Motor(Device):
 

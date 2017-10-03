@@ -3,8 +3,6 @@
 An assortment of classes modeling specific features of the EVB.
 """
 
-from ev3dev._button import ButtonEVIO
-
 OUTPUT_A = 'outA'
 OUTPUT_B = 'outB'
 OUTPUT_C = 'outC'

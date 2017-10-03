@@ -31,7 +31,29 @@ if sys.version_info < (3,4):
 import numbers
 from os.path import abspath
 from struct import unpack
-from ev3dev import Device
+from ev3dev import get_current_platform, Device
+
+
+# INPUT ports have platform specific values that we must import
+platform = get_current_platform()
+
+if platform == 'ev3':
+    from ev3dev._platform.ev3 import INPUT_1, INPUT_2, INPUT_3, INPUT_4
+
+elif platform == 'evb':
+    from ev3dev._platform.evb import INPUT_1, INPUT_2, INPUT_3, INPUT_4
+
+elif platform == 'pistorms':
+    from ev3dev._platform.pistorms import INPUT_1, INPUT_2, INPUT_3, INPUT_4
+
+elif platform == 'brickpi':
+    from ev3dev._platform.brickpi import INPUT_1, INPUT_2, INPUT_3, INPUT_4
+
+elif platform == 'brickpi3':
+    from ev3dev._platform.brickpi3 import INPUT_1, INPUT_2, INPUT_3, INPUT_4
+
+else:
+    raise Exception("Unsupported platform '%s'" % platform)
 
 
 class Sensor(Device):
