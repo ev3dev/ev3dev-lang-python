@@ -26,9 +26,6 @@
 An assortment of classes modeling specific features of the BrickPi.
 """
 
-from .core import *
-
-
 OUTPUT_A = 'ttyAMA0:MA'
 OUTPUT_B = 'ttyAMA0:MB'
 OUTPUT_C = 'ttyAMA0:MC'

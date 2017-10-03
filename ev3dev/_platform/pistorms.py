@@ -3,8 +3,6 @@
 An assortment of classes modeling specific features of the PiStorms.
 """
 
-from .core import *
-
 OUTPUT_A = 'pistorms:BBM1'
 OUTPUT_B = 'pistorms:BBM2'
 OUTPUT_C = 'pistorms:BAM2'
