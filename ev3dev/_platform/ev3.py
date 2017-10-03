@@ -27,6 +27,7 @@ An assortment of classes modeling specific features of the EV3 brick.
 """
 
 from ev3dev._button import ButtonEVIO
+from ev3dev._led import Led
 
 OUTPUT_A = 'outA'
 OUTPUT_B = 'outB'

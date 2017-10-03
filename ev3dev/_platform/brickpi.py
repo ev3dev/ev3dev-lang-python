@@ -26,6 +26,8 @@
 An assortment of classes modeling specific features of the BrickPi.
 """
 
+from ev3dev._led import Led
+
 OUTPUT_A = 'ttyAMA0:MA'
 OUTPUT_B = 'ttyAMA0:MB'
 OUTPUT_C = 'ttyAMA0:MC'
