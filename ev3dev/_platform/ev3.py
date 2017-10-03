@@ -26,7 +26,6 @@
 An assortment of classes modeling specific features of the EV3 brick.
 """
 
-from ev3dev._button import ButtonEVIO
 from ev3dev._led import Led
 
 OUTPUT_A = 'outA'
@@ -39,6 +38,8 @@ INPUT_2 = 'in2'
 INPUT_3 = 'in3'
 INPUT_4 = 'in4'
 
+buttons_filename = '/dev/input/by-path/platform-gpio_keys-event'
+evdev_device_name = 'EV3 brick buttons'
 
 class Leds(object):
     """
@@ -95,73 +96,3 @@ class Leds(object):
         Leds.red_right.brightness = 0
         Leds.green_left.brightness = 0
         Leds.green_right.brightness = 0
-
-
-class Button(ButtonEVIO):
-    """
-    EV3 Buttons
-    """
-
-    _buttons_filename = '/dev/input/by-path/platform-gpio_keys-event'
-    _buttons = {
-            'up': {'name': _buttons_filename, 'value': 103},
-            'down': {'name': _buttons_filename, 'value': 108},
-            'left': {'name': _buttons_filename, 'value': 105},
-            'right': {'name': _buttons_filename, 'value': 106},
-            'enter': {'name': _buttons_filename, 'value': 28},
-            'backspace': {'name': _buttons_filename, 'value': 14},
-        }
-    evdev_device_name = 'EV3 brick buttons'
-
-    '''
-    These handlers are called by `process()` whenever state of 'up', 'down',
-    etc buttons have changed since last `process()` call
-    '''
-    on_up = None
-    on_down = None
-    on_left = None
-    on_right = None
-    on_enter = None
-    on_backspace = None
-
-    @property
-    def up(self):
-        """
-        Check if 'up' button is pressed.
-        """
-        return 'up' in self.buttons_pressed
-
-    @property
-    def down(self):
-        """
-        Check if 'down' button is pressed.
-        """
-        return 'down' in self.buttons_pressed
-
-    @property
-    def left(self):
-        """
-        Check if 'left' button is pressed.
-        """
-        return 'left' in self.buttons_pressed
-
-    @property
-    def right(self):
-        """
-        Check if 'right' button is pressed.
-        """
-        return 'right' in self.buttons_pressed
-
-    @property
-    def enter(self):
-        """
-        Check if 'enter' button is pressed.
-        """
-        return 'enter' in self.buttons_pressed
-
-    @property
-    def backspace(self):
-        """
-        Check if 'backspace' button is pressed.
-        """
-        return 'backspace' in self.buttons_pressed
