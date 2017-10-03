@@ -9,7 +9,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from populate_arena import populate_arena
 from clean_arena    import clean_arena
 
-import ev3dev.core as ev3
+import ev3dev as ev3
+from ev3dev.sensor.lego import InfraredSensor
+from ev3dev.motor import MediumMotor
 
 ev3.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 
@@ -47,9 +49,9 @@ class TestAPI(unittest.TestCase):
         populate_arena({'medium_motor' : [0, 'outA']})
 
         # Do not write motor.command on exit (so that fake tree stays intact)
-        ev3.MediumMotor.__del__ = dummy
+        MediumMotor.__del__ = dummy
 
-        m = ev3.MediumMotor()
+        m = MediumMotor()
 
         self.assertTrue(m.connected);
 
@@ -82,7 +84,7 @@ class TestAPI(unittest.TestCase):
         clean_arena()
         populate_arena({'infrared_sensor' : [0, 'in1']})
 
-        s = ev3.InfraredSensor()
+        s = InfraredSensor()
 
         self.assertTrue(s.connected)
 
