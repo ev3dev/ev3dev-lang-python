@@ -38,8 +38,8 @@ INPUT_2 = 'in2'
 INPUT_3 = 'in3'
 INPUT_4 = 'in4'
 
-buttons_filename = '/dev/input/by-path/platform-gpio_keys-event'
-evdev_device_name = 'EV3 brick buttons'
+BUTTONS_FILENAME = '/dev/input/by-path/platform-gpio_keys-event'
+EVDEV_DEVICE_NAME = 'EV3 brick buttons'
 
 class Leds(object):
     """

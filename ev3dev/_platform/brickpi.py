@@ -38,6 +38,8 @@ INPUT_2 = 'ttyAMA0:S2'
 INPUT_3 = 'ttyAMA0:S3'
 INPUT_4 = 'ttyAMA0:S4'
 
+BUTTONS_FILENAME = None
+EVDEV_DEVICE_NAME = None
 
 class Leds(object):
     """

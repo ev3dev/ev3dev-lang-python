@@ -43,23 +43,25 @@ except ImportError:
 
 
 # Import the button filenames, this is platform specific
-from ev3dev import get_current_platform
 platform = get_current_platform()
 
-# Only EV3 and EVB have buttons
 if platform == 'ev3':
-    from ev3dev._platform.ev3 import (
-        buttons_filename as platform_buttons_filename,
-        evdev_device_name as platform_evdev_device_name
-    )
+    from ev3dev._platform.ev3 import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
+
 elif platform == 'evb':
-    from ev3dev._platform.evb import (
-        buttons_filename as platform_buttons_filename,
-        evdev_device_name as platform_evdev_device_name
-    )
+    from ev3dev._platform.evb import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
+
+elif platform == 'pistorms':
+    from ev3dev._platform.pistorms import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
+
+elif platform == 'brickpi':
+    from ev3dev._platform.brickpi import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
+
+elif platform == 'brickpi3':
+    from ev3dev._platform.brickpi3 import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
+
 else:
-    platform_buttons_filename = None
-    platform_evdev_device_name = None
+    raise Exception("Unsupported platform '%s'" % platform)
 
 
 class ButtonBase(object):
@@ -247,14 +249,14 @@ class Button(ButtonEVIO):
     """
 
     _buttons = {
-            'up': {'name': platform_buttons_filename, 'value': 103},
-            'down': {'name': platform_buttons_filename, 'value': 108},
-            'left': {'name': platform_buttons_filename, 'value': 105},
-            'right': {'name': platform_buttons_filename, 'value': 106},
-            'enter': {'name': platform_buttons_filename, 'value': 28},
-            'backspace': {'name': platform_buttons_filename, 'value': 14},
+            'up': {'name': BUTTONS_FILENAME, 'value': 103},
+            'down': {'name': BUTTONS_FILENAME, 'value': 108},
+            'left': {'name': BUTTONS_FILENAME, 'value': 105},
+            'right': {'name': BUTTONS_FILENAME, 'value': 106},
+            'enter': {'name': BUTTONS_FILENAME, 'value': 28},
+            'backspace': {'name': BUTTONS_FILENAME, 'value': 14},
         }
-    evdev_device_name = platform_evdev_device_name
+    evdev_device_name = EVDEV_DEVICE_NAME
 
     '''
     These handlers are called by `process()` whenever state of 'up', 'down',

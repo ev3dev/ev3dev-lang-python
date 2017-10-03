@@ -12,3 +12,6 @@ INPUT_1 = 'pistorms:BBS1'
 INPUT_2 = 'pistorms:BBS2'
 INPUT_3 = 'pistorms:BAS2'
 INPUT_4 = 'pistorms:BAS1'
+
+BUTTONS_FILENAME = None
+EVDEV_DEVICE_NAME = None

@@ -13,5 +13,5 @@ INPUT_2 = 'in2'
 INPUT_3 = 'in3'
 INPUT_4 = 'in4'
 
-buttons_filename = '/dev/input/by-path/platform-evb-buttons-event'
-evdev_device_name = 'evb-input'
+BUTTONS_FILENAME = '/dev/input/by-path/platform-evb-buttons-event'
+EVDEV_DEVICE_NAME = 'evb-input'
