@@ -31,10 +31,30 @@ if sys.version_info < (3,4):
 import select
 import time
 from os.path import abspath
+from ev3dev import get_current_platform, Device
 
 # The number of milliseconds we wait for the state of a motor to
 # update to 'running' in the "on_for_XYZ" methods of the Motor class
 WAIT_RUNNING_TIMEOUT = 100
+
+
+# OUTPUT ports have platform specific values that we must import
+platform = get_current_platform()
+
+if platform == 'ev3':
+    from ev3dev._platform.ev3 import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+
+elif platform == 'evb':
+    from ev3dev._platform.evb import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+
+elif platform == 'pistorms':
+    from ev3dev._platform.pistorms import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+
+elif platform == 'brickpi':
+    from ev3dev._platform.brickpi import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+
+elif platform == 'brickpi3':
+    from ev3dev._platform.brickpi3 import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
 
 
 class Motor(Device):
