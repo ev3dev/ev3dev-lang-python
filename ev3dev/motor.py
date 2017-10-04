@@ -726,12 +726,20 @@ class Motor(Device):
         return self.wait(lambda state: s not in state, timeout)
 
     def _set_position_rotations(self, speed_pct, rotations):
+
+        # +/- speed is used to control direction, rotations must be positive
+        assert rotations >= 0, "rotations is %s, must be >= 0" % rotations
+
         if speed_pct > 0:
             self.position_sp = self.position + int(rotations * self.count_per_rot)
         else:
             self.position_sp = self.position - int(rotations * self.count_per_rot)
 
     def _set_position_degrees(self, speed_pct, degrees):
+
+        # +/- speed is used to control direction, degrees must be positive
+        assert degrees >= 0, "degrees is %s, must be >= 0" % degrees
+
         if speed_pct > 0:
             self.position_sp = self.position + int((degrees * self.count_per_rot)/360)
         else:
