@@ -64,6 +64,10 @@ else:
     raise Exception("Unsupported platform '%s'" % platform)
 
 
+class MissingButton(Exception):
+    pass
+
+
 class ButtonBase(object):
     """
     Abstract button interface.
@@ -214,6 +218,10 @@ class ButtonEVIO(ButtonBase):
 
         for b in self._buttons:
             name = self._buttons[b]['name']
+
+            if name is None:
+                raise MissingButton("Button '%s' is not available on this platform" % b)
+
             if name not in self._file_cache:
                 self._file_cache[name] = open(name, 'rb', 0)
                 self._buffer_cache[name] = array.array('B', [0] * self.KEY_BUF_LEN)
