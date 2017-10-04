@@ -26,7 +26,7 @@
 An assortment of classes modeling specific features of the EV3 brick.
 """
 
-from ev3dev._led import Led
+from collections import OrderedDict
 
 OUTPUT_A = 'outA'
 OUTPUT_B = 'outB'
@@ -41,58 +41,20 @@ INPUT_4 = 'in4'
 BUTTONS_FILENAME = '/dev/input/by-path/platform-gpio_keys-event'
 EVDEV_DEVICE_NAME = 'EV3 brick buttons'
 
-class Leds(object):
-    """
-    The EV3 LEDs.
-    """
-    red_left = Led(name_pattern='led0:red:brick-status')
-    red_right = Led(name_pattern='led1:red:brick-status')
-    green_left = Led(name_pattern='led0:green:brick-status')
-    green_right = Led(name_pattern='led1:green:brick-status')
+LEDS = OrderedDict()
+LEDS['red_left'] = 'led0:red:brick-status'
+LEDS['red_right'] = 'led1:red:brick-status'
+LEDS['green_left'] = 'led0:green:brick-status'
+LEDS['green_right'] = 'led1:green:brick-status'
 
-    LEFT = ( red_left, green_left, )
-    RIGHT = ( red_right, green_right, )
+LED_GROUPS = OrderedDict()
+LED_GROUPS['LEFT'] = ('red_left', 'green_left')
+LED_GROUPS['RIGHT'] = ('red_right', 'green_right')
 
-    BLACK = ( 0, 0, )
-    RED = ( 1, 0, )
-    GREEN = ( 0, 1, )
-    AMBER = ( 1, 1, )
-    ORANGE = ( 1, 0.5, )
-    YELLOW = ( 0.1, 1, )
-
-    @staticmethod
-    def set_color(group, color, pct=1):
-        """
-        Sets brigthness of leds in the given group to the values specified in
-        color tuple. When percentage is specified, brightness of each led is
-        reduced proportionally.
-
-        Example::
-
-            Leds.set_color(LEFT, AMBER)
-        """
-        for l, v in zip(group, color):
-            l.brightness_pct = v * pct
-
-    @staticmethod
-    def set(group, **kwargs):
-        """
-        Set attributes for each led in group.
-
-        Example::
-
-            Leds.set(LEFT, brightness_pct=0.5, trigger='timer')
-        """
-        for led in group:
-            for k in kwargs:
-                setattr(led, k, kwargs[k])
-
-    @staticmethod
-    def all_off():
-        """
-        Turn all leds off
-        """
-        Leds.red_left.brightness = 0
-        Leds.red_right.brightness = 0
-        Leds.green_left.brightness = 0
-        Leds.green_right.brightness = 0
+LED_COLORS = OrderedDict()
+LED_COLORS['BLACK'] = (0, 0)
+LED_COLORS['RED'] = (1, 0)
+LED_COLORS['GREEN'] = (0, 1)
+LED_COLORS['AMBER'] = (1, 1)
+LED_COLORS['ORANGE'] = (1, 0.5)
+LED_COLORS['YELLOW'] = (0.1, 1)

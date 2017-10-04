@@ -15,3 +15,7 @@ INPUT_4 = 'pistorms:BAS1'
 
 BUTTONS_FILENAME = None
 EVDEV_DEVICE_NAME = None
+
+LEDS = {}
+LED_GROUPS = {}
+LED_COLORS = {}

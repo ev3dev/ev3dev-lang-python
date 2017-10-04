@@ -15,3 +15,8 @@ INPUT_4 = 'in4'
 
 BUTTONS_FILENAME = '/dev/input/by-path/platform-evb-buttons-event'
 EVDEV_DEVICE_NAME = 'evb-input'
+
+# EVB does not have LEDs
+LEDS = {}
+LED_GROUPS = {}
+LED_COLORS = {}

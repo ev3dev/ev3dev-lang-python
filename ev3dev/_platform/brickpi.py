@@ -26,7 +26,7 @@
 An assortment of classes modeling specific features of the BrickPi.
 """
 
-from ev3dev._led import Led
+from collections import OrderedDict
 
 OUTPUT_A = 'ttyAMA0:MA'
 OUTPUT_B = 'ttyAMA0:MB'
@@ -41,50 +41,14 @@ INPUT_4 = 'ttyAMA0:S4'
 BUTTONS_FILENAME = None
 EVDEV_DEVICE_NAME = None
 
-class Leds(object):
-    """
-    The BrickPi LEDs.
-    """
-    blue_led1 = Led(name_pattern='brickpi:led1:blue:ev3dev')
-    blue_led2 = Led(name_pattern='brickpi:led2:blue:ev3dev')
+LEDS = OrderedDict()
+LEDS['blue_led1'] = 'brickpi:led1:blue:ev3dev'
+LEDS['blue_led2'] = 'brickpi:led2:blue:ev3dev'
 
-    LED1 = ( blue_led1, )
-    LED2 = ( blue_led2, )
+LED_GROUPS = OrderedDict()
+LED_GROUPS['LED1'] = ('blue_led1',)
+LED_GROUPS['LED2'] = ('blue_led2',)
 
-    BLACK = ( 0, )
-    BLUE = ( 1, )
-
-    @staticmethod
-    def set_color(group, color, pct=1):
-        """
-        Sets brigthness of leds in the given group to the values specified in
-        color tuple. When percentage is specified, brightness of each led is
-        reduced proportionally.
-
-        Example::
-
-            Leds.set_color(LEFT, AMBER)
-        """
-        for l, v in zip(group, color):
-            l.brightness_pct = v * pct
-
-    @staticmethod
-    def set(group, **kwargs):
-        """
-        Set attributes for each led in group.
-
-        Example::
-
-            Leds.set(LEFT, brightness_pct=0.5, trigger='timer')
-        """
-        for led in group:
-            for k in kwargs:
-                setattr(led, k, kwargs[k])
-
-    @staticmethod
-    def all_off():
-        """
-        Turn all leds off
-        """
-        Leds.blue_led1.brightness = 0
-        Leds.blue_led2.brightness = 0
+LED_COLORS = OrderedDict()
+LED_COLORS['BLACK'] = (0,)
+LED_COLORS['BLUE'] = (1,)
