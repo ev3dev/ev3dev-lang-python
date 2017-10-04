@@ -1810,9 +1810,9 @@ class MoveTank(MotorSet):
 
         if left_speed > right_speed:
             left_rotations = rotations
-            right_rotations = float(right_speed / left_speed) * rotations
+            right_rotations = abs(float(right_speed / left_speed)) * rotations
         else:
-            left_rotations = float(left_speed / right_speed) * rotations
+            left_rotations = abs(float(left_speed / right_speed)) * rotations
             right_rotations = rotations
 
         # Set all parameters
@@ -4206,5 +4206,3 @@ class Sound:
         'e': 1./8,
         's': 1./16,
     }
-
-
