@@ -44,7 +44,7 @@ def get_current_platform():
     """
     Look in /sys/class/board-info/ to determine the platform type.
 
-    This can return 'ev3', 'evb', 'pistorms', 'brickpi' or 'brickpi3'.
+    This can return 'ev3', 'evb', 'pistorms', 'brickpi', 'brickpi3' or 'fake'.
     """
     board_info_dir = '/sys/class/board-info/'
 
@@ -74,6 +74,10 @@ def get_current_platform():
 
                         elif value == 'Dexter Industries BrickPi3':
                             return 'brickpi3'
+
+                        elif value == 'FAKE-SYS':
+                            return 'fake'
+
     return None
 
 

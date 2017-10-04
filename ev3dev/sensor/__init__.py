@@ -31,7 +31,7 @@ if sys.version_info < (3,4):
 import numbers
 from os.path import abspath
 from struct import unpack
-from ev3dev import get_current_platform, Device
+from ev3dev import get_current_platform, Device, list_device_names
 
 
 # INPUT ports have platform specific values that we must import
@@ -51,6 +51,9 @@ elif platform == 'brickpi':
 
 elif platform == 'brickpi3':
     from ev3dev._platform.brickpi3 import INPUT_1, INPUT_2, INPUT_3, INPUT_4
+
+elif platform == 'fake':
+    from ev3dev._platform.fake import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 
 else:
     raise Exception("Unsupported platform '%s'" % platform)

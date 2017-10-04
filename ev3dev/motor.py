@@ -31,7 +31,7 @@ if sys.version_info < (3,4):
 import select
 import time
 from os.path import abspath
-from ev3dev import get_current_platform, Device
+from ev3dev import get_current_platform, Device, list_device_names
 
 # The number of milliseconds we wait for the state of a motor to
 # update to 'running' in the "on_for_XYZ" methods of the Motor class
@@ -56,6 +56,9 @@ elif platform == 'brickpi':
 elif platform == 'brickpi3':
     from ev3dev._platform.brickpi3 import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
 
+elif platform == 'fake':
+    from ev3dev._platform.fake import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+
 else:
     raise Exception("Unsupported platform '%s'" % platform)
 
@@ -76,6 +79,110 @@ class Motor(Device):
 
     SYSTEM_CLASS_NAME = 'tacho-motor'
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
+
+    __slots__ = [
+    '_address',
+    '_command',
+    '_commands',
+    '_count_per_rot',
+    '_count_per_m',
+    '_driver_name',
+    '_duty_cycle',
+    '_duty_cycle_sp',
+    '_full_travel_count',
+    '_polarity',
+    '_position',
+    '_position_p',
+    '_position_i',
+    '_position_d',
+    '_position_sp',
+    '_max_speed',
+    '_speed',
+    '_speed_sp',
+    '_ramp_up_sp',
+    '_ramp_down_sp',
+    '_speed_p',
+    '_speed_i',
+    '_speed_d',
+    '_state',
+    '_stop_action',
+    '_stop_actions',
+    '_time_sp',
+    '_poll',
+    ]
+
+    #: Run the motor until another command is sent.
+    COMMAND_RUN_FOREVER = 'run-forever'
+
+    #: Run to an absolute position specified by `position_sp` and then
+    #: stop using the action specified in `stop_action`.
+    COMMAND_RUN_TO_ABS_POS = 'run-to-abs-pos'
+
+    #: Run to a position relative to the current `position` value.
+    #: The new position will be current `position` + `position_sp`.
+    #: When the new position is reached, the motor will stop using
+    #: the action specified by `stop_action`.
+    COMMAND_RUN_TO_REL_POS = 'run-to-rel-pos'
+
+    #: Run the motor for the amount of time specified in `time_sp`
+    #: and then stop the motor using the action specified by `stop_action`.
+    COMMAND_RUN_TIMED = 'run-timed'
+
+    #: Run the motor at the duty cycle specified by `duty_cycle_sp`.
+    #: Unlike other run commands, changing `duty_cycle_sp` while running *will*
+    #: take effect immediately.
+    COMMAND_RUN_DIRECT = 'run-direct'
+
+    #: Stop any of the run commands before they are complete using the
+    #: action specified by `stop_action`.
+    COMMAND_STOP = 'stop'
+
+    #: Reset all of the motor parameter attributes to their default value.
+    #: This will also have the effect of stopping the motor.
+    COMMAND_RESET = 'reset'
+
+    #: Sets the normal polarity of the rotary encoder.
+    ENCODER_POLARITY_NORMAL = 'normal'
+
+    #: Sets the inversed polarity of the rotary encoder.
+    ENCODER_POLARITY_INVERSED = 'inversed'
+
+    #: With `normal` polarity, a positive duty cycle will
+    #: cause the motor to rotate clockwise.
+    POLARITY_NORMAL = 'normal'
+
+    #: With `inversed` polarity, a positive duty cycle will
+    #: cause the motor to rotate counter-clockwise.
+    POLARITY_INVERSED = 'inversed'
+
+    #: Power is being sent to the motor.
+    STATE_RUNNING = 'running'
+
+    #: The motor is ramping up or down and has not yet reached a constant output level.
+    STATE_RAMPING = 'ramping'
+
+    #: The motor is not turning, but rather attempting to hold a fixed position.
+    STATE_HOLDING = 'holding'
+
+    #: The motor is turning, but cannot reach its `speed_sp`.
+    STATE_OVERLOADED = 'overloaded'
+
+    #: The motor is not turning when it should be.
+    STATE_STALLED = 'stalled'
+
+    #: Power will be removed from the motor and it will freely coast to a stop.
+    STOP_ACTION_COAST = 'coast'
+
+    #: Power will be removed from the motor and a passive electrical load will
+    #: be placed on the motor. This is usually done by shorting the motor terminals
+    #: together. This load will absorb the energy from the rotation of the motors and
+    #: cause the motor to stop more quickly than coasting.
+    STOP_ACTION_BRAKE = 'brake'
+
+    #: Does not remove power from the motor. Instead it actively try to hold the motor
+    #: at the current position. If an external force tries to turn the motor, the motor
+    #: will `push back` to maintain its position.
+    STOP_ACTION_HOLD = 'hold'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
@@ -111,37 +218,6 @@ class Motor(Device):
         self._stop_actions = None
         self._time_sp = None
         self._poll = None
-
-    __slots__ = [
-    '_address',
-    '_command',
-    '_commands',
-    '_count_per_rot',
-    '_count_per_m',
-    '_driver_name',
-    '_duty_cycle',
-    '_duty_cycle_sp',
-    '_full_travel_count',
-    '_polarity',
-    '_position',
-    '_position_p',
-    '_position_i',
-    '_position_d',
-    '_position_sp',
-    '_max_speed',
-    '_speed',
-    '_speed_sp',
-    '_ramp_up_sp',
-    '_ramp_down_sp',
-    '_speed_p',
-    '_speed_i',
-    '_speed_d',
-    '_state',
-    '_stop_action',
-    '_stop_actions',
-    '_time_sp',
-    '_poll',
-    ]
 
     @property
     def address(self):
@@ -491,79 +567,6 @@ class Motor(Device):
     def time_sp(self, value):
         self._time_sp = self.set_attr_int(self._time_sp, 'time_sp', value)
 
-    #: Run the motor until another command is sent.
-    COMMAND_RUN_FOREVER = 'run-forever'
-
-    #: Run to an absolute position specified by `position_sp` and then
-    #: stop using the action specified in `stop_action`.
-    COMMAND_RUN_TO_ABS_POS = 'run-to-abs-pos'
-
-    #: Run to a position relative to the current `position` value.
-    #: The new position will be current `position` + `position_sp`.
-    #: When the new position is reached, the motor will stop using
-    #: the action specified by `stop_action`.
-    COMMAND_RUN_TO_REL_POS = 'run-to-rel-pos'
-
-    #: Run the motor for the amount of time specified in `time_sp`
-    #: and then stop the motor using the action specified by `stop_action`.
-    COMMAND_RUN_TIMED = 'run-timed'
-
-    #: Run the motor at the duty cycle specified by `duty_cycle_sp`.
-    #: Unlike other run commands, changing `duty_cycle_sp` while running *will*
-    #: take effect immediately.
-    COMMAND_RUN_DIRECT = 'run-direct'
-
-    #: Stop any of the run commands before they are complete using the
-    #: action specified by `stop_action`.
-    COMMAND_STOP = 'stop'
-
-    #: Reset all of the motor parameter attributes to their default value.
-    #: This will also have the effect of stopping the motor.
-    COMMAND_RESET = 'reset'
-
-    #: Sets the normal polarity of the rotary encoder.
-    ENCODER_POLARITY_NORMAL = 'normal'
-
-    #: Sets the inversed polarity of the rotary encoder.
-    ENCODER_POLARITY_INVERSED = 'inversed'
-
-    #: With `normal` polarity, a positive duty cycle will
-    #: cause the motor to rotate clockwise.
-    POLARITY_NORMAL = 'normal'
-
-    #: With `inversed` polarity, a positive duty cycle will
-    #: cause the motor to rotate counter-clockwise.
-    POLARITY_INVERSED = 'inversed'
-
-    #: Power is being sent to the motor.
-    STATE_RUNNING = 'running'
-
-    #: The motor is ramping up or down and has not yet reached a constant output level.
-    STATE_RAMPING = 'ramping'
-
-    #: The motor is not turning, but rather attempting to hold a fixed position.
-    STATE_HOLDING = 'holding'
-
-    #: The motor is turning, but cannot reach its `speed_sp`.
-    STATE_OVERLOADED = 'overloaded'
-
-    #: The motor is not turning when it should be.
-    STATE_STALLED = 'stalled'
-
-    #: Power will be removed from the motor and it will freely coast to a stop.
-    STOP_ACTION_COAST = 'coast'
-
-    #: Power will be removed from the motor and a passive electrical load will
-    #: be placed on the motor. This is usually done by shorting the motor terminals
-    #: together. This load will absorb the energy from the rotation of the motors and
-    #: cause the motor to stop more quickly than coasting.
-    STOP_ACTION_BRAKE = 'brake'
-
-    #: Does not remove power from the motor. Instead it actively try to hold the motor
-    #: at the current position. If an external force tries to turn the motor, the motor
-    #: will `push back` to maintain its position.
-    STOP_ACTION_HOLD = 'hold'
-
     def run_forever(self, **kwargs):
         """Run the motor until another command is sent.
         """
@@ -726,12 +729,20 @@ class Motor(Device):
         return self.wait(lambda state: s not in state, timeout)
 
     def _set_position_rotations(self, speed_pct, rotations):
+
+        # +/- speed is used to control direction, rotations must be positive
+        assert rotations >= 0, "rotations is %s, must be >= 0" % rotations
+
         if speed_pct > 0:
             self.position_sp = self.position + int(rotations * self.count_per_rot)
         else:
             self.position_sp = self.position - int(rotations * self.count_per_rot)
 
     def _set_position_degrees(self, speed_pct, degrees):
+
+        # +/- speed is used to control direction, degrees must be positive
+        assert degrees >= 0, "degrees is %s, must be >= 0" % degrees
+
         if speed_pct > 0:
             self.position_sp = self.position + int((degrees * self.count_per_rot)/360)
         else:
