@@ -289,12 +289,12 @@ class Leds(object):
             my_leds = Leds()
             my_leds.set_color('LEFT', 'AMBER')
         """
-        assert group in self.led_groups, "%s is an invalid LED group, valid choices are %s" % (group, ','.join(self.led_groups.keys()))
-        assert color in self.led_colors, "%s is an invalid LED color, valid choices are %s" % (color, ','.join(self.led_colors.keys()))
-
         # If this is a platform without LEDs there is nothing to do
         if not self.leds:
             return
+
+        assert group in self.led_groups, "%s is an invalid LED group, valid choices are %s" % (group, ','.join(self.led_groups.keys()))
+        assert color in self.led_colors, "%s is an invalid LED color, valid choices are %s" % (color, ','.join(self.led_colors.keys()))
 
         for led, value in zip(self.led_groups[group], self.led_colors[color]):
             led.brightness_pct = value * pct
@@ -307,11 +307,12 @@ class Leds(object):
             my_leds = Leds()
             my_leds.set_color('LEFT', brightness_pct=0.5, trigger='timer')
         """
-        assert group in self.led_groups, "%s is an invalid LED group, valid choices are %s" % (group, ','.join(self.led_groups.keys()))
 
         # If this is a platform without LEDs there is nothing to do
         if not self.leds:
             return
+
+        assert group in self.led_groups, "%s is an invalid LED group, valid choices are %s" % (group, ','.join(self.led_groups.keys()))
 
         for led in self.led_groups[group]:
             for k in kwargs:
