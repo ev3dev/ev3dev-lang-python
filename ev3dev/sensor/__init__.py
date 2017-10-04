@@ -31,7 +31,7 @@ if sys.version_info < (3,4):
 import numbers
 from os.path import abspath
 from struct import unpack
-from ev3dev import get_current_platform, Device
+from ev3dev import get_current_platform, Device, list_device_names
 
 
 # INPUT ports have platform specific values that we must import

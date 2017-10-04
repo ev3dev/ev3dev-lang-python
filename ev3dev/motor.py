@@ -31,7 +31,7 @@ if sys.version_info < (3,4):
 import select
 import time
 from os.path import abspath
-from ev3dev import get_current_platform, Device
+from ev3dev import get_current_platform, Device, list_device_names
 
 # The number of milliseconds we wait for the state of a motor to
 # update to 'running' in the "on_for_XYZ" methods of the Motor class
