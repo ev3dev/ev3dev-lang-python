@@ -5,7 +5,7 @@ Used to adjust the position of a motor in an already assembled robot
 where you can"t move the motor by hand.
 """
 
-from ev3dev.auto import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D, Motor
+from ev3dev.motor import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D, Motor
 import argparse
 import logging
 import sys

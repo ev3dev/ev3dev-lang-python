@@ -60,6 +60,9 @@ elif platform == 'brickpi':
 elif platform == 'brickpi3':
     from ev3dev._platform.brickpi3 import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
 
+elif platform == 'fake':
+    from ev3dev._platform.fake import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
+
 else:
     raise Exception("Unsupported platform '%s'" % platform)
 

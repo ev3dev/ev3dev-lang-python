@@ -52,6 +52,9 @@ elif platform == 'brickpi':
 elif platform == 'brickpi3':
     from ev3dev._platform.brickpi3 import LEDS, LED_GROUPS, LED_COLORS
 
+elif platform == 'fake':
+    from ev3dev._platform.fake import LEDS, LED_GROUPS, LED_COLORS
+
 else:
     raise Exception("Unsupported platform '%s'" % platform)
 
