@@ -46,8 +46,10 @@ def get_current_platform():
 
     This can return 'ev3', 'evb', 'pistorms', 'brickpi', 'brickpi3' or 'fake'.
     """
-    FAKE_SYS = os.path.join(os.path.dirname(__file__), 'fake-sys')
-    board_info_dir = os.path.join(FAKE_SYS, '/sys/class/board-info/')
+    board_info_dir = '/sys/class/board-info/'
+
+    if not os.path.exists(board_info_dir):
+        board_info_dir = os.path.join(os.path.dirname(__file__), 'fake-sys/arena/board-info')
 
     for board in os.listdir(board_info_dir):
         uevent_filename = os.path.join(board_info_dir, board, 'uevent')
