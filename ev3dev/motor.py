@@ -30,8 +30,12 @@ if sys.version_info < (3,4):
 
 import select
 import time
+from logging import getLogger
+from math import atan2, degrees as math_degrees, hypot
 from os.path import abspath
 from ev3dev import get_current_platform, Device, list_device_names
+
+log = getLogger(__name__)
 
 # The number of milliseconds we wait for the state of a motor to
 # update to 'running' in the "on_for_XYZ" methods of the Motor class
@@ -1695,3 +1699,199 @@ class MoveSteering(MoveTank):
     def on(self, steering, speed_pct):
         (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
         MoveTank.on(self, left_speed_pct, right_speed_pct)
+
+
+class MoveJoystick(MoveTank):
+    """
+    Used to control a pair of motors via a joystick
+    """
+
+    def angle_to_speed_percentage(self, angle):
+        """
+                                (1, 1)
+                             . . . . . . .
+                          .        |        .
+                       .           |           .
+              (0, 1) .             |             . (1, 0)
+                   .               |               .
+                  .                |                 .
+                 .                 |                  .
+                .                  |                   .
+               .                   |                   .
+               .                   |     x-axis        .
+       (-1, 1) .---------------------------------------. (1, -1)
+               .                   |                   .
+               .                   |                   .
+                .                  |                  .
+                 .                 | y-axis          .
+                   .               |               .
+             (0, -1) .             |             . (-1, 0)
+                       .           |           .
+                          .        |        .
+                             . . . . . . .
+                                (-1, -1)
+
+
+        The joystick is a circle within a circle where the (x, y) coordinates
+        of the joystick form an angle with the x-axis.  Our job is to translate
+        this angle into the percentage of power that should be sent to each motor.
+        For instance if the joystick is moved all the way to the top of the circle
+        we want both motors to move forward with 100% power...that is represented
+        above by (1, 1).  If the joystick is moved all the way to the right side of
+        the circle we want to rotate clockwise so we move the left motor forward 100%
+        and the right motor backwards 100%...so (1, -1).  If the joystick is at
+        45 degrees then we move apply (1, 0) to move the left motor forward 100% and
+        the right motor stays still.
+
+        The 8 points shown above are pretty easy. For the points in between those 8
+        we do some math to figure out what the percentages should be. Take 11.25 degrees
+        for example. We look at how the motors transition from 0 degrees to 45 degrees:
+        - the left motor is 1 so that is easy
+        - the right motor moves from -1 to 0
+
+        We determine how far we are between 0 and 45 degrees (11.25 is 25% of 45) so we
+        know that the right motor should be 25% of the way from -1 to 0...so -0.75 is the
+        percentage for the right motor at 11.25 degrees.
+        """
+
+        if angle >= 0 and angle <= 45:
+
+            # left motor stays at 1
+            left_speed_percentage = 1
+
+            # right motor transitions from -1 to 0
+            right_speed_percentage = -1 + (angle/45.0)
+
+        elif angle > 45 and angle <= 90:
+
+            # left motor stays at 1
+            left_speed_percentage = 1
+
+            # right motor transitions from 0 to 1
+            percentage_from_45_to_90 = (angle - 45) / 45.0
+            right_speed_percentage = percentage_from_45_to_90
+
+        elif angle > 90 and angle <= 135:
+
+            # left motor transitions from 1 to 0
+            percentage_from_90_to_135 = (angle - 90) / 45.0
+            left_speed_percentage = 1 - percentage_from_90_to_135
+
+            # right motor stays at 1
+            right_speed_percentage = 1
+
+        elif angle > 135 and angle <= 180:
+
+            # left motor transitions from 0 to -1
+            percentage_from_135_to_180 = (angle - 135) / 45.0
+            left_speed_percentage = -1 * percentage_from_135_to_180
+
+            # right motor stays at 1
+            right_speed_percentage = 1
+
+        elif angle > 180 and angle <= 225:
+
+            # left motor transitions from -1 to 0
+            percentage_from_180_to_225 = (angle - 180) / 45.0
+            left_speed_percentage = -1 + percentage_from_180_to_225
+
+            # right motor transitions from 1 to -1
+            # right motor transitions from 1 to 0 between 180 and 202.5
+            if angle < 202.5:
+                percentage_from_180_to_202 = (angle - 180) / 22.5
+                right_speed_percentage = 1 - percentage_from_180_to_202
+
+            # right motor is 0 at 202.5
+            elif angle == 202.5:
+                right_speed_percentage = 0
+
+            # right motor transitions from 0 to -1 between 202.5 and 225
+            else:
+                percentage_from_202_to_225 = (angle - 202.5) / 22.5
+                right_speed_percentage = -1 * percentage_from_202_to_225
+
+        elif angle > 225 and angle <= 270:
+
+            # left motor transitions from 0 to -1
+            percentage_from_225_to_270 = (angle - 225) / 45.0
+            left_speed_percentage = -1 * percentage_from_225_to_270
+
+            # right motor stays at -1
+            right_speed_percentage = -1
+
+        elif angle > 270 and angle <= 315:
+
+            # left motor stays at -1
+            left_speed_percentage = -1
+
+            # right motor transitions from -1 to 0
+            percentage_from_270_to_315 = (angle - 270) / 45.0
+            right_speed_percentage = -1 + percentage_from_270_to_315
+
+        elif angle > 315 and angle <= 360:
+
+            # left motor transitions from -1 to 1
+            # left motor transitions from -1 to 0 between 315 and 337.5
+            if angle < 337.5:
+                percentage_from_315_to_337 = (angle - 315) / 22.5
+                left_speed_percentage = (1 - percentage_from_315_to_337) * -1
+
+            # left motor is 0 at 337.5
+            elif angle == 337.5:
+                left_speed_percentage = 0
+
+            # left motor transitions from 0 to 1 between 337.5 and 360
+            elif angle > 337.5:
+                percentage_from_337_to_360 = (angle - 337.5) / 22.5
+                left_speed_percentage = percentage_from_337_to_360
+
+            # right motor transitions from 0 to -1
+            percentage_from_315_to_360 = (angle - 315) / 45.0
+            right_speed_percentage = -1 * percentage_from_315_to_360
+
+        else:
+            raise Exception('You created a circle with more than 360 degrees (%s)...that is quite the trick' % angle)
+
+        return (left_speed_percentage * 100, right_speed_percentage * 100)
+
+    def on(self, x, y, max_speed, radius=100.0):
+        """
+        Convert x,y joystick coordinates to left/right motor speed percentages
+        and move the motors
+        """
+
+        # If joystick is in the middle stop the tank
+        if not x and not y:
+            MoveTank.off()
+            return
+
+        vector_length = hypot(x, y)
+        angle = math_degrees(atan2(y, x))
+
+        if angle < 0:
+            angle += 360
+
+        # Should not happen but can happen (just by a hair) due to floating point math
+        if vector_length > radius:
+            vector_length = radius
+
+        (init_left_speed_percentage, init_right_speed_percentage) = self.angle_to_speed_percentage(angle)
+
+        # scale the speed percentages based on vector_length vs. radius
+        left_speed_percentage = (init_left_speed_percentage * vector_length) / radius
+        right_speed_percentage = (init_right_speed_percentage * vector_length) / radius
+
+        log.debug("""
+    x, y                         : %s, %s
+    radius                       : %s
+    angle                        : %s
+    vector length                : %s
+    init left_speed_percentage   : %s
+    init right_speed_percentage  : %s
+    final left_speed_percentage  : %s
+    final right_speed_percentage : %s
+    """ % (x, y, radius, angle, vector_length,
+            init_left_speed_percentage, init_right_speed_percentage,
+            left_speed_percentage, right_speed_percentage))
+
+        MoveTank.on(self, left_speed_percentage, right_speed_percentage)
