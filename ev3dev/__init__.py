@@ -49,7 +49,7 @@ def get_current_platform():
     board_info_dir = '/sys/class/board-info/'
 
     if not os.path.exists(board_info_dir):
-        board_info_dir = './tests/fake-sys/arena/board-info'
+        return 'fake'
 
     for board in os.listdir(board_info_dir):
         uevent_filename = os.path.join(board_info_dir, board, 'uevent')
