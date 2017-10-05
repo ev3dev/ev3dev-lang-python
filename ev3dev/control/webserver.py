@@ -211,22 +211,7 @@ class TankWebHandler(RobotWebHandler):
                 if seq > max_move_xy_seq:
                     self.robot.on(x, y, motor_max_speed)
                     max_move_xy_seq = seq
-
                     log.debug("seq %d: (x, y) (%4d, %4d)" % (seq, x, y))
-                    '''
-                    (left_speed, right_speed) = xy_to_speed(x, y, motor_max_speed)
-                    log.debug("seq %d: (x, y) %4d, %4d -> speed %d %d" % (seq, x, y, left_speed, right_speed))
-
-                    if left_speed == 0:
-                        self.robot.left_motor.stop()
-                    else:
-                        self.robot.left_motor.run_forever(speed_sp=left_speed)
-
-                    if right_speed == 0:
-                        self.robot.right_motor.stop()
-                    else:
-                        self.robot.right_motor.run_forever(speed_sp=right_speed)
-                    '''
                 else:
                     log.debug("seq %d: (x, y) %4d, %4d (ignore, max seq %d)" %
                               (seq, x, y, max_move_xy_seq))
