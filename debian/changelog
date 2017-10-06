@@ -1,3 +1,10 @@
+python-ev3dev (1.1.0) testing; urgency=medium
+
+  [Daniel Walton]
+  * Fixes to make the library work on Debian Stretch.
+
+ -- Denis Demidov <dennis.demidov@gmail.com>  Fri, 20 Oct 2017 09:29:00 +0300
+
 python-ev3dev (1.0.0) stable; urgency=medium
 
   [Denis Demidov]
