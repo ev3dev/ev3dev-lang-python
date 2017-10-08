@@ -1376,7 +1376,6 @@ class MotorSet(object):
             self.motors[motor_port] = motor_class(motor_port)
 
         self.desc = desc
-        self.verify_connected()
 
     def __str__(self):
 
@@ -1384,12 +1383,6 @@ class MotorSet(object):
             return self.desc
         else:
             return self.__class__.__name__
-
-    def verify_connected(self):
-        for motor in self.motors.values():
-            if not motor.connected:
-                print("%s: %s is not connected" % (self, motor))
-                sys.exit(1)
 
     def set_args(self, **kwargs):
         motors = kwargs.get('motors', self.motors.values())
