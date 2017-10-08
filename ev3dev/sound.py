@@ -28,10 +28,10 @@ import sys
 if sys.version_info < (3,4):
     raise SystemError('Must be using Python 3.4 or higher')
 
-import io
+import os
 import re
 import shlex
-from subprocess import Popen, check_output, PIPE
+from subprocess import check_output, Popen
 
 
 def _make_scales(notes):
@@ -44,11 +44,9 @@ def _make_scales(notes):
     return res
 
 
-class Sound:
+class Sound(object):
     """
-    Sound-related functions. The class has only static methods and is not
-    intended for instantiation. It can beep, play wav files, or convert text to
-    speech.
+    Support beep, play wav files, or convert text to speech.
 
     Note that all methods of the class spawn system processes and return
     subprocess.Popen objects. The methods are asynchronous (they return
@@ -75,8 +73,21 @@ class Sound:
 
     channel = None
 
-    @staticmethod
-    def beep(args=''):
+    # play_types
+    PLAY_WAIT_FOR_COMPLETE = 0
+    PLAY_NO_WAIT_FOR_COMPLETE = 1
+    PLAY_LOOP = 2
+
+    PLAY_TYPES = (
+        PLAY_WAIT_FOR_COMPLETE,
+        PLAY_NO_WAIT_FOR_COMPLETE,
+        PLAY_LOOP
+    )
+
+    def _validate_play_type(self, play_type):
+        assert play_type in self.PLAY_TYPES, "Invalid play_type %s, must be one of %s" % (play_type, ','.join(self.PLAY_TYPES))
+
+    def beep(self, args=''):
         """
         Call beep command with the provided arguments (if any).
         See `beep man page`_ and google `linux beep music`_ for inspiration.
@@ -87,8 +98,7 @@ class Sound:
         with open(os.devnull, 'w') as n:
             return Popen(shlex.split('/usr/bin/beep %s' % args), stdout=n)
 
-    @staticmethod
-    def tone(*args):
+    def tone(self, *args):
         """
         .. rubric:: tone(tone_sequence)
 
@@ -134,7 +144,7 @@ class Sound:
 
                 return args
 
-            return Sound.beep(' -n '.join([beep_args(*t) for t in tone_sequence]))
+            return self.beep(' -n '.join([beep_args(*t) for t in tone_sequence]))
 
         if len(args) == 1:
             return play_tone_sequence(args[0])
@@ -143,32 +153,75 @@ class Sound:
         else:
             raise Exception("Unsupported number of parameters in Sound.tone()")
 
-    @staticmethod
-    def play(wav_file):
+    def play_tone(self, frequency, duration_ms, delay_ms=100, volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
+        self._validate_play_type(play_type)
+        self.set_volume(volume)
+
+        if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
+            play = self.tone([(frequency, duration_ms, delay_ms)])
+            play.wait()
+
+        elif play_type == Sound.PLAY_NO_WAIT_FOR_COMPLETE:
+            return self.tone([(frequency, duration_ms, delay_ms)])
+
+        elif play_type == Sound.PLAY_LOOP:
+            while True:
+                play = self.tone([(frequency, duration_ms, delay_ms)])
+                play.wait()
+
+    def play(self, wav_file, play_type=PLAY_WAIT_FOR_COMPLETE):
         """
         Play wav file.
         """
-        with open(os.devnull, 'w') as n:
-            return Popen(shlex.split('/usr/bin/aplay -q "%s"' % wav_file), stdout=n)
+        self._validate_play_type(play_type)
 
-    @staticmethod
-    def speak(text, espeak_opts='-a 200 -s 130'):
+        with open(os.devnull, 'w') as n:
+
+            if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
+                pid = Popen(shlex.split('/usr/bin/aplay -q "%s"' % wav_file), stdout=n)
+                pid.wait()
+
+            # Do not wait, run in the background
+            elif play_type == Sound.PLAY_NO_WAIT_FOR_COMPLETE:
+                return Popen(shlex.split('/usr/bin/aplay -q "%s"' % wav_file), stdout=n)
+
+            elif play_type == Sound.PLAY_LOOP:
+                while True:
+                    pid = Popen(shlex.split('/usr/bin/aplay -q "%s"' % wav_file), stdout=n)
+                    pid.wait()
+
+    def play_file(self, wav_file, volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
+        self.set_volume(volume)
+        self.play(wav_file, play_type)
+
+    def speak(self, text, espeak_opts='-a 200 -s 130', volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
         """
         Speak the given text aloud.
         """
-        with open(os.devnull, 'w') as n:
-            cmd_line = '/usr/bin/espeak --stdout {0} "{1}"'.format(espeak_opts, text)
-            espeak = Popen(shlex.split(cmd_line), stdout=PIPE)
-            play = Popen(['/usr/bin/aplay', '-q'], stdin=espeak.stdout, stdout=n)
-            return espeak
+        self._validate_play_type(play_type)
+        self.set_volume(volume)
 
-    @staticmethod
-    def _get_channel():
+        with open(os.devnull, 'w') as n:
+            cmd_line = '/usr/bin/espeak --stdout {0} "{1}" | /usr/bin/aplay -q'.format(espeak_opts, text)
+
+            if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
+                play = Popen(cmd_line, stdout=n, shell=True)
+                play.wait()
+
+            elif play_type == Sound.PLAY_NO_WAIT_FOR_COMPLETE:
+                return Popen(cmd_line, stdout=n, shell=True)
+
+            elif play_type == Sound.PLAY_LOOP:
+                while True:
+                    play = Popen(cmd_line, stdout=n, shell=True)
+                    play.wait()
+
+    def _get_channel(self):
         """
         :return: the detected sound channel
         :rtype: str
         """
-        if Sound.channel is None:
+        if self.channel is None:
             # Get default channel as the first one that pops up in
             # 'amixer scontrols' output, which contains strings in the
             # following format:
@@ -178,14 +231,13 @@ class Sound:
             out = check_output(['amixer', 'scontrols']).decode()
             m = re.search("'(?P<channel>[^']+)'", out)
             if m:
-                Sound.channel = m.group('channel')
+                self.channel = m.group('channel')
             else:
-                Sound.channel = 'Playback'
+                self.channel = 'Playback'
 
-        return Sound.channel
+        return self.channel
 
-    @staticmethod
-    def set_volume(pct, channel=None):
+    def set_volume(self, pct, channel=None):
         """
         Sets the sound volume to the given percentage [0-100] by calling
         ``amixer -q set <channel> <pct>%``.
@@ -195,13 +247,12 @@ class Sound:
         """
 
         if channel is None:
-            channel = Sound._get_channel()
+            channel = self._get_channel()
 
         cmd_line = '/usr/bin/amixer -q set {0} {1:d}%'.format(channel, pct)
         Popen(shlex.split(cmd_line)).wait()
 
-    @staticmethod
-    def get_volume(channel=None):
+    def get_volume(self, channel=None):
         """
         Gets the current sound volume by parsing the output of
         ``amixer get <channel>``.
@@ -211,7 +262,7 @@ class Sound:
         """
 
         if channel is None:
-            channel = Sound._get_channel()
+            channel = self._get_channel()
 
         out = check_output(['amixer', 'get', channel]).decode()
         m = re.search('\[(?P<volume>\d+)%\]', out)
@@ -220,8 +271,7 @@ class Sound:
         else:
             raise Exception('Failed to parse output of `amixer get {}`'.format(channel))
 
-    @classmethod
-    def play_song(cls, song, tempo=120, delay=50):
+    def play_song(self, song, tempo=120, delay=50):
         """ Plays a song provided as a list of tuples containing the note name and its
         value using music conventional notation instead of numerical values for frequency
         and duration.
@@ -296,26 +346,26 @@ class Sound:
             Returns:
                 str: the arguments to be passed to the beep command
             """
-            freq = Sound._NOTE_FREQUENCIES[note.upper()]
+            freq = self._NOTE_FREQUENCIES[note.upper()]
             if '/' in value:
                 base, factor = value.split('/')
-                duration = meas_duration * Sound._NOTE_VALUES[base] / float(factor)
+                duration = meas_duration * self._NOTE_VALUES[base] / float(factor)
             elif '*' in value:
                 base, factor = value.split('*')
-                duration = meas_duration * Sound._NOTE_VALUES[base] * float(factor)
+                duration = meas_duration * self._NOTE_VALUES[base] * float(factor)
             elif value.endswith('.'):
                 base = value[:-1]
-                duration = meas_duration * Sound._NOTE_VALUES[base] * 1.5
+                duration = meas_duration * self._NOTE_VALUES[base] * 1.5
             elif value.endswith('3'):
                 base = value[:-1]
-                duration = meas_duration * Sound._NOTE_VALUES[base] * 2 / 3
+                duration = meas_duration * self._NOTE_VALUES[base] * 2 / 3
             else:
-                duration = meas_duration * Sound._NOTE_VALUES[value]
+                duration = meas_duration * self._NOTE_VALUES[value]
 
             return '-f %d -l %d -D %d' % (freq, duration, delay)
 
-        return Sound.beep(' -n '.join(
-            [beep_args(note, value) for note, value in song]
+        return self.beep(' -n '.join(
+            [beep_args(note, value) for (note, value) in song]
         ))
 
     #: Note frequencies.
