@@ -3,7 +3,7 @@
 import logging
 import os
 import re
-from ev3dev.motor import MoveJoystick, list_motors
+from ev3dev.motor import MoveJoystick, list_motors, LargeMotor
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 log = logging.getLogger(__name__)
@@ -81,7 +81,7 @@ class RobotWebHandler(BaseHTTPRequestHandler):
 max_move_xy_seq = 0
 motor_max_speed = None
 medium_motor_max_speed = None
-joystick_enaged = False
+joystick_engaged = False
 
 class TankWebHandler(RobotWebHandler):
 
@@ -278,8 +278,8 @@ class WebControlledTank(MoveJoystick):
     A tank that is controlled via a web browser
     """
 
-    def __init__(self, left_motor, right_motor, port_number=8000):
-        MoveJoystick.__init__(self, left_motor, right_motor)
+    def __init__(self, left_motor, right_motor, port_number=8000, desc=None, motor_class=LargeMotor):
+        MoveJoystick.__init__(self, left_motor, right_motor, desc, motor_class)
         self.www = RobotWebServer(self, TankWebHandler, port_number)
 
     def main(self):

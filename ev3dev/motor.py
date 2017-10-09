@@ -1380,7 +1380,6 @@ class MotorSet(object):
             self.motors[motor_port] = motor_class(motor_port)
 
         self.desc = desc
-        self.verify_connected()
 
     def __str__(self):
 
@@ -1388,12 +1387,6 @@ class MotorSet(object):
             return self.desc
         else:
             return self.__class__.__name__
-
-    def verify_connected(self):
-        for motor in self.motors.values():
-            if not motor.connected:
-                print("%s: %s is not connected" % (self, motor))
-                sys.exit(1)
 
     def set_args(self, **kwargs):
         motors = kwargs.get('motors', self.motors.values())
@@ -1754,7 +1747,7 @@ class MoveJoystick(MoveTank):
         percentage for the right motor at 11.25 degrees.
         """
 
-        if angle >= 0 and angle <= 45:
+        if 0 <= angle <= 45:
 
             # left motor stays at 1
             left_speed_percentage = 1
@@ -1762,7 +1755,7 @@ class MoveJoystick(MoveTank):
             # right motor transitions from -1 to 0
             right_speed_percentage = -1 + (angle/45.0)
 
-        elif angle > 45 and angle <= 90:
+        elif 45 < angle <= 90:
 
             # left motor stays at 1
             left_speed_percentage = 1
@@ -1771,7 +1764,7 @@ class MoveJoystick(MoveTank):
             percentage_from_45_to_90 = (angle - 45) / 45.0
             right_speed_percentage = percentage_from_45_to_90
 
-        elif angle > 90 and angle <= 135:
+        elif 90 < angle <= 135:
 
             # left motor transitions from 1 to 0
             percentage_from_90_to_135 = (angle - 90) / 45.0
@@ -1780,7 +1773,7 @@ class MoveJoystick(MoveTank):
             # right motor stays at 1
             right_speed_percentage = 1
 
-        elif angle > 135 and angle <= 180:
+        elif 135 < angle <= 180:
 
             # left motor transitions from 0 to -1
             percentage_from_135_to_180 = (angle - 135) / 45.0
@@ -1789,7 +1782,7 @@ class MoveJoystick(MoveTank):
             # right motor stays at 1
             right_speed_percentage = 1
 
-        elif angle > 180 and angle <= 225:
+        elif 180 < angle <= 225:
 
             # left motor transitions from -1 to 0
             percentage_from_180_to_225 = (angle - 180) / 45.0
@@ -1810,7 +1803,7 @@ class MoveJoystick(MoveTank):
                 percentage_from_202_to_225 = (angle - 202.5) / 22.5
                 right_speed_percentage = -1 * percentage_from_202_to_225
 
-        elif angle > 225 and angle <= 270:
+        elif 225 < angle <= 270:
 
             # left motor transitions from 0 to -1
             percentage_from_225_to_270 = (angle - 225) / 45.0
@@ -1819,7 +1812,7 @@ class MoveJoystick(MoveTank):
             # right motor stays at -1
             right_speed_percentage = -1
 
-        elif angle > 270 and angle <= 315:
+        elif 270 < angle <= 315:
 
             # left motor stays at -1
             left_speed_percentage = -1
@@ -1828,7 +1821,7 @@ class MoveJoystick(MoveTank):
             percentage_from_270_to_315 = (angle - 270) / 45.0
             right_speed_percentage = -1 + percentage_from_270_to_315
 
-        elif angle > 315 and angle <= 360:
+        elif 315 < angle <= 360:
 
             # left motor transitions from -1 to 1
             # left motor transitions from -1 to 0 between 315 and 337.5
