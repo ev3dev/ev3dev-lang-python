@@ -113,6 +113,10 @@ class Motor(Device):
     '_stop_actions',
     '_time_sp',
     '_poll',
+    '_max_rps',
+    '_max_rpm',
+    '_max_dps',
+    '_max_dpm',
     ]
 
     #: Run the motor until another command is sent.
@@ -222,6 +226,10 @@ class Motor(Device):
         self._stop_actions = None
         self._time_sp = None
         self._poll = None
+        self._max_rps = float(self.max_speed/self.count_per_rot)
+        self._max_rpm = self._max_rps * 60
+        self._max_dps = self._max_rps * 360
+        self._max_dpm = self._max_rpm * 360
 
     @property
     def address(self):
@@ -732,6 +740,62 @@ class Motor(Device):
         """
         return self.wait(lambda state: s not in state, timeout)
 
+    def rps_to_speed(self, rps):
+        """
+        Return the motor speed percentage to achieve rps (rotations-per-second)
+        """
+        assert abs(rps) <= self._max_rps, "%s maximum rotations-per-second is %s, %s was requested" % (self, self._max_rps, rps)
+        return float(rps/self._max_rps) * 100
+
+    def rpm_to_speed(self, rpm):
+        """
+        Return the motor speed percentage to achieve rpm (rotations-per-minute)
+        """
+        assert abs(rpm) <= self._max_rpm, "%s maximum rotations-per-minute is %s, %s was requested" % (self, self._max_rpm, rpm)
+        return float(rpm/self._max_rpm) * 100
+
+    def dps_to_speed(self, dps):
+        """
+        Return the motor speed percentage to achieve dps (degrees-per-second)
+        """
+        assert abs(dps) <= self._max_dps, "%s maximum degrees-per-second is %s, %s was requested" % (self, self._max_dps, dps)
+        return float(dps/self._max_dps) * 100
+
+    def dpm_to_speed(self, dpm):
+        """
+        Return the motor speed percentage to achieve dpm (degrees-per-minute)
+        """
+        assert abs(dpm) <= self._max_dpm, "%s maximum degrees-per-minute is %s, %s was requested" % (self, self._max_dpm, dpm)
+        return float(dpm/self._max_dpm) * 100
+
+    def _speed_pct(self, speed_pct):
+
+        if isinstance(speed_pct, tuple) or isinstance(speed_pct, list):
+            (speed_type, speed_value) = speed_pct
+
+            if speed_type == 'pct':
+                speed_pct = speed_value
+
+            elif speed_type == 'rps':
+                speed_pct = self.rps_to_speed(speed_value)
+
+            elif speed_type == 'rpm':
+                speed_pct = self.rpm_to_speed(speed_value)
+
+            elif speed_type == 'dps':
+                speed_pct = self.dps_to_speed(speed_value)
+
+            elif speed_type == 'dpm':
+                speed_pct = self.dpm_to_speed(speed_value)
+
+            else:
+                raise Exception("%s is an invalid speed_type" % speed_type)
+
+        assert speed_pct >= -100 and speed_pct <= 100,\
+            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+
+        return speed_pct
+
     def _set_position_rotations(self, speed_pct, rotations):
 
         # +/- speed is used to control direction, rotations must be positive
@@ -760,10 +824,9 @@ class Motor(Device):
 
     def on_for_rotations(self, speed_pct, rotations, brake=True, block=True):
         """
-        Rotate the motor at 'speed' for 'rotations'
+        Rotate the motor at 'speed_pct' for 'rotations'
         """
-        assert speed_pct >= -100 and speed_pct <= 100,\
-            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        speed_pct = self._speed_pct(speed_pct)
 
         if not speed_pct or not rotations:
             log.warning("%s speed_pct is %s but rotations is %s, motor will not move" % (self, speed_pct, rotations))
@@ -781,10 +844,9 @@ class Motor(Device):
 
     def on_for_degrees(self, speed_pct, degrees, brake=True, block=True):
         """
-        Rotate the motor at 'speed' for 'degrees'
+        Rotate the motor at 'speed_pct' for 'degrees'
         """
-        assert speed_pct >= -100 and speed_pct <= 100,\
-            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        speed_pct = self._speed_pct(speed_pct)
 
         if not speed_pct or not degrees:
             log.warning("%s speed_pct is %s but degrees is %s, motor will not move" % (self, speed_pct, degrees))
@@ -800,12 +862,31 @@ class Motor(Device):
             self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
             self.wait_until_not_moving()
 
+    def on_to_position(self, speed_pct, position, brake=True, block=True):
+        """
+        Rotate the motor at 'speed_pct' to 'position'
+        """
+        speed_pct = self._speed_pct(speed_pct)
+
+        if not speed_pct:
+            log.warning("%s speed_pct is %s, motor will not move" % (self, speed_pct))
+            self._set_brake(brake)
+            return
+
+        self.speed_sp = int((speed_pct * self.max_speed) / 100)
+        self.position_sp = position
+        self._set_brake(brake)
+        self.run_to_abs_pos()
+
+        if block:
+            self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
+            self.wait_until_not_moving()
+
     def on_for_seconds(self, speed_pct, seconds, brake=True, block=True):
         """
-        Rotate the motor at 'speed' for 'seconds'
+        Rotate the motor at 'speed_pct' for 'seconds'
         """
-        assert speed_pct >= -100 and speed_pct <= 100,\
-            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        speed_pct = self._speed_pct(speed_pct)
 
         if not speed_pct or not seconds:
             log.warning("%s speed_pct is %s but seconds is %s, motor will not move" % (self, speed_pct, seconds))
@@ -821,12 +902,13 @@ class Motor(Device):
             self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
             self.wait_until_not_moving()
 
-    def on(self, speed_pct):
+    def on(self, speed_pct, brake=True, block=False):
         """
-        Rotate the motor at 'speed' for forever
+        Rotate the motor at 'speed_pct' for forever
+
+        Note that `block` is False by default, this is different from the `on_for_XYZ` methods
         """
-        assert speed_pct >= -100 and speed_pct <= 100,\
-            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        speed_pct = self._speed_pct(speed_pct)
 
         if not speed_pct:
             log.warning("%s speed_pct is %s, motor will not move" % (self, speed_pct))
@@ -834,7 +916,12 @@ class Motor(Device):
             return
 
         self.speed_sp = int((speed_pct * self.max_speed) / 100)
+        self._set_brake(brake)
         self.run_forever()
+
+        if block:
+            self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
+            self.wait_until_not_moving()
 
     def off(self, brake=True):
         self._set_brake(brake)
