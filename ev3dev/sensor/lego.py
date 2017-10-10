@@ -430,6 +430,17 @@ class GyroSensor(Sensor):
         self.mode = self.MODE_GYRO_ANG
         self._direct = self.set_attr_raw(self._direct, 'direct', 17)
 
+    def wait_until_angle_changed_by(self, delta):
+        """
+        Wait until angle has changed by specified amount.
+        """
+        assert self.mode in (self.MODE_GYRO_G_A, self.MODE_GYRO_ANG,
+                             self.MODE_TILT_ANG),\
+            'Gyro mode should be MODE_GYRO_ANG, MODE_GYRO_G_A or MODE_TILT_ANG'
+        start_angle = self.value(0)
+        while abs(start_angle - self.value(0)) < delta:
+            time.sleep(0.01)
+
 
 class InfraredSensor(Sensor, ButtonBase):
     """
