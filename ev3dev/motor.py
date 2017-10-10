@@ -764,6 +764,12 @@ class Motor(Device):
         """
         assert speed_pct >= -100 and speed_pct <= 100,\
             "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+
+        if not speed_pct or not rotations:
+            log.warning("%s speed_pct is %s but rotations is %s, motor will not move" % (self, speed_pct, rotations))
+            self._set_brake(brake)
+            return
+
         self.speed_sp = int((speed_pct * self.max_speed) / 100)
         self._set_position_rotations(speed_pct, rotations)
         self._set_brake(brake)
@@ -779,6 +785,12 @@ class Motor(Device):
         """
         assert speed_pct >= -100 and speed_pct <= 100,\
             "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+
+        if not speed_pct or not degrees:
+            log.warning("%s speed_pct is %s but degrees is %s, motor will not move" % (self, speed_pct, degrees))
+            self._set_brake(brake)
+            return
+
         self.speed_sp = int((speed_pct * self.max_speed) / 100)
         self._set_position_degrees(speed_pct, degrees)
         self._set_brake(brake)
@@ -794,6 +806,12 @@ class Motor(Device):
         """
         assert speed_pct >= -100 and speed_pct <= 100,\
             "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+
+        if not speed_pct or not seconds:
+            log.warning("%s speed_pct is %s but seconds is %s, motor will not move" % (self, speed_pct, seconds))
+            self._set_brake(brake)
+            return
+
         self.speed_sp = int((speed_pct * self.max_speed) / 100)
         self.time_sp = int(seconds * 1000)
         self._set_brake(brake)
@@ -809,6 +827,12 @@ class Motor(Device):
         """
         assert speed_pct >= -100 and speed_pct <= 100,\
             "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+
+        if not speed_pct:
+            log.warning("%s speed_pct is %s, motor will not move" % (self, speed_pct))
+            self._set_brake(brake)
+            return
+
         self.speed_sp = int((speed_pct * self.max_speed) / 100)
         self.run_forever()
 
