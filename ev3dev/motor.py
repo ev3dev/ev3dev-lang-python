@@ -67,6 +67,58 @@ else:
     raise Exception("Unsupported platform '%s'" % platform)
 
 
+class SpeedInteger(int):
+    pass
+
+
+class SpeedRPS(SpeedInteger):
+    """
+    Speed in rotations-per-second
+    """
+
+    def __str__(self):
+        return ("%d rps" % self)
+
+    def get_speed_pct(self, motor):
+        return motor.rps_to_speed(self)
+
+
+class SpeedRPM(SpeedInteger):
+    """
+    Speed in rotations-per-minute
+    """
+
+    def __str__(self):
+        return ("%d rpm" % self)
+
+    def get_speed_pct(self, motor):
+        return motor.rpm_to_speed(self)
+
+
+class SpeedDPS(SpeedInteger):
+    """
+    Speed in degrees-per-second
+    """
+
+    def __str__(self):
+        return ("%d dps" % self)
+
+    def get_speed_pct(self, motor):
+        return motor.dps_to_speed(self)
+
+
+class SpeedDPM(SpeedInteger):
+    """
+    Speed in degrees-per-minute
+    """
+
+    def __str__(self):
+        return ("%d dpm" % self)
+
+    def get_speed_pct(self, motor):
+        return motor.dpm_to_speed(self)
+
+
 class Motor(Device):
 
     """
@@ -770,28 +822,12 @@ class Motor(Device):
 
     def _speed_pct(self, speed_pct):
 
-        if isinstance(speed_pct, tuple) or isinstance(speed_pct, list):
-            (speed_type, speed_value) = speed_pct
+        # If speed_pct is SpeedInteger object we must convert
+        # SpeedRPS, etc to an actual speed percentage
+        if isinstance(speed_pct, SpeedInteger):
+            speed_pct = speed_pct.get_speed_pct(self)
 
-            if speed_type == 'pct':
-                speed_pct = speed_value
-
-            elif speed_type == 'rps':
-                speed_pct = self.rps_to_speed(speed_value)
-
-            elif speed_type == 'rpm':
-                speed_pct = self.rpm_to_speed(speed_value)
-
-            elif speed_type == 'dps':
-                speed_pct = self.dps_to_speed(speed_value)
-
-            elif speed_type == 'dpm':
-                speed_pct = self.dpm_to_speed(speed_value)
-
-            else:
-                raise Exception("%s is an invalid speed_type" % speed_type)
-
-        assert speed_pct >= -100 and speed_pct <= 100,\
+        assert -100 <= speed_pct <= 100,\
             "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
 
         return speed_pct
