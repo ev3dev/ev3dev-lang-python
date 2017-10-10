@@ -31,6 +31,8 @@ if sys.version_info < (3,4):
 import os
 import mmap
 import ctypes
+import ev3dev.fonts as fonts
+from PIL import Image, ImageDraw
 from struct import pack
 import fcntl
 
@@ -186,7 +188,6 @@ class Screen(FbMem):
     """
 
     def __init__(self):
-        from PIL import Image, ImageDraw
         FbMem.__init__(self)
 
         self._img = Image.new(
@@ -228,18 +229,6 @@ class Screen(FbMem):
         """
         return self._draw
 
-    @property
-    def image(self):
-        """
-        Returns a handle to PIL.Image class that is backing the screen. This can
-        be accessed for blitting images to the screen.
-
-        Example::
-
-            screen.image.paste(picture, (0, 0))
-        """
-        return self._img
-
     def clear(self):
         """
         Clears the screen
@@ -267,3 +256,63 @@ class Screen(FbMem):
             self.mmap[:] = self._img_to_rgb565_bytes()
         else:
             raise Exception("Not supported")
+
+    def image(self, filename, clear_screen=True, x1=0, y1=0, x2=None, y2=None):
+
+        if clear_screen:
+            self.clear()
+
+        filename_im = Image.open(filename)
+
+        if x2 is not None and y2 is not None:
+            return self._img.paste(filename_im, (x1, y1, x2, y2))
+        else:
+            return self._img.paste(filename_im, (x1, y1))
+
+    def shapes_line(self, clear_screen=True, x1=0, y1=0, x2=0, y2=0, line_color='black', width=1):
+
+        if clear_screen:
+            self.clear()
+
+        return self.draw.line((x1, y1, x2, y2), fill=line_color, width=width)
+
+    def shapes_circle(self, clear_screen=True, x=50, y=50, radius=40, fill_color='black', outline_color='black'):
+
+        if clear_screen:
+            self.clear()
+
+        x1 = x - radius
+        y1 = y - radius
+        x2 = x + radius
+        y2 = y + radius
+
+        return self.draw.ellipse((x1, y1, x2, y2), fill=fill_color, outline=outline_color)
+
+    def shapes_rectangle(self, clear_screen=True, x=0, y=0, width=0, height=0, fill_color='black', outline_color='black'):
+
+        if clear_screen:
+            self.clear()
+
+        return self.draw.rectangle((x, y, width, height), fill=fill_color, outline=outline_color)
+
+    def shapes_point(self, clear_screen=True, x=0, y=0, point_color='black'):
+
+        if clear_screen:
+            self.clear()
+
+        return self.draw.point((x, y), fill=point_color)
+
+    def text_pixels(self, text, clear_screen=True, x=0, y=0, text_color='black', font=None):
+
+        if clear_screen:
+            self.clear()
+
+        if font is not None:
+            assert font in fonts.available(), "%s is an invalid font" % font
+            return self.draw.text((x, y), text, fill=text_color, font=fonts.load(font))
+        else:
+            return self.draw.text((x, y), text, fill=text_color)
+
+    def reset_screen(self):
+        self.clear()
+        self.update()
