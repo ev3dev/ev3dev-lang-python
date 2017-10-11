@@ -83,7 +83,8 @@ class SpeedRPS(SpeedInteger):
         """
         Return the motor speed percentage to achieve desired rotations-per-second
         """
-        return float(self/motor.max_rps) * 100
+        assert self <= motor.max_rps, "%s max RPS is %s, %s was requested"  % (motor, motor.max_rps, self)
+        return (self/motor.max_rps) * 100
 
 
 class SpeedRPM(SpeedInteger):
@@ -98,7 +99,8 @@ class SpeedRPM(SpeedInteger):
         """
         Return the motor speed percentage to achieve desired rotations-per-minute
         """
-        return float(self/motor.max_rpm) * 100
+        assert self <= motor.max_rpm, "%s max RPM is %s, %s was requested"  % (motor, motor.max_rpm, self)
+        return (self/motor.max_rpm) * 100
 
 
 class SpeedDPS(SpeedInteger):
@@ -113,7 +115,8 @@ class SpeedDPS(SpeedInteger):
         """
         Return the motor speed percentage to achieve desired degrees-per-second
         """
-        return float(self/motor.max_dps) * 100
+        assert self <= motor.max_dps, "%s max DPS is %s, %s was requested"  % (motor, motor.max_dps, self)
+        return (self/motor.max_dps) * 100
 
 
 class SpeedDPM(SpeedInteger):
@@ -128,7 +131,8 @@ class SpeedDPM(SpeedInteger):
         """
         Return the motor speed percentage to achieve desired degrees-per-minute
         """
-        return float(self/motor.max_dpm) * 100
+        assert self <= motor.max_dps, "%s max DPM is %s, %s was requested"  % (motor, motor.max_dpm, self)
+        return (self/motor.max_dpm) * 100
 
 
 class Motor(Device):
@@ -845,6 +849,9 @@ class Motor(Device):
     def on_for_rotations(self, speed_pct, rotations, brake=True, block=True):
         """
         Rotate the motor at 'speed_pct' for 'rotations'
+
+        'speed_pct' can be an integer or a SpeedInteger object which will be
+        converted to an actual speed percentage in _speed_pct()
         """
         speed_pct = self._speed_pct(speed_pct)
 
@@ -865,6 +872,9 @@ class Motor(Device):
     def on_for_degrees(self, speed_pct, degrees, brake=True, block=True):
         """
         Rotate the motor at 'speed_pct' for 'degrees'
+
+        'speed_pct' can be an integer or a SpeedInteger object which will be
+        converted to an actual speed percentage in _speed_pct()
         """
         speed_pct = self._speed_pct(speed_pct)
 
@@ -885,6 +895,9 @@ class Motor(Device):
     def on_to_position(self, speed_pct, position, brake=True, block=True):
         """
         Rotate the motor at 'speed_pct' to 'position'
+
+        'speed_pct' can be an integer or a SpeedInteger object which will be
+        converted to an actual speed percentage in _speed_pct()
         """
         speed_pct = self._speed_pct(speed_pct)
 
@@ -905,6 +918,9 @@ class Motor(Device):
     def on_for_seconds(self, speed_pct, seconds, brake=True, block=True):
         """
         Rotate the motor at 'speed_pct' for 'seconds'
+
+        'speed_pct' can be an integer or a SpeedInteger object which will be
+        converted to an actual speed percentage in _speed_pct()
         """
         speed_pct = self._speed_pct(speed_pct)
 
@@ -926,7 +942,11 @@ class Motor(Device):
         """
         Rotate the motor at 'speed_pct' for forever
 
-        Note that `block` is False by default, this is different from the `on_for_XYZ` methods
+        'speed_pct' can be an integer or a SpeedInteger object which will be
+        converted to an actual speed percentage in _speed_pct()
+
+        Note that `block` is False by default, this is different from the
+        other `on_for_XYZ` methods
         """
         speed_pct = self._speed_pct(speed_pct)
 
