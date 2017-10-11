@@ -80,7 +80,10 @@ class SpeedRPS(SpeedInteger):
         return ("%d rps" % self)
 
     def get_speed_pct(self, motor):
-        return motor.rps_to_speed(self)
+        """
+        Return the motor speed percentage to achieve desired rotations-per-second
+        """
+        return float(self/motor.max_rps) * 100
 
 
 class SpeedRPM(SpeedInteger):
@@ -92,7 +95,10 @@ class SpeedRPM(SpeedInteger):
         return ("%d rpm" % self)
 
     def get_speed_pct(self, motor):
-        return motor.rpm_to_speed(self)
+        """
+        Return the motor speed percentage to achieve desired rotations-per-minute
+        """
+        return float(self/motor.max_rpm) * 100
 
 
 class SpeedDPS(SpeedInteger):
@@ -104,7 +110,10 @@ class SpeedDPS(SpeedInteger):
         return ("%d dps" % self)
 
     def get_speed_pct(self, motor):
-        return motor.dps_to_speed(self)
+        """
+        Return the motor speed percentage to achieve desired degrees-per-second
+        """
+        return float(self/motor.max_dps) * 100
 
 
 class SpeedDPM(SpeedInteger):
@@ -116,7 +125,10 @@ class SpeedDPM(SpeedInteger):
         return ("%d dpm" % self)
 
     def get_speed_pct(self, motor):
-        return motor.dpm_to_speed(self)
+        """
+        Return the motor speed percentage to achieve desired degrees-per-minute
+        """
+        return float(self/motor.max_dpm) * 100
 
 
 class Motor(Device):
@@ -165,10 +177,10 @@ class Motor(Device):
     '_stop_actions',
     '_time_sp',
     '_poll',
-    '_max_rps',
-    '_max_rpm',
-    '_max_dps',
-    '_max_dpm',
+    'max_rps',
+    'max_rpm',
+    'max_dps',
+    'max_dpm',
     ]
 
     #: Run the motor until another command is sent.
@@ -278,10 +290,10 @@ class Motor(Device):
         self._stop_actions = None
         self._time_sp = None
         self._poll = None
-        self._max_rps = float(self.max_speed/self.count_per_rot)
-        self._max_rpm = self._max_rps * 60
-        self._max_dps = self._max_rps * 360
-        self._max_dpm = self._max_rpm * 360
+        self.max_rps = float(self.max_speed/self.count_per_rot)
+        self.max_rpm = self.max_rps * 60
+        self.max_dps = self.max_rps * 360
+        self.max_dpm = self.max_rpm * 360
 
     @property
     def address(self):
@@ -791,34 +803,6 @@ class Motor(Device):
             m.wait_while('running')
         """
         return self.wait(lambda state: s not in state, timeout)
-
-    def rps_to_speed(self, rps):
-        """
-        Return the motor speed percentage to achieve rps (rotations-per-second)
-        """
-        assert abs(rps) <= self._max_rps, "%s maximum rotations-per-second is %s, %s was requested" % (self, self._max_rps, rps)
-        return float(rps/self._max_rps) * 100
-
-    def rpm_to_speed(self, rpm):
-        """
-        Return the motor speed percentage to achieve rpm (rotations-per-minute)
-        """
-        assert abs(rpm) <= self._max_rpm, "%s maximum rotations-per-minute is %s, %s was requested" % (self, self._max_rpm, rpm)
-        return float(rpm/self._max_rpm) * 100
-
-    def dps_to_speed(self, dps):
-        """
-        Return the motor speed percentage to achieve dps (degrees-per-second)
-        """
-        assert abs(dps) <= self._max_dps, "%s maximum degrees-per-second is %s, %s was requested" % (self, self._max_dps, dps)
-        return float(dps/self._max_dps) * 100
-
-    def dpm_to_speed(self, dpm):
-        """
-        Return the motor speed percentage to achieve dpm (degrees-per-minute)
-        """
-        assert abs(dpm) <= self._max_dpm, "%s maximum degrees-per-minute is %s, %s was requested" % (self, self._max_dpm, dpm)
-        return float(dpm/self._max_dpm) * 100
 
     def _speed_pct(self, speed_pct):
 
