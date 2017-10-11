@@ -67,6 +67,74 @@ else:
     raise Exception("Unsupported platform '%s'" % platform)
 
 
+class SpeedInteger(int):
+    pass
+
+
+class SpeedRPS(SpeedInteger):
+    """
+    Speed in rotations-per-second
+    """
+
+    def __str__(self):
+        return ("%d rps" % self)
+
+    def get_speed_pct(self, motor):
+        """
+        Return the motor speed percentage to achieve desired rotations-per-second
+        """
+        assert self <= motor.max_rps, "%s max RPS is %s, %s was requested"  % (motor, motor.max_rps, self)
+        return (self/motor.max_rps) * 100
+
+
+class SpeedRPM(SpeedInteger):
+    """
+    Speed in rotations-per-minute
+    """
+
+    def __str__(self):
+        return ("%d rpm" % self)
+
+    def get_speed_pct(self, motor):
+        """
+        Return the motor speed percentage to achieve desired rotations-per-minute
+        """
+        assert self <= motor.max_rpm, "%s max RPM is %s, %s was requested"  % (motor, motor.max_rpm, self)
+        return (self/motor.max_rpm) * 100
+
+
+class SpeedDPS(SpeedInteger):
+    """
+    Speed in degrees-per-second
+    """
+
+    def __str__(self):
+        return ("%d dps" % self)
+
+    def get_speed_pct(self, motor):
+        """
+        Return the motor speed percentage to achieve desired degrees-per-second
+        """
+        assert self <= motor.max_dps, "%s max DPS is %s, %s was requested"  % (motor, motor.max_dps, self)
+        return (self/motor.max_dps) * 100
+
+
+class SpeedDPM(SpeedInteger):
+    """
+    Speed in degrees-per-minute
+    """
+
+    def __str__(self):
+        return ("%d dpm" % self)
+
+    def get_speed_pct(self, motor):
+        """
+        Return the motor speed percentage to achieve desired degrees-per-minute
+        """
+        assert self <= motor.max_dps, "%s max DPM is %s, %s was requested"  % (motor, motor.max_dpm, self)
+        return (self/motor.max_dpm) * 100
+
+
 class Motor(Device):
 
     """
@@ -113,6 +181,10 @@ class Motor(Device):
     '_stop_actions',
     '_time_sp',
     '_poll',
+    'max_rps',
+    'max_rpm',
+    'max_dps',
+    'max_dpm',
     ]
 
     #: Run the motor until another command is sent.
@@ -222,6 +294,10 @@ class Motor(Device):
         self._stop_actions = None
         self._time_sp = None
         self._poll = None
+        self.max_rps = float(self.max_speed/self.count_per_rot)
+        self.max_rpm = self.max_rps * 60
+        self.max_dps = self.max_rps * 360
+        self.max_dpm = self.max_rpm * 360
 
     @property
     def address(self):
@@ -732,6 +808,18 @@ class Motor(Device):
         """
         return self.wait(lambda state: s not in state, timeout)
 
+    def _speed_pct(self, speed_pct):
+
+        # If speed_pct is SpeedInteger object we must convert
+        # SpeedRPS, etc to an actual speed percentage
+        if isinstance(speed_pct, SpeedInteger):
+            speed_pct = speed_pct.get_speed_pct(self)
+
+        assert -100 <= speed_pct <= 100,\
+            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+
+        return speed_pct
+
     def _set_position_rotations(self, speed_pct, rotations):
 
         # +/- speed is used to control direction, rotations must be positive
@@ -760,10 +848,18 @@ class Motor(Device):
 
     def on_for_rotations(self, speed_pct, rotations, brake=True, block=True):
         """
-        Rotate the motor at 'speed' for 'rotations'
+        Rotate the motor at 'speed_pct' for 'rotations'
+
+        'speed_pct' can be an integer or a SpeedInteger object which will be
+        converted to an actual speed percentage in _speed_pct()
         """
-        assert speed_pct >= -100 and speed_pct <= 100,\
-            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        speed_pct = self._speed_pct(speed_pct)
+
+        if not speed_pct or not rotations:
+            log.warning("%s speed_pct is %s but rotations is %s, motor will not move" % (self, speed_pct, rotations))
+            self._set_brake(brake)
+            return
+
         self.speed_sp = int((speed_pct * self.max_speed) / 100)
         self._set_position_rotations(speed_pct, rotations)
         self._set_brake(brake)
@@ -775,10 +871,18 @@ class Motor(Device):
 
     def on_for_degrees(self, speed_pct, degrees, brake=True, block=True):
         """
-        Rotate the motor at 'speed' for 'degrees'
+        Rotate the motor at 'speed_pct' for 'degrees'
+
+        'speed_pct' can be an integer or a SpeedInteger object which will be
+        converted to an actual speed percentage in _speed_pct()
         """
-        assert speed_pct >= -100 and speed_pct <= 100,\
-            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        speed_pct = self._speed_pct(speed_pct)
+
+        if not speed_pct or not degrees:
+            log.warning("%s speed_pct is %s but degrees is %s, motor will not move" % (self, speed_pct, degrees))
+            self._set_brake(brake)
+            return
+
         self.speed_sp = int((speed_pct * self.max_speed) / 100)
         self._set_position_degrees(speed_pct, degrees)
         self._set_brake(brake)
@@ -788,12 +892,43 @@ class Motor(Device):
             self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
             self.wait_until_not_moving()
 
+    def on_to_position(self, speed_pct, position, brake=True, block=True):
+        """
+        Rotate the motor at 'speed_pct' to 'position'
+
+        'speed_pct' can be an integer or a SpeedInteger object which will be
+        converted to an actual speed percentage in _speed_pct()
+        """
+        speed_pct = self._speed_pct(speed_pct)
+
+        if not speed_pct:
+            log.warning("%s speed_pct is %s, motor will not move" % (self, speed_pct))
+            self._set_brake(brake)
+            return
+
+        self.speed_sp = int((speed_pct * self.max_speed) / 100)
+        self.position_sp = position
+        self._set_brake(brake)
+        self.run_to_abs_pos()
+
+        if block:
+            self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
+            self.wait_until_not_moving()
+
     def on_for_seconds(self, speed_pct, seconds, brake=True, block=True):
         """
-        Rotate the motor at 'speed' for 'seconds'
+        Rotate the motor at 'speed_pct' for 'seconds'
+
+        'speed_pct' can be an integer or a SpeedInteger object which will be
+        converted to an actual speed percentage in _speed_pct()
         """
-        assert speed_pct >= -100 and speed_pct <= 100,\
-            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        speed_pct = self._speed_pct(speed_pct)
+
+        if not speed_pct or not seconds:
+            log.warning("%s speed_pct is %s but seconds is %s, motor will not move" % (self, speed_pct, seconds))
+            self._set_brake(brake)
+            return
+
         self.speed_sp = int((speed_pct * self.max_speed) / 100)
         self.time_sp = int(seconds * 1000)
         self._set_brake(brake)
@@ -803,14 +938,30 @@ class Motor(Device):
             self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
             self.wait_until_not_moving()
 
-    def on(self, speed_pct):
+    def on(self, speed_pct, brake=True, block=False):
         """
-        Rotate the motor at 'speed' for forever
+        Rotate the motor at 'speed_pct' for forever
+
+        'speed_pct' can be an integer or a SpeedInteger object which will be
+        converted to an actual speed percentage in _speed_pct()
+
+        Note that `block` is False by default, this is different from the
+        other `on_for_XYZ` methods
         """
-        assert speed_pct >= -100 and speed_pct <= 100,\
-            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        speed_pct = self._speed_pct(speed_pct)
+
+        if not speed_pct:
+            log.warning("%s speed_pct is %s, motor will not move" % (self, speed_pct))
+            self._set_brake(brake)
+            return
+
         self.speed_sp = int((speed_pct * self.max_speed) / 100)
+        self._set_brake(brake)
         self.run_forever()
+
+        if block:
+            self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
+            self.wait_until_not_moving()
 
     def off(self, brake=True):
         self._set_brake(brake)
