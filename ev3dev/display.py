@@ -335,11 +335,11 @@ class Display(FbMem):
             return self.draw.text((x, y), text, fill=text_color)
 
     def text_grid(self, text, clear_screen=True, x=0, y=0, text_color='black', font=None):
-        assert 0 < x < Display.GRID_COLUMNS,\
+        assert 0 <= x < Display.GRID_COLUMNS,\
             "grid columns must be between 0 and %d, %d was requested" %\
             ((Display.GRID_COLUMNS - 1, x))
 
-        assert 0 < y < Display.GRID_ROWS,\
+        assert 0 <= y < Display.GRID_ROWS,\
             "grid rows must be between 0 and %d, %d was requested" %\
             ((Display.GRID_COLUMNS - 1), y)
 
