@@ -290,14 +290,20 @@ class Display(FbMem):
         else:
             return self._img.paste(filename_im, (x1, y1))
 
-    def shapes_line(self, clear_screen=True, x1=0, y1=0, x2=0, y2=0, line_color='black', width=1):
+    def line(self, clear_screen=True, x1=10, y1=10, x2=50, y2=50, line_color='black', width=1):
+        """
+        Draw a line from (x1, y1) to (x2, y2)
+        """
 
         if clear_screen:
             self.clear()
 
         return self.draw.line((x1, y1, x2, y2), fill=line_color, width=width)
 
-    def shapes_circle(self, clear_screen=True, x=50, y=50, radius=40, fill_color='black', outline_color='black'):
+    def circle(self, clear_screen=True, x=50, y=50, radius=40, fill_color='black', outline_color='black'):
+        """
+        Draw a circle of 'radius' centered at (x, y)
+        """
 
         if clear_screen:
             self.clear()
@@ -309,14 +315,20 @@ class Display(FbMem):
 
         return self.draw.ellipse((x1, y1, x2, y2), fill=fill_color, outline=outline_color)
 
-    def shapes_rectangle(self, clear_screen=True, x=0, y=0, width=0, height=0, fill_color='black', outline_color='black'):
+    def rectangle(self, clear_screen=True, x=10, y=10, width=80, height=40, fill_color='black', outline_color='black'):
+        """
+        Draw a rectangle 'width x height' where the top left corner is at (x, y)
+        """
 
         if clear_screen:
             self.clear()
 
         return self.draw.rectangle((x, y, width, height), fill=fill_color, outline=outline_color)
 
-    def shapes_point(self, clear_screen=True, x=0, y=0, point_color='black'):
+    def point(self, clear_screen=True, x=10, y=10, point_color='black'):
+        """
+        Draw a single pixel at (x, y)
+        """
 
         if clear_screen:
             self.clear()
@@ -324,6 +336,21 @@ class Display(FbMem):
         return self.draw.point((x, y), fill=point_color)
 
     def text_pixels(self, text, clear_screen=True, x=0, y=0, text_color='black', font=None):
+        """
+        Display `text` starting at pixel (x, y).
+
+        The EV3 display is 178x128 pixels
+        - (0, 0) would be the top left corner of the display
+        - (89, 64) would be right in the middle of the display
+
+        'text_color' : PIL says it supports "common HTML color names". There
+        are 140 HTML color names listed here that are supported by all modern
+        browsers. This is probably a good list to start with.
+            https://www.w3schools.com/colors/colors_names.asp
+
+        'font' : can be any font displayed here
+            http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/stable/other.html#bitmap-fonts
+        """
 
         if clear_screen:
             self.clear()
@@ -335,6 +362,22 @@ class Display(FbMem):
             return self.draw.text((x, y), text, fill=text_color)
 
     def text_grid(self, text, clear_screen=True, x=0, y=0, text_color='black', font=None):
+        """
+        Display 'text' starting at grid (x, y)
+
+        The EV3 display can be broken down in a grid that is 22 columns wide
+        and 12 rows tall. Each column is 8 pixels wide and each row is 10
+        pixels tall.
+
+        'text_color' : PIL says it supports "common HTML color names". There
+        are 140 HTML color names listed here that are supported by all modern
+        browsers. This is probably a good list to start with.
+            https://www.w3schools.com/colors/colors_names.asp
+
+        'font' : can be any font displayed here
+            http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/stable/other.html#bitmap-fonts
+        """
+
         assert 0 <= x < Display.GRID_COLUMNS,\
             "grid columns must be between 0 and %d, %d was requested" %\
             ((Display.GRID_COLUMNS - 1, x))
