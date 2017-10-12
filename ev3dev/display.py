@@ -181,13 +181,18 @@ class FbMem(object):
         )
 
 
-class Screen(FbMem):
+class Display(FbMem):
     """
     A convenience wrapper for the FbMem class.
     Provides drawing functions from the python imaging library (PIL).
     """
 
-    def __init__(self):
+    GRID_COLUMNS = 22
+    GRID_COLUMN_PIXELS = 8
+    GRID_ROWS = 12
+    GRID_ROW_PIXELS = 10
+
+    def __init__(self, desc='Display'):
         FbMem.__init__(self)
 
         self._img = Image.new(
@@ -196,6 +201,10 @@ class Screen(FbMem):
                 "white")
 
         self._draw = ImageDraw.Draw(self._img)
+        self.desc = desc
+
+    def __str__(self):
+        return self.desc
 
     @property
     def xres(self):
@@ -312,6 +321,20 @@ class Screen(FbMem):
             return self.draw.text((x, y), text, fill=text_color, font=fonts.load(font))
         else:
             return self.draw.text((x, y), text, fill=text_color)
+
+    def text_grid(self, text, clear_screen=True, x=0, y=0, text_color='black', font=None):
+        assert 0 < x < Display.GRID_COLUMNS,\
+            "grid columns must be between 0 and %d, %d was requested" %\
+            ((Display.GRID_COLUMNS - 1, x))
+
+        assert 0 < y < Display.GRID_ROWS,\
+            "grid rows must be between 0 and %d, %d was requested" %\
+            ((Display.GRID_COLUMNS - 1), y)
+
+        return self.text_pixels(text, clear_screen,
+                                x * Display.GRID_COLUMN_PIXELS,
+                                y * Display.GRID_ROW_PIXELS,
+                                text_color, font)
 
     def reset_screen(self):
         self.clear()
