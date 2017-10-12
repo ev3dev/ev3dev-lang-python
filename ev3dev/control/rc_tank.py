@@ -1,6 +1,7 @@
 
 import logging
-from ev3dev.auto import InfraredSensor, MoveTank
+from ev3dev.motor import MoveTank
+from ev3dev.sensor.lego import InfraredSensor
 from time import sleep
 
 log = logging.getLogger(__name__)
@@ -36,7 +37,7 @@ class RemoteControlledTank(MoveTank):
 
         try:
             while True:
-                self.remote.process(self.channel)
+                self.remote.process()
                 sleep(0.01)
 
         # Exit cleanly so that all motors are stopped
