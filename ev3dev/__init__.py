@@ -124,7 +124,7 @@ def list_device_names(class_path, name_pattern, **kwargs):
                 yield f
 
 
-class DeviceNotFoundException(Exception):
+class DeviceNotFound(Exception):
     pass
 
 # -----------------------------------------------------------------------------
@@ -185,7 +185,7 @@ class Device(object):
             except StopIteration:
                 self._path = None
                 self._device_index = None
-                raise DeviceNotFoundException("No device matching the given requirements was found.")
+                raise DeviceNotFound("%s is not connected." % self)
 
     def __str__(self):
         if 'address' in self.kwargs:
