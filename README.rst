@@ -36,89 +36,20 @@ your Python code to a file.
 Make sure that you look at the `User Resources`_ section as well for links
 to documentation and larger examples.
 
-Usage Examples
+Usage
 --------------
 
-To run these minimal examples, run the Python3 interpreter from
-the terminal using the ``python3`` command:
+To start out, you'll need a way to work with Python. We recommend the
+`ev3dev Visual Studio Code extension`_. If you're interested in using that,
+check out our `Python + VSCode introduction tutorial`_ and then come back
+once you have that set up.
 
-.. code-block:: bash
+Otherwise, you can can work with files via an SSH connection with an editor
+such as `nano`_, use the Python interactive REPL (type ``python3``), or roll
+your own solution.
 
-  $ python3
-  Python 3.4.2 (default, Oct  8 2014, 14:47:30)
-  [GCC 4.9.1] on linux
-  Type "help", "copyright", "credits" or "license" for more information.
-  >>>
-
-The ``>>>`` characters are the default prompt for Python. In the examples
-below, we have removed these characters so it's easier to cut and
-paste the code into your session.
-
-Required: Import the library
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you are using an EV3 brick (which is the case for most users), add the
-following to the top of your file:
-
-.. code-block:: python
-
-  import ev3dev.ev3 as ev3
-
-If you are using a BrickPi, use this line:
-
-.. code-block:: python
-
-  import ev3dev.brickpi as ev3
-
-Controlling the LEDs with a touch sensor
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This code will turn the left LED red whenever the touch sensor is pressed, and
-back to green when it's released. Plug a touch sensor into any sensor port and
-then paste in this code - you'll need to hit ``Enter`` after pasting to complete
-the loop and start the program.  Hit ``Ctrl-C`` to exit the loop.
-
-.. code-block:: python
-
-  ts = ev3.TouchSensor()
-  while True:
-      ev3.Leds.set_color(ev3.Leds.LEFT, (ev3.Leds.GREEN, ev3.Leds.RED)[ts.value()])
-
-Running a motor
-~~~~~~~~~~~~~~~
-
-Now plug a motor into the ``A`` port and paste this code into the Python prompt.
-This little program will run the motor at 500 ticks per second, which on the EV3
-"large" motors equates to around 1.4 rotations per second, for three seconds
-(3000 milliseconds).
-
-.. code-block:: python
-
-  m = ev3.LargeMotor('outA')
-  m.run_timed(time_sp=3000, speed_sp=500)
-
-The units for ``speed_sp`` that you see above are in "tacho ticks" per second.
-On the large EV3 motor, these equate to one tick per degree, so this is 500
-degress per second.
-
-
-
-Using text-to-speech
-~~~~~~~~~~~~~~~~~~~~
-
-If you want to make your robot speak, you can use the `Sound.speak` method:
-
-.. code-block:: python
-
-  ev3.Sound.speak('Welcome to the E V 3 dev project!').wait()
-
-**To quit the Python REPL, just type** ``exit()`` **or press** ``Ctrl-D`` **.**
-
-Make sure to check out the `User Resources`_ section for more detailed
-information on these features and many others.
-
-Writing Python Programs for Ev3dev
-----------------------------------
+The template for a Python script
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Every Python program should have a few basic parts. Use this template
 to get started:
@@ -126,18 +57,74 @@ to get started:
 .. code-block:: python
 
    #!/usr/bin/env python3
-   from ev3dev.ev3 import *
+   from ev3dev2.motor import LargeMotor, OUTPUT_A
+   from ev3dev2.sensor.lego import TouchSensor
+   from ev3dev2.led import Leds
 
    # TODO: Add code here
 
-The first two lines should be included in every Python program you write
-for ev3dev. The first allows you to run this program from Brickman, while the
-second imports this library.
+The first line should be included in every Python program you write
+for ev3dev. It allows you to run this program from Brickman, the graphical
+menu that you see on the device screen. You will need to add additional classes
+to the import list if you want to use other types of devices.
 
-When saving Python files, it is best to use the ``.py`` extension, e.g. ``my-file.py``.
-To be able to run your Python code, **your program must be executable**. To mark a
-program as executable run ``chmod +x my-file.py``. You can then run ``my-file.py``
-via the Brickman File Browser or you can run it from the command line via ``$ ./my-file.py``
+You should use the ``.py`` extension for your file, e.g. ``my-file.py``.
+
+Important: Make your script executable
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To be able to run your Python file, **your program must be executable**. If
+you're using the `ev3dev Visual Studio Code extension`_, this step will be
+automatically performed when you download your code to the brick. **You can
+skip this step.**
+
+**To mark a program as executable from the command line (often an SSH session),
+run **``chmod +x my-file.py``.
+
+You can now run ``my-file.py`` via the Brickman File Browser or you can run it
+from the command line by preceding the file name with ``./``: ``$ ./my-file.py``
+
+Controlling the LEDs with a touch sensor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This code will turn the left LED red whenever the touch sensor is pressed, and
+back to green when it's released. Plug a touch sensor into any sensor port before
+trying this out.
+
+.. code-block:: python
+
+  ts = TouchSensor()
+  leds = Leds()
+
+  while True:
+      if ts.is_pressed:
+          leds.set_color(leds.led_groups.LEFT, leds.led_colors.GREEN)
+      else:
+          leds.set_color(leds.led_groups.LEFT, leds.led_colors.RED)
+
+Running a motor
+~~~~~~~~~~~~~~~
+
+This will run a LEGO Large Motor at 75% power for 5 rotations.
+
+.. code-block:: python
+
+  m = LargeMotor(OUTPUT_A)
+  m.on_for_rotations(75, 5)
+
+Using text-to-speech
+~~~~~~~~~~~~~~~~~~~~
+
+If you want to make your robot speak, you can use the `Sound.speak` method:
+
+.. code-block:: python
+  from ev3dev2.sound import Sound
+
+  sound = Sound()
+  sound.speak('Welcome to the E V 3 dev project!').wait()
+
+Make sure to check out the `User Resources`_ section for more detailed
+information on these features and many others.
 
 User Resources
 --------------
@@ -146,6 +133,11 @@ Library Documentation
     **Class documentation for this library can be found on** `our Read the Docs page`_ **.**
     You can always go there to get information on how you can use this
     library's functionality.
+
+Demo Code
+    There are several demo programs that you can run to get acquainted with
+    this language binding. The programs are available at
+    https://github.com/ev3dev/ev3dev-lang-python-demo
 
 ev3python.com
     One of our community members, @ndward, has put together a great website
@@ -167,11 +159,6 @@ Support
     issue, make sure to include as much information as possible about
     what you are trying to do and what you have tried. The issue template
     is in place to guide you through this process.
-
-Demo Code
-    There are several demo programs that you can run to get acquainted with
-    this language binding. The programs are available at
-    https://github.com/ev3dev/ev3dev-lang-python-demo
 
 Upgrading this Library
 ----------------------
@@ -243,3 +230,6 @@ Python 3 and this is the only version that will be supported from here forward.
 .. _pypi: https://pypi.python.org/pypi
 .. _latest version of this package: pypi-python-ev3dev_
 .. _pypi-python-ev3dev: https://pypi.python.org/pypi/python-ev3dev
+.. _ev3dev Visual Studio Code extension: https://github.com/ev3dev/vscode-ev3dev-browser
+.. _Python + VSCode introduction tutorial: https://github.com/ev3dev/vscode-hello-python
+.. _nano: http://www.ev3dev.org/docs/tutorials/nano-cheat-sheet/
