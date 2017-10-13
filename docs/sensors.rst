@@ -6,7 +6,9 @@ Sensor
 
 This is the base class all the other sensor classes are derived from.
 
-.. autoclass:: ev3dev.sensor.Sensor
+.. currentmodule:: ev3dev.sensor
+
+.. autoclass:: Sensor
     :members:
 
 Special sensor classes
@@ -21,7 +23,7 @@ sure the sensor is in the required mode and then returns the specified value.
 Touch Sensor
 ########################
 
-.. autoclass:: ev3dev.sensor.lego.TouchSensor
+.. autoclass:: lego.TouchSensor
     :members:
     :show-inheritance:
 
@@ -30,7 +32,7 @@ Touch Sensor
 Color Sensor
 ########################
 
-.. autoclass:: ev3dev.sensor.lego.ColorSensor
+.. autoclass:: lego.ColorSensor
     :members:
     :show-inheritance:
 
@@ -39,7 +41,7 @@ Color Sensor
 Ultrasonic Sensor
 ########################
 
-.. autoclass:: ev3dev.sensor.lego.UltrasonicSensor
+.. autoclass:: lego.UltrasonicSensor
     :members:
     :show-inheritance:
 
@@ -48,7 +50,7 @@ Ultrasonic Sensor
 Gyro Sensor
 ########################
 
-.. autoclass:: ev3dev.sensor.lego.GyroSensor
+.. autoclass:: lego.GyroSensor
     :members:
     :show-inheritance:
 
@@ -57,7 +59,7 @@ Gyro Sensor
 Infrared Sensor
 ########################
 
-.. autoclass:: ev3dev.sensor.lego.InfraredSensor
+.. autoclass:: lego.InfraredSensor
     :members:
     :show-inheritance:
 
@@ -66,7 +68,7 @@ Infrared Sensor
 Sound Sensor
 ########################
 
-.. autoclass:: ev3dev.sensor.lego.SoundSensor
+.. autoclass:: lego.SoundSensor
     :members:
     :show-inheritance:
 
@@ -75,7 +77,7 @@ Sound Sensor
 Light Sensor
 ########################
 
-.. autoclass:: ev3dev.sensor.lego.LightSensor
+.. autoclass:: lego.LightSensor
     :members:
     :show-inheritance:
 
