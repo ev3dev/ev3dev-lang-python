@@ -33,7 +33,7 @@ import time
 from logging import getLogger
 from math import atan2, degrees as math_degrees, hypot
 from os.path import abspath
-from ev3dev import get_current_platform, Device, list_device_names
+from ev3dev2 import get_current_platform, Device, list_device_names
 
 log = getLogger(__name__)
 
@@ -46,22 +46,22 @@ WAIT_RUNNING_TIMEOUT = 100
 platform = get_current_platform()
 
 if platform == 'ev3':
-    from ev3dev._platform.ev3 import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+    from ev3dev2._platform.ev3 import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
 
 elif platform == 'evb':
-    from ev3dev._platform.evb import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+    from ev3dev2._platform.evb import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
 
 elif platform == 'pistorms':
-    from ev3dev._platform.pistorms import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+    from ev3dev2._platform.pistorms import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
 
 elif platform == 'brickpi':
-    from ev3dev._platform.brickpi import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+    from ev3dev2._platform.brickpi import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
 
 elif platform == 'brickpi3':
-    from ev3dev._platform.brickpi3 import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+    from ev3dev2._platform.brickpi3 import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
 
 elif platform == 'fake':
-    from ev3dev._platform.fake import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+    from ev3dev2._platform.fake import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
 
 else:
     raise Exception("Unsupported platform '%s'" % platform)

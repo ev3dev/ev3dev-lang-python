@@ -3,7 +3,7 @@
 import logging
 import os
 import re
-from ev3dev.motor import MoveJoystick, list_motors, LargeMotor
+from ev3dev2.motor import MoveJoystick, list_motors, LargeMotor
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 log = logging.getLogger(__name__)

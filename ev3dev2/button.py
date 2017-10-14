@@ -31,7 +31,7 @@ if sys.version_info < (3,4):
 import array
 import time
 import evdev
-from ev3dev import get_current_platform
+from ev3dev2 import get_current_platform
 
 try:
     # This is a linux-specific module.
@@ -46,22 +46,22 @@ except ImportError:
 platform = get_current_platform()
 
 if platform == 'ev3':
-    from ev3dev._platform.ev3 import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
+    from ev3dev2._platform.ev3 import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
 
 elif platform == 'evb':
-    from ev3dev._platform.evb import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
+    from ev3dev2._platform.evb import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
 
 elif platform == 'pistorms':
-    from ev3dev._platform.pistorms import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
+    from ev3dev2._platform.pistorms import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
 
 elif platform == 'brickpi':
-    from ev3dev._platform.brickpi import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
+    from ev3dev2._platform.brickpi import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
 
 elif platform == 'brickpi3':
-    from ev3dev._platform.brickpi3 import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
+    from ev3dev2._platform.brickpi3 import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
 
 elif platform == 'fake':
-    from ev3dev._platform.fake import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
+    from ev3dev2._platform.fake import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
 
 else:
     raise Exception("Unsupported platform '%s'" % platform)
