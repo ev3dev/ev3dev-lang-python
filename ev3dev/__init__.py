@@ -252,7 +252,7 @@ class Device(object):
             # We will assume that a file-not-found error is the result of a disconnected device
             # rather than a library error. If that isn't the case, at a minimum the underlying
             # error info will be printed for debugging.
-            raise DeviceNotFoundException("%s is no longer connected" % self) from driver_error
+            raise DeviceNotFound("%s is no longer connected" % self) from driver_error
         raise driver_error
 
     def get_attr_int(self, attribute, name):
