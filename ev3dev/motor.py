@@ -30,8 +30,12 @@ if sys.version_info < (3,4):
 
 import select
 import time
+from logging import getLogger
+from math import atan2, degrees as math_degrees, hypot
 from os.path import abspath
 from ev3dev import get_current_platform, Device, list_device_names
+
+log = getLogger(__name__)
 
 # The number of milliseconds we wait for the state of a motor to
 # update to 'running' in the "on_for_XYZ" methods of the Motor class
@@ -61,6 +65,74 @@ elif platform == 'fake':
 
 else:
     raise Exception("Unsupported platform '%s'" % platform)
+
+
+class SpeedInteger(int):
+    pass
+
+
+class SpeedRPS(SpeedInteger):
+    """
+    Speed in rotations-per-second
+    """
+
+    def __str__(self):
+        return ("%d rps" % self)
+
+    def get_speed_pct(self, motor):
+        """
+        Return the motor speed percentage to achieve desired rotations-per-second
+        """
+        assert self <= motor.max_rps, "%s max RPS is %s, %s was requested"  % (motor, motor.max_rps, self)
+        return (self/motor.max_rps) * 100
+
+
+class SpeedRPM(SpeedInteger):
+    """
+    Speed in rotations-per-minute
+    """
+
+    def __str__(self):
+        return ("%d rpm" % self)
+
+    def get_speed_pct(self, motor):
+        """
+        Return the motor speed percentage to achieve desired rotations-per-minute
+        """
+        assert self <= motor.max_rpm, "%s max RPM is %s, %s was requested"  % (motor, motor.max_rpm, self)
+        return (self/motor.max_rpm) * 100
+
+
+class SpeedDPS(SpeedInteger):
+    """
+    Speed in degrees-per-second
+    """
+
+    def __str__(self):
+        return ("%d dps" % self)
+
+    def get_speed_pct(self, motor):
+        """
+        Return the motor speed percentage to achieve desired degrees-per-second
+        """
+        assert self <= motor.max_dps, "%s max DPS is %s, %s was requested"  % (motor, motor.max_dps, self)
+        return (self/motor.max_dps) * 100
+
+
+class SpeedDPM(SpeedInteger):
+    """
+    Speed in degrees-per-minute
+    """
+
+    def __str__(self):
+        return ("%d dpm" % self)
+
+    def get_speed_pct(self, motor):
+        """
+        Return the motor speed percentage to achieve desired degrees-per-minute
+        """
+        assert self <= motor.max_dps, "%s max DPM is %s, %s was requested"  % (motor, motor.max_dpm, self)
+        return (self/motor.max_dpm) * 100
 
 
 class Motor(Device):
@@ -109,6 +181,10 @@ class Motor(Device):
     '_stop_actions',
     '_time_sp',
     '_poll',
+    'max_rps',
+    'max_rpm',
+    'max_dps',
+    'max_dpm',
     ]
 
     #: Run the motor until another command is sent.
@@ -218,6 +294,10 @@ class Motor(Device):
         self._stop_actions = None
         self._time_sp = None
         self._poll = None
+        self.max_rps = float(self.max_speed/self.count_per_rot)
+        self.max_rpm = self.max_rps * 60
+        self.max_dps = self.max_rps * 360
+        self.max_dpm = self.max_rpm * 360
 
     @property
     def address(self):
@@ -728,6 +808,18 @@ class Motor(Device):
         """
         return self.wait(lambda state: s not in state, timeout)
 
+    def _speed_pct(self, speed_pct):
+
+        # If speed_pct is SpeedInteger object we must convert
+        # SpeedRPS, etc to an actual speed percentage
+        if isinstance(speed_pct, SpeedInteger):
+            speed_pct = speed_pct.get_speed_pct(self)
+
+        assert -100 <= speed_pct <= 100,\
+            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+
+        return speed_pct
+
     def _set_position_rotations(self, speed_pct, rotations):
 
         # +/- speed is used to control direction, rotations must be positive
@@ -756,10 +848,18 @@ class Motor(Device):
 
     def on_for_rotations(self, speed_pct, rotations, brake=True, block=True):
         """
-        Rotate the motor at 'speed' for 'rotations'
+        Rotate the motor at 'speed_pct' for 'rotations'
+
+        'speed_pct' can be an integer or a SpeedInteger object which will be
+        converted to an actual speed percentage in _speed_pct()
         """
-        assert speed_pct >= -100 and speed_pct <= 100,\
-            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        speed_pct = self._speed_pct(speed_pct)
+
+        if not speed_pct or not rotations:
+            log.warning("%s speed_pct is %s but rotations is %s, motor will not move" % (self, speed_pct, rotations))
+            self._set_brake(brake)
+            return
+
         self.speed_sp = int((speed_pct * self.max_speed) / 100)
         self._set_position_rotations(speed_pct, rotations)
         self._set_brake(brake)
@@ -771,10 +871,18 @@ class Motor(Device):
 
     def on_for_degrees(self, speed_pct, degrees, brake=True, block=True):
         """
-        Rotate the motor at 'speed' for 'degrees'
+        Rotate the motor at 'speed_pct' for 'degrees'
+
+        'speed_pct' can be an integer or a SpeedInteger object which will be
+        converted to an actual speed percentage in _speed_pct()
         """
-        assert speed_pct >= -100 and speed_pct <= 100,\
-            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        speed_pct = self._speed_pct(speed_pct)
+
+        if not speed_pct or not degrees:
+            log.warning("%s speed_pct is %s but degrees is %s, motor will not move" % (self, speed_pct, degrees))
+            self._set_brake(brake)
+            return
+
         self.speed_sp = int((speed_pct * self.max_speed) / 100)
         self._set_position_degrees(speed_pct, degrees)
         self._set_brake(brake)
@@ -784,12 +892,43 @@ class Motor(Device):
             self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
             self.wait_until_not_moving()
 
+    def on_to_position(self, speed_pct, position, brake=True, block=True):
+        """
+        Rotate the motor at 'speed_pct' to 'position'
+
+        'speed_pct' can be an integer or a SpeedInteger object which will be
+        converted to an actual speed percentage in _speed_pct()
+        """
+        speed_pct = self._speed_pct(speed_pct)
+
+        if not speed_pct:
+            log.warning("%s speed_pct is %s, motor will not move" % (self, speed_pct))
+            self._set_brake(brake)
+            return
+
+        self.speed_sp = int((speed_pct * self.max_speed) / 100)
+        self.position_sp = position
+        self._set_brake(brake)
+        self.run_to_abs_pos()
+
+        if block:
+            self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
+            self.wait_until_not_moving()
+
     def on_for_seconds(self, speed_pct, seconds, brake=True, block=True):
         """
-        Rotate the motor at 'speed' for 'seconds'
+        Rotate the motor at 'speed_pct' for 'seconds'
+
+        'speed_pct' can be an integer or a SpeedInteger object which will be
+        converted to an actual speed percentage in _speed_pct()
         """
-        assert speed_pct >= -100 and speed_pct <= 100,\
-            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        speed_pct = self._speed_pct(speed_pct)
+
+        if not speed_pct or not seconds:
+            log.warning("%s speed_pct is %s but seconds is %s, motor will not move" % (self, speed_pct, seconds))
+            self._set_brake(brake)
+            return
+
         self.speed_sp = int((speed_pct * self.max_speed) / 100)
         self.time_sp = int(seconds * 1000)
         self._set_brake(brake)
@@ -799,14 +938,30 @@ class Motor(Device):
             self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
             self.wait_until_not_moving()
 
-    def on(self, speed_pct):
+    def on(self, speed_pct, brake=True, block=False):
         """
-        Rotate the motor at 'speed' for forever
+        Rotate the motor at 'speed_pct' for forever
+
+        'speed_pct' can be an integer or a SpeedInteger object which will be
+        converted to an actual speed percentage in _speed_pct()
+
+        Note that `block` is False by default, this is different from the
+        other `on_for_XYZ` methods
         """
-        assert speed_pct >= -100 and speed_pct <= 100,\
-            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+        speed_pct = self._speed_pct(speed_pct)
+
+        if not speed_pct:
+            log.warning("%s speed_pct is %s, motor will not move" % (self, speed_pct))
+            self._set_brake(brake)
+            return
+
         self.speed_sp = int((speed_pct * self.max_speed) / 100)
+        self._set_brake(brake)
         self.run_forever()
+
+        if block:
+            self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
+            self.wait_until_not_moving()
 
     def off(self, brake=True):
         self._set_brake(brake)
@@ -1688,3 +1843,199 @@ class MoveSteering(MoveTank):
     def on(self, steering, speed_pct):
         (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
         MoveTank.on(self, left_speed_pct, right_speed_pct)
+
+
+class MoveJoystick(MoveTank):
+    """
+    Used to control a pair of motors via a joystick
+    """
+
+    def angle_to_speed_percentage(self, angle):
+        """
+                                (1, 1)
+                             . . . . . . .
+                          .        |        .
+                       .           |           .
+              (0, 1) .             |             . (1, 0)
+                   .               |               .
+                  .                |                 .
+                 .                 |                  .
+                .                  |                   .
+               .                   |                   .
+               .                   |     x-axis        .
+       (-1, 1) .---------------------------------------. (1, -1)
+               .                   |                   .
+               .                   |                   .
+                .                  |                  .
+                 .                 | y-axis          .
+                   .               |               .
+             (0, -1) .             |             . (-1, 0)
+                       .           |           .
+                          .        |        .
+                             . . . . . . .
+                                (-1, -1)
+
+
+        The joystick is a circle within a circle where the (x, y) coordinates
+        of the joystick form an angle with the x-axis.  Our job is to translate
+        this angle into the percentage of power that should be sent to each motor.
+        For instance if the joystick is moved all the way to the top of the circle
+        we want both motors to move forward with 100% power...that is represented
+        above by (1, 1).  If the joystick is moved all the way to the right side of
+        the circle we want to rotate clockwise so we move the left motor forward 100%
+        and the right motor backwards 100%...so (1, -1).  If the joystick is at
+        45 degrees then we move apply (1, 0) to move the left motor forward 100% and
+        the right motor stays still.
+
+        The 8 points shown above are pretty easy. For the points in between those 8
+        we do some math to figure out what the percentages should be. Take 11.25 degrees
+        for example. We look at how the motors transition from 0 degrees to 45 degrees:
+        - the left motor is 1 so that is easy
+        - the right motor moves from -1 to 0
+
+        We determine how far we are between 0 and 45 degrees (11.25 is 25% of 45) so we
+        know that the right motor should be 25% of the way from -1 to 0...so -0.75 is the
+        percentage for the right motor at 11.25 degrees.
+        """
+
+        if 0 <= angle <= 45:
+
+            # left motor stays at 1
+            left_speed_percentage = 1
+
+            # right motor transitions from -1 to 0
+            right_speed_percentage = -1 + (angle/45.0)
+
+        elif 45 < angle <= 90:
+
+            # left motor stays at 1
+            left_speed_percentage = 1
+
+            # right motor transitions from 0 to 1
+            percentage_from_45_to_90 = (angle - 45) / 45.0
+            right_speed_percentage = percentage_from_45_to_90
+
+        elif 90 < angle <= 135:
+
+            # left motor transitions from 1 to 0
+            percentage_from_90_to_135 = (angle - 90) / 45.0
+            left_speed_percentage = 1 - percentage_from_90_to_135
+
+            # right motor stays at 1
+            right_speed_percentage = 1
+
+        elif 135 < angle <= 180:
+
+            # left motor transitions from 0 to -1
+            percentage_from_135_to_180 = (angle - 135) / 45.0
+            left_speed_percentage = -1 * percentage_from_135_to_180
+
+            # right motor stays at 1
+            right_speed_percentage = 1
+
+        elif 180 < angle <= 225:
+
+            # left motor transitions from -1 to 0
+            percentage_from_180_to_225 = (angle - 180) / 45.0
+            left_speed_percentage = -1 + percentage_from_180_to_225
+
+            # right motor transitions from 1 to -1
+            # right motor transitions from 1 to 0 between 180 and 202.5
+            if angle < 202.5:
+                percentage_from_180_to_202 = (angle - 180) / 22.5
+                right_speed_percentage = 1 - percentage_from_180_to_202
+
+            # right motor is 0 at 202.5
+            elif angle == 202.5:
+                right_speed_percentage = 0
+
+            # right motor transitions from 0 to -1 between 202.5 and 225
+            else:
+                percentage_from_202_to_225 = (angle - 202.5) / 22.5
+                right_speed_percentage = -1 * percentage_from_202_to_225
+
+        elif 225 < angle <= 270:
+
+            # left motor transitions from 0 to -1
+            percentage_from_225_to_270 = (angle - 225) / 45.0
+            left_speed_percentage = -1 * percentage_from_225_to_270
+
+            # right motor stays at -1
+            right_speed_percentage = -1
+
+        elif 270 < angle <= 315:
+
+            # left motor stays at -1
+            left_speed_percentage = -1
+
+            # right motor transitions from -1 to 0
+            percentage_from_270_to_315 = (angle - 270) / 45.0
+            right_speed_percentage = -1 + percentage_from_270_to_315
+
+        elif 315 < angle <= 360:
+
+            # left motor transitions from -1 to 1
+            # left motor transitions from -1 to 0 between 315 and 337.5
+            if angle < 337.5:
+                percentage_from_315_to_337 = (angle - 315) / 22.5
+                left_speed_percentage = (1 - percentage_from_315_to_337) * -1
+
+            # left motor is 0 at 337.5
+            elif angle == 337.5:
+                left_speed_percentage = 0
+
+            # left motor transitions from 0 to 1 between 337.5 and 360
+            elif angle > 337.5:
+                percentage_from_337_to_360 = (angle - 337.5) / 22.5
+                left_speed_percentage = percentage_from_337_to_360
+
+            # right motor transitions from 0 to -1
+            percentage_from_315_to_360 = (angle - 315) / 45.0
+            right_speed_percentage = -1 * percentage_from_315_to_360
+
+        else:
+            raise Exception('You created a circle with more than 360 degrees (%s)...that is quite the trick' % angle)
+
+        return (left_speed_percentage * 100, right_speed_percentage * 100)
+
+    def on(self, x, y, max_speed, radius=100.0):
+        """
+        Convert x,y joystick coordinates to left/right motor speed percentages
+        and move the motors
+        """
+
+        # If joystick is in the middle stop the tank
+        if not x and not y:
+            MoveTank.off()
+            return
+
+        vector_length = hypot(x, y)
+        angle = math_degrees(atan2(y, x))
+
+        if angle < 0:
+            angle += 360
+
+        # Should not happen but can happen (just by a hair) due to floating point math
+        if vector_length > radius:
+            vector_length = radius
+
+        (init_left_speed_percentage, init_right_speed_percentage) = self.angle_to_speed_percentage(angle)
+
+        # scale the speed percentages based on vector_length vs. radius
+        left_speed_percentage = (init_left_speed_percentage * vector_length) / radius
+        right_speed_percentage = (init_right_speed_percentage * vector_length) / radius
+
+        log.debug("""
+    x, y                         : %s, %s
+    radius                       : %s
+    angle                        : %s
+    vector length                : %s
+    init left_speed_percentage   : %s
+    init right_speed_percentage  : %s
+    final left_speed_percentage  : %s
+    final right_speed_percentage : %s
+    """ % (x, y, radius, angle, vector_length,
+            init_left_speed_percentage, init_right_speed_percentage,
+            left_speed_percentage, right_speed_percentage))
+
+        MoveTank.on(self, left_speed_percentage, right_speed_percentage)
