@@ -3,7 +3,7 @@ Maintainer: Ralph Hempel <rhempel@hempeldesigngroup.com>
 Section: python
 Priority: optional
 Standards-Version: 3.9.5
-Build-Depends: python3-setuptools (>= 0.6b3), python3-all (>= 3.4), debhelper (>= 9), dh-python
+Build-Depends: python3-setuptools (>= 0.6b3), python3-all (>= 3.4), debhelper (>= 9), dh-python, python3-pillow
 VCS-Git: git://github.com/rhempel/ev3dev-lang-python.git
 VCS-Browser: https://github.com/rhempel/ev3dev-lang-python
 
