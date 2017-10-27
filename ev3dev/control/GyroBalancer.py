@@ -92,6 +92,10 @@ class GyroBalancer(LargeMotorPair):
         self.touch = TouchSensor()
         self.remote = RemoteControl(channel=1)
 
+        if not self.remote.connected:
+            log.error("%s is not connected" % self.remote)
+            sys.exit(1)
+
         # Motor setup
         self.left_motor.reset()
         self.right_motor.reset()
