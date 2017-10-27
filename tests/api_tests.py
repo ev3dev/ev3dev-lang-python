@@ -9,7 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from populate_arena import populate_arena
 from clean_arena    import clean_arena
 
-import ev3dev2 as ev3dev2
+import ev3dev2
 from ev3dev2.sensor.lego import InfraredSensor
 from ev3dev2.motor import MediumMotor
 
