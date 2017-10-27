@@ -185,7 +185,7 @@ class Device(object):
             except StopIteration:
                 self._path = None
                 self._device_index = None
-                raise DeviceNotFound("%s is not connected." % self)
+                raise DeviceNotFound("%s is not connected." % self) from None
 
     def __str__(self):
         if 'address' in self.kwargs:
