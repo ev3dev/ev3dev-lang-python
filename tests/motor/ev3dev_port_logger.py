@@ -86,4 +86,4 @@ for p,v in test['meta']['ports'].items():
      test['data'][p] = logs[p].results
 
 # Add a nice JSON formatter here - maybe?
-print json.dumps( test, indent = 4 )
+print (json.dumps( test, indent = 4 ))
