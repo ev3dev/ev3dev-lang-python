@@ -67,7 +67,7 @@ for k,d in test['data'].items():
 
     # Clean up the chartjunk
     for i,ax in enumerate(axarr):
-        print(i),(ax)
+        print(i, ax)
         # Remove the plot frame lines. They are unnecessary chartjunk.
         ax.spines["top"].set_visible(False)
 
