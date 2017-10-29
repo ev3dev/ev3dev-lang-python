@@ -1,3 +1,10 @@
+python-ev3dev (1.1.1) testing; urgency=medium
+
+  [Denis Demidov]
+  * Fixed Screen class on Debian Stretch
+
+ -- Denis Demidov <dennis.demidov@gmail.com>  Sun, 29 Oct 2017 11:29:00 +0300
+
 python-ev3dev (1.1.0) testing; urgency=medium
 
   [Daniel Walton]
