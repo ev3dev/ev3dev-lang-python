@@ -1,8 +1,8 @@
 Python language bindings for ev3dev
 ===================================
 
-.. image:: https://travis-ci.org/rhempel/ev3dev-lang-python.svg?branch=master
-    :target: https://travis-ci.org/rhempel/ev3dev-lang-python
+.. image:: https://travis-ci.org/ev3dev/ev3dev-lang-python.svg?branch=master
+    :target: https://travis-ci.org/ev3dev/ev3dev-lang-python
 .. image:: https://readthedocs.org/projects/python-ev3dev/badge/?version=stable
     :target: http://python-ev3dev.readthedocs.org/en/stable/?badge=stable
     :alt: Documentation Status
