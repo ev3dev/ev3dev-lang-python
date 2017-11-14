@@ -21,25 +21,20 @@ class TestAPI(unittest.TestCase):
         populate_arena({'medium_motor' : [0, 'outA'], 'infrared_sensor' : [0, 'in1']})
 
         d = ev3.Device('tacho-motor', 'motor*')
-        self.assertTrue(d.connected)
 
         d = ev3.Device('tacho-motor', 'motor0')
-        self.assertTrue(d.connected)
 
         d = ev3.Device('tacho-motor', 'motor*', driver_name='lego-ev3-m-motor')
-        self.assertTrue(d.connected)
 
         d = ev3.Device('tacho-motor', 'motor*', address='outA')
-        self.assertTrue(d.connected)
 
-        d = ev3.Device('tacho-motor', 'motor*', address='outA', driver_name='not-valid')
-        self.assertTrue(not d.connected)
+        with self.assertRaises(ev3.DeviceNotFound):
+            d = ev3.Device('tacho-motor', 'motor*', address='outA', driver_name='not-valid')
 
         d = ev3.Device('lego-sensor', 'sensor*')
-        self.assertTrue(d.connected)
 
-        d = ev3.Device('this-does-not-exist')
-        self.assertFalse(d.connected)
+        with self.assertRaises(ev3.DeviceNotFound):
+            d = ev3.Device('this-does-not-exist')
 
     def test_medium_motor(self):
         def dummy(self):
@@ -52,8 +47,6 @@ class TestAPI(unittest.TestCase):
         MediumMotor.__del__ = dummy
 
         m = MediumMotor()
-
-        self.assertTrue(m.connected);
 
         self.assertEqual(m.device_index, 0)
 
@@ -85,8 +78,6 @@ class TestAPI(unittest.TestCase):
         populate_arena({'infrared_sensor' : [0, 'in1']})
 
         s = InfraredSensor()
-
-        self.assertTrue(s.connected)
 
         self.assertEqual(s.device_index,    0)
         self.assertEqual(s.bin_data_format, 's8')
