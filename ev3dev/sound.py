@@ -90,7 +90,7 @@ class Sound(object):
 
     def _validate_play_type(self, play_type):
         assert play_type in self.PLAY_TYPES, \
-            "Invalid play_type %s, must be one of %s" % (play_type, ','.join(self.PLAY_TYPES))
+            "Invalid play_type %s, must be one of %s" % (play_type, ','.join(str(t) for t in self.PLAY_TYPES))
 
     def beep(self, args=''):
         """
