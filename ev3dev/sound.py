@@ -136,6 +136,9 @@ class Sound(object):
                 (392.00, 300, 150), (311.13, 250, 100), (466.16, 25, 100), (392, 700)
                 ]).wait()
 
+        Have also a look at :py:meth:`play_song` for a more musician-friendly way of doing, which uses
+        the conventional notation for notes and durations.
+
         .. rubric:: tone(frequency, duration)
 
         Play single tone of given frequency (Hz) and duration (milliseconds).
@@ -161,14 +164,14 @@ class Sound(object):
         else:
             raise Exception("Unsupported number of parameters in Sound.tone()")
 
-    def play_tone(self, frequency, duration, delay=0.1, volume=100,
+    def play_tone(self, frequency, duration, delay=0.0, volume=100,
                   play_type=PLAY_WAIT_FOR_COMPLETE):
-        """ Play a tone, specified by its frequency, duration, volume and final delay.
+        """ Play a single tone, specified by its frequency, duration, volume and final delay.
 
         Args:
             frequency (int): the tone frequency, in Hertz
             duration (float): tone duration, in seconds
-            delay (float): delay after tone, in seconds
+            delay (float): delay after tone, in seconds (can be useful when chaining calls to ``play_tone``)
             volume (int): sound volume in percent (between 0 and 100)
             play_type (int): one off Sound.PLAY_xxx play types (wait, no wait, loop)
 
@@ -182,7 +185,7 @@ class Sound(object):
 
         if duration <= 0:
             raise ValueError('invalid duration (%s)' % duration)
-        if delay <= 0:
+        if delay < 0:
             raise ValueError('invalid delay (%s)' % delay)
         if not 0 < volume <= 100:
             raise ValueError('invalid volume (%s)' % volume)
