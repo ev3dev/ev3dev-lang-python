@@ -33,10 +33,6 @@ elif args.motor == "D":
 else:
     raise Exception("%s is invalid, options are A, B, C, D")
 
-if not motor.connected:
-    log.error("%s is not connected" % motor)
-    sys.exit(1)
-
 if args.degrees:
     log.info("Motor %s, current position %d, move to position %d, max speed %d" %
              (args.motor, motor.position, args.degrees, motor.max_speed))

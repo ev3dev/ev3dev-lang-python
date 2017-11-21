@@ -272,7 +272,8 @@ class Display(FbMem):
         Nothing will be drawn on the screen until this function is called.
         """
         if self.var_info.bits_per_pixel == 1:
-            self.mmap[:] = self._img.tobytes("raw", "1;IR")
+            b = self._img.tobytes("raw", "1;R")
+            self.mmap[:len(b)] = b
         elif self.var_info.bits_per_pixel == 16:
             self.mmap[:] = self._img_to_rgb565_bytes()
         else:
