@@ -28,13 +28,13 @@ class TestAPI(unittest.TestCase):
 
         d = ev3dev2.Device('tacho-motor', 'motor*', address='outA')
 
-        with self.assertRaises(ev3.DeviceNotFound):
-            d = ev3.Device('tacho-motor', 'motor*', address='outA', driver_name='not-valid')
+        with self.assertRaises(ev3dev2.DeviceNotFound):
+            d = ev3dev2.Device('tacho-motor', 'motor*', address='outA', driver_name='not-valid')
 
-        d = ev3.Device('lego-sensor', 'sensor*')
+        d = ev3dev2.Device('lego-sensor', 'sensor*')
 
-        with self.assertRaises(ev3.DeviceNotFound):
-            d = ev3.Device('this-does-not-exist')
+        with self.assertRaises(ev3dev2.DeviceNotFound):
+            d = ev3dev2.Device('this-does-not-exist')
 
     def test_medium_motor(self):
         def dummy(self):
