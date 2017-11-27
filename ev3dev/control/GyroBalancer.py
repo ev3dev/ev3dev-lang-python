@@ -32,6 +32,8 @@ import time
 import json
 import queue
 import threading
+import math
+import signal
 from collections import deque
 from ev3dev.power import PowerSupply
 from ev3dev.motor import LargeMotor, OUTPUT_A, OUTPUT_D
@@ -42,7 +44,7 @@ from collections import OrderedDict
 log = logging.getLogger(__name__)
 
 # Constants
-RAD_PER_DEG = 3.14159265/180
+RAD_PER_DEG = math.pi / 180
 
 # EV3 Platform specific constants
 
@@ -153,6 +155,10 @@ class GyroBalancer(object):
         # Debugging
         self.debug = debug
 
+        # Handlers for SIGINT and SIGTERM
+        signal.signal(signal.SIGINT, self.signal_int_handler)
+        signal.signal(signal.SIGTERM, self.signal_term_handler)
+
     def shutdown(self):
         """Close all file handles and stop all motors."""
         self.stop_balance.set()  # Stop balance thread
@@ -190,6 +196,18 @@ class GyroBalancer(object):
 
         # Apply the signal to the motor
         self._fast_write(motor_duty_file, duty_int)
+
+    def signal_int_handler(self, signum, frame):
+        """Signal handler for SIGINT."""
+        log.info('"Caught SIGINT')
+        self.shutdown()
+        raise GracefulShutdown()
+
+    def signal_term_handler(self, signum, frame):
+        """Signal handler for SIGTERM."""
+        log.info('"Caught SIGTERM')
+        self.shutdown()
+        raise GracefulShutdown()
 
     def balance(self):
         """Run the _balance method as a thread."""
@@ -481,3 +499,9 @@ class GyroBalancer(object):
     def stop(self):
         """Stop robot (balancing will continue)."""
         self._move(speed=0, steering=0)
+
+
+class GracefulShutdown(Exception):
+    """Custom exception for SIGINT and SIGTERM."""
+
+    pass
