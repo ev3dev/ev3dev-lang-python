@@ -114,7 +114,7 @@ class ColorSensor(Sensor):
     #: Reflected light. Red LED on.
     MODE_COL_REFLECT = 'COL-REFLECT'
 
-    #: Ambient light. Red LEDs off.
+    #: Ambient light. Blue LEDs on.
     MODE_COL_AMBIENT = 'COL-AMBIENT'
 
     #: Color. All LEDs rapidly cycling, appears white.
