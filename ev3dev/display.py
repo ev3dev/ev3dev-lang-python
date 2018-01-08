@@ -347,7 +347,7 @@ class Display(FbMem):
         'text_color' : PIL says it supports "common HTML color names". There
         are 140 HTML color names listed here that are supported by all modern
         browsers. This is probably a good list to start with.
-            https://www.w3schools.com/colors/colors_names.asp
+        https://www.w3schools.com/colors/colors_names.asp
 
         'font' : can be any font displayed here
             http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/stable/other.html#bitmap-fonts
@@ -373,7 +373,7 @@ class Display(FbMem):
         'text_color' : PIL says it supports "common HTML color names". There
         are 140 HTML color names listed here that are supported by all modern
         browsers. This is probably a good list to start with.
-            https://www.w3schools.com/colors/colors_names.asp
+        https://www.w3schools.com/colors/colors_names.asp
 
         'font' : can be any font displayed here
             http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/stable/other.html#bitmap-fonts
