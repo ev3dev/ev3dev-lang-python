@@ -477,7 +477,7 @@ class Motor(Device):
         """
         Writing specifies the target position for the `run-to-abs-pos` and `run-to-rel-pos`
         commands. Reading returns the current value. Units are in tacho counts. You
-        can use the value returned by `counts_per_rot` to convert tacho counts to/from
+        can use the value returned by `count_per_rot` to convert tacho counts to/from
         rotations or degrees.
         """
         self._position_sp, value = self.get_attr_int(self._position_sp, 'position_sp')
