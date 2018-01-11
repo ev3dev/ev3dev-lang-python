@@ -612,6 +612,20 @@ class InfraredSensor(Sensor, ButtonBase):
 
     _BUTTONS = ('top_left', 'bottom_left', 'top_right', 'bottom_right', 'beacon')
 
+    # Button codes for doing rapid check of remote status
+    NO_BUTTON = 0
+    TOP_LEFT = 1
+    BOTTOM_LEFT = 2
+    TOP_RIGHT = 3
+    BOTTOM_RIGHT = 4
+    TOP_LEFT_TOP_RIGHT = 5
+    TOP_LEFT_BOTTOM_RIGHT = 6
+    BOTTOM_LEFT_TOP_RIGHT = 7
+    BOTTOM_LEFT_BOTTOM_RIGHT = 8
+    BEACON = 9
+    TOP_LEFT_BOTTOM_LEFT = 10
+    TOP_RIGHT_BOTTOM_RIGHT = 11
+
     # See process() for an explanation on how to use these
     #: Handles ``Red Up``, etc events on channel 1
     on_channel1_top_left = None
