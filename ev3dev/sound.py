@@ -295,7 +295,7 @@ class Sound(object):
 
         with open(os.devnull, 'w') as n:
             cmd_line = '/usr/bin/espeak --stdout {0} "{1}" | /usr/bin/aplay -q'.format(
-                espeak_opts, text
+                espeak_opts, text.replace('"','\\"')
             )
 
             if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
