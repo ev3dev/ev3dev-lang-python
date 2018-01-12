@@ -170,7 +170,7 @@ class ColorSensor(Sensor):
     )
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(ColorSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-color'], **kwargs)
+        super(ColorSensor, self).__init__(address, name_pattern, name_exact, driver_name='lego-ev3-color', **kwargs)
 
         # See calibrate_white() for more details
         self.red_max = 300
@@ -506,7 +506,7 @@ class GyroSensor(Sensor):
     )
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(GyroSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-gyro'], **kwargs)
+        super(GyroSensor, self).__init__(address, name_pattern, name_exact, driver_name='lego-ev3-gyro', **kwargs)
         self._direct = None
 
     @property
@@ -656,7 +656,7 @@ class InfraredSensor(Sensor, ButtonBase):
     on_channel4_beacon = None
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
+        super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name='lego-ev3-ir', **kwargs)
 
     def _normalize_channel(self, channel):
         assert channel >= 1 and channel <= 4, "channel is %s, it must be 1, 2, 3, or 4" % channel
@@ -808,7 +808,7 @@ class SoundSensor(Sensor):
     )
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(SoundSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-nxt-sound'], **kwargs)
+        super(SoundSensor, self).__init__(address, name_pattern, name_exact, driver_name='lego-nxt-sound', **kwargs)
 
     @property
     def sound_pressure(self):
@@ -849,7 +849,7 @@ class LightSensor(Sensor):
     )
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(LightSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-nxt-light'], **kwargs)
+        super(LightSensor, self).__init__(address, name_pattern, name_exact, driver_name='lego-nxt-light', **kwargs)
 
     @property
     def reflected_light_intensity(self):
