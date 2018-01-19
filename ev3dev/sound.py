@@ -31,7 +31,7 @@ if sys.version_info < (3, 4):
 import os
 import re
 import shlex
-from subprocess import check_output, Popen
+from subprocess import check_output, Popen, PIPE
 
 
 def _make_scales(notes):
@@ -294,20 +294,22 @@ class Sound(object):
         self.set_volume(volume)
 
         with open(os.devnull, 'w') as n:
-            cmd_line = '/usr/bin/espeak --stdout {0} "{1}" | /usr/bin/aplay -q'.format(
-                espeak_opts, text.replace('"','\\"')
-            )
+            cmd_line = ['/usr/bin/espeak', '--stdout'] + shlex.split(espeak_opts) + [shlex.quote(text)]
+            aplay_cmd_line = shlex.split('/usr/bin/aplay -q')
 
             if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
-                play = Popen(cmd_line, stdout=n, shell=True)
+                espeak = Popen(cmd_line, stdout=PIPE)
+                play = Popen(aplay_cmd_line, stdin=espeak.stdout, stdout=n, shell=True)
                 play.wait()
 
             elif play_type == Sound.PLAY_NO_WAIT_FOR_COMPLETE:
-                return Popen(cmd_line, stdout=n, shell=True)
+                espeak = Popen(cmd_line, stdout=PIPE)
+                return Popen(aplay_cmd_line, stdin=espeak.stdout, stdout=n, shell=True)
 
             elif play_type == Sound.PLAY_LOOP:
                 while True:
-                    play = Popen(cmd_line, stdout=n, shell=True)
+                    espeak = Popen(cmd_line, stdout=PIPE)
+                    play = Popen(aplay_cmd_line, stdin=espeak.stdout, stdout=n)
                     play.wait()
 
     def _get_channel(self):
