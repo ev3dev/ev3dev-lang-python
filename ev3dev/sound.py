@@ -299,12 +299,12 @@ class Sound(object):
 
             if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
                 espeak = Popen(cmd_line, stdout=PIPE)
-                play = Popen(aplay_cmd_line, stdin=espeak.stdout, stdout=n, shell=True)
+                play = Popen(aplay_cmd_line, stdin=espeak.stdout, stdout=n)
                 play.wait()
 
             elif play_type == Sound.PLAY_NO_WAIT_FOR_COMPLETE:
                 espeak = Popen(cmd_line, stdout=PIPE)
-                return Popen(aplay_cmd_line, stdin=espeak.stdout, stdout=n, shell=True)
+                return Popen(aplay_cmd_line, stdin=espeak.stdout, stdout=n)
 
             elif play_type == Sound.PLAY_LOOP:
                 while True:
