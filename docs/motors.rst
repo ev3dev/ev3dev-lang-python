@@ -1,7 +1,7 @@
 Motor classes
 =============
 
-.. currentmodule:: ev3dev.core
+.. currentmodule:: ev3dev.motor
 
 Tacho motor
 -----------

@@ -299,7 +299,7 @@ def list_sensors(name_pattern=Sensor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
         keyword arguments: used for matching the corresponding device
             attributes. For example, driver_name='lego-ev3-touch', or
             address=['in1', 'in3']. When argument value is a list,
-        then a match against any entry of the list is enough.
+            then a match against any entry of the list is enough.
     """
     class_path = abspath(Device.DEVICE_ROOT_PATH + '/' + Sensor.SYSTEM_CLASS_NAME)
     return (Sensor(name_pattern=name, name_exact=True)
