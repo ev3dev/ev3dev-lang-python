@@ -134,7 +134,7 @@ html_theme = 'bootstrap'
 html_theme_options = {
         'bootswatch_theme': 'yeti',
         'navbar_links' : [
-            ("GitHub", "https://github.com/rhempel/ev3dev-lang-python", True)
+            ("GitHub", "https://github.com/ev3dev/ev3dev-lang-python", True)
             ]
         }
 
