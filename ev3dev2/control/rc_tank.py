@@ -1,7 +1,7 @@
 
 import logging
-from ev3dev.motor import MoveTank
-from ev3dev.sensor.lego import InfraredSensor
+from ev3dev2.motor import MoveTank
+from ev3dev2.sensor.lego import InfraredSensor
 from time import sleep
 
 log = logging.getLogger(__name__)

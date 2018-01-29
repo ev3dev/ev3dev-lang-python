@@ -5,6 +5,6 @@ __pycache__
 dist
 *.egg-info
 RELEASE-VERSION
-ev3dev/version.py
+ev3dev2/version.py
 build
 .idea
