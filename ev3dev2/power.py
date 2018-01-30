@@ -28,7 +28,7 @@ import sys
 if sys.version_info < (3,4):
     raise SystemError('Must be using Python 3.4 or higher')
 
-from ev3dev import Device
+from ev3dev2 import Device
 
 
 class PowerSupply(Device):

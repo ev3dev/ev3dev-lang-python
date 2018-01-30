@@ -215,7 +215,7 @@ class Sound(object):
             duration (float): tone duration, in seconds
             volume (int) the play volume, in percent of maximum volume
             play_type (int) the type of play (wait, no wait, loop), as defined
-                by the ``PLAY_xxx`` constants
+            by the ``PLAY_xxx`` constants
 
         Returns:
             the PID of the underlying beep command if no wait play type, None otherwise

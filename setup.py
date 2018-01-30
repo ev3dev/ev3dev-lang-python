@@ -11,11 +11,11 @@ setup(
     license='MIT',
     url='https://github.com/rhempel/ev3dev-lang-python',
     include_package_data=True,
-    packages=['ev3dev',
-              'ev3dev.fonts',
-              'ev3dev.sensor',
-              'ev3dev.control',
-              'ev3dev._platform'],
+    packages=['ev3dev2',
+              'ev3dev2.fonts',
+              'ev3dev2.sensor',
+              'ev3dev2.control',
+              'ev3dev2._platform'],
     package_data={'': ['*.pil', '*.pbm']},
     install_requires=['Pillow']
     )

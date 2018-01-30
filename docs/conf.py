@@ -26,6 +26,7 @@ if on_rtd:
     import pip
     pip.main(['install', 'sphinx_bootstrap_theme'])
     pip.main(['install', 'recommonmark'])
+    pip.main(['install', 'evdev'])
 
 import sphinx_bootstrap_theme
 from recommonmark.parser import CommonMarkParser

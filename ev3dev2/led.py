@@ -32,28 +32,28 @@ import os
 import stat
 import time
 from collections import OrderedDict
-from ev3dev import get_current_platform, Device
+from ev3dev2 import get_current_platform, Device
 
 # Import the LED settings, this is platform specific
 platform = get_current_platform()
 
 if platform == 'ev3':
-    from ev3dev._platform.ev3 import LEDS, LED_GROUPS, LED_COLORS
+    from ev3dev2._platform.ev3 import LEDS, LED_GROUPS, LED_COLORS
 
 elif platform == 'evb':
-    from ev3dev._platform.evb import LEDS, LED_GROUPS, LED_COLORS
+    from ev3dev2._platform.evb import LEDS, LED_GROUPS, LED_COLORS
 
 elif platform == 'pistorms':
-    from ev3dev._platform.pistorms import LEDS, LED_GROUPS, LED_COLORS
+    from ev3dev2._platform.pistorms import LEDS, LED_GROUPS, LED_COLORS
 
 elif platform == 'brickpi':
-    from ev3dev._platform.brickpi import LEDS, LED_GROUPS, LED_COLORS
+    from ev3dev2._platform.brickpi import LEDS, LED_GROUPS, LED_COLORS
 
 elif platform == 'brickpi3':
-    from ev3dev._platform.brickpi3 import LEDS, LED_GROUPS, LED_COLORS
+    from ev3dev2._platform.brickpi3 import LEDS, LED_GROUPS, LED_COLORS
 
 elif platform == 'fake':
-    from ev3dev._platform.fake import LEDS, LED_GROUPS, LED_COLORS
+    from ev3dev2._platform.fake import LEDS, LED_GROUPS, LED_COLORS
 
 else:
     raise Exception("Unsupported platform '%s'" % platform)
