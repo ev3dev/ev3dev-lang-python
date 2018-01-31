@@ -78,12 +78,9 @@ class Led(Device):
     'desc',
     ]
 
-    def __init__(self, address=None,
+    def __init__(self,
                  name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False,
                  desc='LED', **kwargs):
-
-        if address is not None:
-            kwargs['address'] = address
         super(Led, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
         self._max_brightness = None
