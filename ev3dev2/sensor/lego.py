@@ -439,13 +439,32 @@ class UltrasonicSensor(Sensor):
         super(UltrasonicSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-us', 'lego-nxt-us'], **kwargs)
 
     @property
+    def distance_centimeters_continuous(self):
+        self.mode = self.MODE_US_DIST_CM
+        return self.value(0) * self._scale('US_DIST_CM')
+
+    @property
+    def distance_centimeters_ping(self):
+        self.mode = self.MODE_US_SI_CM
+        return self.value(0) * self._scale('US_DIST_CM')
+
+    @property
     def distance_centimeters(self):
         """
         Measurement of the distance detected by the sensor,
         in centimeters.
         """
-        self.mode = self.MODE_US_DIST_CM
-        return self.value(0) * self._scale('US_DIST_CM')
+        return self.distance_centimeters_continuous
+
+    @property
+    def distance_inches_continuous(self):
+        self.mode = self.MODE_US_DIST_IN
+        return self.value(0) * self._scale('US_DIST_IN')
+
+    @property
+    def distance_inches_ping(self):
+        self.mode = self.MODE_US_SI_IN
+        return self.value(0) * self._scale('US_DIST_IN')
 
     @property
     def distance_inches(self):
@@ -453,8 +472,7 @@ class UltrasonicSensor(Sensor):
         Measurement of the distance detected by the sensor,
         in inches.
         """
-        self.mode = self.MODE_US_DIST_IN
-        return self.value(0) * self._scale('US_DIST_IN')
+        return self.distance_inches_continuous
 
     @property
     def other_sensor_present(self):
@@ -463,7 +481,7 @@ class UltrasonicSensor(Sensor):
         be heard nearby.
         """
         self.mode = self.MODE_US_LISTEN
-        return self.value(0)
+        return bool(self.value(0))
 
 
 class GyroSensor(Sensor):
