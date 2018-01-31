@@ -80,7 +80,7 @@ class Led(Device):
 
     def __init__(self,
                  name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False,
-                 desc='LED', **kwargs):
+                 desc=None, **kwargs):
         super(Led, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
         self._max_brightness = None
@@ -92,7 +92,10 @@ class Led(Device):
         self.desc = desc
 
     def __str__(self):
-        return self.desc
+        if self.desc:
+            return self.desc
+        else:
+            return Device.__str__(self)
 
     @property
     def max_brightness(self):
@@ -278,6 +281,9 @@ class Leds(object):
 
             for led_name in value:
                 self.led_groups[key].append(self.leds[led_name])
+
+    def __str__(self):
+        return self.__class__.__name__
 
     def set_color(self, group, color, pct=1):
         """
