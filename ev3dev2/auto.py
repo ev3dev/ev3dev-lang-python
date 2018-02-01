@@ -36,10 +36,6 @@ else:
     raise Exception("Unsupported platform '%s'" % platform)
 
 from ev3dev2.button import *
-from ev3dev2.control import *
-from ev3dev2.control.GyroBalancer  import *
-from ev3dev2.control.rc_tank import *
-from ev3dev2.control.webserver import *
 from ev3dev2.display import *
 from ev3dev2.fonts import *
 from ev3dev2.led import *
