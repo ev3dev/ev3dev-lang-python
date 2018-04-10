@@ -71,8 +71,8 @@ def git_version(abbrev=4):
     if version != release_version:
         write_release_version(version)
 
-    # Update the ev3dev/version.py
-    with open('{}/ev3dev/version.py'.format(os.path.dirname(__file__)), 'w') as f:
+    # Update the ev3dev2/version.py
+    with open('{}/ev3dev2/version.py'.format(os.path.dirname(__file__)), 'w') as f:
         f.write("__version__ = '{}'".format(version))
 
     # Finally, return the current version.

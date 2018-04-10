@@ -5,7 +5,7 @@ Used to adjust the position of a motor in an already assembled robot
 where you can"t move the motor by hand.
 """
 
-from ev3dev.auto import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D, Motor
+from ev3dev2.motor import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D, Motor
 import argparse
 import logging
 import sys
@@ -32,10 +32,6 @@ elif args.motor == "D":
     motor = Motor(OUTPUT_D)
 else:
     raise Exception("%s is invalid, options are A, B, C, D")
-
-if not motor.connected:
-    log.error("%s is not connected" % motor)
-    sys.exit(1)
 
 if args.degrees:
     log.info("Motor %s, current position %d, move to position %d, max speed %d" %

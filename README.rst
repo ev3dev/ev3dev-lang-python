@@ -1,11 +1,14 @@
 Python language bindings for ev3dev
 ===================================
 
-.. image:: https://travis-ci.org/rhempel/ev3dev-lang-python.svg?branch=master
-    :target: https://travis-ci.org/rhempel/ev3dev-lang-python
+.. image:: https://travis-ci.org/ev3dev/ev3dev-lang-python.svg?branch=master
+    :target: https://travis-ci.org/ev3dev/ev3dev-lang-python
 .. image:: https://readthedocs.org/projects/python-ev3dev/badge/?version=stable
     :target: http://python-ev3dev.readthedocs.org/en/stable/?badge=stable
     :alt: Documentation Status
+.. image:: https://badges.gitter.im/ev3dev/chat.svg
+    :target: https://gitter.im/ev3dev/chat
+    :alt: Chat at https://gitter.im/ev3dev/chat
 
 A Python3 library implementing an interface for ev3dev_ devices,
 letting you control motors, sensors, hardware buttons, LCD
@@ -168,16 +171,10 @@ Support
     what you are trying to do and what you have tried. The issue template
     is in place to guide you through this process.
 
-Demo Robot
-    Laurens Valk of robot-square_ has been kind enough to allow us to
-    reference his excellent `EXPLOR3R`_ robot. Consider building the
-    `EXPLOR3R`_ and running the demo programs referenced below to get
-    familiar with what Python programs using this binding look like.
-
 Demo Code
-    There are `demo programs`_ that you can run to get acquainted with
-    this language binding. The programs are designed to work with the
-    `EXPLOR3R`_ robot.
+    There are several demo programs that you can run to get acquainted with
+    this language binding. The programs are available at
+    https://github.com/ev3dev/ev3dev-lang-python-demo
 
 Upgrading this Library
 ----------------------

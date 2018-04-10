@@ -4,6 +4,7 @@ python:
 sudo: false
 install:
 - pip install Pillow
+- pip install evdev
 script:
 - ./tests/api_tests.py
 deploy:
