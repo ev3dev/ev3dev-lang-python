@@ -1,16 +1,14 @@
-import pkg_resources
 import os.path
+from glob import glob
 from PIL import ImageFont
 
 def available():
     """
     Returns list of available font names.
     """
-    names = []
-    for f in pkg_resources.resource_listdir('ev3dev.fonts', ''):
-        name, ext = os.path.splitext(os.path.basename(f))
-        if ext == '.pil':
-            names.append(name)
+    font_dir = os.path.dirname(__file__)
+    names = [os.path.basename(os.path.splitext(f)[0])
+            for f in glob(os.path.join(font_dir, '*.pil'))]
     return sorted(names)
 
 def load(name):
@@ -20,8 +18,9 @@ def load(name):
     class.
     """
     try:
-        pil_file = pkg_resources.resource_filename('ev3dev.fonts', '{}.pil'.format(name))
-        pbm_file = pkg_resources.resource_filename('ev3dev.fonts', '{}.pbm'.format(name))
+        font_dir = os.path.dirname(__file__)
+        pil_file = os.path.join(font_dir, '{}.pil'.format(name))
+        pbm_file = os.path.join(font_dir, '{}.pbm'.format(name))
         return ImageFont.load(pil_file)
     except FileNotFoundError:
         raise Exception('Failed to load font "{}". '.format(name) +
