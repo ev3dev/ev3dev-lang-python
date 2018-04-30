@@ -3451,7 +3451,7 @@ class Sound:
             cmd_line = '/usr/bin/espeak --stdout {0} "{1}"'.format(espeak_opts, text)
             espeak = Popen(shlex.split(cmd_line), stdout=PIPE)
             play = Popen(['/usr/bin/aplay', '-q'], stdin=espeak.stdout, stdout=n)
-            return espeak
+            return play
 
     @staticmethod
     def _get_channel():
