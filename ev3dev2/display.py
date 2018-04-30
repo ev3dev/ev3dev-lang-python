@@ -33,6 +33,7 @@ import mmap
 import ctypes
 from PIL import Image, ImageDraw
 from . import fonts
+from . import get_current_platform
 from struct import pack
 import fcntl
 
@@ -195,12 +196,16 @@ class Display(FbMem):
     def __init__(self, desc='Display'):
         FbMem.__init__(self)
 
-        if self.var_info.bits_per_pixel == 1:
+        self.platform = get_current_platform()
+
+        if self.platform == "ev3" and self.var_info.bits_per_pixel == 1:
+            # Pre 4.14 kernel
             im_type = "1"
-        elif self.var_info.bits_per_pixel == 16:
-            im_type = "RGB"
-        elif self.var_info.bits_per_pixel == 32:
+        elif self.platform == "ev3" and self.var_info.bits_per_pixel == 32:
+            # Post 4.14 kernel
             im_type = "L"
+        elif self.platform == "pistorms" and self.var_info.bits_per_pixel == 16:
+            im_type = "RGB"
         else:
             raise Exception("Not supported")
 
@@ -290,13 +295,15 @@ class Display(FbMem):
         Applies pending changes to the screen.
         Nothing will be drawn on the screen until this function is called.
         """
-        if self.var_info.bits_per_pixel == 1:
+        if self.platform == "ev3" and self.var_info.bits_per_pixel == 1:
+            # Pre 4.14 kernel
             b = self._img.tobytes("raw", "1;R")
             self.mmap[:len(b)] = b
-        elif self.var_info.bits_per_pixel == 16:
-            self.mmap[:] = self._img_to_rgb565_bytes()
-        elif self.var_info.bits_per_pixel == 32:
+        elif self.platform == "ev3" and self.var_info.bits_per_pixel == 32:
+            # Post 4.14 kernel
             self.mmap[:] = self._img_to_xrgb_bytes()
+        elif self.platform == "pistorms" and self.var_info.bits_per_pixel == 16:
+            self.mmap[:] = self._img_to_rgb565_bytes()
         else:
             raise Exception("Not supported")
 
