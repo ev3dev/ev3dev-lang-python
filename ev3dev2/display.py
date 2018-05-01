@@ -198,14 +198,12 @@ class Display(FbMem):
 
         self.platform = get_current_platform()
 
-        if self.platform == "ev3" and self.var_info.bits_per_pixel == 1:
-            # Pre 4.14 kernel
+        if self.var_info.bits_per_pixel == 1:
             im_type = "1"
-        elif self.platform == "ev3" and self.var_info.bits_per_pixel == 32:
-            # Post 4.14 kernel
-            im_type = "L"
-        elif self.platform == "pistorms" and self.var_info.bits_per_pixel == 16:
+        elif self.var_info.bits_per_pixel == 16:
             im_type = "RGB"
+        elif self.platform == "ev3" and self.var_info.bits_per_pixel == 32:
+            im_type = "L"
         else:
             raise Exception("Not supported")
 
@@ -295,15 +293,13 @@ class Display(FbMem):
         Applies pending changes to the screen.
         Nothing will be drawn on the screen until this function is called.
         """
-        if self.platform == "ev3" and self.var_info.bits_per_pixel == 1:
-            # Pre 4.14 kernel
+        if self.var_info.bits_per_pixel == 1:
             b = self._img.tobytes("raw", "1;R")
             self.mmap[:len(b)] = b
-        elif self.platform == "ev3" and self.var_info.bits_per_pixel == 32:
-            # Post 4.14 kernel
-            self.mmap[:] = self._img_to_xrgb_bytes()
-        elif self.platform == "pistorms" and self.var_info.bits_per_pixel == 16:
+        elif self.var_info.bits_per_pixel == 16:
             self.mmap[:] = self._img_to_rgb565_bytes()
+        elif self.platform == "ev3" and self.var_info.bits_per_pixel == 32:
+            self.mmap[:] = self._img_to_xrgb_bytes()
         else:
             raise Exception("Not supported")
 
