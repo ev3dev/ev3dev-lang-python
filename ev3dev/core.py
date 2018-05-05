@@ -3244,8 +3244,19 @@ class Screen(FbMem):
         from PIL import Image, ImageDraw
         FbMem.__init__(self)
 
-        self._img = Image.new(
-                self.var_info.bits_per_pixel == 1 and "1" or "RGB",
+        if self.var_info.bits_per_pixel == 1:
+            im_type = "1"
+        elif self.var_info.bits_per_pixel == 16:
+            im_type = "RGB"
+        elif self.var_info.bits_per_pixel == 32:
+            # EV3 LCD is currently only screen that identifies as 32bpp, but
+            # it is really 2bpp grayscal. "L" is 8bpp grayscale, which is the
+            # closest match in PIL
+            im_type = "L"
+        else:
+            raise RuntimeError("Screen color depth not supported")
+
+        self._img = Image.new(im_type,
                 (self.fix_info.line_length * 8 // self.var_info.bits_per_pixel, self.yres),
                 "white")
 
@@ -3311,6 +3322,11 @@ class Screen(FbMem):
         pixels = [self._color565(r, g, b) for (r, g, b) in self._img.getdata()]
         return pack('H' * len(pixels), *pixels)
 
+    def _img_to_xrgb_bytes(self):
+        # convert grayscale to XRGB
+        pixels = [0x010101 * v for v in self._img.getdata()]
+        return pack('I' * len(pixels), *pixels)
+
     def update(self):
         """
         Applies pending changes to the screen.
@@ -3321,6 +3337,8 @@ class Screen(FbMem):
             self.mmap[:len(b)] = b
         elif self.var_info.bits_per_pixel == 16:
             self.mmap[:] = self._img_to_rgb565_bytes()
+        elif self.var_info.bits_per_pixel == 32:
+            self.mmap[:] = self._img_to_xrgb_bytes()
         else:
             raise Exception("Not supported")
 
