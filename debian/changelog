@@ -1,3 +1,16 @@
+python-ev3dev (1.2.0) stable; urgency=medium
+
+  [ Denis Demidov ]
+  * Return handle to aplay in Sound.espeak
+
+  [ David Lechner ]
+  * Update BrickPi port names for 4.14 kernel
+  * Fix brickpi led names
+  * brickpi3 support
+  * Fix EV3 framebuffer for 4.14 kernel
+
+ -- David Lechner <david@lechnology.com>  Sat, 05 May 2018 10:37:02 -0500
+
 python-ev3dev (1.1.1) testing; urgency=medium
 
   [Denis Demidov]
