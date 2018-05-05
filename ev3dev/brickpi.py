@@ -29,15 +29,15 @@ An assortment of classes modeling specific features of the BrickPi.
 from .core import *
 
 
-OUTPUT_A = 'ttyAMA0:MA'
-OUTPUT_B = 'ttyAMA0:MB'
-OUTPUT_C = 'ttyAMA0:MC'
-OUTPUT_D = 'ttyAMA0:MD'
+OUTPUT_A = 'serial0-0:MA'
+OUTPUT_B = 'serial0-0:MB'
+OUTPUT_C = 'serial0-0:MC'
+OUTPUT_D = 'serial0-0:MD'
 
-INPUT_1 = 'ttyAMA0:S1'
-INPUT_2 = 'ttyAMA0:S2'
-INPUT_3 = 'ttyAMA0:S3'
-INPUT_4 = 'ttyAMA0:S4'
+INPUT_1 = 'serial0-0:S1'
+INPUT_2 = 'serial0-0:S2'
+INPUT_3 = 'serial0-0:S3'
+INPUT_4 = 'serial0-0:S4'
 
 
 class Leds(object):
