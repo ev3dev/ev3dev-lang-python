@@ -4,6 +4,7 @@ python-ev3dev (1.2.0) stable; urgency=medium
   * Return handle to aplay in Sound.espeak
 
   [ David Lechner ]
+  * PiStorms support
   * Update BrickPi port names for 4.14 kernel
   * Fix brickpi led names
   * brickpi3 support
