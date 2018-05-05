@@ -282,7 +282,7 @@ class Display(FbMem):
         """Convert red, green, blue components to a 32-bit XRGB value. Components
         should be values 0 to 255.
         """
-        return ((v << 24) | (v << 16) | (v << 8))
+        return ((v << 16) | (v << 8) | v)
 
     def _img_to_xrgb_bytes(self):
         pixels = [self._color_xrgb(v) for v in self._img.getdata()]
