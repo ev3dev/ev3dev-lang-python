@@ -45,16 +45,14 @@ class Leds(object):
     The BrickPi LEDs.
     """
 
-# ~autogen led-colors platforms.brickpi.led>currentClass
+    blue_led1 = Led(name_pattern='led1:blue:brick-status')
+    blue_led2 = Led(name_pattern='led2:blue:brick-status')
 
-    blue_led1 = Led(name_pattern='brickpi:led1:blue:ev3dev')
-    blue_led2 = Led(name_pattern='brickpi:led2:blue:ev3dev')
+    LED1 = (blue_led1,)
+    LED2 = (blue_led2,)
 
-    LED1 = ( blue_led1, )
-    LED2 = ( blue_led2, )
-
-    BLACK = ( 0, )
-    BLUE = ( 1, )
+    BLACK = (0,)
+    BLUE = (1,)
 
     @staticmethod
     def set_color(group, color, pct=1):
@@ -90,6 +88,3 @@ class Leds(object):
         """
         Leds.blue_led1.brightness = 0
         Leds.blue_led2.brightness = 0
-
-
-# ~autogen
