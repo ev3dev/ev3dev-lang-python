@@ -31,8 +31,9 @@ if sys.version_info < (3,4):
 import os
 import mmap
 import ctypes
-import ev3dev.fonts as fonts
 from PIL import Image, ImageDraw
+from . import fonts
+from . import get_current_platform
 from struct import pack
 import fcntl
 
@@ -195,8 +196,19 @@ class Display(FbMem):
     def __init__(self, desc='Display'):
         FbMem.__init__(self)
 
+        self.platform = get_current_platform()
+
+        if self.var_info.bits_per_pixel == 1:
+            im_type = "1"
+        elif self.var_info.bits_per_pixel == 16:
+            im_type = "RGB"
+        elif self.platform == "ev3" and self.var_info.bits_per_pixel == 32:
+            im_type = "L"
+        else:
+            raise Exception("Not supported")
+
         self._img = Image.new(
-                self.var_info.bits_per_pixel == 1 and "1" or "RGB",
+                im_type,
                 (self.fix_info.line_length * 8 // self.var_info.bits_per_pixel, self.yres),
                 "white")
 
@@ -266,6 +278,16 @@ class Display(FbMem):
         pixels = [self._color565(r, g, b) for (r, g, b) in self._img.getdata()]
         return pack('H' * len(pixels), *pixels)
 
+    def _color_xrgb(self, v):
+        """Convert red, green, blue components to a 32-bit XRGB value. Components
+        should be values 0 to 255.
+        """
+        return ((v << 16) | (v << 8) | v)
+
+    def _img_to_xrgb_bytes(self):
+        pixels = [self._color_xrgb(v) for v in self._img.getdata()]
+        return pack('I' * len(pixels), *pixels)
+
     def update(self):
         """
         Applies pending changes to the screen.
@@ -276,6 +298,8 @@ class Display(FbMem):
             self.mmap[:len(b)] = b
         elif self.var_info.bits_per_pixel == 16:
             self.mmap[:] = self._img_to_rgb565_bytes()
+        elif self.platform == "ev3" and self.var_info.bits_per_pixel == 32:
+            self.mmap[:] = self._img_to_xrgb_bytes()
         else:
             raise Exception("Not supported")
 
