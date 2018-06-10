@@ -1688,6 +1688,9 @@ class MotorSet(object):
 
 
 class MoveTank(MotorSet):
+    """
+    Controls a pair of motors simultaneously, via individual speed setpoints for each motor.
+    """
 
     def __init__(self, left_motor_port, right_motor_port, desc=None, motor_class=LargeMotor):
         motor_specs = {
@@ -1716,12 +1719,20 @@ class MoveTank(MotorSet):
 
     def on_for_rotations(self, left_speed_pct, right_speed_pct, rotations, brake=True, block=True):
         """
-        Rotate the motor at 'left_speed & right_speed' for 'rotations'
+        Rotate the motors at 'left_speed & right_speed' for 'rotations'.
+
+        If the left speed is not equal to the right speed (i.e., the robot will
+        turn), the motor on the outside of the turn will rotate for the full
+        ``rotations`` while the motor on the inside will have its requested
+        distance calculated according to the expected turn.
         """
         self._validate_speed_pct(left_speed_pct, right_speed_pct)
         left_speed = int((left_speed_pct * self.max_speed) / 100)
         right_speed = int((right_speed_pct * self.max_speed) / 100)
 
+        # proof of the following distance calculation: consider the circle formed by each wheel's path
+        # v_l = d_l/t, v_r = d_r/t
+        # therefore, t = d_l/v_l = d_r/v_r
         if left_speed > right_speed:
             left_rotations = rotations
             right_rotations = abs(float(right_speed / left_speed)) * rotations
@@ -1746,7 +1757,12 @@ class MoveTank(MotorSet):
 
     def on_for_degrees(self, left_speed_pct, right_speed_pct, degrees, brake=True, block=True):
         """
-        Rotate the motor at 'left_speed & right_speed' for 'degrees'
+        Rotate the motors at 'left_speed & right_speed' for 'degrees'.
+
+        If the left speed is not equal to the right speed (i.e., the robot will
+        turn), the motor on the outside of the turn will rotate for the full
+        ``degrees`` while the motor on the inside will have its requested
+        distance calculated according to the expected turn.
         """
         self._validate_speed_pct(left_speed_pct, right_speed_pct)
         left_speed = int((left_speed_pct * self.max_speed) / 100)
@@ -1776,7 +1792,7 @@ class MoveTank(MotorSet):
 
     def on_for_seconds(self, left_speed_pct, right_speed_pct, seconds, brake=True, block=True):
         """
-        Rotate the motor at 'left_speed & right_speed' for 'seconds'
+        Rotate the motors at 'left_speed & right_speed' for 'seconds'
         """
         self._validate_speed_pct(left_speed_pct, right_speed_pct)
 
@@ -1797,7 +1813,7 @@ class MoveTank(MotorSet):
 
     def on(self, left_speed_pct, right_speed_pct):
         """
-        Rotate the motor at 'left_speed & right_speed' for forever
+        Start rotating the motors according to ``left_speed_pct`` and ``right_speed_pct`` forever.
         """
         self._validate_speed_pct(left_speed_pct, right_speed_pct)
         self.left_motor.speed_sp = int((left_speed_pct * self.max_speed) / 100)
@@ -1808,6 +1824,10 @@ class MoveTank(MotorSet):
         self.right_motor.run_forever()
 
     def off(self, brake=True):
+        """
+        Stop both motors immediately. Configure both to brake if ``brake`` is
+        set.
+        """
         self.left_motor._set_brake(brake)
         self.right_motor._set_brake(brake)
         self.left_motor.stop()
@@ -1815,20 +1835,43 @@ class MoveTank(MotorSet):
 
 
 class MoveSteering(MoveTank):
+    """
+    Controls a pair of motors simultaneously, via a single "steering" value.
 
+    steering [-100, 100]:
+        * -100 means turn left as fast as possible,
+        *  0   means drive in a straight line, and
+        *  100 means turn right as fast as possible.
+    """
     def on_for_rotations(self, steering, speed_pct, rotations, brake=True, block=True):
+        """
+        Rotate the motors according to the provided ``steering``.
+
+        The distance each motor will travel follows the rules of :meth:`MoveTank.on_for_rotations`.
+        """
         (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
         MoveTank.on_for_rotations(self, left_speed_pct, right_speed_pct, rotations, brake, block)
 
     def on_for_degrees(self, steering, speed_pct, degrees, brake=True, block=True):
+        """
+        Rotate the motors according to the provided ``steering``.
+
+        The distance each motor will travel follows the rules of :meth:`MoveTank.on_for_degrees`.
+        """
         (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
         MoveTank.on_for_degrees(self, left_speed_pct, right_speed_pct, degrees, brake, block)
 
     def on_for_seconds(self, steering, speed_pct, seconds, brake=True, block=True):
+        """
+        Rotate the motors according to the provided ``steering`` for ``seconds``.
+        """
         (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
         MoveTank.on_for_seconds(self, left_speed_pct, right_speed_pct, seconds, brake, block)
 
     def on(self, steering, speed_pct):
+        """
+        Start rotating the motors according to the provided ``steering`` forever.
+        """
         (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
         MoveTank.on(self, left_speed_pct, right_speed_pct)
 
@@ -1874,9 +1917,8 @@ class MoveSteering(MoveTank):
 
 class MoveJoystick(MoveTank):
     """
-    Used to control a pair of motors via a single joystick (X/Y pair)
+    Used to control a pair of motors via a single joystick vector.
     """
-
 
     def on(self, x, y, max_speed, radius=100.0):
         """
@@ -1925,7 +1967,8 @@ class MoveJoystick(MoveTank):
     def angle_to_speed_percentage(angle):
         """
         The following graphic illustrates the **motor power outputs** for the
-        left and right motors based on where the joystick is pointing::
+        left and right motors based on where the joystick is pointing, of the
+        form ``(left power, right power)``::
 
                                      (1, 1)
                                   . . . . . . .
