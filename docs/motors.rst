@@ -11,10 +11,24 @@ Units
 Most methods which run motors with accept a ``speed_pct`` argument. While this can be provided as an integer which will be interpreted as a percentage of max speed, you can also specify an instance of any of the following classes, each of which represents a different unit system:
 
 .. autoclass:: SpeedInteger
+.. autoclass:: SpeedPercent
 .. autoclass:: SpeedRPS
 .. autoclass:: SpeedRPM
 .. autoclass:: SpeedDPS
 .. autoclass:: SpeedDPM
+
+Example:
+
+.. code:: python
+
+    from ev3dev2.motor import SpeedRPM
+    
+    # later...
+
+    # rotates the motor at 200 RPM (rotations-per-minute) for five seconds.
+    my_motor.on_for_seconds(SpeedRPM(200), 5)
+
+
 
 Common motors
 -------------

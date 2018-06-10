@@ -70,10 +70,24 @@ else:
 class SpeedInteger(int):
     """
     A base class for other unit types. Don't use this directly; instead, see
-    :class:`SpeedRPS`, :class:`SpeedRPM`, :class:`SpeedDPS`, and
-    :class:`SpeedDPM`.
+    :class:`SpeedPercent`, :class:`SpeedRPS`, :class:`SpeedRPM`,
+    :class:`SpeedDPS`, and :class:`SpeedDPM`.
     """
     pass
+
+class SpeedPercent(SpeedInteger):
+    """
+    Speed as a percentage of the motor's maximum rated speed.
+    """
+
+    def __str__(self):
+        return ("%d%%" % self)
+
+    def get_speed_pct(self, motor):
+        """
+        Return the motor speed percentage represented by this SpeedPercent
+        """
+        return self
 
 
 class SpeedRPS(SpeedInteger):
@@ -853,7 +867,7 @@ class Motor(Device):
 
     def on_for_rotations(self, speed_pct, rotations, brake=True, block=True):
         """
-        Rotate the motor at 'speed_pct' for 'rotations'
+        Rotate the motor at ``speed_pct`` for ``rotations``
 
         ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
         object, enabling use of other units.
@@ -876,7 +890,7 @@ class Motor(Device):
 
     def on_for_degrees(self, speed_pct, degrees, brake=True, block=True):
         """
-        Rotate the motor at 'speed_pct' for 'degrees'
+        Rotate the motor at ``speed_pct`` for ``degrees``
 
         ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
         object, enabling use of other units.
@@ -899,9 +913,9 @@ class Motor(Device):
 
     def on_to_position(self, speed_pct, position, brake=True, block=True):
         """
-        Rotate the motor at 'speed_pct' to 'position'
+        Rotate the motor at ``speed_pct`` to ``position``
 
-       ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
+        ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
         object, enabling use of other units.
         """
         speed_pct = self._speed_pct(speed_pct)
@@ -922,7 +936,7 @@ class Motor(Device):
 
     def on_for_seconds(self, speed_pct, seconds, brake=True, block=True):
         """
-        Rotate the motor at 'speed_pct' for 'seconds'
+        Rotate the motor at ``speed_pct`` for ``seconds``
 
         ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
         object, enabling use of other units.
@@ -945,7 +959,7 @@ class Motor(Device):
 
     def on(self, speed_pct, brake=True, block=False):
         """
-        Rotate the motor at 'speed_pct' for forever
+        Rotate the motor at ``speed_pct`` for forever
 
         ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
         object, enabling use of other units.
