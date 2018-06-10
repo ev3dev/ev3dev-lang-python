@@ -40,7 +40,7 @@ Make sure that you look at the `User Resources`_ section as well for links
 to documentation and larger examples.
 
 Usage
---------------
+-----
 
 To start out, you'll need a way to work with Python. We recommend the
 `ev3dev Visual Studio Code extension`_. If you're interested in using that,
@@ -77,15 +77,14 @@ Important: Make your script executable
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To be able to run your Python file, **your program must be executable**. If
-you're using the `ev3dev Visual Studio Code extension`_, this step will be
-automatically performed when you download your code to the brick. **You can
-skip this step.**
+you are using the `ev3dev Visual Studio Code extension`_, you can skip this step,
+as it will beautomatically performed when you download your code to the brick.
 
 **To mark a program as executable from the command line (often an SSH session),
 run **``chmod +x my-file.py``.
 
 You can now run ``my-file.py`` via the Brickman File Browser or you can run it
-from the command line by preceding the file name with ``./``: ``$ ./my-file.py``
+from the command line by preceding the file name with ``./``: ``./my-file.py``
 
 Controlling the LEDs with a touch sensor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

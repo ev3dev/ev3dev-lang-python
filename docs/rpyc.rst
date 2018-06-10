@@ -58,7 +58,7 @@ use RPyC with ev3dev:
 
        import rpyc
        conn = rpyc.classic.connect('ev3dev') # host name or IP address of the EV3
-       ev3 = conn.modules['ev3dev.ev3']      # import ev3dev.ev3 remotely
+       ev3 = conn.modules['ev3dev2.ev3']      # import ev3dev2.ev3 remotely
        m = ev3.LargeMotor('outA')
        m.run_timed(time_sp=1000, speed_sp=600)
 

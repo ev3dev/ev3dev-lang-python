@@ -68,12 +68,17 @@ else:
 
 
 class SpeedInteger(int):
+    """
+    A base class for other unit types. Don't use this directly; instead, see
+    :class:`SpeedRPS`, :class:`SpeedRPM`, :class:`SpeedDPS`, and
+    :class:`SpeedDPM`.
+    """
     pass
 
 
 class SpeedRPS(SpeedInteger):
     """
-    Speed in rotations-per-second
+    Speed in rotations-per-second.
     """
 
     def __str__(self):
@@ -89,7 +94,7 @@ class SpeedRPS(SpeedInteger):
 
 class SpeedRPM(SpeedInteger):
     """
-    Speed in rotations-per-minute
+    Speed in rotations-per-minute.
     """
 
     def __str__(self):
@@ -105,7 +110,7 @@ class SpeedRPM(SpeedInteger):
 
 class SpeedDPS(SpeedInteger):
     """
-    Speed in degrees-per-second
+    Speed in degrees-per-second.
     """
 
     def __str__(self):
@@ -121,7 +126,7 @@ class SpeedDPS(SpeedInteger):
 
 class SpeedDPM(SpeedInteger):
     """
-    Speed in degrees-per-minute
+    Speed in degrees-per-minute.
     """
 
     def __str__(self):
@@ -850,8 +855,8 @@ class Motor(Device):
         """
         Rotate the motor at 'speed_pct' for 'rotations'
 
-        'speed_pct' can be an integer or a SpeedInteger object which will be
-        converted to an actual speed percentage in _speed_pct()
+        ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
+        object, enabling use of other units.
         """
         speed_pct = self._speed_pct(speed_pct)
 
@@ -873,8 +878,8 @@ class Motor(Device):
         """
         Rotate the motor at 'speed_pct' for 'degrees'
 
-        'speed_pct' can be an integer or a SpeedInteger object which will be
-        converted to an actual speed percentage in _speed_pct()
+        ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
+        object, enabling use of other units.
         """
         speed_pct = self._speed_pct(speed_pct)
 
@@ -896,8 +901,8 @@ class Motor(Device):
         """
         Rotate the motor at 'speed_pct' to 'position'
 
-        'speed_pct' can be an integer or a SpeedInteger object which will be
-        converted to an actual speed percentage in _speed_pct()
+       ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
+        object, enabling use of other units.
         """
         speed_pct = self._speed_pct(speed_pct)
 
@@ -919,8 +924,8 @@ class Motor(Device):
         """
         Rotate the motor at 'speed_pct' for 'seconds'
 
-        'speed_pct' can be an integer or a SpeedInteger object which will be
-        converted to an actual speed percentage in _speed_pct()
+        ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
+        object, enabling use of other units.
         """
         speed_pct = self._speed_pct(speed_pct)
 
@@ -942,11 +947,11 @@ class Motor(Device):
         """
         Rotate the motor at 'speed_pct' for forever
 
-        'speed_pct' can be an integer or a SpeedInteger object which will be
-        converted to an actual speed percentage in _speed_pct()
+        ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
+        object, enabling use of other units.
 
         Note that `block` is False by default, this is different from the
-        other `on_for_XYZ` methods
+        other `on_for_XYZ` methods.
         """
         speed_pct = self._speed_pct(speed_pct)
 
@@ -998,7 +1003,9 @@ def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
 class LargeMotor(Motor):
 
     """
-    EV3/NXT large servo motor
+    EV3/NXT large servo motor.
+
+    Same as :class:`Motor`, except it will only successfully initialize if it finds a "large" motor.
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
@@ -1013,7 +1020,9 @@ class LargeMotor(Motor):
 class MediumMotor(Motor):
 
     """
-    EV3 medium servo motor
+    EV3 medium servo motor.
+
+    Same as :class:`Motor`, except it will only successfully initialize if it finds a "medium" motor.
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
@@ -1028,7 +1037,9 @@ class MediumMotor(Motor):
 class ActuonixL1250Motor(Motor):
 
     """
-    Actuonix L12 50 linear servo motor
+    Actuonix L12 50 linear servo motor.
+
+    Same as :class:`Motor`, except it will only successfully initialize if it finds an Actuonix L12 50 linear servo motor
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
@@ -1043,7 +1054,9 @@ class ActuonixL1250Motor(Motor):
 class ActuonixL12100Motor(Motor):
 
     """
-    Actuonix L12 100 linear servo motor
+    Actuonix L12 100 linear servo motor.
+
+    Same as :class:`Motor`, except it will only successfully initialize if it finds an Actuonix L12 100 linear servo motor
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
@@ -1789,6 +1802,22 @@ class MoveTank(MotorSet):
 
 class MoveSteering(MoveTank):
 
+    def on_for_rotations(self, steering, speed_pct, rotations, brake=True, block=True):
+        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
+        MoveTank.on_for_rotations(self, left_speed_pct, right_speed_pct, rotations, brake, block)
+
+    def on_for_degrees(self, steering, speed_pct, degrees, brake=True, block=True):
+        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
+        MoveTank.on_for_degrees(self, left_speed_pct, right_speed_pct, degrees, brake, block)
+
+    def on_for_seconds(self, steering, speed_pct, seconds, brake=True, block=True):
+        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
+        MoveTank.on_for_seconds(self, left_speed_pct, right_speed_pct, seconds, brake, block)
+
+    def on(self, steering, speed_pct):
+        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
+        MoveTank.on(self, left_speed_pct, right_speed_pct)
+
     def get_speed_steering(self, steering, speed_pct):
         """
         Calculate the speed_sp for each motor in a pair to achieve the specified
@@ -1828,52 +1857,84 @@ class MoveSteering(MoveTank):
 
         return (left_speed_pct, right_speed_pct)
 
-    def on_for_rotations(self, steering, speed_pct, rotations, brake=True, block=True):
-        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
-        MoveTank.on_for_rotations(self, left_speed_pct, right_speed_pct, rotations, brake, block)
-
-    def on_for_degrees(self, steering, speed_pct, degrees, brake=True, block=True):
-        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
-        MoveTank.on_for_degrees(self, left_speed_pct, right_speed_pct, degrees, brake, block)
-
-    def on_for_seconds(self, steering, speed_pct, seconds, brake=True, block=True):
-        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
-        MoveTank.on_for_seconds(self, left_speed_pct, right_speed_pct, seconds, brake, block)
-
-    def on(self, steering, speed_pct):
-        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
-        MoveTank.on(self, left_speed_pct, right_speed_pct)
-
 
 class MoveJoystick(MoveTank):
     """
-    Used to control a pair of motors via a joystick
+    Used to control a pair of motors via a single joystick (X/Y pair)
     """
 
-    def angle_to_speed_percentage(self, angle):
+
+    def on(self, x, y, max_speed, radius=100.0):
         """
-                                (1, 1)
-                             . . . . . . .
-                          .        |        .
-                       .           |           .
-              (0, 1) .             |             . (1, 0)
-                   .               |               .
-                  .                |                 .
-                 .                 |                  .
-                .                  |                   .
-               .                   |                   .
-               .                   |     x-axis        .
-       (-1, 1) .---------------------------------------. (1, -1)
-               .                   |                   .
-               .                   |                   .
-                .                  |                  .
-                 .                 | y-axis          .
-                   .               |               .
-             (0, -1) .             |             . (-1, 0)
-                       .           |           .
-                          .        |        .
-                             . . . . . . .
-                                (-1, -1)
+        Convert x,y joystick coordinates to left/right motor speed percentages
+        and move the motors
+        """
+
+        # If joystick is in the middle stop the tank
+        if not x and not y:
+            MoveTank.off()
+            return
+
+        vector_length = hypot(x, y)
+        angle = math_degrees(atan2(y, x))
+
+        if angle < 0:
+            angle += 360
+
+        # Should not happen but can happen (just by a hair) due to floating point math
+        if vector_length > radius:
+            vector_length = radius
+
+        (init_left_speed_percentage, init_right_speed_percentage) = MoveJoystick.angle_to_speed_percentage(angle)
+
+        # scale the speed percentages based on vector_length vs. radius
+        left_speed_percentage = (init_left_speed_percentage * vector_length) / radius
+        right_speed_percentage = (init_right_speed_percentage * vector_length) / radius
+
+        log.debug("""
+    x, y                         : %s, %s
+    radius                       : %s
+    angle                        : %s
+    vector length                : %s
+    init left_speed_percentage   : %s
+    init right_speed_percentage  : %s
+    final left_speed_percentage  : %s
+    final right_speed_percentage : %s
+    """ % (x, y, radius, angle, vector_length,
+            init_left_speed_percentage, init_right_speed_percentage,
+            left_speed_percentage, right_speed_percentage))
+
+        MoveTank.on(self, left_speed_percentage, right_speed_percentage)
+
+
+    @staticmethod
+    def angle_to_speed_percentage(angle):
+        """
+        The following graphic illustrates the **motor power outputs** for the
+        left and right motors based on where the joystick is pointing::
+
+                                     (1, 1)
+                                  . . . . . . .
+                               .        |        .
+                            .           |           .
+                   (0, 1) .             |             . (1, 0)
+                        .               |               .
+                       .                |                 .
+                      .                 |                  .
+                     .                  |                   .
+                    .                   |                   .
+                    .                   |     x-axis        .
+            (-1, 1) .---------------------------------------. (1, -1)
+                    .                   |                   .
+                    .                   |                   .
+                     .                  |                  .
+                      .                 | y-axis          .
+                        .               |               .
+                  (0, -1) .             |             . (-1, 0)
+                            .           |           .
+                               .        |        .
+                                  . . . . . . .
+                                     (-1, -1)
 
 
         The joystick is a circle within a circle where the (x, y) coordinates
@@ -1997,45 +2058,3 @@ class MoveJoystick(MoveTank):
             raise Exception('You created a circle with more than 360 degrees (%s)...that is quite the trick' % angle)
 
         return (left_speed_percentage * 100, right_speed_percentage * 100)
-
-    def on(self, x, y, max_speed, radius=100.0):
-        """
-        Convert x,y joystick coordinates to left/right motor speed percentages
-        and move the motors
-        """
-
-        # If joystick is in the middle stop the tank
-        if not x and not y:
-            MoveTank.off()
-            return
-
-        vector_length = hypot(x, y)
-        angle = math_degrees(atan2(y, x))
-
-        if angle < 0:
-            angle += 360
-
-        # Should not happen but can happen (just by a hair) due to floating point math
-        if vector_length > radius:
-            vector_length = radius
-
-        (init_left_speed_percentage, init_right_speed_percentage) = self.angle_to_speed_percentage(angle)
-
-        # scale the speed percentages based on vector_length vs. radius
-        left_speed_percentage = (init_left_speed_percentage * vector_length) / radius
-        right_speed_percentage = (init_right_speed_percentage * vector_length) / radius
-
-        log.debug("""
-    x, y                         : %s, %s
-    radius                       : %s
-    angle                        : %s
-    vector length                : %s
-    init left_speed_percentage   : %s
-    init right_speed_percentage  : %s
-    final left_speed_percentage  : %s
-    final right_speed_percentage : %s
-    """ % (x, y, radius, angle, vector_length,
-            init_left_speed_percentage, init_right_speed_percentage,
-            left_speed_percentage, right_speed_percentage))
-
-        MoveTank.on(self, left_speed_percentage, right_speed_percentage)

@@ -3,15 +3,15 @@ API reference
 
 Each class in ev3dev module inherits from the base :py:class:`Device` class.
 
-.. autoclass:: ev3dev.Device
+.. autoclass:: ev3dev2.Device
 
-.. autofunction:: ev3dev.list_device_names
+.. autofunction:: ev3dev2.list_device_names
 
-.. autofunction:: ev3dev.list_devices
+.. autofunction:: ev3dev2.list_devices
 
-.. autofunction:: ev3dev.list_motors
+.. autofunction:: ev3dev2.motor.list_motors
 
-.. autofunction:: ev3dev.list_sensors
+.. autofunction:: ev3dev2.sensor.list_sensors
 
 .. rubric:: Contents:
 
