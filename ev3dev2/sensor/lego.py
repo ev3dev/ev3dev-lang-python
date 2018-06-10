@@ -29,8 +29,8 @@ if sys.version_info < (3,4):
     raise SystemError('Must be using Python 3.4 or higher')
 
 import time
-from ev3dev.button import ButtonBase
-from ev3dev.sensor import Sensor
+from ev3dev2.button import ButtonBase
+from ev3dev2.sensor import Sensor
 
 
 class TouchSensor(Sensor):
@@ -114,7 +114,7 @@ class ColorSensor(Sensor):
     #: Reflected light. Red LED on.
     MODE_COL_REFLECT = 'COL-REFLECT'
 
-    #: Ambient light. Red LEDs off.
+    #: Ambient light. Blue LEDs on.
     MODE_COL_AMBIENT = 'COL-AMBIENT'
 
     #: Color. All LEDs rapidly cycling, appears white.
@@ -170,7 +170,7 @@ class ColorSensor(Sensor):
     )
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(ColorSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-color'], **kwargs)
+        super(ColorSensor, self).__init__(address, name_pattern, name_exact, driver_name='lego-ev3-color', **kwargs)
 
         # See calibrate_white() for more details
         self.red_max = 300
@@ -262,6 +262,124 @@ class ColorSensor(Sensor):
                 min(int((blue * 255) / self.blue_max), 255))
 
     @property
+    def lab(self):
+        """
+        Return colors in Lab color space
+        """
+        RGB = [0, 0, 0]
+        XYZ = [0, 0, 0]
+
+        for (num, value) in enumerate(self.rgb):
+            if value > 0.04045:
+                value = pow(((value + 0.055) / 1.055), 2.4)
+            else:
+                value = value / 12.92
+
+            RGB[num] = value * 100.0
+
+        # http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html
+        # sRGB
+        # 0.4124564  0.3575761  0.1804375
+        # 0.2126729  0.7151522  0.0721750
+        # 0.0193339  0.1191920  0.9503041
+        X = (RGB[0] * 0.4124564) + (RGB[1] * 0.3575761) + (RGB[2] * 0.1804375)
+        Y = (RGB[0] * 0.2126729) + (RGB[1] * 0.7151522) + (RGB[2] * 0.0721750)
+        Z = (RGB[0] * 0.0193339) + (RGB[1] * 0.1191920) + (RGB[2] * 0.9503041)
+
+        XYZ[0] = X / 95.047   # ref_X =  95.047
+        XYZ[1] = Y / 100.0    # ref_Y = 100.000
+        XYZ[2] = Z / 108.883  # ref_Z = 108.883
+
+        for (num, value) in enumerate(XYZ):
+            if value > 0.008856:
+                value = pow(value, (1.0 / 3.0))
+            else:
+                value = (7.787 * value) + (16 / 116.0)
+
+            XYZ[num] = value
+
+        L = (116.0 * XYZ[1]) - 16
+        a = 500.0 * (XYZ[0] - XYZ[1])
+        b = 200.0 * (XYZ[1] - XYZ[2])
+
+        L = round(L, 4)
+        a = round(a, 4)
+        b = round(b, 4)
+
+        return (L, a, b)
+
+    @property
+    def hsv(self):
+        """
+        HSV: Hue, Saturation, Value
+        H: position in the spectrum
+        S: color saturation ("purity")
+        V: color brightness
+        """
+        (r, g, b) = self.rgb
+        maxc = max(r, g, b)
+        minc = min(r, g, b)
+        v = maxc
+
+        if minc == maxc:
+            return 0.0, 0.0, v
+
+        s = (maxc-minc) / maxc
+        rc = (maxc-r) / (maxc-minc)
+        gc = (maxc-g) / (maxc-minc)
+        bc = (maxc-b) / (maxc-minc)
+
+        if r == maxc:
+            h = bc-gc
+        elif g == maxc:
+            h = 2.0+rc-bc
+        else:
+            h = 4.0+gc-rc
+
+        h = (h/6.0) % 1.0
+
+        return (h, s, v)
+
+    @property
+    def hls(self):
+        """
+        HLS: Hue, Luminance, Saturation
+        H: position in the spectrum
+        L: color lightness
+        S: color saturation
+        """
+        (r, g, b) = self.rgb
+        maxc = max(r, g, b)
+        minc = min(r, g, b)
+        l = (minc+maxc)/2.0
+
+        if minc == maxc:
+            return 0.0, l, 0.0
+
+        if l <= 0.5:
+            s = (maxc-minc) / (maxc+minc)
+        else:
+            if 2.0-maxc-minc == 0:
+                s = 0
+            else:
+                s = (maxc-minc) / (2.0-maxc-minc)
+
+        rc = (maxc-r) / (maxc-minc)
+        gc = (maxc-g) / (maxc-minc)
+        bc = (maxc-b) / (maxc-minc)
+
+        if r == maxc:
+            h = bc-gc
+        elif g == maxc:
+            h = 2.0+rc-bc
+        else:
+            h = 4.0+gc-rc
+
+        h = (h/6.0) % 1.0
+
+        return (h, l, s)
+
+    @property
     def red(self):
         """
         Red component of the detected color, in the range 0-1020.
@@ -321,13 +439,32 @@ class UltrasonicSensor(Sensor):
         super(UltrasonicSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-us', 'lego-nxt-us'], **kwargs)
 
     @property
+    def distance_centimeters_continuous(self):
+        self.mode = self.MODE_US_DIST_CM
+        return self.value(0) * self._scale('US_DIST_CM')
+
+    @property
+    def distance_centimeters_ping(self):
+        self.mode = self.MODE_US_SI_CM
+        return self.value(0) * self._scale('US_DIST_CM')
+
+    @property
     def distance_centimeters(self):
         """
         Measurement of the distance detected by the sensor,
         in centimeters.
         """
-        self.mode = self.MODE_US_DIST_CM
-        return self.value(0) * self._scale('US_DIST_CM')
+        return self.distance_centimeters_continuous
+
+    @property
+    def distance_inches_continuous(self):
+        self.mode = self.MODE_US_DIST_IN
+        return self.value(0) * self._scale('US_DIST_IN')
+
+    @property
+    def distance_inches_ping(self):
+        self.mode = self.MODE_US_SI_IN
+        return self.value(0) * self._scale('US_DIST_IN')
 
     @property
     def distance_inches(self):
@@ -335,8 +472,7 @@ class UltrasonicSensor(Sensor):
         Measurement of the distance detected by the sensor,
         in inches.
         """
-        self.mode = self.MODE_US_DIST_IN
-        return self.value(0) * self._scale('US_DIST_IN')
+        return self.distance_inches_continuous
 
     @property
     def other_sensor_present(self):
@@ -345,7 +481,7 @@ class UltrasonicSensor(Sensor):
         be heard nearby.
         """
         self.mode = self.MODE_US_LISTEN
-        return self.value(0)
+        return bool(self.value(0))
 
 
 class GyroSensor(Sensor):
@@ -388,7 +524,7 @@ class GyroSensor(Sensor):
     )
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(GyroSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-gyro'], **kwargs)
+        super(GyroSensor, self).__init__(address, name_pattern, name_exact, driver_name='lego-ev3-gyro', **kwargs)
         self._direct = None
 
     @property
@@ -494,6 +630,20 @@ class InfraredSensor(Sensor, ButtonBase):
 
     _BUTTONS = ('top_left', 'bottom_left', 'top_right', 'bottom_right', 'beacon')
 
+    # Button codes for doing rapid check of remote status
+    NO_BUTTON = 0
+    TOP_LEFT = 1
+    BOTTOM_LEFT = 2
+    TOP_RIGHT = 3
+    BOTTOM_RIGHT = 4
+    TOP_LEFT_TOP_RIGHT = 5
+    TOP_LEFT_BOTTOM_RIGHT = 6
+    BOTTOM_LEFT_TOP_RIGHT = 7
+    BOTTOM_LEFT_BOTTOM_RIGHT = 8
+    BEACON = 9
+    TOP_LEFT_BOTTOM_LEFT = 10
+    TOP_RIGHT_BOTTOM_RIGHT = 11
+
     # See process() for an explanation on how to use these
     #: Handles ``Red Up``, etc events on channel 1
     on_channel1_top_left = None
@@ -524,7 +674,7 @@ class InfraredSensor(Sensor, ButtonBase):
     on_channel4_beacon = None
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-ir'], **kwargs)
+        super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name='lego-ev3-ir', **kwargs)
 
     def _normalize_channel(self, channel):
         assert channel >= 1 and channel <= 4, "channel is %s, it must be 1, 2, 3, or 4" % channel
@@ -676,7 +826,7 @@ class SoundSensor(Sensor):
     )
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(SoundSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-nxt-sound'], **kwargs)
+        super(SoundSensor, self).__init__(address, name_pattern, name_exact, driver_name='lego-nxt-sound', **kwargs)
 
     @property
     def sound_pressure(self):
@@ -717,7 +867,7 @@ class LightSensor(Sensor):
     )
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(LightSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-nxt-light'], **kwargs)
+        super(LightSensor, self).__init__(address, name_pattern, name_exact, driver_name='lego-nxt-light', **kwargs)
 
     @property
     def reflected_light_intensity(self):

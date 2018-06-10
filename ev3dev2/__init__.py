@@ -124,13 +124,16 @@ def list_device_names(class_path, name_pattern, **kwargs):
                 yield f
 
 
+class DeviceNotFound(Exception):
+    pass
+
 # -----------------------------------------------------------------------------
 # Define the base class from which all other ev3dev classes are defined.
 
 class Device(object):
     """The ev3dev device base class"""
 
-    __slots__ = ['_path', 'connected', '_device_index', 'kwargs']
+    __slots__ = ['_path', '_device_index', 'kwargs']
 
     DEVICE_ROOT_PATH = '/sys/class'
 
@@ -158,7 +161,7 @@ class Device(object):
             d = ev3dev.Device('tacho-motor', address='outA')
             s = ev3dev.Device('lego-sensor', driver_name=['lego-ev3-us', 'lego-nxt-us'])
 
-        When connected succesfully, the `connected` attribute is set to True.
+        If there was no valid connected device, an error is thrown.
         """
 
         classpath = abspath(Device.DEVICE_ROOT_PATH + '/' + class_name)
@@ -174,23 +177,24 @@ class Device(object):
         if name_exact:
             self._path = classpath + '/' + name_pattern
             self._device_index = get_index(name_pattern)
-            self.connected = True
         else:
             try:
                 name = next(list_device_names(classpath, name_pattern, **kwargs))
                 self._path = classpath + '/' + name
                 self._device_index = get_index(name)
-                self.connected = True
             except StopIteration:
                 self._path = None
                 self._device_index = None
-                self.connected = False
+                raise DeviceNotFound("%s is not connected." % self) from None
 
     def __str__(self):
         if 'address' in self.kwargs:
             return "%s(%s)" % (self.__class__.__name__, self.kwargs.get('address'))
         else:
             return self.__class__.__name__
+    
+    def __repr__(self):
+        return self.__str__()
 
     def _attribute_file_open(self, name):
         path = os.path.join(self._path, name)
@@ -209,35 +213,27 @@ class Device(object):
 
     def _get_attribute(self, attribute, name):
         """Device attribute getter"""
-        if self.connected:
+        if attribute is None:
+            attribute = self._attribute_file_open( name )
+        else:
+            attribute.seek(0)
+        return attribute, attribute.read().strip().decode()
+
+    def _set_attribute(self, attribute, name, value):
+        """Device attribute setter"""
+        try:
             if attribute is None:
                 attribute = self._attribute_file_open( name )
             else:
                 attribute.seek(0)
-            return attribute, attribute.read().strip().decode()
-        else:
-            #log.info("%s: path %s, attribute %s" % (self, self._path, name))
-            raise Exception("%s is not connected" % self)
 
-    def _set_attribute(self, attribute, name, value):
-        """Device attribute setter"""
-        if self.connected:
-            try:
-                if attribute is None:
-                    attribute = self._attribute_file_open( name )
-                else:
-                    attribute.seek(0)
-
-                if isinstance(value, str):
-                    value = value.encode()
-                attribute.write(value)
-                attribute.flush()
-            except Exception as ex:
-                self._raise_friendly_access_error(ex, name)
-            return attribute
-        else:
-            #log.info("%s: path %s, attribute %s" % (self, self._path, name))
-            raise Exception("%s is not connected" % self)
+            if isinstance(value, str):
+                value = value.encode()
+            attribute.write(value)
+            attribute.flush()
+        except Exception as ex:
+            self._raise_friendly_access_error(ex, name)
+        return attribute
 
     def _raise_friendly_access_error(self, driver_error, attribute):
         if not isinstance(driver_error, OSError):
@@ -256,7 +252,7 @@ class Device(object):
             # We will assume that a file-not-found error is the result of a disconnected device
             # rather than a library error. If that isn't the case, at a minimum the underlying
             # error info will be printed for debugging.
-            raise Exception("%s is no longer connected" % self) from driver_error
+            raise DeviceNotFound("%s is no longer connected" % self) from driver_error
         raise driver_error
 
     def get_attr_int(self, attribute, name):

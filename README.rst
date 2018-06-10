@@ -1,11 +1,14 @@
 Python language bindings for ev3dev
 ===================================
 
-.. image:: https://travis-ci.org/rhempel/ev3dev-lang-python.svg?branch=master
-    :target: https://travis-ci.org/rhempel/ev3dev-lang-python
+.. image:: https://travis-ci.org/ev3dev/ev3dev-lang-python.svg?branch=master
+    :target: https://travis-ci.org/ev3dev/ev3dev-lang-python
 .. image:: https://readthedocs.org/projects/python-ev3dev/badge/?version=stable
     :target: http://python-ev3dev.readthedocs.org/en/stable/?badge=stable
     :alt: Documentation Status
+.. image:: https://badges.gitter.im/ev3dev/chat.svg
+    :target: https://gitter.im/ev3dev/chat
+    :alt: Chat at https://gitter.im/ev3dev/chat
 
 A Python3 library implementing an interface for ev3dev_ devices,
 letting you control motors, sensors, hardware buttons, LCD
