@@ -81,7 +81,7 @@ you are using the `ev3dev Visual Studio Code extension`_, you can skip this step
 as it will beautomatically performed when you download your code to the brick.
 
 **To mark a program as executable from the command line (often an SSH session),
-run **``chmod +x my-file.py``.
+run** ``chmod +x my-file.py``.
 
 You can now run ``my-file.py`` via the Brickman File Browser or you can run it
 from the command line by preceding the file name with ``./``: ``./my-file.py``
@@ -107,12 +107,19 @@ trying this out.
 Running a motor
 ~~~~~~~~~~~~~~~
 
-This will run a LEGO Large Motor at 75% power for 5 rotations.
+This will run a LEGO Large Motor at 75% of maximum speed for 5 rotations.
 
 .. code-block:: python
 
   m = LargeMotor(OUTPUT_A)
-  m.on_for_rotations(75, 5)
+  m.on_for_rotations(SpeedPercent(75), 5)
+
+You can also run a motor for a number of degrees, an amount of time, or simply
+start it and let it run until you tell it to stop. Additionally, other units are
+also available. See the following pages for more information:
+
+    - http://python-ev3dev.readthedocs.io/en/stretch/motors.html#ev3dev.motor.Motor.on_for_degrees
+    - http://python-ev3dev.readthedocs.io/en/stretch/motors.html#units
 
 Using text-to-speech
 ~~~~~~~~~~~~~~~~~~~~
