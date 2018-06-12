@@ -1690,6 +1690,14 @@ class MotorSet(object):
 class MoveTank(MotorSet):
     """
     Controls a pair of motors simultaneously, via individual speed setpoints for each motor.
+
+    Example:
+
+    .. code:: python
+
+        drive = MoveTank(OUTPUT_A, OUTPUT_B)
+        # drive in a turn for 10 rotations of the outer motor
+        drive.on_for_rotations(50, 75, 10)
     """
 
     def __init__(self, left_motor_port, right_motor_port, desc=None, motor_class=LargeMotor):
@@ -1842,6 +1850,14 @@ class MoveSteering(MoveTank):
         * -100 means turn left as fast as possible,
         *  0   means drive in a straight line, and
         *  100 means turn right as fast as possible.
+    
+    Example:
+
+    .. code:: python
+
+        drive = MoveSteering(OUTPUT_A, OUTPUT_B)
+        # drive in a turn for 10 rotations of the outer motor
+        drive.on_for_rotations(-20, 75, 10)
     """
     def on_for_rotations(self, steering, speed_pct, rotations, brake=True, block=True):
         """

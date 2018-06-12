@@ -25,19 +25,7 @@ your EV3 or other ev3dev device as explained in the `ev3dev Getting Started guid
 Make sure that you have a kernel version that includes ``-10-ev3dev`` or higher (a
 larger number). You can check the kernel version by selecting "About" in Brickman
 and scrolling down to the "kernel version". If you don't have a compatible version,
-`upgrade the kernel before continuing`_. Also note that if the ev3dev image you downloaded
-was created before September 2016, you probably don't have the most recent version of this
-library installed: see `Upgrading this Library`_ to upgrade it.
-
-Once you have booted ev3dev and `connected to your EV3 (or Raspberry Pi / BeagleBone)
-via SSH`_, you should be ready to start using ev3dev with Python: this library
-is included out-of-the-box. If you want to go through some basic usage examples,
-check out the `Usage Examples`_ section to try out motors, sensors and LEDs.
-Then look at `Writing Python Programs for Ev3dev`_ to see how you can save
-your Python code to a file.
-
-Make sure that you look at the `User Resources`_ section as well for links
-to documentation and larger examples.
+`upgrade the kernel before continuing`_.
 
 Usage
 -----
@@ -47,9 +35,10 @@ To start out, you'll need a way to work with Python. We recommend the
 check out our `Python + VSCode introduction tutorial`_ and then come back
 once you have that set up.
 
-Otherwise, you can can work with files via an SSH connection with an editor
+Otherwise, you can can work with files `via an SSH connection`_ with an editor
 such as `nano`_, use the Python interactive REPL (type ``python3``), or roll
-your own solution.
+your own solution. If you don't know how to do that, you are probably better off
+choosing the recommended option above.
 
 The template for a Python script
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -68,17 +57,19 @@ to get started:
 
 The first line should be included in every Python program you write
 for ev3dev. It allows you to run this program from Brickman, the graphical
-menu that you see on the device screen. You will need to add additional classes
-to the import list if you want to use other types of devices.
+menu that you see on the device screen. The other lines are import statements
+which give you access to the library functionality. You will need to add
+additional classes to the import list if you want to use other types of devices
+or additional utilities.
 
 You should use the ``.py`` extension for your file, e.g. ``my-file.py``.
 
-Important: Make your script executable
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Important: Make your script executable (non-Visual Studio Code only)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To be able to run your Python file, **your program must be executable**. If
 you are using the `ev3dev Visual Studio Code extension`_, you can skip this step,
-as it will beautomatically performed when you download your code to the brick.
+as it will be automatically performed when you download your code to the brick.
 
 **To mark a program as executable from the command line (often an SSH session),
 run** ``chmod +x my-file.py``.
@@ -124,7 +115,7 @@ also available. See the following pages for more information:
 Using text-to-speech
 ~~~~~~~~~~~~~~~~~~~~
 
-If you want to make your robot speak, you can use the `Sound.speak` method:
+If you want to make your robot speak, you can use the ``Sound.speak`` method:
 
 .. code-block:: python
   from ev3dev2.sound import Sound
@@ -215,7 +206,7 @@ Python 3 and this is the only version that will be supported from here forward.
 .. _ev3dev-getting-started: http://www.ev3dev.org/docs/getting-started/
 .. _upgrade the kernel before continuing: http://www.ev3dev.org/docs/tutorials/upgrading-ev3dev/
 .. _detailed instructions for USB connections: ev3dev-usb-internet_
-.. _connected to your EV3 (or Raspberry Pi / BeagleBone) via SSH: http://www.ev3dev.org/docs/tutorials/connecting-to-ev3dev-with-ssh/
+.. _via an SSH connection: http://www.ev3dev.org/docs/tutorials/connecting-to-ev3dev-with-ssh/
 .. _ev3dev-usb-internet: http://www.ev3dev.org/docs/tutorials/connecting-to-the-internet-via-usb/
 .. _our Read the Docs page: http://python-ev3dev.readthedocs.org/en/stable/
 .. _source repository for the generic API: ev3dev-lang_
