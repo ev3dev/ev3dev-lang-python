@@ -3,4 +3,4 @@
 	url = https://github.com/ev3dev/ev3dev-lang.git
 [submodule "tests/fake-sys"]
 	path = tests/fake-sys
-	url = https://github.com/rhempel/ev3dev-lang-fake-sys.git
+	url = https://github.com/ev3dev/ev3dev-lang-fake-sys.git
