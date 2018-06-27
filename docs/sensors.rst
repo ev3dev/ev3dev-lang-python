@@ -1,22 +1,14 @@
 Sensor classes
 ==============
 
-Sensor
-------
+.. contents:: :local:
 
-This is the base class all the other sensor classes are derived from.
-
-.. currentmodule:: ev3dev2.sensor
-
-.. autoclass:: Sensor
-    :members:
-
-Special sensor classes
+Dedicated sensor classes
 ----------------------
 
-The classes derive from :py:class:`Sensor` and provide helper functions
-specific to the corresponding sensor type. Each of the functions makes
-sure the sensor is in the required mode and then returns the specified value.
+These classes derive from :py:class:`Sensor` and provide helper functions
+specific to the corresponding sensor type. Each provides sensible property
+accessors for the main functionality of the sensor.
 
 ..
 
@@ -84,6 +76,19 @@ Light Sensor
     :show-inheritance:
 
 
+
+Base "Sensor"
+-------------
+
+This is the base class all the other sensor classes are derived from. You
+generally want to use one of the other classes instead, but if your sensor
+doesn't have a dedicated class, this is will let you interface with it as a
+generic device.
+
+.. currentmodule:: ev3dev2.sensor
+
+.. autoclass:: Sensor
+    :members:
 
 
 ..
