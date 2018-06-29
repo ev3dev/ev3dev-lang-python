@@ -1745,7 +1745,8 @@ class MoveTank(MotorSet):
 
     def on_for_rotations(self, left_speed, right_speed, rotations, brake=True, block=True):
         """
-        Rotate the motors at 'left_speed & right_speed' for 'rotations'.
+        Rotate the motors at 'left_speed & right_speed' for 'rotations'. Speeds
+        can be integer percentages or any SpeedInteger implementation.
 
         If the left speed is not equal to the right speed (i.e., the robot will
         turn), the motor on the outside of the turn will rotate for the full
@@ -1781,7 +1782,8 @@ class MoveTank(MotorSet):
 
     def on_for_degrees(self, left_speed, right_speed, degrees, brake=True, block=True):
         """
-        Rotate the motors at 'left_speed & right_speed' for 'degrees'.
+        Rotate the motors at 'left_speed & right_speed' for 'degrees'. Speeds
+        can be integer percentages or any SpeedInteger implementation.
 
         If the left speed is not equal to the right speed (i.e., the robot will
         turn), the motor on the outside of the turn will rotate for the full
@@ -1814,7 +1816,8 @@ class MoveTank(MotorSet):
 
     def on_for_seconds(self, left_speed, right_speed, seconds, brake=True, block=True):
         """
-        Rotate the motors at 'left_speed & right_speed' for 'seconds'
+        Rotate the motors at 'left_speed & right_speed' for 'seconds'. Speeds
+        can be integer percentages or any SpeedInteger implementation.
         """
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
@@ -1835,7 +1838,8 @@ class MoveTank(MotorSet):
 
     def on(self, left_speed, right_speed):
         """
-        Start rotating the motors according to ``left_speed_pct`` and ``right_speed_pct`` forever.
+        Start rotating the motors according to ``left_speed`` and ``right_speed`` forever.
+        Speeds can be integer percentages or any SpeedInteger implementation.
         """
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
@@ -1872,7 +1876,7 @@ class MoveSteering(MoveTank):
 
         drive = MoveSteering(OUTPUT_A, OUTPUT_B)
         # drive in a turn for 10 rotations of the outer motor
-        drive.on_for_rotations(-20, 75, 10)
+        drive.on_for_rotations(-20, SpeedPercent(75), 10)
     """
     def on_for_rotations(self, steering, speed, rotations, brake=True, block=True):
         """
@@ -1988,7 +1992,7 @@ class MoveJoystick(MoveTank):
     #         init_left_speed_percentage, init_right_speed_percentage,
     #         left_speed_percentage, right_speed_percentage))
 
-        MoveTank.on(self, SpeedPercent(left_speed_percentage * max_speed / 100), SpeedPercent(right_speed_percentage * max_speed / 100))
+        MoveTank.on(self, SpeedPercent(left_speed_percentage * self.left_motor._speed_pct(max_speed) / 100), SpeedPercent(right_speed_percentage * self.right_motor._speed_pct(max_speed) / 100))
 
 
     @staticmethod
