@@ -11,14 +11,19 @@ from clean_arena    import clean_arena
 
 import ev3dev2
 from ev3dev2.sensor.lego import InfraredSensor
-from ev3dev2.motor import MediumMotor
+from ev3dev2.motor import Motor, MediumMotor, MoveTank, MoveSteering, MoveJoystick, SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits, OUTPUT_A, OUTPUT_B
 
 ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
+
+def dummy_wait(self, cond, timeout=None):
+    pass
+
+Motor.wait = dummy_wait
 
 class TestAPI(unittest.TestCase):
     def test_device(self):
         clean_arena()
-        populate_arena({'medium_motor' : [0, 'outA'], 'infrared_sensor' : [0, 'in1']})
+        populate_arena([('medium_motor', 0, 'outA'), ('infrared_sensor', 0, 'in1')])
 
         d = ev3dev2.Device('tacho-motor', 'motor*')
 
@@ -41,7 +46,7 @@ class TestAPI(unittest.TestCase):
             pass
 
         clean_arena()
-        populate_arena({'medium_motor' : [0, 'outA']})
+        populate_arena([('medium_motor', 0, 'outA')])
 
         # Do not write motor.command on exit (so that fake tree stays intact)
         MediumMotor.__del__ = dummy
@@ -75,7 +80,7 @@ class TestAPI(unittest.TestCase):
 
     def test_infrared_sensor(self):
         clean_arena()
-        populate_arena({'infrared_sensor' : [0, 'in1']})
+        populate_arena([('infrared_sensor', 0, 'in1')])
 
         s = InfraredSensor()
 
@@ -95,6 +100,75 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(m.speed_sp, 0)
         m.speed_sp = 500
         self.assertEqual(m.speed_sp, 500)
+
+    def test_move_tank(self):
+        clean_arena()
+        populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
+
+        drive = MoveTank(OUTPUT_A, OUTPUT_B)
+        drive.on_for_rotations(50, 25, 10)
+
+        self.assertEqual(drive.left_motor.position, 0)
+        self.assertEqual(drive.left_motor.position_sp, 10 * 360)
+        self.assertEqual(drive.left_motor.speed_sp, 1050 / 2)
+
+        self.assertEqual(drive.right_motor.position, 0)
+        self.assertAlmostEqual(drive.right_motor.position_sp, 5 * 360, delta=5)
+        self.assertAlmostEqual(drive.right_motor.speed_sp, 1050 / 4, delta=1)
+    
+    def test_tank_units(self):
+        clean_arena()
+        populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
+
+        drive = MoveTank(OUTPUT_A, OUTPUT_B)
+        drive.on_for_rotations(SpeedDPS(400), SpeedDPM(10_000), 10)
+
+        self.assertEqual(drive.left_motor.position, 0)
+        self.assertEqual(drive.left_motor.position_sp, 10 * 360)
+        self.assertEqual(drive.left_motor.speed_sp, 400)
+
+        self.assertEqual(drive.right_motor.position, 0)
+        self.assertAlmostEqual(drive.right_motor.position_sp, 10 * 360 * ((10_000 / 60) / 400), delta=7)
+        self.assertAlmostEqual(drive.right_motor.speed_sp, 10_000 / 60, delta=1)
+
+    def test_steering_units(self):
+        clean_arena()
+        populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
+
+        drive = MoveSteering(OUTPUT_A, OUTPUT_B)
+        drive.on_for_rotations(25, SpeedDPS(400), 10)
+
+        self.assertEqual(drive.left_motor.position, 0)
+        self.assertEqual(drive.left_motor.position_sp, 10 * 360)
+        self.assertEqual(drive.left_motor.speed_sp, 400)
+
+        self.assertEqual(drive.right_motor.position, 0)
+        self.assertEqual(drive.right_motor.position_sp, 5 * 360)
+        self.assertEqual(drive.right_motor.speed_sp, 200)
+
+    def test_joystick_units(self):
+        clean_arena()
+        populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
+
+        drive = MoveJoystick(OUTPUT_A, OUTPUT_B)
+        drive.on(100, 100)
+
+        self.assertEqual(drive.left_motor.speed_sp, 1050)
+        self.assertAlmostEqual(drive.right_motor.speed_sp, 0)
+
+    def test_units(self):
+        clean_arena()
+        populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
+
+        m = Motor()
+
+        self.assertEqual(SpeedPercent(35).get_speed_pct(m), 35)
+        self.assertEqual(SpeedDPS(300).get_speed_pct(m), 300 / 1050 * 100)
+        self.assertEqual(SpeedNativeUnits(300).get_speed_pct(m), 300 / 1050 * 100)
+        self.assertEqual(SpeedDPM(30_000).get_speed_pct(m), (30_000 / 60) / 1050 * 100)
+        self.assertEqual(SpeedRPS(2).get_speed_pct(m), 360 * 2 / 1050 * 100)
+        self.assertEqual(SpeedRPM(100).get_speed_pct(m), (360 * 100 / 60) / 1050 * 100)
+
 
 if __name__ == "__main__":
     unittest.main()

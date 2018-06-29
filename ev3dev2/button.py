@@ -30,7 +30,6 @@ if sys.version_info < (3,4):
 
 import array
 import time
-import evdev
 from . import get_current_platform
 
 try:
@@ -39,7 +38,16 @@ try:
     # safely ignored if one just needs to run API tests on Windows.
     import fcntl
 except ImportError:
-    print("WARNING: Failed to import fcntl. Button class will be unuseable!")
+    print("WARNING: Failed to import fcntl. Button class will be unusable!")
+
+
+try:
+    # This is a linux-specific module.
+    # It is required by the Button() class, but failure to import it may be
+    # safely ignored if one just needs to run API tests on Windows.
+    import evdev
+except ImportError:
+    print("WARNING: Failed to import evdev. Button class will be unusable!")
 
 
 # Import the button filenames, this is platform specific
