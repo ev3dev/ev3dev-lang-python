@@ -121,15 +121,15 @@ class TestAPI(unittest.TestCase):
         populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
 
         drive = MoveTank(OUTPUT_A, OUTPUT_B)
-        drive.on_for_rotations(SpeedDPS(400), SpeedDPM(10_000), 10)
+        drive.on_for_rotations(SpeedDPS(400), SpeedDPM(10000), 10)
 
         self.assertEqual(drive.left_motor.position, 0)
         self.assertEqual(drive.left_motor.position_sp, 10 * 360)
         self.assertEqual(drive.left_motor.speed_sp, 400)
 
         self.assertEqual(drive.right_motor.position, 0)
-        self.assertAlmostEqual(drive.right_motor.position_sp, 10 * 360 * ((10_000 / 60) / 400), delta=7)
-        self.assertAlmostEqual(drive.right_motor.speed_sp, 10_000 / 60, delta=1)
+        self.assertAlmostEqual(drive.right_motor.position_sp, 10 * 360 * ((10000 / 60) / 400), delta=7)
+        self.assertAlmostEqual(drive.right_motor.speed_sp, 10000 / 60, delta=1)
 
     def test_steering_units(self):
         clean_arena()
@@ -165,7 +165,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(SpeedPercent(35).get_speed_pct(m), 35)
         self.assertEqual(SpeedDPS(300).get_speed_pct(m), 300 / 1050 * 100)
         self.assertEqual(SpeedNativeUnits(300).get_speed_pct(m), 300 / 1050 * 100)
-        self.assertEqual(SpeedDPM(30_000).get_speed_pct(m), (30_000 / 60) / 1050 * 100)
+        self.assertEqual(SpeedDPM(30000).get_speed_pct(m), (30000 / 60) / 1050 * 100)
         self.assertEqual(SpeedRPS(2).get_speed_pct(m), 360 * 2 / 1050 * 100)
         self.assertEqual(SpeedRPM(100).get_speed_pct(m), (360 * 100 / 60) / 1050 * 100)
 
