@@ -86,5 +86,15 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(s.address,         'in1')
         self.assertEqual(s.value(0),        16)
 
+    def test_medium_motor_write(self):
+        clean_arena()
+        populate_arena({'medium_motor' : [0, 'outA']})
+
+        m = MediumMotor()
+
+        self.assertEqual(m.speed_sp, 0)
+        m.speed_sp = 500
+        self.assertEqual(m.speed_sp, 500)
+
 if __name__ == "__main__":
     unittest.main()
