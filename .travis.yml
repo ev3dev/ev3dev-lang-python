@@ -6,6 +6,7 @@ install:
 - pip install Pillow
 - pip install evdev
 script:
+- chmod -R g+rw ./tests/fake-sys/devices/**/*
 - ./tests/api_tests.py
 deploy:
   provider: pypi
