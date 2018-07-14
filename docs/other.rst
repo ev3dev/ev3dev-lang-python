@@ -69,7 +69,7 @@ Sound
     :members:
 
 Display
-------
+-------
 
 .. autoclass:: ev3dev2.display.Display
     :members:
@@ -78,7 +78,7 @@ Display
 Bitmap fonts
 ^^^^^^^^^^^^
 
-The :py:class:`Display` class allows to write text on the LCD using python
+The :py:class:`ev3dev2.display.Display` class allows to write text on the LCD using python
 imaging library (PIL) interface (see description of the ``text()`` method
 `here <http://pillow.readthedocs.io/en/3.1.x/reference/ImageDraw.html#PIL.ImageDraw.PIL.ImageDraw.Draw.text>`_).
 The ``ev3dev2.fonts`` module contains bitmap fonts in PIL format that should

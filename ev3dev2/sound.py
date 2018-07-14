@@ -374,8 +374,8 @@ class Sound(object):
 
         It supports symbolic notes (e.g. ``A4``, ``D#3``, ``Gb5``) and durations (e.g. ``q``, ``h``).
 
-        For an exhaustive list of accepted note symbols and values, have a look at the :py:attr:`_NOTE_FREQUENCIES`
-        and :py:attr:`_NOTE_VALUES` private dictionaries in the source code.
+        For an exhaustive list of accepted note symbols and values, have a look at the ``_NOTE_FREQUENCIES``
+        and ``_NOTE_VALUES`` private dictionaries in the source code.
 
         The value can be suffixed by modifiers:
 

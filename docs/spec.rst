@@ -1,7 +1,7 @@
 API reference
 =============
 
-Each class in ev3dev module inherits from the base :py:class:`Device` class.
+Each class in ev3dev module inherits from the base :py:class:`ev3dev2.Device` class.
 
 .. autoclass:: ev3dev2.Device
 

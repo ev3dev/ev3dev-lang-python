@@ -315,6 +315,11 @@ texinfo_documents = [
 
 autodoc_member_order = 'bysource'
 
+nitpick_ignore = [
+    ('py:class', 'ev3dev2.display.FbMem'),
+    ('py:class', 'ev3dev2.button.ButtonBase')
+]
+
 def setup(app):
     app.add_config_value('recommonmark_config', {
             'enable_eval_rst': True,

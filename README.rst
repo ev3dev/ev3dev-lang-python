@@ -200,11 +200,6 @@ Python Package Index
     libraries that others have written, including the `latest version of
     this package`_.
 
-The ev3dev-lang Project on GitHub
-    The `source repository for the generic API`_ and the scripts to automatically
-    generate the binding. Only developers of the ev3dev-lang-python_ binding
-    would normally need to access this information.
-
 Python 2.x and Python 3.x Compatibility
 ---------------------------------------
 
@@ -224,7 +219,6 @@ Python 3 and this is the only version that will be supported from here forward.
 .. _via an SSH connection: http://www.ev3dev.org/docs/tutorials/connecting-to-ev3dev-with-ssh/
 .. _ev3dev-usb-internet: http://www.ev3dev.org/docs/tutorials/connecting-to-the-internet-via-usb/
 .. _our Read the Docs page: http://python-ev3dev.readthedocs.org/en/stable/
-.. _source repository for the generic API: ev3dev-lang_
 .. _ev3python.com: http://ev3python.com/
 .. _FAQ: http://python-ev3dev.readthedocs.io/en/stable/faq.html
 .. _ev3dev-lang-python: https://github.com/rhempel/ev3dev-lang-python

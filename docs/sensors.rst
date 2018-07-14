@@ -4,9 +4,9 @@ Sensor classes
 .. contents:: :local:
 
 Dedicated sensor classes
-----------------------
+------------------------
 
-These classes derive from :py:class:`Sensor` and provide helper functions
+These classes derive from :py:class:`ev3dev2.sensor.Sensor` and provide helper functions
 specific to the corresponding sensor type. Each provides sensible property
 accessors for the main functionality of the sensor.
 
@@ -15,7 +15,7 @@ accessors for the main functionality of the sensor.
 .. currentmodule:: ev3dev2.sensor.lego
 
 Touch Sensor
-########################
+############
 
 .. autoclass:: TouchSensor
     :members:
@@ -24,7 +24,7 @@ Touch Sensor
 
 
 Color Sensor
-########################
+############
 
 .. autoclass:: ColorSensor
     :members:
@@ -33,7 +33,7 @@ Color Sensor
 
 
 Ultrasonic Sensor
-########################
+#################
 
 .. autoclass:: UltrasonicSensor
     :members:
@@ -42,7 +42,7 @@ Ultrasonic Sensor
 
 
 Gyro Sensor
-########################
+###########
 
 .. autoclass:: GyroSensor
     :members:
@@ -51,7 +51,7 @@ Gyro Sensor
 
 
 Infrared Sensor
-########################
+###############
 
 .. autoclass:: InfraredSensor
     :members:
@@ -60,7 +60,7 @@ Infrared Sensor
 
 
 Sound Sensor
-########################
+############
 
 .. autoclass:: SoundSensor
     :members:
@@ -69,7 +69,7 @@ Sound Sensor
 
 
 Light Sensor
-########################
+############
 
 .. autoclass:: LightSensor
     :members:

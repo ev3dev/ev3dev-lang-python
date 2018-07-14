@@ -98,13 +98,13 @@ Move Tank
     :members:
 
 Move Steering
-~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. autoclass:: MoveSteering
     :members:
 
 Move Joystick
-~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. autoclass:: MoveJoystick
     :members:
