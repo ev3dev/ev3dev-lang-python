@@ -93,7 +93,7 @@ class TestAPI(unittest.TestCase):
 
     def test_medium_motor_write(self):
         clean_arena()
-        populate_arena({'medium_motor' : [0, 'outA']})
+        populate_arena([('medium_motor', 0, 'outA')])
 
         m = MediumMotor()
 
