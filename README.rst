@@ -118,6 +118,7 @@ Using text-to-speech
 If you want to make your robot speak, you can use the ``Sound.speak`` method:
 
 .. code-block:: python
+
   from ev3dev2.sound import Sound
 
   sound = Sound()

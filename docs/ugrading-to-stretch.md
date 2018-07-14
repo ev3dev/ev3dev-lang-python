@@ -39,6 +39,17 @@ The `RemoteControl` and `BeaconSeeker` classes have been removed; you will now u
 
 Additionally, we have renamed many of the properties on the `InfraredSensor` class to make the meaning more obvious. Check out [the `InfraredSensor` documentation](docs/sensors#infrared-sensor) for more info.
 
+## Re-designed `Sound` class
+
+The names and interfaces of some of the `Sound` class methods have changed. Check out [the `Sound` class docs](docs/other#sound) for details.
+
 # Once you've adapted to breaking changes, check out the cool new features!
 
-Visit our nonexistent page which tells you about the new features which are available.
+```eval_rst
+- New classes are available for coordinating motors: :py:class:`ev3dev2.motor.MotorSet`, :py:class:`ev3dev2.motor.MoveTank`, :py:class:`ev3dev2.motor.MoveSteering`, and :py:class:`ev3dev2.motor.MoveJoystick`.
+- Classes representing a variety of motor speed units are available and accepted by many of the motor interfaces: see :ref:`motor-unit-classes`.
+- Friendlier interfaces for operating motors and sensors: check out :py:meth:`ev3dev2.motor.Motor.on_for_rotations` and the other ``on_for_*`` methods on motors.
+- Easier interactivity via buttons: each button now has ``wait_for_pressed``, ``wait_for_released`` and ``wait_for_bump``
+- Improved :py:class:`ev3dev2.sound.Sound` and :py:class:`ev3dev2.display.Display` interfaces
+- New color conversion methods in :py:class:`ev3dev2.sensor.lego.ColorSensor`
+```

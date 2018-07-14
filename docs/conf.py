@@ -30,6 +30,7 @@ if on_rtd:
 
 import sphinx_bootstrap_theme
 from recommonmark.parser import CommonMarkParser
+from recommonmark.transform import AutoStructify
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -313,3 +314,9 @@ texinfo_documents = [
 #texinfo_no_detailmenu = False
 
 autodoc_member_order = 'bysource'
+
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+            'enable_eval_rst': True,
+            }, True)
+    app.add_transform(AutoStructify)

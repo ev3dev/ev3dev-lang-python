@@ -5,6 +5,8 @@ Motor classes
 
 .. contents:: :local:
 
+.. _motor-unit-classes:
+
 Units
 -----
 
