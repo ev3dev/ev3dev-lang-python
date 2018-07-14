@@ -115,7 +115,21 @@ also available. See the following pages for more information:
 Driving with two motors
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-TODO
+The simplest drive control style is with the `MoveTank` class:
+
+.. code-block:: python
+
+    drive = MoveTank(OUTPUT_A, OUTPUT_B)
+
+    # drive in a turn for 5 rotations of the outer motor
+    # the first two parameters are percentages; they can also be unit classes.
+    drive.on_for_rotations(50, 75, 10)
+    
+    # drive in a different turn for 3 rotations of the outer motor
+    drive.on_for_rotations(60, 30, 3)
+
+There are also `MoveSteering` and `MoveJoystick` classes which provide different
+styles of control. Take a look at the corresponding documentation for more detail.
 
 Using text-to-speech
 ~~~~~~~~~~~~~~~~~~~~
@@ -186,11 +200,6 @@ Python Package Index
     libraries that others have written, including the `latest version of
     this package`_.
 
-The ev3dev Binding Specification
-    Like all of the language bindings for ev3dev_ supported hardware, the
-    Python binding follows the minimal API that must be provided per
-    `this document`_.
-
 The ev3dev-lang Project on GitHub
     The `source repository for the generic API`_ and the scripts to automatically
     generate the binding. Only developers of the ev3dev-lang-python_ binding
@@ -218,11 +227,8 @@ Python 3 and this is the only version that will be supported from here forward.
 .. _source repository for the generic API: ev3dev-lang_
 .. _ev3python.com: http://ev3python.com/
 .. _FAQ: http://python-ev3dev.readthedocs.io/en/stable/faq.html
-.. _ev3dev-lang: https://github.com/ev3dev/ev3dev-lang
 .. _ev3dev-lang-python: https://github.com/rhempel/ev3dev-lang-python
 .. _our Issues tracker: https://github.com/rhempel/ev3dev-lang-python/issues
-.. _this document: wrapper-specification_
-.. _wrapper-specification: https://github.com/ev3dev/ev3dev-lang/blob/develop/wrapper-specification.md
 .. _EXPLOR3R: demo-robot_
 .. _demo-robot: http://robotsquare.com/2015/10/06/explor3r-building-instructions/
 .. _demo programs: demo-code_
