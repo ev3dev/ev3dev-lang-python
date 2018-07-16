@@ -49,7 +49,7 @@ to get started:
 .. code-block:: python
 
    #!/usr/bin/env python3
-   from ev3dev2.motor import LargeMotor, OUTPUT_A
+   from ev3dev2.motor import LargeMotor, OUTPUT_A, SpeedPercent
    from ev3dev2.sensor.lego import TouchSensor
    from ev3dev2.led import Leds
 
