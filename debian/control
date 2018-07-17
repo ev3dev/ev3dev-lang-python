@@ -1,13 +1,13 @@
-Source: python-ev3dev
+Source: python-ev3dev2
 Maintainer: Ralph Hempel <rhempel@hempeldesigngroup.com>
 Section: python
 Priority: optional
-Standards-Version: 3.9.5
+Standards-Version: 3.9.8
 Build-Depends: python3-setuptools (>= 0.6b3), python3-all (>= 3.4), debhelper (>= 9), dh-python, python3-pillow
-VCS-Git: git://github.com/rhempel/ev3dev-lang-python.git
-VCS-Browser: https://github.com/rhempel/ev3dev-lang-python
+VCS-Git: https://github.com/ev3dev/ev3dev-lang-python.git
+VCS-Browser: https://github.com/ev3dev/ev3dev-lang-python
 
-Package: python3-ev3dev
+Package: python3-ev3dev2
 Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends}
 Description: Python language bindings for ev3dev
