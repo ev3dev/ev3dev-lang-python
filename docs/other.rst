@@ -4,7 +4,7 @@ Other classes
 Button
 ------
 
-.. autoclass:: ev3dev.button.Button
+.. autoclass:: ev3dev2.button.Button
     :members:
     :inherited-members:
 
@@ -24,10 +24,10 @@ Button
 Leds
 ----
 
-.. autoclass:: ev3dev.led.Led
+.. autoclass:: ev3dev2.led.Led
     :members:
 
-.. autoclass:: ev3dev.led.Leds
+.. autoclass:: ev3dev2.led.Leds
     :members:
 
     .. rubric:: EV3 platform
@@ -59,39 +59,39 @@ Leds
 Power Supply
 ------------
 
-.. autoclass:: ev3dev.power.PowerSupply
+.. autoclass:: ev3dev2.power.PowerSupply
     :members:
 
 Sound
 -----
 
-.. autoclass:: ev3dev.sound.Sound
+.. autoclass:: ev3dev2.sound.Sound
     :members:
 
-Screen
-------
+Display
+-------
 
-.. autoclass:: ev3dev.display.Display
+.. autoclass:: ev3dev2.display.Display
     :members:
     :show-inheritance:
 
 Bitmap fonts
 ^^^^^^^^^^^^
 
-The :py:class:`Display` class allows to write text on the LCD using python
+The :py:class:`ev3dev2.display.Display` class allows to write text on the LCD using python
 imaging library (PIL) interface (see description of the ``text()`` method
 `here <http://pillow.readthedocs.io/en/3.1.x/reference/ImageDraw.html#PIL.ImageDraw.PIL.ImageDraw.Draw.text>`_).
-The ``ev3dev.fonts`` module contains bitmap fonts in PIL format that should
+The ``ev3dev2.fonts`` module contains bitmap fonts in PIL format that should
 look good on a tiny EV3 screen:
 
 .. code-block:: py
 
-    import ev3dev.fonts as fonts
+    import ev3dev2.fonts as fonts
     display.draw.text((10,10), 'Hello World!', font=fonts.load('luBS14'))
 
-.. autofunction:: ev3dev.fonts.available
+.. autofunction:: ev3dev2.fonts.available
 
-.. autofunction:: ev3dev.fonts.load
+.. autofunction:: ev3dev2.fonts.load
 
 The following image lists all available fonts. The grid lines correspond
 to EV3 screen size:
@@ -101,5 +101,5 @@ to EV3 screen size:
 Lego Port
 ---------
 
-.. autoclass:: ev3dev.port.LegoPort
+.. autoclass:: ev3dev2.port.LegoPort
     :members:

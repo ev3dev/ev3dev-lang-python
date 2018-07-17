@@ -35,8 +35,14 @@ from PIL import Image, ImageDraw
 from . import fonts
 from . import get_current_platform
 from struct import pack
-import fcntl
 
+try:
+    # This is a linux-specific module.
+    # It is required by the Display class, but failure to import it may be
+    # safely ignored if one just needs to run API tests on Windows.
+    import fcntl
+except ImportError:
+    print("WARNING: Failed to import fcntl. Display class will be unusable!")
 
 class FbMem(object):
 

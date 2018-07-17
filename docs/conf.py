@@ -30,6 +30,7 @@ if on_rtd:
 
 import sphinx_bootstrap_theme
 from recommonmark.parser import CommonMarkParser
+from recommonmark.transform import AutoStructify
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -135,7 +136,7 @@ html_theme = 'bootstrap'
 html_theme_options = {
         'bootswatch_theme': 'yeti',
         'navbar_links' : [
-            ("GitHub", "https://github.com/rhempel/ev3dev-lang-python", True)
+            ("GitHub", "https://github.com/ev3dev/ev3dev-lang-python", True)
             ]
         }
 
@@ -311,3 +312,16 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+autodoc_member_order = 'bysource'
+
+nitpick_ignore = [
+    ('py:class', 'ev3dev2.display.FbMem'),
+    ('py:class', 'ev3dev2.button.ButtonBase')
+]
+
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+            'enable_eval_rst': True,
+            }, True)
+    app.add_transform(AutoStructify)

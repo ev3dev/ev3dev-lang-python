@@ -1,13 +1,17 @@
 language: python
 python:
 - 3.4
+cache: pip
 sudo: false
+git:
+  depth: 100
 install:
-- pip install Pillow
-- pip install evdev
+- pip install -q Pillow evdev Sphinx sphinx_bootstrap_theme recommonmark evdev
+- pip install -q -r ./docs/requirements.txt
 script:
 - chmod -R g+rw ./tests/fake-sys/devices/**/*
 - ./tests/api_tests.py
+- sphinx-build -nW -b html ./docs/ ./docs/_build/html
 deploy:
   provider: pypi
   user: Denis.Demidov
