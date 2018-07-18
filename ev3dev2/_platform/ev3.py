@@ -28,15 +28,15 @@ An assortment of classes modeling specific features of the EV3 brick.
 
 from collections import OrderedDict
 
-OUTPUT_A = 'outA'
-OUTPUT_B = 'outB'
-OUTPUT_C = 'outC'
-OUTPUT_D = 'outD'
+OUTPUT_A = 'ev3-ports:outA'
+OUTPUT_B = 'ev3-ports:outB'
+OUTPUT_C = 'ev3-ports:outC'
+OUTPUT_D = 'ev3-ports:outD'
 
-INPUT_1 = 'in1'
-INPUT_2 = 'in2'
-INPUT_3 = 'in3'
-INPUT_4 = 'in4'
+INPUT_1 = 'ev3-ports:in1'
+INPUT_2 = 'ev3-ports:in2'
+INPUT_3 = 'ev3-ports:in3'
+INPUT_4 = 'ev3-ports:in4'
 
 BUTTONS_FILENAME = '/dev/input/by-path/platform-gpio_keys-event'
 EVDEV_DEVICE_NAME = 'EV3 brick buttons'
