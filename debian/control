@@ -1,5 +1,5 @@
 Source: python-ev3dev2
-Maintainer: Ralph Hempel <rhempel@hempeldesigngroup.com>
+Maintainer: ev3dev Python team <python-team@ev3dev.org>
 Section: python
 Priority: optional
 Standards-Version: 3.9.8
