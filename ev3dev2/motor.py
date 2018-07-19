@@ -31,7 +31,7 @@ if sys.version_info < (3,4):
 import select
 import time
 from logging import getLogger
-from math import atan2, degrees as math_degrees, hypot
+from math import atan2, degrees as math_degrees, sqrt
 from os.path import abspath
 from ev3dev2 import get_current_platform, Device, list_device_names
 
@@ -1997,7 +1997,7 @@ class MoveJoystick(MoveTank):
             MoveTank.off()
             return
 
-        vector_length = hypot(x, y)
+        vector_length = sqrt(x*x + y*y)
         angle = math_degrees(atan2(y, x))
 
         if angle < 0:
