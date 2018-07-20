@@ -10,13 +10,13 @@ OUTPUT_C = 'pistorms:BBM1'
 OUTPUT_D = 'pistorms:BBM2'
 
 INPUT_1 = 'pistorms:BAS1'
-INPUT_2 = 'pistorms:BBS2'
+INPUT_2 = 'pistorms:BAS2'
 INPUT_3 = 'pistorms:BBS1'
 INPUT_4 = 'pistorms:BBS2'
 
 
 BUTTONS_FILENAME = '/dev/input/by-path/platform-3f804000.i2c-event'
-EVDEV_DEVICE_NAME = None
+EVDEV_DEVICE_NAME = 'PiStorms'
 
 
 LEDS = OrderedDict()
