@@ -1709,9 +1709,9 @@ class MoveTank(MotorSet):
 
     .. code:: python
 
-        drive = MoveTank(OUTPUT_A, OUTPUT_B)
+        tank_drive = MoveTank(OUTPUT_A, OUTPUT_B)
         # drive in a turn for 10 rotations of the outer motor
-        drive.on_for_rotations(50, 75, 10)
+        tank_drive.on_for_rotations(50, 75, 10)
     """
 
     def __init__(self, left_motor_port, right_motor_port, desc=None, motor_class=LargeMotor):
@@ -1866,17 +1866,19 @@ class MoveSteering(MoveTank):
     Controls a pair of motors simultaneously, via a single "steering" value.
 
     steering [-100, 100]:
-        * -100 means turn left as fast as possible,
+        * -100 means turn left on the spot (right motor at 100% forward, left motor at 100% backward),
         *  0   means drive in a straight line, and
-        *  100 means turn right as fast as possible.
+        *  100 means turn right on the spot (left motor at 100% forward, right motor at 100% backward).
     
+    "steering" can be any number between -100 and 100.
+
     Example:
 
     .. code:: python
 
-        drive = MoveSteering(OUTPUT_A, OUTPUT_B)
+        steering_drive = MoveSteering(OUTPUT_A, OUTPUT_B)
         # drive in a turn for 10 rotations of the outer motor
-        drive.on_for_rotations(-20, SpeedPercent(75), 10)
+        steering_drive.on_for_rotations(-20, SpeedPercent(75), 10)
     """
     def on_for_rotations(self, steering, speed, rotations, brake=True, block=True):
         """
@@ -1918,9 +1920,9 @@ class MoveSteering(MoveTank):
         afterwards to make the motors move.
 
         steering [-100, 100]:
-            * -100 means turn left as fast as possible,
+            * -100 means turn left on the spot (right motor at 100% forward, left motor at 100% backward),
             *  0   means drive in a straight line, and
-            *  100 means turn right as fast as possible.
+            *  100 means turn right on the spot (left motor at 100% forward, right motor at 100% backward).
 
         speed:
             The speed that should be applied to the outmost motor (the one
@@ -1955,7 +1957,25 @@ class MoveJoystick(MoveTank):
     def on(self, x, y, max_speed=100.0, radius=100.0):
         """
         Convert x,y joystick coordinates to left/right motor speed percentages
-        and move the motors
+        and move the motors.
+
+        This will use a classic "arcade drive" algorithm: a full-forward joystick
+        goes straight forward and likewise for full-backward. Pushing the joystick
+        all the way to one side will make it turn on the spot in that direction.
+        Positions in the middle will control how fast the vehicle moves and how
+        sharply it turns.
+
+        "x", "y":
+            The X and Y coordinates of the joystick's position, with
+            (0,0) representing the center position. X is horizontal and Y is vertical.
+        
+        max_speed (default 100%):
+            A percentage or other SpeedInteger, controlling the maximum motor speed.
+        
+        radius (default 100):
+            The radius of the joystick, controlling the range of the input (x, y) values.
+            e.g. if "x" and "y" can be between -1 and 1, radius should be set to "1".
+        
         """
 
         # If joystick is in the middle stop the tank

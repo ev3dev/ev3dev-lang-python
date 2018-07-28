@@ -1,10 +1,10 @@
 Python language bindings for ev3dev
 ===================================
 
-.. image:: https://travis-ci.org/ev3dev/ev3dev-lang-python.svg?branch=master
+.. image:: https://travis-ci.org/ev3dev/ev3dev-lang-python.svg?branch=ev3dev-stretch
     :target: https://travis-ci.org/ev3dev/ev3dev-lang-python
-.. image:: https://readthedocs.org/projects/python-ev3dev/badge/?version=stable
-    :target: http://python-ev3dev.readthedocs.org/en/stable/?badge=stable
+.. image:: https://readthedocs.org/projects/python-ev3dev/badge/?version=ev3dev-stretch
+    :target: http://python-ev3dev.readthedocs.org/en/ev3dev-stretch/?badge=ev3dev-stretch
     :alt: Documentation Status
 .. image:: https://badges.gitter.im/ev3dev/chat.svg
     :target: https://gitter.im/ev3dev/chat
@@ -95,8 +95,8 @@ trying this out.
       else:
           leds.set_color(leds.led_groups.LEFT, leds.led_colors.RED)
 
-Running a motor
-~~~~~~~~~~~~~~~
+Running a single motor
+~~~~~~~~~~~~~~~~~~~~~~
 
 This will run a LEGO Large Motor at 75% of maximum speed for 5 rotations.
 
@@ -109,8 +109,8 @@ You can also run a motor for a number of degrees, an amount of time, or simply
 start it and let it run until you tell it to stop. Additionally, other units are
 also available. See the following pages for more information:
 
-- http://python-ev3dev.readthedocs.io/en/stretch/motors.html#ev3dev.motor.Motor.on_for_degrees
-- http://python-ev3dev.readthedocs.io/en/stretch/motors.html#units
+- http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/motors.html#ev3dev.motor.Motor.on_for_degrees
+- http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/motors.html#units
 
 Driving with two motors
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -119,17 +119,20 @@ The simplest drive control style is with the `MoveTank` class:
 
 .. code-block:: python
 
-    drive = MoveTank(OUTPUT_A, OUTPUT_B)
+    tank_drive = MoveTank(OUTPUT_A, OUTPUT_B)
 
     # drive in a turn for 5 rotations of the outer motor
-    # the first two parameters are percentages; they can also be unit classes.
-    drive.on_for_rotations(50, 75, 10)
+    # the first two parameters can be unit classes or percentages.
+    tank_drive.on_for_rotations(SpeedPercent(50), SpeedPercent(75), 10)
     
-    # drive in a different turn for 3 rotations of the outer motor
-    drive.on_for_rotations(60, 30, 3)
+    # drive in a different turn for 3 seconds
+    tank_drive.on_for_seconds(SpeedPercent(60), SpeedPercent(30), 3)
 
 There are also `MoveSteering` and `MoveJoystick` classes which provide different
-styles of control. Take a look at the corresponding documentation for more detail.
+styles of control. See the following pages for more information:
+
+- http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/motors.html#multiple-motor-groups
+- http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/motors.html#units
 
 Using text-to-speech
 ~~~~~~~~~~~~~~~~~~~~

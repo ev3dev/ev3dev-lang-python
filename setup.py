@@ -3,13 +3,13 @@ from git_version import git_version
 
 
 setup(
-    name='python-ev3dev',
+    name='python-ev3dev2',
     version=git_version(),
-    description='Python language bindings for ev3dev',
-    author='Ralph Hempel',
-    author_email='rhempel@hempeldesigngroup.com',
+    description='v2.x Python language bindings for ev3dev',
+    author='ev3dev Python team',
+    author_email='python-team@ev3dev.org',
     license='MIT',
-    url='https://github.com/rhempel/ev3dev-lang-python',
+    url='https://github.com/ev3dev/ev3dev-lang-python',
     include_package_data=True,
     packages=['ev3dev2',
               'ev3dev2.fonts',
@@ -19,4 +19,3 @@ setup(
     package_data={'': ['*.pil', '*.pbm']},
     install_requires=['Pillow']
     )
-
