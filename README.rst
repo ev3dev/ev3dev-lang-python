@@ -1,10 +1,10 @@
 Python language bindings for ev3dev
 ===================================
 
-.. image:: https://travis-ci.org/ev3dev/ev3dev-lang-python.svg?branch=master
+.. image:: https://travis-ci.org/ev3dev/ev3dev-lang-python.svg?branch=ev3dev-stretch
     :target: https://travis-ci.org/ev3dev/ev3dev-lang-python
-.. image:: https://readthedocs.org/projects/python-ev3dev/badge/?version=stable
-    :target: http://python-ev3dev.readthedocs.org/en/stable/?badge=stable
+.. image:: https://readthedocs.org/projects/python-ev3dev/badge/?version=ev3dev-stretch
+    :target: http://python-ev3dev.readthedocs.org/en/ev3dev-stretch/?badge=ev3dev-stretch
     :alt: Documentation Status
 .. image:: https://badges.gitter.im/ev3dev/chat.svg
     :target: https://gitter.im/ev3dev/chat
