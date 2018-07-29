@@ -250,7 +250,7 @@ but this library is compatible only with Python 3.
 .. _package repository: pypi_
 .. _pypi: https://pypi.python.org/pypi
 .. _latest version of this package: pypi-python-ev3dev_
-.. _pypi-python-ev3dev: https://pypi.python.org/pypi/python-ev3dev
+.. _pypi-python-ev3dev: https://pypi.python.org/pypi/python-ev3dev2
 .. _ev3dev Visual Studio Code extension: https://github.com/ev3dev/vscode-ev3dev-browser
 .. _Python + VSCode introduction tutorial: https://github.com/ev3dev/vscode-hello-python
 .. _nano: http://www.ev3dev.org/docs/tutorials/nano-cheat-sheet/
