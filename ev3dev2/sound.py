@@ -92,30 +92,40 @@ class Sound(object):
         assert play_type in self.PLAY_TYPES, \
             "Invalid play_type %s, must be one of %s" % (play_type, ','.join(str(t) for t in self.PLAY_TYPES))
 
-    def beep(self, args=''):
+    def beep(self, args='', play_type=PLAY_WAIT_FOR_COMPLETE):
         """
         Call beep command with the provided arguments (if any).
         See `beep man page`_ and google `linux beep music`_ for inspiration.
+
+        :param string args: Any additional arguments to be passed to ``beep`` (see the `beep man page`_ for details)
+        
+        :param play_type: The behavior of ``beep`` once playback has been initiated
+        :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE`` or  ``Sound.PLAY_NO_WAIT_FOR_COMPLETE``
+
+        :return: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
 
         .. _`beep man page`: https://linux.die.net/man/1/beep
         .. _`linux beep music`: https://www.google.com/search?q=linux+beep+music
         """
         with open(os.devnull, 'w') as n:
-            return Popen(shlex.split('/usr/bin/beep %s' % args), stdout=n)
+            subprocess = Popen(shlex.split('/usr/bin/beep %s' % args), stdout=n)
+            if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
+                subprocess.wait()
+                return None
+            else:
+                return subprocess
 
-    def tone(self, *args):
+
+    def tone(self, *args, play_type=PLAY_WAIT_FOR_COMPLETE):
         """
         .. rubric:: tone(tone_sequence)
 
-        Play tone sequence. The tone_sequence parameter is a list of tuples,
-        where each tuple contains up to three numbers. The first number is
-        frequency in Hz, the second is duration in milliseconds, and the third
-        is delay in milliseconds between this and the next tone in the
-        sequence.
+        Play tone sequence.
 
         Here is a cheerful example::
 
-            Sound.tone([
+            my_sound = Sound()
+            my_sound.tone([
                 (392, 350, 100), (392, 350, 100), (392, 350, 100), (311.1, 250, 100),
                 (466.2, 25, 100), (392, 350, 100), (311.1, 250, 100), (466.2, 25, 100),
                 (392, 700, 100), (587.32, 350, 100), (587.32, 350, 100),
@@ -134,14 +144,29 @@ class Sound(object):
                 (466.16, 25, 100), (440, 25, 100), (466.16, 50, 400), (311.13, 25, 200),
                 (392, 350, 100), (311.13, 250, 100), (466.16, 25, 100),
                 (392.00, 300, 150), (311.13, 250, 100), (466.16, 25, 100), (392, 700)
-                ]).wait()
+                ])
 
         Have also a look at :py:meth:`play_song` for a more musician-friendly way of doing, which uses
         the conventional notation for notes and durations.
 
+        :param list[tuple(float,float,float)] tone_sequence: The sequence of tones to play. The first number of each tuple is frequency in Hz, the second is duration in milliseconds, and the third is delay in milliseconds between this and the next tone in the sequence.
+
+        :param play_type: The behavior of ``tone`` once playback has been initiated
+        :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_NO_WAIT_FOR_COMPLETE``
+
+        :return: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
+
         .. rubric:: tone(frequency, duration)
 
-        Play single tone of given frequency (Hz) and duration (milliseconds).
+        Play single tone of given frequency and duration.
+
+        :param float frequency: The frequency of the tone in Hz
+        :param float duration: The duration of the tone in milliseconds
+
+        :param play_type: The behavior of ``tone`` once playback has been initiated
+        :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_NO_WAIT_FOR_COMPLETE``
+
+        :return: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
         def play_tone_sequence(tone_sequence):
             def beep_args(frequency=None, duration=None, delay=None):
@@ -155,14 +180,14 @@ class Sound(object):
 
                 return args
 
-            return self.beep(' -n '.join([beep_args(*t) for t in tone_sequence]))
+            return self.beep(' -n '.join([beep_args(*t) for t in tone_sequence]), play_type=play_type)
 
         if len(args) == 1:
             return play_tone_sequence(args[0])
         elif len(args) == 2:
             return play_tone_sequence([(args[0], args[1])])
         else:
-            raise Exception("Unsupported number of parameters in Sound.tone()")
+            raise Exception("Unsupported number of parameters in Sound.tone(): expected 1 or 2, got " + str(len(args)))
 
     def play_tone(self, frequency, duration, delay=0.0, volume=100,
                   play_type=PLAY_WAIT_FOR_COMPLETE):
