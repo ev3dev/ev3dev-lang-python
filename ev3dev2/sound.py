@@ -168,17 +168,10 @@ class Sound(object):
                   play_type=PLAY_WAIT_FOR_COMPLETE):
         """ Play a single tone, specified by its frequency, duration, volume and final delay.
 
-        :param frequency: the tone frequency, in Hertz
-        :type frequency: int
-
-        :param duration: Tone duration, in seconds
-        :type duration: float
-
-        :param delay: Delay after tone, in seconds (can be useful when chaining calls to ``play_tone``)
-        :type delay: float
-
-        :param volume: The play volume, in percent of maximum volume
-        :type volume: int
+        :param int frequency: the tone frequency, in Hertz
+        :param float duration: Tone duration, in seconds
+        :param float delay: Delay after tone, in seconds (can be useful when chaining calls to ``play_tone``)
+        :param int volume: The play volume, in percent of maximum volume
 
         :param play_type: The behavior of ``play_tone`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
@@ -216,14 +209,9 @@ class Sound(object):
     def play_note(self, note, duration, volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
         """ Plays a note, given by its name as defined in ``_NOTE_FREQUENCIES``.
 
-        :param note: The note symbol with its octave number
-        :type note: string
-
-        :param duration: Tone duration, in seconds
-        :type duration: float
-
-        :param volume: The play volume, in percent of maximum volume
-        :type volume: int
+        :param string note: The note symbol with its octave number
+        :param float duration: Tone duration, in seconds
+        :param int volume: The play volume, in percent of maximum volume
 
         :param play_type: The behavior of ``play_note`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
@@ -247,8 +235,7 @@ class Sound(object):
     def play(self, wav_file, play_type=PLAY_WAIT_FOR_COMPLETE):
         """ Play a sound file (wav format).
 
-        :param wav_file: The sound file path
-        :type wav_file: string
+        :param string wav_file: The sound file path
 
         :param play_type: The behavior of ``play`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
@@ -276,11 +263,8 @@ class Sound(object):
         """ Play a sound file (wav format) at a given volume.
 
         
-        :param wav_file: The sound file path
-        :type wav_file: string
-
-        :param volume: The play volume, in percent of maximum volume
-        :type volume: int
+        :param string wav_file: The sound file path
+        :param int volume: The play volume, in percent of maximum volume
 
         :param play_type: The behavior of ``play_file`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
@@ -295,14 +279,9 @@ class Sound(object):
 
         Uses the ``espeak`` external command.
 
-        :param text: The text to speak
-        :type text: string
-
-        :param espeak_opts: ``espeak`` command options (advanced usage)
-        :type espeak_opts: string
-
-        :param volume: The play volume, in percent of maximum volume
-        :type volume: int
+        :param string text: The text to speak
+        :param string espeak_opts: ``espeak`` command options (advanced usage)
+        :param int volume: The play volume, in percent of maximum volume
 
         :param play_type: The behavior of ``speak`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
@@ -441,15 +420,9 @@ class Sound(object):
 
             Only 4/4 signature songs are supported with respect to note durations.
 
-        :param song: the song
-        :type song: iterable[tuple(str, str)]
-
-
-        :param tempo: the song tempo, given in quarters per minute
-        :type tempo: int
-
-        :param delay: delay between notes (in seconds)
-        :type delay: float
+        :param iterable[tuple(string, string)] song: the song
+        :param int tempo: the song tempo, given in quarters per minute
+        :param float delay: delay between notes (in seconds)
 
         :return: the spawn subprocess from ``subprocess.Popen``
 
