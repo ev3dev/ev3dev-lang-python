@@ -22,10 +22,9 @@ Getting Started
 
 This library runs on ev3dev_. Before continuing, make sure that you have set up
 your EV3 or other ev3dev device as explained in the `ev3dev Getting Started guide`_.
-Make sure that you have a kernel version that includes ``-10-ev3dev`` or higher (a
-larger number). You can check the kernel version by selecting "About" in Brickman
-and scrolling down to the "kernel version". If you don't have a compatible version,
-`upgrade the kernel before continuing`_.
+Make sure you have an ev3dev-stretch version greater than ``2.2.0``. You can check
+the kernel version by selecting "About" in Brickman and scrolling down to the
+"kernel version". If you don't have a compatible version, `upgrade the kernel before continuing`_.
 
 Usage
 -----
@@ -41,7 +40,7 @@ your own solution. If you don't know how to do that, you are probably better off
 choosing the recommended option above.
 
 The template for a Python script
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Every Python program should have a few basic parts. Use this template
 to get started:
@@ -49,7 +48,8 @@ to get started:
 .. code-block:: python
 
    #!/usr/bin/env python3
-   from ev3dev2.motor import LargeMotor, OUTPUT_A, SpeedPercent
+   from ev3dev2.motor import LargeMotor, OUTPUT_A, OUTPUT_B, SpeedPercent, MoveTank
+   from ev3dev2.sensor import INPUT_1
    from ev3dev2.sensor.lego import TouchSensor
    from ev3dev2.led import Leds
 
@@ -63,6 +63,10 @@ additional classes to the import list if you want to use other types of devices
 or additional utilities.
 
 You should use the ``.py`` extension for your file, e.g. ``my-file.py``.
+
+If you encounter an error such as ``/usr/bin/env: 'python3\r': No such file or directory``,
+you must switch your editor's "line endings" setting for the file from "CRLF" to just "LF".
+This is usually in the status bar at the bottom. For help, see `our FAQ page`_.
 
 Important: Make your script executable (non-Visual Studio Code only)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,7 +84,7 @@ from the command line by preceding the file name with ``./``: ``./my-file.py``
 Controlling the LEDs with a touch sensor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This code will turn the left LED red whenever the touch sensor is pressed, and
+This code will turn the LEDs red whenever the touch sensor is pressed, and
 back to green when it's released. Plug a touch sensor into any sensor port before
 trying this out.
 
@@ -89,11 +93,21 @@ trying this out.
   ts = TouchSensor()
   leds = Leds()
 
+  print("Press the touch sensor to change the LED color!")
+
   while True:
       if ts.is_pressed:
-          leds.set_color(leds.led_groups.LEFT, leds.led_colors.GREEN)
+          leds.set_color("LEFT", "GREEN")
+          leds.set_color("RIGHT", "GREEN")
       else:
-          leds.set_color(leds.led_groups.LEFT, leds.led_colors.RED)
+          leds.set_color("LEFT", "RED")
+          leds.set_color("RIGHT", "RED")
+
+If you'd like to use a sensor on a specific port, specify the port like this:
+
+.. code-block:: python
+
+  ts = TouchSensor(INPUT_1)
 
 Running a single motor
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -144,7 +158,7 @@ If you want to make your robot speak, you can use the ``Sound.speak`` method:
   from ev3dev2.sound import Sound
 
   sound = Sound()
-  sound.speak('Welcome to the E V 3 dev project!').wait()
+  sound.speak('Welcome to the E V 3 dev project!')
 
 Make sure to check out the `User Resources`_ section for more detailed
 information on these features and many others.
@@ -192,7 +206,7 @@ to type the password (the default is ``maker``) when prompted.
 .. code-block:: bash
 
    sudo apt-get update
-   sudo apt-get install --only-upgrade python3-ev3dev
+   sudo apt-get install --only-upgrade python3-ev3dev2
 
 
 Developer Resources
@@ -209,9 +223,6 @@ Python 2.x and Python 3.x Compatibility
 Some versions of the ev3dev_ distribution come with both `Python 2.x`_ and `Python 3.x`_ installed
 but this library is compatible only with Python 3.
 
-As of the 2016-10-17 ev3dev image, the version of this library which is included runs on
-Python 3 and this is the only version that will be supported from here forward.
-
 .. _ev3dev: http://ev3dev.org
 .. _ev3dev.org: ev3dev_
 .. _Getting Started: ev3dev-getting-started_
@@ -221,9 +232,10 @@ Python 3 and this is the only version that will be supported from here forward.
 .. _detailed instructions for USB connections: ev3dev-usb-internet_
 .. _via an SSH connection: http://www.ev3dev.org/docs/tutorials/connecting-to-ev3dev-with-ssh/
 .. _ev3dev-usb-internet: http://www.ev3dev.org/docs/tutorials/connecting-to-the-internet-via-usb/
-.. _our Read the Docs page: http://python-ev3dev.readthedocs.org/en/stable/
+.. _our Read the Docs page: http://python-ev3dev.readthedocs.org/en/ev3dev-stretch/
 .. _ev3python.com: http://ev3python.com/
-.. _FAQ: http://python-ev3dev.readthedocs.io/en/stable/faq.html
+.. _FAQ: http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/faq.html
+.. _our FAQ page: FAQ_
 .. _ev3dev-lang-python: https://github.com/rhempel/ev3dev-lang-python
 .. _our Issues tracker: https://github.com/rhempel/ev3dev-lang-python/issues
 .. _EXPLOR3R: demo-robot_

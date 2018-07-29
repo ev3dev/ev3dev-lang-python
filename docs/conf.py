@@ -317,7 +317,14 @@ autodoc_member_order = 'bysource'
 
 nitpick_ignore = [
     ('py:class', 'ev3dev2.display.FbMem'),
-    ('py:class', 'ev3dev2.button.ButtonBase')
+    ('py:class', 'ev3dev2.button.ButtonBase'),
+    ('py:class', 'int'),
+    ('py:class', 'float'),
+    ('py:class', 'string'),
+    ('py:class', 'iterable'),
+    ('py:class', 'tuple'),
+    ('py:class', 'list'),
+    ('py:exc', 'ValueError')
 ]
 
 def setup(app):
