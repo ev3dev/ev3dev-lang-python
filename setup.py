@@ -1,6 +1,10 @@
 from setuptools import setup
 from git_version import git_version
+from os import path
 
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.rst'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
     name='python-ev3dev2',
@@ -11,6 +15,8 @@ setup(
     license='MIT',
     url='https://github.com/ev3dev/ev3dev-lang-python',
     include_package_data=True,
+    long_description=long_description,
+    long_description_content_type='text/x-rst',
     packages=['ev3dev2',
               'ev3dev2.fonts',
               'ev3dev2.sensor',
