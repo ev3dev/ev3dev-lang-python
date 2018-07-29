@@ -30,24 +30,26 @@ if sys.version_info < (3,4):
 
 import array
 import time
-from . import get_current_platform
+import logging
+from . import get_current_platform, library_load_warning_message
+
+log = logging.getLogger(__name__)
 
 try:
     # This is a linux-specific module.
-    # It is required by the Button() class, but failure to import it may be
+    # It is required by the Button class, but failure to import it may be
     # safely ignored if one just needs to run API tests on Windows.
     import fcntl
 except ImportError:
-    print("WARNING: Failed to import fcntl. Button class will be unusable!")
-
+    log.warning(library_load_warning_message("fcntl", "Button"))
 
 try:
     # This is a linux-specific module.
-    # It is required by the Button() class, but failure to import it may be
+    # It is required by the Button class, but failure to import it may be
     # safely ignored if one just needs to run API tests on Windows.
     import evdev
 except ImportError:
-    print("WARNING: Failed to import evdev. Button class will be unusable!")
+    log.warning(library_load_warning_message("evdev", "Button"))
 
 
 # Import the button filenames, this is platform specific

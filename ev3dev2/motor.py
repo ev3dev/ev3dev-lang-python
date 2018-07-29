@@ -81,7 +81,7 @@ class SpeedPercent(SpeedInteger):
     """
 
     def __str__(self):
-        return ("%d%%" % self)
+        return int.__str__(self) + "%"
 
     def get_speed_pct(self, motor):
         """
@@ -96,7 +96,7 @@ class SpeedNativeUnits(SpeedInteger):
     """
 
     def __str__(self):
-        return ("%d% (counts/sec)" % self)
+        return int.__str__(self) + "% (counts/sec)"
 
     def get_speed_pct(self, motor):
         """
@@ -110,13 +110,13 @@ class SpeedRPS(SpeedInteger):
     """
 
     def __str__(self):
-        return ("%d rps" % self)
+        return int.__str__(self) + " rps"
 
     def get_speed_pct(self, motor):
         """
         Return the motor speed percentage to achieve desired rotations-per-second
         """
-        assert self <= motor.max_rps, "%s max RPS is %s, %s was requested"  % (motor, motor.max_rps, self)
+        assert self <= motor.max_rps, "{} max RPS is {}, {} was requested".format(motor, motor.max_rps, self)
         return (self/motor.max_rps) * 100
 
 
@@ -126,13 +126,13 @@ class SpeedRPM(SpeedInteger):
     """
 
     def __str__(self):
-        return ("%d rpm" % self)
+        return int.__str__(self) + " rpm"
 
     def get_speed_pct(self, motor):
         """
         Return the motor speed percentage to achieve desired rotations-per-minute
         """
-        assert self <= motor.max_rpm, "%s max RPM is %s, %s was requested"  % (motor, motor.max_rpm, self)
+        assert self <= motor.max_rpm, "{} max RPM is {}, {} was requested".format(motor, motor.max_rpm, self)
         return (self/motor.max_rpm) * 100
 
 
@@ -142,13 +142,13 @@ class SpeedDPS(SpeedInteger):
     """
 
     def __str__(self):
-        return ("%d dps" % self)
+        return int.__str__(self) + " dps"
 
     def get_speed_pct(self, motor):
         """
         Return the motor speed percentage to achieve desired degrees-per-second
         """
-        assert self <= motor.max_dps, "%s max DPS is %s, %s was requested"  % (motor, motor.max_dps, self)
+        assert self <= motor.max_dps, "{} max DPS is {}, {} was requested".format(motor, motor.max_dps, self)
         return (self/motor.max_dps) * 100
 
 
@@ -158,13 +158,13 @@ class SpeedDPM(SpeedInteger):
     """
 
     def __str__(self):
-        return ("%d dpm" % self)
+        return int.__str__(self) + " dpm"
 
     def get_speed_pct(self, motor):
         """
         Return the motor speed percentage to achieve desired degrees-per-minute
         """
-        assert self <= motor.max_dpm, "%s max DPM is %s, %s was requested"  % (motor, motor.max_dpm, self)
+        assert self <= motor.max_dpm, "{} max DPM is {}, {} was requested".format(motor, motor.max_dpm, self)
         return (self/motor.max_dpm) * 100
 
 
@@ -849,14 +849,14 @@ class Motor(Device):
             speed_pct = speed_pct.get_speed_pct(self)
 
         assert -100 <= speed_pct <= 100,\
-            "%s%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % (None if label is None else (label + ": ") , speed_pct)
+            "{}{} is an invalid speed_pct, must be between -100 and 100 (inclusive)".format(None if label is None else (label + ": ") , speed_pct)
 
         return speed_pct
 
     def _set_position_rotations(self, speed_pct, rotations):
 
         # +/- speed is used to control direction, rotations must be positive
-        assert rotations >= 0, "rotations is %s, must be >= 0" % rotations
+        assert rotations >= 0, "rotations is {}, must be >= 0".format(rotations)
 
         if speed_pct > 0:
             self.position_sp = self.position + int(rotations * self.count_per_rot)
@@ -889,7 +889,7 @@ class Motor(Device):
         speed_pct = self._speed_pct(speed_pct)
 
         if not speed_pct or not rotations:
-            log.warning("%s speed_pct is %s but rotations is %s, motor will not move" % (self, speed_pct, rotations))
+            log.warning("({}) Either speed_pct ({}) or rotations ({}) is invalid, motor will not move" .format(self, speed_pct, rotations))
             self._set_brake(brake)
             return
 
@@ -912,7 +912,7 @@ class Motor(Device):
         speed_pct = self._speed_pct(speed_pct)
 
         if not speed_pct or not degrees:
-            log.warning("%s speed_pct is %s but degrees is %s, motor will not move" % (self, speed_pct, degrees))
+            log.warning("({}) Either speed_pct ({}) or degrees ({}) is invalid, motor will not move" .format(self, speed_pct, degrees))
             self._set_brake(brake)
             return
 
@@ -935,7 +935,7 @@ class Motor(Device):
         speed_pct = self._speed_pct(speed_pct)
 
         if not speed_pct:
-            log.warning("%s speed_pct is %s, motor will not move" % (self, speed_pct))
+            log.warning("({}) speed_pct is invalid ({}), motor will not move".format(self, speed_pct))
             self._set_brake(brake)
             return
 
@@ -958,7 +958,7 @@ class Motor(Device):
         speed_pct = self._speed_pct(speed_pct)
 
         if not speed_pct or not seconds:
-            log.warning("%s speed_pct is %s but seconds is %s, motor will not move" % (self, speed_pct, seconds))
+            log.warning("({}) Either speed_pct ({}) or seconds ({}) is invalid, motor will not move" .format(self, speed_pct, seconds))
             self._set_brake(brake)
             return
 
@@ -984,7 +984,7 @@ class Motor(Device):
         speed_pct = self._speed_pct(speed_pct)
 
         if not speed_pct:
-            log.warning("%s speed_pct is %s, motor will not move" % (self, speed_pct))
+            log.warning("({}) speed_pct is invalid ({}), motor will not move".format(self, speed_pct))
             self._set_brake(brake)
             return
 
@@ -1931,7 +1931,7 @@ class MoveSteering(MoveTank):
         """
 
         assert steering >= -100 and steering <= 100,\
-            "%s is an invalid steering, must be between -100 and 100 (inclusive)" % steering
+            "%{} is an invalid steering, must be between -100 and 100 (inclusive)".format(steering)
 
         # We don't have a good way to make this generic for the pair... so we
         # assume that the left motor's speed stats are the same as the right
@@ -2164,6 +2164,6 @@ class MoveJoystick(MoveTank):
             right_speed_percentage = -1 * percentage_from_315_to_360
 
         else:
-            raise Exception('You created a circle with more than 360 degrees (%s)...that is quite the trick' % angle)
+            raise Exception('You created a circle with more than 360 degrees ({})...that is quite the trick'.format(angle))
 
         return (left_speed_percentage * 100, right_speed_percentage * 100)

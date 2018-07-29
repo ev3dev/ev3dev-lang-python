@@ -31,10 +31,13 @@ if sys.version_info < (3,4):
 import os
 import mmap
 import ctypes
+import logging
 from PIL import Image, ImageDraw
 from . import fonts
-from . import get_current_platform
+from . import get_current_platform, library_load_warning_message
 from struct import pack
+
+log = logging.getLogger(__name__)
 
 try:
     # This is a linux-specific module.
@@ -42,7 +45,7 @@ try:
     # safely ignored if one just needs to run API tests on Windows.
     import fcntl
 except ImportError:
-    print("WARNING: Failed to import fcntl. Display class will be unusable!")
+    log.warning(library_load_warning_message("fcntl", "Display"))
 
 class FbMem(object):
 
