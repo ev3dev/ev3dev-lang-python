@@ -323,6 +323,7 @@ nitpick_ignore = [
     ('py:class', 'string'),
     ('py:class', 'iterable'),
     ('py:class', 'tuple'),
+    ('py:class', 'list'),
     ('py:exc', 'ValueError')
 ]
 
