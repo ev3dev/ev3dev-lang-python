@@ -114,7 +114,7 @@ Display
     :show-inheritance:
 
 Bitmap fonts
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 The :py:class:`ev3dev2.display.Display` class allows to write text on the LCD using python
 imaging library (PIL) interface (see description of the ``text()`` method
