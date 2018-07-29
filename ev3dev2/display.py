@@ -383,7 +383,7 @@ class Display(FbMem):
         https://www.w3schools.com/colors/colors_names.asp
 
         'font' : can be any font displayed here
-            http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/stable/other.html#bitmap-fonts
+            http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/ev3dev-stretch/other.html#bitmap-fonts
         """
 
         if clear_screen:
@@ -409,7 +409,7 @@ class Display(FbMem):
         https://www.w3schools.com/colors/colors_names.asp
 
         'font' : can be any font displayed here
-            http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/stable/other.html#bitmap-fonts
+            http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/ev3dev-stretch/other.html#bitmap-fonts
         """
 
         assert 0 <= x < Display.GRID_COLUMNS,\
