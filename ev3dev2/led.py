@@ -292,17 +292,27 @@ class Leds(object):
         reduced proportionally.
 
         Example::
+
             my_leds = Leds()
             my_leds.set_color('LEFT', 'AMBER')
+        
+        With a custom color::
+
+            my_leds = Leds()
+            my_leds.set_color('LEFT', (0.5, 0.3))
         """
         # If this is a platform without LEDs there is nothing to do
         if not self.leds:
             return
 
-        assert group in self.led_groups, "%s is an invalid LED group, valid choices are %s" % (group, ','.join(self.led_groups.keys()))
-        assert color in self.led_colors, "%s is an invalid LED color, valid choices are %s" % (color, ','.join(self.led_colors.keys()))
+        color_tuple = color
+        if isinstance(color, str):
+            assert color in self.led_colors, "%s is an invalid LED color, valid choices are %s" % (color, ','.join(self.led_colors.keys()))
+            color_tuple = self.led_colors[color]
 
-        for led, value in zip(self.led_groups[group], self.led_colors[color]):
+        assert group in self.led_groups, "%s is an invalid LED group, valid choices are %s" % (group, ','.join(self.led_groups.keys()))
+
+        for led, value in zip(self.led_groups[group], color_tuple):
             led.brightness_pct = value * pct
 
     def set(self, group, **kwargs):
@@ -310,6 +320,7 @@ class Leds(object):
         Set attributes for each led in group.
 
         Example::
+
             my_leds = Leds()
             my_leds.set_color('LEFT', brightness_pct=0.5, trigger='timer')
         """

@@ -55,11 +55,11 @@ class Sound(object):
 
     Examples::
 
-        # Play 'bark.wav', return immediately:
+        # Play 'bark.wav':
         Sound.play('bark.wav')
 
-        # Introduce yourself, wait for completion:
-        Sound.speak('Hello, I am Robot').wait()
+        # Introduce yourself:
+        Sound.speak('Hello, I am Robot')
 
         # Play a small song
         Sound.play_song((
@@ -78,9 +78,9 @@ class Sound(object):
     channel = None
 
     # play_types
-    PLAY_WAIT_FOR_COMPLETE = 0
-    PLAY_NO_WAIT_FOR_COMPLETE = 1
-    PLAY_LOOP = 2
+    PLAY_WAIT_FOR_COMPLETE = 0 #: Play the sound and block until it is complete
+    PLAY_NO_WAIT_FOR_COMPLETE = 1 #: Start playing the sound but return immediately
+    PLAY_LOOP = 2 #: Never return; start the sound immediately after it completes, until the program is killed
 
     PLAY_TYPES = (
         PLAY_WAIT_FOR_COMPLETE,
@@ -168,18 +168,24 @@ class Sound(object):
                   play_type=PLAY_WAIT_FOR_COMPLETE):
         """ Play a single tone, specified by its frequency, duration, volume and final delay.
 
-        Args:
-            frequency (int): the tone frequency, in Hertz
-            duration (float): tone duration, in seconds
-            delay (float): delay after tone, in seconds (can be useful when chaining calls to ``play_tone``)
-            volume (int): sound volume in percent (between 0 and 100)
-            play_type (int): one off Sound.PLAY_xxx play types (wait, no wait, loop)
+        :param frequency: the tone frequency, in Hertz
+        :type frequency: int
 
-        Returns:
-            the sound playing subprocess PID when no wait play type is selected, None otherwise
+        :param duration: Tone duration, in seconds
+        :type duration: float
 
-        Raises:
-            ValueError: if invalid value for parameter(s)
+        :param delay: Delay after tone, in seconds (can be useful when chaining calls to ``play_tone``)
+        :type delay: float
+
+        :param volume: The play volume, in percent of maximum volume
+        :type volume: int
+
+        :param play_type: The behavior of ``play_tone`` once playback has been initiated
+        :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
+
+        :return: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the PID of the underlying beep command; ``None`` otherwise
+
+        :raises ValueError: if invalid parameter
         """
         self._validate_play_type(play_type)
 
@@ -210,18 +216,21 @@ class Sound(object):
     def play_note(self, note, duration, volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
         """ Plays a note, given by its name as defined in ``_NOTE_FREQUENCIES``.
 
-        Args:
-            note (str) the note symbol with its octave number
-            duration (float): tone duration, in seconds
-            volume (int) the play volume, in percent of maximum volume
-            play_type (int) the type of play (wait, no wait, loop), as defined
-            by the ``PLAY_xxx`` constants
+        :param note: The note symbol with its octave number
+        :type note: string
 
-        Returns:
-            the PID of the underlying beep command if no wait play type, None otherwise
+        :param duration: Tone duration, in seconds
+        :type duration: float
 
-        Raises:
-            ValueError: is invalid parameter (note, duration,...)
+        :param volume: The play volume, in percent of maximum volume
+        :type volume: int
+
+        :param play_type: The behavior of ``play_note`` once playback has been initiated
+        :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
+
+        :return: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the PID of the underlying beep command; ``None`` otherwise
+
+        :raises ValueError: is invalid parameter (note, duration,...)
         """
         self._validate_play_type(play_type)
         try:
@@ -238,12 +247,13 @@ class Sound(object):
     def play(self, wav_file, play_type=PLAY_WAIT_FOR_COMPLETE):
         """ Play a sound file (wav format).
 
-        Args:
-            wav_file (str): the sound file path
-            play_type (int): one off Sound.PLAY_xxx play types (wait, no wait, loop)
+        :param wav_file: The sound file path
+        :type wav_file: string
 
-        Returns:
-            subprocess.Popen: the spawn subprocess when no wait play type is selected, None otherwise
+        :param play_type: The behavior of ``play`` once playback has been initiated
+        :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
+
+        :returns: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
         self._validate_play_type(play_type)
 
@@ -265,13 +275,17 @@ class Sound(object):
     def play_file(self, wav_file, volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
         """ Play a sound file (wav format) at a given volume.
 
-        Args:
-            wav_file (str): the sound file path
-            volume (int) the play volume, in percent of maximum volume
-            play_type (int): one off Sound.PLAY_xxx play types (wait, no wait, loop)
+        
+        :param wav_file: The sound file path
+        :type wav_file: string
 
-        Returns:
-            subprocess.Popen: the spawn subprocess when no wait play type is selected, None otherwise
+        :param volume: The play volume, in percent of maximum volume
+        :type volume: int
+
+        :param play_type: The behavior of ``play_file`` once playback has been initiated
+        :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
+
+        :returns: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
         self.set_volume(volume)
         self.play(wav_file, play_type)
@@ -281,14 +295,19 @@ class Sound(object):
 
         Uses the ``espeak`` external command.
 
-        Args:
-            text (str): the text to speak
-            espeak_opts (str): espeak command options
-            volume (int) the play volume, in percent of maximum volume
-            play_type (int): one off Sound.PLAY_xxx play types (wait, no wait, loop)
+        :param text: The text to speak
+        :type text: string
 
-        Returns:
-            subprocess.Popen: the spawn subprocess when no wait play type is selected, None otherwise
+        :param espeak_opts: ``espeak`` command options (advanced usage)
+        :type espeak_opts: string
+
+        :param volume: The play volume, in percent of maximum volume
+        :type volume: int
+
+        :param play_type: The behavior of ``speak`` once playback has been initiated
+        :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
+
+        :returns: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
         self._validate_play_type(play_type)
         self.set_volume(volume)
@@ -314,8 +333,8 @@ class Sound(object):
 
     def _get_channel(self):
         """
-        Returns:
-            str: the detected sound channel
+        :returns: The detected sound channel
+        :rtype: string
         """
         if self.channel is None:
             # Get default channel as the first one that pops up in
@@ -422,16 +441,19 @@ class Sound(object):
 
             Only 4/4 signature songs are supported with respect to note durations.
 
-        Args:
-            song (iterable[tuple(str, str)]): the song
-            tempo (int): the song tempo, given in quarters per minute
-            delay (float): delay between notes (in seconds)
+        :param song: the song
+        :type song: iterable[tuple(str, str)]
 
-        Returns:
-            subprocess.Popen: the spawn subprocess
 
-        Raises:
-            ValueError: if invalid note in song or invalid play parameters
+        :param tempo: the song tempo, given in quarters per minute
+        :type tempo: int
+
+        :param delay: delay between notes (in seconds)
+        :type delay: float
+
+        :return: the spawn subprocess from ``subprocess.Popen``
+
+        :raises ValueError: if invalid note in song or invalid play parameters
         """
         if tempo <= 0:
             raise ValueError('invalid tempo (%s)' % tempo)

@@ -30,31 +30,69 @@ Leds
 .. autoclass:: ev3dev2.led.Leds
     :members:
 
-    .. rubric:: EV3 platform
+LED group and color names
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Led groups:
+.. rubric:: EV3 platform
 
-    .. py:data:: LEFT
-    .. py:data:: RIGHT
+Led groups:
 
-    Colors:
+- ``LEFT``
+- ``RIGHT``
 
-    .. py:data:: RED
-    .. py:data:: GREEN
-    .. py:data:: AMBER
-    .. py:data:: ORANGE
-    .. py:data:: YELLOW
+Colors:
 
-    .. rubric:: BrickPI platform
+- ``BLACK``
+- ``RED``
+- ``GREEN``
+- ``AMBER``
+- ``ORANGE``
+- ``YELLOW``
 
-    Led groups:
+.. rubric:: BrickPI platform
 
-    .. py:data:: LED1
-    .. py:data:: LED2
+Led groups:
 
-    Colors:
+- ``LED1``
+- ``LED2``
 
-    .. py:data:: BLUE
+Colors:
+
+- ``BLACK``
+- ``BLUE``
+
+.. rubric:: BrickPI3 platform
+
+Led groups:
+
+- ``LED``
+
+Colors:
+
+- ``BLACK``
+- ``BLUE``
+
+.. rubric:: PiStorms platform
+
+Led groups:
+
+- ``LEFT``
+- ``RIGHT``
+
+Colors:
+
+- ``BLACK``
+- ``RED``
+- ``GREEN``
+- ``BLUE``
+- ``YELLOW``
+- ``CYAN``
+- ``MAGENTA``
+
+.. rubric:: EVB platform
+
+None.
+    
 
 Power Supply
 ------------
