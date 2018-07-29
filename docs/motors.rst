@@ -14,6 +14,7 @@ Most methods which run motors with accept a ``speed`` or ``speed_pct`` argument.
 
 .. autoclass:: SpeedInteger
 .. autoclass:: SpeedPercent
+.. autoclass:: SpeedNativeUnits
 .. autoclass:: SpeedRPS
 .. autoclass:: SpeedRPM
 .. autoclass:: SpeedDPS

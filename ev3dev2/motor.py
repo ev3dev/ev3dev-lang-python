@@ -81,7 +81,7 @@ class SpeedPercent(SpeedInteger):
     """
 
     def __str__(self):
-        return ("%d%%" % self)
+        return int.__str__(self) + "%"
 
     def get_speed_pct(self, motor):
         """
@@ -90,19 +90,33 @@ class SpeedPercent(SpeedInteger):
         return self
 
 
+class SpeedNativeUnits(SpeedInteger):
+    """
+    Speed in tacho counts per second.
+    """
+
+    def __str__(self):
+        return int.__str__(self) + "% (counts/sec)"
+
+    def get_speed_pct(self, motor):
+        """
+        Return the motor speed percentage represented by this SpeedNativeUnits
+        """
+        return self/motor.max_speed * 100
+
 class SpeedRPS(SpeedInteger):
     """
     Speed in rotations-per-second.
     """
 
     def __str__(self):
-        return ("%d rps" % self)
+        return int.__str__(self) + " rps"
 
     def get_speed_pct(self, motor):
         """
         Return the motor speed percentage to achieve desired rotations-per-second
         """
-        assert self <= motor.max_rps, "%s max RPS is %s, %s was requested"  % (motor, motor.max_rps, self)
+        assert self <= motor.max_rps, "{} max RPS is {}, {} was requested".format(motor, motor.max_rps, self)
         return (self/motor.max_rps) * 100
 
 
@@ -112,13 +126,13 @@ class SpeedRPM(SpeedInteger):
     """
 
     def __str__(self):
-        return ("%d rpm" % self)
+        return int.__str__(self) + " rpm"
 
     def get_speed_pct(self, motor):
         """
         Return the motor speed percentage to achieve desired rotations-per-minute
         """
-        assert self <= motor.max_rpm, "%s max RPM is %s, %s was requested"  % (motor, motor.max_rpm, self)
+        assert self <= motor.max_rpm, "{} max RPM is {}, {} was requested".format(motor, motor.max_rpm, self)
         return (self/motor.max_rpm) * 100
 
 
@@ -128,13 +142,13 @@ class SpeedDPS(SpeedInteger):
     """
 
     def __str__(self):
-        return ("%d dps" % self)
+        return int.__str__(self) + " dps"
 
     def get_speed_pct(self, motor):
         """
         Return the motor speed percentage to achieve desired degrees-per-second
         """
-        assert self <= motor.max_dps, "%s max DPS is %s, %s was requested"  % (motor, motor.max_dps, self)
+        assert self <= motor.max_dps, "{} max DPS is {}, {} was requested".format(motor, motor.max_dps, self)
         return (self/motor.max_dps) * 100
 
 
@@ -144,13 +158,13 @@ class SpeedDPM(SpeedInteger):
     """
 
     def __str__(self):
-        return ("%d dpm" % self)
+        return int.__str__(self) + " dpm"
 
     def get_speed_pct(self, motor):
         """
         Return the motor speed percentage to achieve desired degrees-per-minute
         """
-        assert self <= motor.max_dps, "%s max DPM is %s, %s was requested"  % (motor, motor.max_dpm, self)
+        assert self <= motor.max_dpm, "{} max DPM is {}, {} was requested".format(motor, motor.max_dpm, self)
         return (self/motor.max_dpm) * 100
 
 
@@ -827,7 +841,7 @@ class Motor(Device):
         """
         return self.wait(lambda state: s not in state, timeout)
 
-    def _speed_pct(self, speed_pct):
+    def _speed_pct(self, speed_pct, label=None):
 
         # If speed_pct is SpeedInteger object we must convert
         # SpeedRPS, etc to an actual speed percentage
@@ -835,14 +849,14 @@ class Motor(Device):
             speed_pct = speed_pct.get_speed_pct(self)
 
         assert -100 <= speed_pct <= 100,\
-            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+            "{}{} is an invalid speed_pct, must be between -100 and 100 (inclusive)".format(None if label is None else (label + ": ") , speed_pct)
 
         return speed_pct
 
     def _set_position_rotations(self, speed_pct, rotations):
 
         # +/- speed is used to control direction, rotations must be positive
-        assert rotations >= 0, "rotations is %s, must be >= 0" % rotations
+        assert rotations >= 0, "rotations is {}, must be >= 0".format(rotations)
 
         if speed_pct > 0:
             self.position_sp = self.position + int(rotations * self.count_per_rot)
@@ -875,7 +889,7 @@ class Motor(Device):
         speed_pct = self._speed_pct(speed_pct)
 
         if not speed_pct or not rotations:
-            log.warning("%s speed_pct is %s but rotations is %s, motor will not move" % (self, speed_pct, rotations))
+            log.warning("({}) Either speed_pct ({}) or rotations ({}) is invalid, motor will not move" .format(self, speed_pct, rotations))
             self._set_brake(brake)
             return
 
@@ -898,7 +912,7 @@ class Motor(Device):
         speed_pct = self._speed_pct(speed_pct)
 
         if not speed_pct or not degrees:
-            log.warning("%s speed_pct is %s but degrees is %s, motor will not move" % (self, speed_pct, degrees))
+            log.warning("({}) Either speed_pct ({}) or degrees ({}) is invalid, motor will not move" .format(self, speed_pct, degrees))
             self._set_brake(brake)
             return
 
@@ -921,7 +935,7 @@ class Motor(Device):
         speed_pct = self._speed_pct(speed_pct)
 
         if not speed_pct:
-            log.warning("%s speed_pct is %s, motor will not move" % (self, speed_pct))
+            log.warning("({}) speed_pct is invalid ({}), motor will not move".format(self, speed_pct))
             self._set_brake(brake)
             return
 
@@ -944,7 +958,7 @@ class Motor(Device):
         speed_pct = self._speed_pct(speed_pct)
 
         if not speed_pct or not seconds:
-            log.warning("%s speed_pct is %s but seconds is %s, motor will not move" % (self, speed_pct, seconds))
+            log.warning("({}) Either speed_pct ({}) or seconds ({}) is invalid, motor will not move" .format(self, speed_pct, seconds))
             self._set_brake(brake)
             return
 
@@ -970,7 +984,7 @@ class Motor(Device):
         speed_pct = self._speed_pct(speed_pct)
 
         if not speed_pct:
-            log.warning("%s speed_pct is %s, motor will not move" % (self, speed_pct))
+            log.warning("({}) speed_pct is invalid ({}), motor will not move".format(self, speed_pct))
             self._set_brake(brake)
             return
 
@@ -1717,43 +1731,46 @@ class MoveTank(MotorSet):
         self.left_motor.wait_until_not_moving()
         self.right_motor.wait_until_not_moving()
 
-    def _validate_speed_pct(self, left_speed_pct, right_speed_pct):
-        assert left_speed_pct >= -100 and left_speed_pct <= 100,\
-            "%s is an invalid left_speed_pct, must be between -100 and 100 (inclusive)" % left_speed_pct
-        assert right_speed_pct >= -100 and right_speed_pct <= 100,\
-            "%s is an invalid right_speed_pct, must be between -100 and 100 (inclusive)" % right_speed_pct
-        assert left_speed_pct or right_speed_pct,\
-            "Either left_speed_pct or right_speed_pct must be non-zero"
+    def _unpack_speeds_to_native_units(self, left_speed, right_speed):
+        left_speed_pct = self.left_motor._speed_pct(left_speed, "left_speed")
+        right_speed_pct = self.right_motor._speed_pct(right_speed, "right_speed")
 
-    def on_for_rotations(self, left_speed_pct, right_speed_pct, rotations, brake=True, block=True):
+        assert left_speed_pct or right_speed_pct,\
+            "Either left_speed or right_speed must be non-zero"
+        
+        return (
+            int((left_speed_pct * self.left_motor.max_speed) / 100),
+            int((right_speed_pct * self.right_motor.max_speed) / 100)
+        )
+
+    def on_for_rotations(self, left_speed, right_speed, rotations, brake=True, block=True):
         """
-        Rotate the motors at 'left_speed & right_speed' for 'rotations'.
+        Rotate the motors at 'left_speed & right_speed' for 'rotations'. Speeds
+        can be integer percentages or any SpeedInteger implementation.
 
         If the left speed is not equal to the right speed (i.e., the robot will
         turn), the motor on the outside of the turn will rotate for the full
         ``rotations`` while the motor on the inside will have its requested
         distance calculated according to the expected turn.
         """
-        self._validate_speed_pct(left_speed_pct, right_speed_pct)
-        left_speed = int((left_speed_pct * self.max_speed) / 100)
-        right_speed = int((right_speed_pct * self.max_speed) / 100)
+        (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
         # proof of the following distance calculation: consider the circle formed by each wheel's path
         # v_l = d_l/t, v_r = d_r/t
         # therefore, t = d_l/v_l = d_r/v_r
-        if left_speed > right_speed:
+        if left_speed_native_units > right_speed_native_units:
             left_rotations = rotations
-            right_rotations = abs(float(right_speed / left_speed)) * rotations
+            right_rotations = abs(float(right_speed_native_units / left_speed_native_units)) * rotations
         else:
-            left_rotations = abs(float(left_speed / right_speed)) * rotations
+            left_rotations = abs(float(left_speed_native_units / right_speed_native_units)) * rotations
             right_rotations = rotations
 
         # Set all parameters
-        self.left_motor.speed_sp = left_speed
-        self.left_motor._set_position_rotations(left_speed, left_rotations)
+        self.left_motor.speed_sp = left_speed_native_units
+        self.left_motor._set_position_rotations(left_speed_native_units, left_rotations)
         self.left_motor._set_brake(brake)
-        self.right_motor.speed_sp = right_speed
-        self.right_motor._set_position_rotations(right_speed, right_rotations)
+        self.right_motor.speed_sp = right_speed_native_units
+        self.right_motor._set_position_rotations(right_speed_native_units, right_rotations)
         self.right_motor._set_brake(brake)
 
         # Start the motors
@@ -1763,32 +1780,31 @@ class MoveTank(MotorSet):
         if block:
             self._block()
 
-    def on_for_degrees(self, left_speed_pct, right_speed_pct, degrees, brake=True, block=True):
+    def on_for_degrees(self, left_speed, right_speed, degrees, brake=True, block=True):
         """
-        Rotate the motors at 'left_speed & right_speed' for 'degrees'.
+        Rotate the motors at 'left_speed & right_speed' for 'degrees'. Speeds
+        can be integer percentages or any SpeedInteger implementation.
 
         If the left speed is not equal to the right speed (i.e., the robot will
         turn), the motor on the outside of the turn will rotate for the full
         ``degrees`` while the motor on the inside will have its requested
         distance calculated according to the expected turn.
         """
-        self._validate_speed_pct(left_speed_pct, right_speed_pct)
-        left_speed = int((left_speed_pct * self.max_speed) / 100)
-        right_speed = int((right_speed_pct * self.max_speed) / 100)
+        (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
-        if left_speed > right_speed:
+        if left_speed_native_units > right_speed_native_units:
             left_degrees = degrees
-            right_degrees = float(right_speed / left_speed) * degrees
+            right_degrees = float(right_speed / left_speed_native_units) * degrees
         else:
-            left_degrees = float(left_speed / right_speed) * degrees
+            left_degrees = float(left_speed_native_units / right_speed_native_units) * degrees
             right_degrees = degrees
 
         # Set all parameters
-        self.left_motor.speed_sp = left_speed
-        self.left_motor._set_position_degrees(left_speed, left_degrees)
+        self.left_motor.speed_sp = left_speed_native_units
+        self.left_motor._set_position_degrees(left_speed_native_units, left_degrees)
         self.left_motor._set_brake(brake)
-        self.right_motor.speed_sp = right_speed
-        self.right_motor._set_position_degrees(right_speed, right_degrees)
+        self.right_motor.speed_sp = right_speed_native_units
+        self.right_motor._set_position_degrees(right_speed_native_units, right_degrees)
         self.right_motor._set_brake(brake)
 
         # Start the motors
@@ -1798,17 +1814,18 @@ class MoveTank(MotorSet):
         if block:
             self._block()
 
-    def on_for_seconds(self, left_speed_pct, right_speed_pct, seconds, brake=True, block=True):
+    def on_for_seconds(self, left_speed, right_speed, seconds, brake=True, block=True):
         """
-        Rotate the motors at 'left_speed & right_speed' for 'seconds'
+        Rotate the motors at 'left_speed & right_speed' for 'seconds'. Speeds
+        can be integer percentages or any SpeedInteger implementation.
         """
-        self._validate_speed_pct(left_speed_pct, right_speed_pct)
+        (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
         # Set all parameters
-        self.left_motor.speed_sp = int((left_speed_pct * self.max_speed) / 100)
+        self.left_motor.speed_sp = left_speed_native_units
         self.left_motor.time_sp = int(seconds * 1000)
         self.left_motor._set_brake(brake)
-        self.right_motor.speed_sp = int((right_speed_pct * self.max_speed) / 100)
+        self.right_motor.speed_sp = right_speed_native_units
         self.right_motor.time_sp = int(seconds * 1000)
         self.right_motor._set_brake(brake)
 
@@ -1819,13 +1836,15 @@ class MoveTank(MotorSet):
         if block:
             self._block()
 
-    def on(self, left_speed_pct, right_speed_pct):
+    def on(self, left_speed, right_speed):
         """
-        Start rotating the motors according to ``left_speed_pct`` and ``right_speed_pct`` forever.
+        Start rotating the motors according to ``left_speed`` and ``right_speed`` forever.
+        Speeds can be integer percentages or any SpeedInteger implementation.
         """
-        self._validate_speed_pct(left_speed_pct, right_speed_pct)
-        self.left_motor.speed_sp = int((left_speed_pct * self.max_speed) / 100)
-        self.right_motor.speed_sp = int((right_speed_pct * self.max_speed) / 100)
+        (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
+
+        self.left_motor.speed_sp = left_speed_native_units
+        self.right_motor.speed_sp = right_speed_native_units
 
         # Start the motors
         self.left_motor.run_forever()
@@ -1859,45 +1878,45 @@ class MoveSteering(MoveTank):
 
         steering_drive = MoveSteering(OUTPUT_A, OUTPUT_B)
         # drive in a turn for 10 rotations of the outer motor
-        steering_drive.on_for_rotations(-20, 75, 10)
+        steering_drive.on_for_rotations(-20, SpeedPercent(75), 10)
     """
-    def on_for_rotations(self, steering, speed_pct, rotations, brake=True, block=True):
+    def on_for_rotations(self, steering, speed, rotations, brake=True, block=True):
         """
         Rotate the motors according to the provided ``steering``.
 
         The distance each motor will travel follows the rules of :meth:`MoveTank.on_for_rotations`.
         """
-        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
-        MoveTank.on_for_rotations(self, left_speed_pct, right_speed_pct, rotations, brake, block)
+        (left_speed, right_speed) = self.get_speed_steering(steering, speed)
+        MoveTank.on_for_rotations(self, SpeedNativeUnits(left_speed), SpeedNativeUnits(right_speed), rotations, brake, block)
 
-    def on_for_degrees(self, steering, speed_pct, degrees, brake=True, block=True):
+    def on_for_degrees(self, steering, speed, degrees, brake=True, block=True):
         """
         Rotate the motors according to the provided ``steering``.
 
         The distance each motor will travel follows the rules of :meth:`MoveTank.on_for_degrees`.
         """
-        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
-        MoveTank.on_for_degrees(self, left_speed_pct, right_speed_pct, degrees, brake, block)
+        (left_speed, right_speed) = self.get_speed_steering(steering, speed)
+        MoveTank.on_for_degrees(self, SpeedNativeUnits(left_speed), SpeedNativeUnits(right_speed), degrees, brake, block)
 
-    def on_for_seconds(self, steering, speed_pct, seconds, brake=True, block=True):
+    def on_for_seconds(self, steering, speed, seconds, brake=True, block=True):
         """
         Rotate the motors according to the provided ``steering`` for ``seconds``.
         """
-        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
-        MoveTank.on_for_seconds(self, left_speed_pct, right_speed_pct, seconds, brake, block)
+        (left_speed, right_speed) = self.get_speed_steering(steering, speed)
+        MoveTank.on_for_seconds(self, SpeedNativeUnits(left_speed), SpeedNativeUnits(right_speed), seconds, brake, block)
 
-    def on(self, steering, speed_pct):
+    def on(self, steering, speed):
         """
         Start rotating the motors according to the provided ``steering`` forever.
         """
-        (left_speed_pct, right_speed_pct) = self.get_speed_steering(steering, speed_pct)
-        MoveTank.on(self, left_speed_pct, right_speed_pct)
+        (left_speed, right_speed) = self.get_speed_steering(steering, speed)
+        MoveTank.on(self, SpeedNativeUnits(left_speed), SpeedNativeUnits(right_speed))
 
-    def get_speed_steering(self, steering, speed_pct):
+    def get_speed_steering(self, steering, speed):
         """
         Calculate the speed_sp for each motor in a pair to achieve the specified
         steering. Note that calling this function alone will not make the
-        motors move, it only sets the speed. A run_* function must be called
+        motors move, it only calculates the speed. A run_* function must be called
         afterwards to make the motors move.
 
         steering [-100, 100]:
@@ -1905,32 +1924,29 @@ class MoveSteering(MoveTank):
             *  0   means drive in a straight line, and
             *  100 means turn right on the spot (left motor at 100% forward, right motor at 100% backward).
 
-        speed_pct:
+        speed:
             The speed that should be applied to the outmost motor (the one
             rotating faster). The speed of the other motor will be computed
             automatically.
         """
 
         assert steering >= -100 and steering <= 100,\
-            "%s is an invalid steering, must be between -100 and 100 (inclusive)" % steering
-        assert speed_pct >= -100 and speed_pct <= 100,\
-            "%s is an invalid speed_pct, must be between -100 and 100 (inclusive)" % speed_pct
+            "%{} is an invalid steering, must be between -100 and 100 (inclusive)".format(steering)
 
+        # We don't have a good way to make this generic for the pair... so we
+        # assume that the left motor's speed stats are the same as the right
+        # motor's.
+        speed_pct = self.left_motor._speed_pct(speed)
         left_speed = int((speed_pct * self.max_speed) / 100)
         right_speed = left_speed
-        speed = (50 - abs(float(steering))) / 50
+        speed_factor = (50 - abs(float(steering))) / 50
 
         if steering >= 0:
-            right_speed *= speed
+            right_speed *= speed_factor
         else:
-            left_speed *= speed
-
-        left_speed_pct = int((left_speed * 100) / self.left_motor.max_speed)
-        right_speed_pct = int((right_speed * 100) / self.right_motor.max_speed)
-        #log.debug("%s: steering %d, %s speed %d, %s speed %d" %
-        #    (self, steering, self.left_motor, left_speed_pct, self.right_motor, right_speed_pct))
-
-        return (left_speed_pct, right_speed_pct)
+            left_speed *= speed_factor
+        
+        return (left_speed, right_speed)
 
 
 class MoveJoystick(MoveTank):
@@ -1938,7 +1954,7 @@ class MoveJoystick(MoveTank):
     Used to control a pair of motors via a single joystick vector.
     """
 
-    def on(self, x, y, max_speed, radius=100.0):
+    def on(self, x, y, max_speed=100.0, radius=100.0):
         """
         Convert x,y joystick coordinates to left/right motor speed percentages
         and move the motors.
@@ -1983,20 +1999,20 @@ class MoveJoystick(MoveTank):
         left_speed_percentage = (init_left_speed_percentage * vector_length) / radius
         right_speed_percentage = (init_right_speed_percentage * vector_length) / radius
 
-        log.debug("""
-    x, y                         : %s, %s
-    radius                       : %s
-    angle                        : %s
-    vector length                : %s
-    init left_speed_percentage   : %s
-    init right_speed_percentage  : %s
-    final left_speed_percentage  : %s
-    final right_speed_percentage : %s
-    """ % (x, y, radius, angle, vector_length,
-            init_left_speed_percentage, init_right_speed_percentage,
-            left_speed_percentage, right_speed_percentage))
+    #     log.debug("""
+    # x, y                         : %s, %s
+    # radius                       : %s
+    # angle                        : %s
+    # vector length                : %s
+    # init left_speed_percentage   : %s
+    # init right_speed_percentage  : %s
+    # final left_speed_percentage  : %s
+    # final right_speed_percentage : %s
+    # """ % (x, y, radius, angle, vector_length,
+    #         init_left_speed_percentage, init_right_speed_percentage,
+    #         left_speed_percentage, right_speed_percentage))
 
-        MoveTank.on(self, left_speed_percentage, right_speed_percentage)
+        MoveTank.on(self, SpeedPercent(left_speed_percentage * self.left_motor._speed_pct(max_speed) / 100), SpeedPercent(right_speed_percentage * self.right_motor._speed_pct(max_speed) / 100))
 
 
     @staticmethod
@@ -2148,6 +2164,6 @@ class MoveJoystick(MoveTank):
             right_speed_percentage = -1 * percentage_from_315_to_360
 
         else:
-            raise Exception('You created a circle with more than 360 degrees (%s)...that is quite the trick' % angle)
+            raise Exception('You created a circle with more than 360 degrees ({})...that is quite the trick'.format(angle))
 
         return (left_speed_percentage * 100, right_speed_percentage * 100)

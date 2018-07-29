@@ -124,6 +124,9 @@ def list_device_names(class_path, name_pattern, **kwargs):
                 yield f
 
 
+def library_load_warning_message(library_name, dependent_class):
+    return 'Import warning: Failed to import "{}". {} will be unusable!'.format(library_name, dependent_class)
+
 class DeviceNotFound(Exception):
     pass
 
