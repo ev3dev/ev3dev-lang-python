@@ -1,5 +1,5 @@
-python-ev3dev2 (2.0.0) stable; urgency=medium
+python-ev3dev2 (2.0.0~beta1) stable; urgency=medium
 
-  Initial release for ev3dev-stretch.
+  Initial beta release for ev3dev-stretch.
 
- -- 
+ -- Kaelin Laundry <wasabifan@outlook.com>  Tue, 31 Jul 2018 20:37:00 -0700
