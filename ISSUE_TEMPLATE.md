@@ -4,7 +4,7 @@
 -->
 
 - **ev3dev version:** PASTE THE OUTPUT OF `uname -r` HERE
-- **ev3dev-lang-python version:**
+- **ev3dev-lang-python version:** INSERT ALL VERSIONS GIVEN BY `dpkg-query -l python3-ev3dev*` HERE
 
-<!-- Now tell us about what you were trying to do, and include any error messages you received. Be specific and include any involved code, please! -->
+<!-- Now tell us about what you were trying to do, and include any error messages you received. Be specific and include any involved code, please! Make sure to include your import statements as well. -->
 
