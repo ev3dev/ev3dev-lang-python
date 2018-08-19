@@ -1945,7 +1945,7 @@ class MoveSteering(MoveTank):
         """
 
         assert steering >= -100 and steering <= 100,\
-            "%{} is an invalid steering, must be between -100 and 100 (inclusive)".format(steering)
+            "{} is an invalid steering, must be between -100 and 100 (inclusive)".format(steering)
 
         # We don't have a good way to make this generic for the pair... so we
         # assume that the left motor's speed stats are the same as the right
