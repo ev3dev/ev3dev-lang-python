@@ -67,7 +67,7 @@ else:
     raise Exception("Unsupported platform '%s'" % platform)
 
 
-class SpeedInteger(int):
+class SpeedMeasure():
     """
     A base class for other unit types. Don't use this directly; instead, see
     :class:`SpeedPercent`, :class:`SpeedRPS`, :class:`SpeedRPM`,
@@ -75,87 +75,108 @@ class SpeedInteger(int):
     """
     pass
 
-class SpeedPercent(SpeedInteger):
+class SpeedPercent(SpeedMeasure):
     """
     Speed as a percentage of the motor's maximum rated speed.
     """
 
+    def __init__(self, percent):
+        assert -100 <= percent <= 100,\
+            "{} is an invalid percentage, must be between -100 and 100 (inclusive)".format(percent)
+        
+        self.percent = percent
+
     def __str__(self):
-        return int.__str__(self) + "%"
+        return str(self.percent) + "%"
 
     def get_speed_pct(self, motor):
         """
         Return the motor speed percentage represented by this SpeedPercent
         """
-        return self
+        return self.percent
 
 
-class SpeedNativeUnits(SpeedInteger):
+class SpeedNativeUnits(SpeedMeasure):
     """
     Speed in tacho counts per second.
     """
 
+    def __init__(self, native_counts):
+        self.native_counts = native_counts
+    
     def __str__(self):
-        return int.__str__(self) + "% (counts/sec)"
+        return str(self.native_counts) + " (counts/sec)"
 
     def get_speed_pct(self, motor):
         """
         Return the motor speed percentage represented by this SpeedNativeUnits
         """
-        return self/motor.max_speed * 100
+        return self.native_counts/motor.max_speed * 100
 
-class SpeedRPS(SpeedInteger):
+class SpeedRPS(SpeedMeasure):
     """
     Speed in rotations-per-second.
     """
 
+    def __init__(self, rotations_per_second):
+        self.rotations_per_second = rotations_per_second
+
     def __str__(self):
-        return int.__str__(self) + " rps"
+        return str(self.rotations_per_second) + " rps"
 
     def get_speed_pct(self, motor):
         """
         Return the motor speed percentage to achieve desired rotations-per-second
         """
-        assert self <= motor.max_rps, "{} max RPS is {}, {} was requested".format(motor, motor.max_rps, self)
-        return (self/motor.max_rps) * 100
+        assert abs(self.rotations_per_second) <= motor.max_rps, "invalid rotations-per-second: {} max RPS is {}, {} was requested".format(motor, motor.max_rps, self.rotations_per_second)
+        return (self.rotations_per_second/motor.max_rps) * 100
 
 
-class SpeedRPM(SpeedInteger):
+class SpeedRPM(SpeedMeasure):
     """
     Speed in rotations-per-minute.
     """
 
+    def __init__(self, rotations_per_minute):
+        self.rotations_per_minute = rotations_per_minute
+    
     def __str__(self):
-        return int.__str__(self) + " rpm"
+        return str(self) + " rpm"
 
     def get_speed_pct(self, motor):
         """
         Return the motor speed percentage to achieve desired rotations-per-minute
         """
-        assert self <= motor.max_rpm, "{} max RPM is {}, {} was requested".format(motor, motor.max_rpm, self)
-        return (self/motor.max_rpm) * 100
+        assert abs(self.rotations_per_minute) <= motor.max_rpm, "invalid rotations-per-minute: {} max RPM is {}, {} was requested".format(motor, motor.max_rpm, self.rotations_per_minute)
+        return (self.rotations_per_minute/motor.max_rpm) * 100
 
 
-class SpeedDPS(SpeedInteger):
+class SpeedDPS(SpeedMeasure):
     """
     Speed in degrees-per-second.
     """
 
+    def __init__(self, degrees_per_second):
+        self.degrees_per_second = degrees_per_second
+    
     def __str__(self):
-        return int.__str__(self) + " dps"
+        return str(self) + " dps"
 
     def get_speed_pct(self, motor):
         """
         Return the motor speed percentage to achieve desired degrees-per-second
         """
-        assert self <= motor.max_dps, "{} max DPS is {}, {} was requested".format(motor, motor.max_dps, self)
-        return (self/motor.max_dps) * 100
+        assert abs(self.degrees_per_second) <= motor.max_dps, "invalid degrees-per-second: {} max DPS is {}, {} was requested".format(motor, motor.max_dps, self.degrees_per_second)
+        return (self.degrees_per_second/motor.max_dps) * 100
 
 
-class SpeedDPM(SpeedInteger):
+class SpeedDPM(SpeedMeasure):
     """
     Speed in degrees-per-minute.
     """
+
+    def __init__(self, degrees_per_minute):
+        self.degrees_per_minute = degrees_per_minute
 
     def __str__(self):
         return int.__str__(self) + " dpm"
@@ -164,8 +185,8 @@ class SpeedDPM(SpeedInteger):
         """
         Return the motor speed percentage to achieve desired degrees-per-minute
         """
-        assert self <= motor.max_dpm, "{} max DPM is {}, {} was requested".format(motor, motor.max_dpm, self)
-        return (self/motor.max_dpm) * 100
+        assert abs(self.degrees_per_minute) <= motor.max_dpm, "invalid degrees-per-minute: {} max DPM is {}, {} was requested".format(motor, motor.max_dpm, self.degrees_per_minute)
+        return (self.degrees_per_minute/motor.max_dpm) * 100
 
 
 class Motor(Device):
@@ -843,9 +864,9 @@ class Motor(Device):
 
     def _speed_pct(self, speed_pct, label=None):
 
-        # If speed_pct is SpeedInteger object we must convert
+        # If speed_pct is SpeedMeasure object we must convert
         # SpeedRPS, etc to an actual speed percentage
-        if isinstance(speed_pct, SpeedInteger):
+        if isinstance(speed_pct, SpeedMeasure):
             speed_pct = speed_pct.get_speed_pct(self)
 
         assert -100 <= speed_pct <= 100,\
@@ -883,7 +904,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed_pct`` for ``rotations``
 
-        ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
+        ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedMeasure`
         object, enabling use of other units.
         """
         speed_pct = self._speed_pct(speed_pct)
@@ -906,7 +927,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed_pct`` for ``degrees``
 
-        ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
+        ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedMeasure`
         object, enabling use of other units.
         """
         speed_pct = self._speed_pct(speed_pct)
@@ -929,7 +950,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed_pct`` to ``position``
 
-        ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
+        ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedMeasure`
         object, enabling use of other units.
         """
         speed_pct = self._speed_pct(speed_pct)
@@ -952,7 +973,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed_pct`` for ``seconds``
 
-        ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
+        ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedMeasure`
         object, enabling use of other units.
         """
         speed_pct = self._speed_pct(speed_pct)
@@ -975,7 +996,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed_pct`` for forever
 
-        ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedInteger`
+        ``speed_pct`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedMeasure`
         object, enabling use of other units.
 
         Note that `block` is False by default, this is different from the
@@ -1746,7 +1767,7 @@ class MoveTank(MotorSet):
     def on_for_rotations(self, left_speed, right_speed, rotations, brake=True, block=True):
         """
         Rotate the motors at 'left_speed & right_speed' for 'rotations'. Speeds
-        can be integer percentages or any SpeedInteger implementation.
+        can be integer percentages or any SpeedMeasure implementation.
 
         If the left speed is not equal to the right speed (i.e., the robot will
         turn), the motor on the outside of the turn will rotate for the full
@@ -1783,7 +1804,7 @@ class MoveTank(MotorSet):
     def on_for_degrees(self, left_speed, right_speed, degrees, brake=True, block=True):
         """
         Rotate the motors at 'left_speed & right_speed' for 'degrees'. Speeds
-        can be integer percentages or any SpeedInteger implementation.
+        can be integer percentages or any SpeedMeasure implementation.
 
         If the left speed is not equal to the right speed (i.e., the robot will
         turn), the motor on the outside of the turn will rotate for the full
@@ -1817,7 +1838,7 @@ class MoveTank(MotorSet):
     def on_for_seconds(self, left_speed, right_speed, seconds, brake=True, block=True):
         """
         Rotate the motors at 'left_speed & right_speed' for 'seconds'. Speeds
-        can be integer percentages or any SpeedInteger implementation.
+        can be integer percentages or any SpeedMeasure implementation.
         """
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
@@ -1839,7 +1860,7 @@ class MoveTank(MotorSet):
     def on(self, left_speed, right_speed):
         """
         Start rotating the motors according to ``left_speed`` and ``right_speed`` forever.
-        Speeds can be integer percentages or any SpeedInteger implementation.
+        Speeds can be integer percentages or any SpeedMeasure implementation.
         """
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
@@ -1970,7 +1991,7 @@ class MoveJoystick(MoveTank):
             (0,0) representing the center position. X is horizontal and Y is vertical.
         
         max_speed (default 100%):
-            A percentage or other SpeedInteger, controlling the maximum motor speed.
+            A percentage or other SpeedMeasure, controlling the maximum motor speed.
         
         radius (default 100):
             The radius of the joystick, controlling the range of the input (x, y) values.
