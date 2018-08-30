@@ -902,7 +902,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed`` for ``rotations``
 
-        ``speed`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedMeasure`
+        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedMeasure`
         object, enabling use of other units.
         """
         speed = self._speed_native_units(speed)
@@ -925,7 +925,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed`` for ``degrees``
 
-        ``speed`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedMeasure`
+        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedMeasure`
         object, enabling use of other units.
         """
         speed = self._speed_native_units(speed)
@@ -948,7 +948,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed`` to ``position``
 
-        ``speed`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedMeasure`
+        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedMeasure`
         object, enabling use of other units.
         """
         speed = self._speed_native_units(speed)
@@ -971,7 +971,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed`` for ``seconds``
 
-        ``speed`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedMeasure`
+        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedMeasure`
         object, enabling use of other units.
         """
         speed = self._speed_native_units(speed)
@@ -994,7 +994,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed`` for forever
 
-        ``speed`` can be an integer percentage or a :class:`ev3dev2.motor.SpeedMeasure`
+        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedMeasure`
         object, enabling use of other units.
 
         Note that `block` is False by default, this is different from the
@@ -1765,7 +1765,7 @@ class MoveTank(MotorSet):
     def on_for_rotations(self, left_speed, right_speed, rotations, brake=True, block=True):
         """
         Rotate the motors at 'left_speed & right_speed' for 'rotations'. Speeds
-        can be integer percentages or any SpeedMeasure implementation.
+        can be percentages or any SpeedMeasure implementation.
 
         If the left speed is not equal to the right speed (i.e., the robot will
         turn), the motor on the outside of the turn will rotate for the full
@@ -1802,7 +1802,7 @@ class MoveTank(MotorSet):
     def on_for_degrees(self, left_speed, right_speed, degrees, brake=True, block=True):
         """
         Rotate the motors at 'left_speed & right_speed' for 'degrees'. Speeds
-        can be integer percentages or any SpeedMeasure implementation.
+        can be percentages or any SpeedMeasure implementation.
 
         If the left speed is not equal to the right speed (i.e., the robot will
         turn), the motor on the outside of the turn will rotate for the full
@@ -1836,7 +1836,7 @@ class MoveTank(MotorSet):
     def on_for_seconds(self, left_speed, right_speed, seconds, brake=True, block=True):
         """
         Rotate the motors at 'left_speed & right_speed' for 'seconds'. Speeds
-        can be integer percentages or any SpeedMeasure implementation.
+        can be percentages or any SpeedMeasure implementation.
         """
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
@@ -1858,7 +1858,7 @@ class MoveTank(MotorSet):
     def on(self, left_speed, right_speed):
         """
         Start rotating the motors according to ``left_speed`` and ``right_speed`` forever.
-        Speeds can be integer percentages or any SpeedMeasure implementation.
+        Speeds can be percentages or any SpeedMeasure implementation.
         """
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
