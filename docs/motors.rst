@@ -10,7 +10,7 @@ Motor classes
 Units
 -----
 
-Most methods which run motors with accept a ``speed`` or ``speed_pct`` argument. While this can be provided as an integer which will be interpreted as a percentage of max speed, you can also specify an instance of any of the following classes, each of which represents a different unit system:
+Most methods which run motors with accept a ``speed`` argument. While this can be provided as an integer which will be interpreted as a percentage of max speed, you can also specify an instance of any of the following classes, each of which represents a different unit system:
 
 .. autoclass:: SpeedInteger
 .. autoclass:: SpeedPercent
