@@ -878,9 +878,9 @@ class Motor(Device):
         assert rotations >= 0, "rotations is {}, must be >= 0".format(rotations)
 
         if speed > 0:
-            self.position_sp = self.position + int(rotations * self.count_per_rot)
+            self.position_sp = self.position + int(round(rotations * self.count_per_rot))
         else:
-            self.position_sp = self.position - int(rotations * self.count_per_rot)
+            self.position_sp = self.position - int(round(rotations * self.count_per_rot))
 
     def _set_position_degrees(self, speed, degrees):
 
@@ -1758,8 +1758,8 @@ class MoveTank(MotorSet):
             "Either left_speed or right_speed must be non-zero"
         
         return (
-            int(left_speed),
-            int(right_speed)
+            left_speed,
+            right_speed
         )
 
     def on_for_rotations(self, left_speed, right_speed, rotations, brake=True, block=True):
@@ -1785,10 +1785,10 @@ class MoveTank(MotorSet):
             right_rotations = rotations
 
         # Set all parameters
-        self.left_motor.speed_sp = left_speed_native_units
+        self.left_motor.speed_sp = int(round(left_speed_native_units))
         self.left_motor._set_position_rotations(left_speed_native_units, left_rotations)
         self.left_motor._set_brake(brake)
-        self.right_motor.speed_sp = right_speed_native_units
+        self.right_motor.speed_sp = int(round(right_speed_native_units))
         self.right_motor._set_position_rotations(right_speed_native_units, right_rotations)
         self.right_motor._set_brake(brake)
 
@@ -1819,10 +1819,10 @@ class MoveTank(MotorSet):
             right_degrees = degrees
 
         # Set all parameters
-        self.left_motor.speed_sp = left_speed_native_units
+        self.left_motor.speed_sp = int(round(left_speed_native_units))
         self.left_motor._set_position_degrees(left_speed_native_units, left_degrees)
         self.left_motor._set_brake(brake)
-        self.right_motor.speed_sp = right_speed_native_units
+        self.right_motor.speed_sp = int(round(right_speed_native_units))
         self.right_motor._set_position_degrees(right_speed_native_units, right_degrees)
         self.right_motor._set_brake(brake)
 
@@ -1841,10 +1841,10 @@ class MoveTank(MotorSet):
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
         # Set all parameters
-        self.left_motor.speed_sp = left_speed_native_units
+        self.left_motor.speed_sp = int(round(left_speed_native_units))
         self.left_motor.time_sp = int(seconds * 1000)
         self.left_motor._set_brake(brake)
-        self.right_motor.speed_sp = right_speed_native_units
+        self.right_motor.speed_sp = int(round(right_speed_native_units))
         self.right_motor.time_sp = int(seconds * 1000)
         self.right_motor._set_brake(brake)
 
@@ -1862,8 +1862,8 @@ class MoveTank(MotorSet):
         """
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
-        self.left_motor.speed_sp = left_speed_native_units
-        self.right_motor.speed_sp = right_speed_native_units
+        self.left_motor.speed_sp = int(round(left_speed_native_units))
+        self.right_motor.speed_sp = int(round(right_speed_native_units))
 
         # Start the motors
         self.left_motor.run_forever()

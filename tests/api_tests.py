@@ -116,8 +116,8 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(drive.left_motor.speed_sp, 1050 / 2)
 
         self.assertEqual(drive.right_motor.position, 0)
-        self.assertAlmostEqual(drive.right_motor.position_sp, 5 * 360, delta=5)
-        self.assertAlmostEqual(drive.right_motor.speed_sp, 1050 / 4, delta=1)
+        self.assertEqual(drive.right_motor.position_sp, 5 * 360)
+        self.assertAlmostEqual(drive.right_motor.speed_sp, 1050 / 4, delta=0.5)
     
     def test_tank_units(self):
         clean_arena()
@@ -131,8 +131,8 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(drive.left_motor.speed_sp, 400)
 
         self.assertEqual(drive.right_motor.position, 0)
-        self.assertAlmostEqual(drive.right_motor.position_sp, 10 * 360 * ((10000 / 60) / 400), delta=7)
-        self.assertAlmostEqual(drive.right_motor.speed_sp, 10000 / 60, delta=1)
+        self.assertAlmostEqual(drive.right_motor.position_sp, 10 * 360 * ((10000 / 60) / 400))
+        self.assertAlmostEqual(drive.right_motor.speed_sp, 10000 / 60, delta=0.5)
 
     def test_steering_units(self):
         clean_arena()
