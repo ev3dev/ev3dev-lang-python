@@ -287,16 +287,6 @@ class Display(FbMem):
         pixels = [self._color565(r, g, b) for (r, g, b) in self._img.getdata()]
         return pack('H' * len(pixels), *pixels)
 
-    def _color_xrgb(self, v):
-        """Convert red, green, blue components to a 32-bit XRGB value. Components
-        should be values 0 to 255.
-        """
-        return ((v << 16) | (v << 8) | v)
-
-    def _img_to_xrgb_bytes(self):
-        pixels = [self._color_xrgb(v) for v in self._img.getdata()]
-        return pack('I' * len(pixels), *pixels)
-
     def update(self):
         """
         Applies pending changes to the screen.
@@ -308,7 +298,7 @@ class Display(FbMem):
         elif self.var_info.bits_per_pixel == 16:
             self.mmap[:] = self._img_to_rgb565_bytes()
         elif self.platform == "ev3" and self.var_info.bits_per_pixel == 32:
-            self.mmap[:] = self._img_to_xrgb_bytes()
+            self.mmap[:] = self._img.convert("RGB").tobytes("raw", "XRGB")
         else:
             raise Exception("Not supported")
 
