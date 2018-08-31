@@ -36,6 +36,9 @@ class TestAPI(unittest.TestCase):
         with self.assertRaises(ev3dev2.DeviceNotFound):
             d = ev3dev2.Device('tacho-motor', 'motor*', address='outA', driver_name='not-valid')
 
+        with self.assertRaises(ev3dev2.DeviceNotFound):
+            d = ev3dev2.Device('tacho-motor', 'motor*', address='this-does-not-exist')
+
         d = ev3dev2.Device('lego-sensor', 'sensor*')
 
         with self.assertRaises(ev3dev2.DeviceNotFound):
@@ -113,8 +116,8 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(drive.left_motor.speed_sp, 1050 / 2)
 
         self.assertEqual(drive.right_motor.position, 0)
-        self.assertAlmostEqual(drive.right_motor.position_sp, 5 * 360, delta=5)
-        self.assertAlmostEqual(drive.right_motor.speed_sp, 1050 / 4, delta=1)
+        self.assertEqual(drive.right_motor.position_sp, 5 * 360)
+        self.assertAlmostEqual(drive.right_motor.speed_sp, 1050 / 4, delta=0.5)
     
     def test_tank_units(self):
         clean_arena()
@@ -128,8 +131,8 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(drive.left_motor.speed_sp, 400)
 
         self.assertEqual(drive.right_motor.position, 0)
-        self.assertAlmostEqual(drive.right_motor.position_sp, 10 * 360 * ((10000 / 60) / 400), delta=7)
-        self.assertAlmostEqual(drive.right_motor.speed_sp, 10000 / 60, delta=1)
+        self.assertAlmostEqual(drive.right_motor.position_sp, 10 * 360 * ((10000 / 60) / 400))
+        self.assertAlmostEqual(drive.right_motor.speed_sp, 10000 / 60, delta=0.5)
 
     def test_steering_units(self):
         clean_arena()
@@ -162,12 +165,12 @@ class TestAPI(unittest.TestCase):
 
         m = Motor()
 
-        self.assertEqual(SpeedPercent(35).get_speed_pct(m), 35)
-        self.assertEqual(SpeedDPS(300).get_speed_pct(m), 300 / 1050 * 100)
-        self.assertEqual(SpeedNativeUnits(300).get_speed_pct(m), 300 / 1050 * 100)
-        self.assertEqual(SpeedDPM(30000).get_speed_pct(m), (30000 / 60) / 1050 * 100)
-        self.assertEqual(SpeedRPS(2).get_speed_pct(m), 360 * 2 / 1050 * 100)
-        self.assertEqual(SpeedRPM(100).get_speed_pct(m), (360 * 100 / 60) / 1050 * 100)
+        self.assertEqual(SpeedPercent(35).to_native_units(m), 35 / 100 * m.max_speed)
+        self.assertEqual(SpeedDPS(300).to_native_units(m), 300)
+        self.assertEqual(SpeedNativeUnits(300).to_native_units(m), 300)
+        self.assertEqual(SpeedDPM(30000).to_native_units(m), (30000 / 60))
+        self.assertEqual(SpeedRPS(2).to_native_units(m), 360 * 2)
+        self.assertEqual(SpeedRPM(100).to_native_units(m), (360 * 100 / 60))
 
 
 if __name__ == "__main__":

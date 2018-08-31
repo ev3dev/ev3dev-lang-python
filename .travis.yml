@@ -6,8 +6,8 @@ sudo: false
 git:
   depth: 100
 install:
-- pip install -q Pillow evdev Sphinx sphinx_bootstrap_theme recommonmark evdev
-- pip install -q -r ./docs/requirements.txt
+- pip install Pillow Sphinx sphinx_bootstrap_theme recommonmark evdev==1.0.0
+- pip install -r ./docs/requirements.txt
 script:
 - chmod -R g+rw ./tests/fake-sys/devices/**/*
 - ./tests/api_tests.py
