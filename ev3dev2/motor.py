@@ -67,7 +67,7 @@ else:
     raise Exception("Unsupported platform '%s'" % platform)
 
 
-class SpeedMeasure():
+class SpeedValue():
     """
     A base class for other unit types. Don't use this directly; instead, see
     :class:`SpeedPercent`, :class:`SpeedRPS`, :class:`SpeedRPM`,
@@ -75,7 +75,7 @@ class SpeedMeasure():
     """
     pass
 
-class SpeedPercent(SpeedMeasure):
+class SpeedPercent(SpeedValue):
     """
     Speed as a percentage of the motor's maximum rated speed.
     """
@@ -96,7 +96,7 @@ class SpeedPercent(SpeedMeasure):
         return self.percent / 100 * motor.max_speed
 
 
-class SpeedNativeUnits(SpeedMeasure):
+class SpeedNativeUnits(SpeedValue):
     """
     Speed in tacho counts per second.
     """
@@ -105,7 +105,7 @@ class SpeedNativeUnits(SpeedMeasure):
         self.native_counts = native_counts
     
     def __str__(self):
-        return str(self.native_counts) + " (counts/sec)"
+        return str(self.native_counts) + " counts/sec"
 
     def to_native_units(self, motor):
         """
@@ -113,7 +113,7 @@ class SpeedNativeUnits(SpeedMeasure):
         """
         return self.native_counts
 
-class SpeedRPS(SpeedMeasure):
+class SpeedRPS(SpeedValue):
     """
     Speed in rotations-per-second.
     """
@@ -122,7 +122,7 @@ class SpeedRPS(SpeedMeasure):
         self.rotations_per_second = rotations_per_second
 
     def __str__(self):
-        return str(self.rotations_per_second) + " rps"
+        return str(self.rotations_per_second) + " rot/sec"
 
     def to_native_units(self, motor):
         """
@@ -132,7 +132,7 @@ class SpeedRPS(SpeedMeasure):
         return self.rotations_per_second/motor.max_rps * motor.max_speed
 
 
-class SpeedRPM(SpeedMeasure):
+class SpeedRPM(SpeedValue):
     """
     Speed in rotations-per-minute.
     """
@@ -141,7 +141,7 @@ class SpeedRPM(SpeedMeasure):
         self.rotations_per_minute = rotations_per_minute
     
     def __str__(self):
-        return str(self) + " rpm"
+        return str(self) + " rot/min"
 
     def to_native_units(self, motor):
         """
@@ -151,7 +151,7 @@ class SpeedRPM(SpeedMeasure):
         return self.rotations_per_minute/motor.max_rpm * motor.max_speed
 
 
-class SpeedDPS(SpeedMeasure):
+class SpeedDPS(SpeedValue):
     """
     Speed in degrees-per-second.
     """
@@ -160,7 +160,7 @@ class SpeedDPS(SpeedMeasure):
         self.degrees_per_second = degrees_per_second
     
     def __str__(self):
-        return str(self) + " dps"
+        return str(self) + " deg/sec"
 
     def to_native_units(self, motor):
         """
@@ -170,7 +170,7 @@ class SpeedDPS(SpeedMeasure):
         return self.degrees_per_second/motor.max_dps * motor.max_speed
 
 
-class SpeedDPM(SpeedMeasure):
+class SpeedDPM(SpeedValue):
     """
     Speed in degrees-per-minute.
     """
@@ -179,7 +179,7 @@ class SpeedDPM(SpeedMeasure):
         self.degrees_per_minute = degrees_per_minute
 
     def __str__(self):
-        return int.__str__(self) + " dpm"
+        return int.__str__(self) + " deg/min"
 
     def to_native_units(self, motor):
         """
@@ -196,11 +196,6 @@ class Motor(Device):
     positional and directional feedback such as the EV3 and NXT motors.
     This feedback allows for precise control of the motors. This is the
     most common type of motor, so we just call it `motor`.
-
-    The way to configure a motor is to set the '_sp' attributes when
-    calling a command or before. Only in 'run_direct' mode attribute
-    changes are processed immediately, in the other modes they only
-    take place when a new command is issued.
     """
 
     SYSTEM_CLASS_NAME = 'tacho-motor'
@@ -864,8 +859,8 @@ class Motor(Device):
 
     def _speed_native_units(self, speed, label=None):
 
-        # If speed is not a SpeedMeasure object we treat it as a percentage
-        if not isinstance(speed, SpeedMeasure):
+        # If speed is not a SpeedValue object we treat it as a percentage
+        if not isinstance(speed, SpeedValue):
             assert -100 <= speed <= 100,\
                 "{}{} is an invalid speed percentage, must be between -100 and 100 (inclusive)".format("" if label is None else (label + ": ") , speed)
             speed = SpeedPercent(speed)
@@ -902,7 +897,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed`` for ``rotations``
 
-        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedMeasure`
+        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
         speed = self._speed_native_units(speed)
@@ -912,7 +907,7 @@ class Motor(Device):
             self._set_brake(brake)
             return
 
-        self.speed_sp = int(speed)
+        self.speed_sp = int(round(speed))
         self._set_position_rotations(speed, rotations)
         self._set_brake(brake)
         self.run_to_abs_pos()
@@ -925,7 +920,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed`` for ``degrees``
 
-        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedMeasure`
+        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
         speed = self._speed_native_units(speed)
@@ -935,7 +930,7 @@ class Motor(Device):
             self._set_brake(brake)
             return
 
-        self.speed_sp = int(speed)
+        self.speed_sp = int(round(speed))
         self._set_position_degrees(speed, degrees)
         self._set_brake(brake)
         self.run_to_abs_pos()
@@ -948,7 +943,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed`` to ``position``
 
-        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedMeasure`
+        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
         speed = self._speed_native_units(speed)
@@ -958,7 +953,7 @@ class Motor(Device):
             self._set_brake(brake)
             return
 
-        self.speed_sp = int(speed)
+        self.speed_sp = int(round(speed))
         self.position_sp = position
         self._set_brake(brake)
         self.run_to_abs_pos()
@@ -971,7 +966,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed`` for ``seconds``
 
-        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedMeasure`
+        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
         speed = self._speed_native_units(speed)
@@ -981,7 +976,7 @@ class Motor(Device):
             self._set_brake(brake)
             return
 
-        self.speed_sp = int(speed)
+        self.speed_sp = int(round(speed))
         self.time_sp = int(seconds * 1000)
         self._set_brake(brake)
         self.run_timed()
@@ -994,7 +989,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed`` for forever
 
-        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedMeasure`
+        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
 
         Note that `block` is False by default, this is different from the
@@ -1007,7 +1002,7 @@ class Motor(Device):
             self._set_brake(brake)
             return
 
-        self.speed_sp = int(speed)
+        self.speed_sp = int(round(speed))
         self._set_brake(brake)
         self.run_forever()
 
@@ -1765,7 +1760,7 @@ class MoveTank(MotorSet):
     def on_for_rotations(self, left_speed, right_speed, rotations, brake=True, block=True):
         """
         Rotate the motors at 'left_speed & right_speed' for 'rotations'. Speeds
-        can be percentages or any SpeedMeasure implementation.
+        can be percentages or any SpeedValue implementation.
 
         If the left speed is not equal to the right speed (i.e., the robot will
         turn), the motor on the outside of the turn will rotate for the full
@@ -1802,7 +1797,7 @@ class MoveTank(MotorSet):
     def on_for_degrees(self, left_speed, right_speed, degrees, brake=True, block=True):
         """
         Rotate the motors at 'left_speed & right_speed' for 'degrees'. Speeds
-        can be percentages or any SpeedMeasure implementation.
+        can be percentages or any SpeedValue implementation.
 
         If the left speed is not equal to the right speed (i.e., the robot will
         turn), the motor on the outside of the turn will rotate for the full
@@ -1836,7 +1831,7 @@ class MoveTank(MotorSet):
     def on_for_seconds(self, left_speed, right_speed, seconds, brake=True, block=True):
         """
         Rotate the motors at 'left_speed & right_speed' for 'seconds'. Speeds
-        can be percentages or any SpeedMeasure implementation.
+        can be percentages or any SpeedValue implementation.
         """
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
@@ -1858,7 +1853,7 @@ class MoveTank(MotorSet):
     def on(self, left_speed, right_speed):
         """
         Start rotating the motors according to ``left_speed`` and ``right_speed`` forever.
-        Speeds can be percentages or any SpeedMeasure implementation.
+        Speeds can be percentages or any SpeedValue implementation.
         """
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
@@ -1989,7 +1984,7 @@ class MoveJoystick(MoveTank):
             (0,0) representing the center position. X is horizontal and Y is vertical.
         
         max_speed (default 100%):
-            A percentage or other SpeedMeasure, controlling the maximum motor speed.
+            A percentage or other SpeedValue, controlling the maximum motor speed.
         
         radius (default 100):
             The radius of the joystick, controlling the range of the input (x, y) values.
