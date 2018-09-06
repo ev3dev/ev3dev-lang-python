@@ -93,6 +93,19 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(s.num_values,      1)
         self.assertEqual(s.address,         'in1')
         self.assertEqual(s.value(0),        16)
+        self.assertEqual(s.mode,            "IR-PROX")
+
+        s.mode = "IR-REMOTE"
+        self.assertEqual(s.mode,            "IR-REMOTE")
+
+        val = s.proximity
+        # Our test environment writes to actual files on disk, so while "seek(0) write(...)" works on the real device, it leaves trailing characters from previous writes in tests. "s.mode" returns "IR-PROXTE" here.
+        self.assertTrue(s.mode.startswith("IR-PROX"))
+        self.assertEqual(val,               16)
+
+        val = s.buttons_pressed()
+        self.assertTrue(s.mode.startswith("IR-REMOTE"))
+        self.assertEqual(val,               [])
 
     def test_medium_motor_write(self):
         clean_arena()
@@ -171,7 +184,6 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(SpeedDPM(30000).to_native_units(m), (30000 / 60))
         self.assertEqual(SpeedRPS(2).to_native_units(m), 360 * 2)
         self.assertEqual(SpeedRPM(100).to_native_units(m), (360 * 100 / 60))
-
 
 if __name__ == "__main__":
     unittest.main()

@@ -54,7 +54,7 @@ class TouchSensor(Sensor):
         A boolean indicating whether the current touch sensor is being
         pressed.
         """
-        self.mode = self.MODE_TOUCH
+        self._ensure_mode(self.MODE_TOUCH)
         return self.value(0)
 
     @property
@@ -182,7 +182,7 @@ class ColorSensor(Sensor):
         """
         Reflected light intensity as a percentage. Light on sensor is red.
         """
-        self.mode = self.MODE_COL_REFLECT
+        self._ensure_mode(self.MODE_COL_REFLECT)
         return self.value(0)
 
     @property
@@ -190,7 +190,7 @@ class ColorSensor(Sensor):
         """
         Ambient light intensity. Light on sensor is dimly lit blue.
         """
-        self.mode = self.MODE_COL_AMBIENT
+        self._ensure_mode(self.MODE_COL_AMBIENT)
         return self.value(0)
 
     @property
@@ -206,7 +206,7 @@ class ColorSensor(Sensor):
           - 6: White
           - 7: Brown
         """
-        self.mode = self.MODE_COL_COLOR
+        self._ensure_mode(self.MODE_COL_COLOR)
         return self.value(0)
 
     @property
@@ -226,7 +226,7 @@ class ColorSensor(Sensor):
 
         If this is an issue, check out the rgb() and calibrate_white() methods.
         """
-        self.mode = self.MODE_RGB_RAW
+        self._ensure_mode(self.MODE_RGB_RAW)
         return self.value(0), self.value(1), self.value(2)
 
     def calibrate_white(self):
@@ -384,7 +384,7 @@ class ColorSensor(Sensor):
         """
         Red component of the detected color, in the range 0-1020.
         """
-        self.mode = self.MODE_RGB_RAW
+        self._ensure_mode(self.MODE_RGB_RAW)
         return self.value(0)
 
     @property
@@ -392,7 +392,7 @@ class ColorSensor(Sensor):
         """
         Green component of the detected color, in the range 0-1020.
         """
-        self.mode = self.MODE_RGB_RAW
+        self._ensure_mode(self.MODE_RGB_RAW)
         return self.value(1)
 
     @property
@@ -400,7 +400,7 @@ class ColorSensor(Sensor):
         """
         Blue component of the detected color, in the range 0-1020.
         """
-        self.mode = self.MODE_RGB_RAW
+        self._ensure_mode(self.MODE_RGB_RAW)
         return self.value(2)
 
 
@@ -440,12 +440,12 @@ class UltrasonicSensor(Sensor):
 
     @property
     def distance_centimeters_continuous(self):
-        self.mode = self.MODE_US_DIST_CM
+        self._ensure_mode(self.MODE_US_DIST_CM)
         return self.value(0) * self._scale('US_DIST_CM')
 
     @property
     def distance_centimeters_ping(self):
-        self.mode = self.MODE_US_SI_CM
+        self._ensure_mode(self.MODE_US_SI_CM)
         return self.value(0) * self._scale('US_DIST_CM')
 
     @property
@@ -458,12 +458,12 @@ class UltrasonicSensor(Sensor):
 
     @property
     def distance_inches_continuous(self):
-        self.mode = self.MODE_US_DIST_IN
+        self._ensure_mode(self.MODE_US_DIST_IN)
         return self.value(0) * self._scale('US_DIST_IN')
 
     @property
     def distance_inches_ping(self):
-        self.mode = self.MODE_US_SI_IN
+        self._ensure_mode(self.MODE_US_SI_IN)
         return self.value(0) * self._scale('US_DIST_IN')
 
     @property
@@ -480,7 +480,7 @@ class UltrasonicSensor(Sensor):
         Value indicating whether another ultrasonic sensor could
         be heard nearby.
         """
-        self.mode = self.MODE_US_LISTEN
+        self._ensure_mode(self.MODE_US_LISTEN)
         return bool(self.value(0))
 
 
@@ -533,7 +533,7 @@ class GyroSensor(Sensor):
         The number of degrees that the sensor has been rotated
         since it was put into this mode.
         """
-        self.mode = self.MODE_GYRO_ANG
+        self._ensure_mode(self.MODE_GYRO_ANG)
         return self.value(0)
 
     @property
@@ -541,7 +541,7 @@ class GyroSensor(Sensor):
         """
         The rate at which the sensor is rotating, in degrees/second.
         """
-        self.mode = self.MODE_GYRO_RATE
+        self._ensure_mode(self.MODE_GYRO_RATE)
         return self.value(0)
 
     @property
@@ -549,21 +549,21 @@ class GyroSensor(Sensor):
         """
         Angle (degrees) and Rotational Speed (degrees/second).
         """
-        self.mode = self.MODE_GYRO_G_A
+        self._ensure_mode(self.MODE_GYRO_G_A)
         return self.value(0), self.value(1)
 
     @property
     def tilt_angle(self):
-        self.mode = self.MODE_TILT_ANG
+        self._ensure_mode(self.MODE_TILT_ANG)
         return self.value(0)
 
     @property
     def tilt_rate(self):
-        self.mode = self.MODE_TILT_RATE
+        self._ensure_mode(self.MODE_TILT_RATE)
         return self.value(0)
 
     def reset(self):
-        self.mode = self.MODE_GYRO_ANG
+        self._ensure_mode(self.MODE_GYRO_ANG)
         self._direct = self.set_attr_raw(self._direct, 'direct', 17)
 
     def wait_until_angle_changed_by(self, delta):
@@ -687,14 +687,14 @@ class InfraredSensor(Sensor, ButtonBase):
         A measurement of the distance between the sensor and the remote,
         as a percentage. 100% is approximately 70cm/27in.
         """
-        self.mode = self.MODE_IR_PROX
+        self._ensure_mode(self.MODE_IR_PROX)
         return self.value(0)
 
     def heading(self, channel=1):
         """
         Returns heading (-25, 25) to the beacon on the given channel.
         """
-        self.mode = self.MODE_IR_SEEK
+        self._ensure_mode(self.MODE_IR_SEEK)
         channel = self._normalize_channel(channel)
         return self.value(channel * 2)
 
@@ -703,7 +703,7 @@ class InfraredSensor(Sensor, ButtonBase):
         Returns distance (0, 100) to the beacon on the given channel.
         Returns None when beacon is not found.
         """
-        self.mode = self.MODE_IR_SEEK
+        self._ensure_mode(self.MODE_IR_SEEK)
         channel = self._normalize_channel(channel)
         ret_value = self.value((channel * 2) + 1)
 
@@ -751,7 +751,7 @@ class InfraredSensor(Sensor, ButtonBase):
         """
         Returns list of currently pressed buttons.
         """
-        self.mode = self.MODE_IR_REMOTE
+        self._ensure_mode(self.MODE_IR_REMOTE)
         channel = self._normalize_channel(channel)
         return self._BUTTON_VALUES.get(self.value(channel), [])
 
@@ -834,7 +834,7 @@ class SoundSensor(Sensor):
         A measurement of the measured sound pressure level, as a
         percent. Uses a flat weighting.
         """
-        self.mode = self.MODE_DB
+        self._ensure_mode(self.MODE_DB)
         return self.value(0) * self._scale('DB')
 
     @property
@@ -843,7 +843,7 @@ class SoundSensor(Sensor):
         A measurement of the measured sound pressure level, as a
         percent. Uses A-weighting, which focuses on levels up to 55 dB.
         """
-        self.mode = self.MODE_DBA
+        self._ensure_mode(self.MODE_DBA)
         return self.value(0) * self._scale('DBA')
 
 
@@ -874,7 +874,7 @@ class LightSensor(Sensor):
         """
         A measurement of the reflected light intensity, as a percentage.
         """
-        self.mode = self.MODE_REFLECT
+        self._ensure_mode(self.MODE_REFLECT)
         return self.value(0) * self._scale('REFLECT')
 
     @property
@@ -882,5 +882,5 @@ class LightSensor(Sensor):
         """
         A measurement of the ambient light intensity, as a percentage.
         """
-        self.mode = self.MODE_AMBIENT
+        self._ensure_mode(self.MODE_AMBIENT)
         return self.value(0) * self._scale('AMBIENT')
