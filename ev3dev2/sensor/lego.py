@@ -521,6 +521,8 @@ class UltrasonicSensor(Sensor):
         """
         Measurement of the distance detected by the sensor,
         in inches.
+
+        Equivalent to :meth:`UltrasonicSensor.distance_inches_continuous`.
         """
         return self.distance_inches_continuous
 
@@ -694,33 +696,48 @@ class InfraredSensor(Sensor, ButtonBase):
     TOP_LEFT_BOTTOM_LEFT = 10
     TOP_RIGHT_BOTTOM_RIGHT = 11
 
-    # See process() for an explanation on how to use these
-    #: Handles ``Red Up``, etc events on channel 1
+    #: Handler for top-left button events on channel 1. See :meth:`InfraredSensor.process`.
     on_channel1_top_left = None
+    #: Handler for bottom-left button events on channel 1. See :meth:`InfraredSensor.process`.
     on_channel1_bottom_left = None
+    #: Handler for top-right button events on channel 1. See :meth:`InfraredSensor.process`.
     on_channel1_top_right = None
+    #: Handler for bottom-right button events on channel 1. See :meth:`InfraredSensor.process`.
     on_channel1_bottom_right = None
+    #: Handler for beacon button events on channel 1. See :meth:`InfraredSensor.process`.
     on_channel1_beacon = None
 
-    #: Handles ``Red Up``, etc events on channel 2
+    #: Handler for top-left button events on channel 2. See :meth:`InfraredSensor.process`.
     on_channel2_top_left = None
+    #: Handler for bottom-left button events on channel 2. See :meth:`InfraredSensor.process`.
     on_channel2_bottom_left = None
+    #: Handler for top-right button events on channel 2. See :meth:`InfraredSensor.process`.
     on_channel2_top_right = None
+    #: Handler for bottom-right button events on channel 2. See :meth:`InfraredSensor.process`.
     on_channel2_bottom_right = None
+    #: Handler for beacon button events on channel 2. See :meth:`InfraredSensor.process`.
     on_channel2_beacon = None
 
-    #: Handles ``Red Up``, etc events on channel 3
+    #: Handler for top-left button events on channel 3. See :meth:`InfraredSensor.process`.
     on_channel3_top_left = None
+    #: Handler for bottom-left button events on channel 3. See :meth:`InfraredSensor.process`.
     on_channel3_bottom_left = None
+    #: Handler for top-right button events on channel 3. See :meth:`InfraredSensor.process`.
     on_channel3_top_right = None
+    #: Handler for bottom-right button events on channel 3. See :meth:`InfraredSensor.process`.
     on_channel3_bottom_right = None
+    #: Handler for beacon button events on channel 3. See :meth:`InfraredSensor.process`.
     on_channel3_beacon = None
 
-    #: Handles ``Red Up``, etc events on channel 4
+    #: Handler for top-left button events on channel 4. See :meth:`InfraredSensor.process`.
     on_channel4_top_left = None
+    #: Handler for bottom-left button events on channel 4. See :meth:`InfraredSensor.process`.
     on_channel4_bottom_left = None
+    #: Handler for top-right button events on channel 4. See :meth:`InfraredSensor.process`.
     on_channel4_top_right = None
+    #: Handler for bottom-right button events on channel 4. See :meth:`InfraredSensor.process`.
     on_channel4_bottom_right = None
+    #: Handler for beacon button events on channel 4. See :meth:`InfraredSensor.process`.
     on_channel4_beacon = None
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
@@ -769,31 +786,31 @@ class InfraredSensor(Sensor, ButtonBase):
 
     def top_left(self, channel=1):
         """
-        Checks if `top_left` button is pressed.
+        Checks if ``top_left`` button is pressed.
         """
         return 'top_left' in self.buttons_pressed(channel)
 
     def bottom_left(self, channel=1):
         """
-        Checks if `bottom_left` button is pressed.
+        Checks if ``bottom_left`` button is pressed.
         """
         return 'bottom_left' in self.buttons_pressed(channel)
 
     def top_right(self, channel=1):
         """
-        Checks if `top_right` button is pressed.
+        Checks if ``top_right`` button is pressed.
         """
         return 'top_right' in self.buttons_pressed(channel)
 
     def bottom_right(self, channel=1):
         """
-        Checks if `bottom_right` button is pressed.
+        Checks if ``bottom_right`` button is pressed.
         """
         return 'bottom_right' in self.buttons_pressed(channel)
 
     def beacon(self, channel=1):
         """
-        Checks if `beacon` button is pressed.
+        Checks if ``beacon`` button is pressed.
         """
         return 'beacon' in self.buttons_pressed(channel)
 
@@ -810,7 +827,9 @@ class InfraredSensor(Sensor, ButtonBase):
         Check for currenly pressed buttons. If the new state differs from the
         old state, call the appropriate button event handlers.
 
-        To use the on_channel1_top_left, etc handlers your program would do something like::
+        To use the on_channel1_top_left, etc handlers your program would do something like:
+        
+        .. code:: python
 
             def top_left_channel_1_action(state):
                 print("top left on channel 1: %s" % state)
