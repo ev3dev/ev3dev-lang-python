@@ -440,12 +440,36 @@ class UltrasonicSensor(Sensor):
 
     @property
     def distance_centimeters_continuous(self):
+        """
+        Measurement of the distance detected by the sensor,
+        in centimeters.
+
+        The sensor will continue to take measurements so
+        they are available for future reads.
+
+        Prefer using the equivalent :meth:`UltrasonicSensor.distance_centimeters` property.
+        """
         self._ensure_mode(self.MODE_US_DIST_CM)
         return self.value(0) * self._scale('US_DIST_CM')
 
     @property
     def distance_centimeters_ping(self):
-        self._ensure_mode(self.MODE_US_SI_CM)
+        """
+        Measurement of the distance detected by the sensor,
+        in centimeters.
+
+        The sensor will take a single measurement then stop
+        broadcasting.
+
+        If you use this property too frequently (e.g. every
+        100msec), the sensor will sometimes lock up and writing
+        to the mode attribute will return an error. A delay of
+        250msec between each usage seems sufficient to keep the
+        sensor from locking up.
+        """
+        # This mode is special; setting the mode causes the sensor to send out
+        # a "ping", but the mode isn't actually changed.
+        self.mode = self.MODE_US_SI_CM
         return self.value(0) * self._scale('US_DIST_CM')
 
     @property
@@ -453,17 +477,43 @@ class UltrasonicSensor(Sensor):
         """
         Measurement of the distance detected by the sensor,
         in centimeters.
+
+        Equivalent to :meth:`UltrasonicSensor.distance_centimeters_continuous`.
         """
         return self.distance_centimeters_continuous
 
     @property
     def distance_inches_continuous(self):
+        """
+        Measurement of the distance detected by the sensor,
+        in inches.
+
+        The sensor will continue to take measurements so
+        they are available for future reads.
+
+        Prefer using the equivalent :meth:`UltrasonicSensor.distance_inches` property.
+        """
         self._ensure_mode(self.MODE_US_DIST_IN)
         return self.value(0) * self._scale('US_DIST_IN')
 
     @property
     def distance_inches_ping(self):
-        self._ensure_mode(self.MODE_US_SI_IN)
+        """
+        Measurement of the distance detected by the sensor,
+        in inches.
+
+        The sensor will take a single measurement then stop
+        broadcasting.
+
+        If you use this property too frequently (e.g. every
+        100msec), the sensor will sometimes lock up and writing
+        to the mode attribute will return an error. A delay of
+        250msec between each usage seems sufficient to keep the
+        sensor from locking up.
+        """
+        # This mode is special; setting the mode causes the sensor to send out
+        # a "ping", but the mode isn't actually changed.
+        self.mode = self.MODE_US_SI_IN
         return self.value(0) * self._scale('US_DIST_IN')
 
     @property
@@ -477,7 +527,7 @@ class UltrasonicSensor(Sensor):
     @property
     def other_sensor_present(self):
         """
-        Value indicating whether another ultrasonic sensor could
+        Boolean indicating whether another ultrasonic sensor could
         be heard nearby.
         """
         self._ensure_mode(self.MODE_US_LISTEN)
