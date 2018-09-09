@@ -219,17 +219,7 @@ class Sound(object):
         duration_ms = int(duration * 1000)
         delay_ms = int(delay * 1000)
 
-        if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
-            play = self.tone([(frequency, duration_ms, delay_ms)])
-            play.wait()
-
-        elif play_type == Sound.PLAY_NO_WAIT_FOR_COMPLETE:
-            return self.tone([(frequency, duration_ms, delay_ms)])
-
-        elif play_type == Sound.PLAY_LOOP:
-            while True:
-                play = self.tone([(frequency, duration_ms, delay_ms)])
-                play.wait()
+        self.tone([(frequency, duration_ms, delay_ms)], play_type=play_type)
 
     def play_note(self, note, duration, volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
         """ Plays a note, given by its name as defined in ``_NOTE_FREQUENCIES``.
