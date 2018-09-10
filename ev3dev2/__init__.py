@@ -224,7 +224,7 @@ class Device(object):
 
         v = io.FileIO(path, mode_str)
         print(v)
-        print(path + "      " + mode_str + "     " + mode)
+        print(path + "      " + mode_str + "     " + str(mode))
         return v
 
     def _get_attribute(self, attribute, name):
