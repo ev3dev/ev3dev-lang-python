@@ -16,5 +16,5 @@ make
 # Install dependencies
 # TODO: make unittest show output
 ~/micropython/ports/unix/micropython -m upip install micropython-unittest micropython-os micropython-os.path micropython-shutil micropython-io micropython-fnmatch micropython-numbers micropython-struct micropython-time micropython-logging micropython-select
-# Make unittest module show output
+# Make unittest module show output; will run until failure then print first error
 sed -i 's/#raise/raise/g' ~/.micropython/lib/unittest.py

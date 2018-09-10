@@ -252,7 +252,9 @@ class Device(object):
         if not isinstance(driver_error, OSError):
             raise driver_error
 
-        if driver_error.errno == errno.EINVAL:
+        driver_errorno = driver_error.args[0] if is_micropython() else driver_error.errno
+
+        if driver_errorno == errno.EINVAL:
             if attribute == "speed_sp":
                 try:
                     max_speed = self.max_speed
@@ -261,7 +263,7 @@ class Device(object):
                 else:
                     chain_exception(ValueError("The given speed value was out of range. Max speed: +/-" + str(max_speed)), driver_error)
             chain_exception(ValueError("One or more arguments were out of range or invalid"), driver_error)
-        elif driver_error.errno == errno.ENODEV or driver_error.errno == errno.ENOENT:
+        elif driver_errorno == errno.ENODEV or driver_errorno == errno.ENOENT:
             # We will assume that a file-not-found error is the result of a disconnected device
             # rather than a library error. If that isn't the case, at a minimum the underlying
             # error info will be printed for debugging.
