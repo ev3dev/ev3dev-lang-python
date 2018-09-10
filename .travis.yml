@@ -15,7 +15,6 @@ install:
 - if [ $USE_MICROPYTHON = true ]; then ./.travis/install-micropython.sh && PYTHON=~/micropython/ports/unix/micropython; fi
 script:
 - chmod -R g+rw ./tests/fake-sys/devices/**/*
-- find /home/travis/build/WasabiFan/ev3dev-lang-python/tests/fake-sys/ | xargs stat
 - $PYTHON tests/api_tests.py
 - if [ $USE_MICROPYTHON = false ]; then sphinx-build -nW -b html ./docs/ ./docs/_build/html; fi
 deploy:
