@@ -240,6 +240,7 @@ class Device(object):
                 attribute = self._attribute_file_open( name )
             else:
                 print("seek")
+                print(attribute)
                 attribute.seek(0)
 
             if isinstance(value, str):
