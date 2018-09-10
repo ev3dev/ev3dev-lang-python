@@ -1,17 +1,30 @@
 language: python
+env:
+  - USE_MICROPYTHON=false
+  - USE_MICROPYTHON=true
 python:
 - 3.4
 cache: pip
+addons:
+  apt:
+    packages:
+      - build-essential
+      - libreadline-dev
+      - libffi-dev
+      - git
+      - pkg-config
 sudo: false
 git:
   depth: 100
 install:
-- pip install Pillow Sphinx sphinx_bootstrap_theme recommonmark evdev==1.0.0
-- pip install -r ./docs/requirements.txt
+- PYTHON=python3
+- if [ $USE_MICROPYTHON = false ]; then pip install Pillow Sphinx sphinx_bootstrap_theme recommonmark evdev==1.0.0; fi
+- if [ $USE_MICROPYTHON = false ]; then pip install -r ./docs/requirements.txt; fi
+- if [ $USE_MICROPYTHON = true ]; then ./.travis/install-micropython.sh && PYTHON=~/micropython/ports/unix/micropython; fi
 script:
 - chmod -R g+rw ./tests/fake-sys/devices/**/*
-- ./tests/api_tests.py
-- sphinx-build -nW -b html ./docs/ ./docs/_build/html
+- $PYTHON tests/api_tests.py
+- if [ $USE_MICROPYTHON = false ]; then sphinx-build -nW -b html ./docs/ ./docs/_build/html; fi
 deploy:
   provider: pypi
   user: Denis.Demidov
