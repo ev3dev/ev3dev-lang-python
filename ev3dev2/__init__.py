@@ -222,7 +222,10 @@ class Device(object):
         else:
             mode = 'r'
 
-        return io.FileIO(path, mode)
+        v = io.FileIO(path, mode)
+        print(v)
+        print(path + "      " + mode)
+        return v
 
     def _get_attribute(self, attribute, name):
         """Device attribute getter"""
