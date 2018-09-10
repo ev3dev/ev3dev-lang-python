@@ -236,8 +236,10 @@ class Device(object):
         """Device attribute setter"""
         try:
             if attribute is None:
+                print("open")
                 attribute = self._attribute_file_open( name )
             else:
+                print("seek")
                 attribute.seek(0)
 
             if isinstance(value, str):
