@@ -5,7 +5,7 @@ cd ~/
 
 # Build micropython from source
 # TODO: cache micropython build output
-git clone --recurse-submodules https://github.com/micropython/micropython.git --depth 1 --branch v1.9.4
+git clone --recurse-submodules https://github.com/micropython/micropython.git --depth 1 --branch v1.9.4 --quiet
 cd ./micropython/ports/unix
 make axtls
 make
