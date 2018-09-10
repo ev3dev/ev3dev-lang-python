@@ -216,15 +216,15 @@ class Device(object):
         w_ok = mode & stat.S_IWGRP
 
         if r_ok and w_ok:
-            mode = 'r+'
+            mode_str = 'r+'
         elif w_ok:
-            mode = 'w'
+            mode_str = 'w'
         else:
-            mode = 'r'
+            mode_str = 'r'
 
-        v = io.FileIO(path, mode)
+        v = io.FileIO(path, mode_str)
         print(v)
-        print(path + "      " + mode)
+        print(path + "      " + mode_str + "     " + mode)
         return v
 
     def _get_attribute(self, attribute, name):
