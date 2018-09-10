@@ -222,10 +222,7 @@ class Device(object):
         else:
             mode_str = 'r'
 
-        v = io.FileIO(path, mode_str)
-        print(v)
-        print(path + "      " + mode_str + "     " + str(mode))
-        return v
+        return io.FileIO(path, mode_str)
 
     def _get_attribute(self, attribute, name):
         """Device attribute getter"""
@@ -239,11 +236,8 @@ class Device(object):
         """Device attribute setter"""
         try:
             if attribute is None:
-                print("open")
                 attribute = self._attribute_file_open( name )
             else:
-                print("seek")
-                print(attribute)
                 attribute.seek(0)
 
             if isinstance(value, str):
