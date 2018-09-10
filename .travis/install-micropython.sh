@@ -4,7 +4,7 @@ set -ex
 cd ~/
 
 # Build micropython from source
-# TODO: cache build output
+# TODO: cache micropython build output
 git clone --recurse-submodules https://github.com/micropython/micropython.git --depth 1 --branch v1.9.4
 cd ./micropython/ports/unix
 make axtls
@@ -13,8 +13,8 @@ make
 # Install upip
 ~/micropython/tools/bootstrap_upip.sh
 
-# Install dependencies
-# TODO: make unittest show output
+# Install micropython library modules
 ~/micropython/ports/unix/micropython -m upip install micropython-unittest micropython-os micropython-os.path micropython-shutil micropython-io micropython-fnmatch micropython-numbers micropython-struct micropython-time micropython-logging micropython-select
-# Make unittest module show output; will run until failure then print first error
+# Make unittest module show error output; will run until failure then print first error
+# See https://github.com/micropython/micropython-lib/blob/f20d89c6aad9443a696561ca2a01f7ef0c8fb302/unittest/unittest.py#L203
 sed -i 's/#raise/raise/g' ~/.micropython/lib/unittest.py

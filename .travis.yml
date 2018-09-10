@@ -9,10 +9,8 @@ sudo: false
 git:
   depth: 100
 install:
-- PYTHON=python3
-- if [ $USE_MICROPYTHON = false ]; then pip install Pillow Sphinx sphinx_bootstrap_theme recommonmark evdev==1.0.0; fi
-- if [ $USE_MICROPYTHON = false ]; then pip install -r ./docs/requirements.txt; fi
-- if [ $USE_MICROPYTHON = true ]; then ./.travis/install-micropython.sh && PYTHON=~/micropython/ports/unix/micropython; fi
+- if [ $USE_MICROPYTHON = false ]; then pip install Pillow Sphinx sphinx_bootstrap_theme recommonmark evdev==1.0.0 && pip install -r ./docs/requirements.txt; fi
+- if [ $USE_MICROPYTHON = true ]; then ./.travis/install-micropython.sh && PYTHON=~/micropython/ports/unix/micropython; else PYTHON=python3; fi
 script:
 - chmod -R g+rw ./tests/fake-sys/devices/**/*
 - $PYTHON tests/api_tests.py
