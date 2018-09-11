@@ -141,7 +141,7 @@ class SpeedRPM(SpeedValue):
         self.rotations_per_minute = rotations_per_minute
     
     def __str__(self):
-        return str(self) + " rot/min"
+        return str(self.rotations_per_minute) + " rot/min"
 
     def to_native_units(self, motor):
         """
@@ -160,7 +160,7 @@ class SpeedDPS(SpeedValue):
         self.degrees_per_second = degrees_per_second
     
     def __str__(self):
-        return str(self) + " deg/sec"
+        return str(self.degrees_per_second) + " deg/sec"
 
     def to_native_units(self, motor):
         """
@@ -179,7 +179,7 @@ class SpeedDPM(SpeedValue):
         self.degrees_per_minute = degrees_per_minute
 
     def __str__(self):
-        return int.__str__(self) + " deg/min"
+        return str(self.degrees_per_minute) + " deg/min"
 
     def to_native_units(self, motor):
         """

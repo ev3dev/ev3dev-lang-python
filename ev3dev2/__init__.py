@@ -216,11 +216,14 @@ class Device(object):
 
     def _get_attribute(self, attribute, name):
         """Device attribute getter"""
-        if attribute is None:
-            attribute = self._attribute_file_open( name )
-        else:
-            attribute.seek(0)
-        return attribute, attribute.read().strip().decode()
+        try:
+            if attribute is None:
+                attribute = self._attribute_file_open( name )
+            else:
+                attribute.seek(0)
+            return attribute, attribute.read().strip().decode()
+        except Exception as ex:
+            self._raise_friendly_access_error(ex, name)
 
     def _set_attribute(self, attribute, name, value):
         """Device attribute setter"""
