@@ -54,7 +54,7 @@ class TouchSensor(Sensor):
         A boolean indicating whether the current touch sensor is being
         pressed.
         """
-        self.mode = self.MODE_TOUCH
+        self._ensure_mode(self.MODE_TOUCH)
         return self.value(0)
 
     @property
@@ -182,7 +182,7 @@ class ColorSensor(Sensor):
         """
         Reflected light intensity as a percentage. Light on sensor is red.
         """
-        self.mode = self.MODE_COL_REFLECT
+        self._ensure_mode(self.MODE_COL_REFLECT)
         return self.value(0)
 
     @property
@@ -190,7 +190,7 @@ class ColorSensor(Sensor):
         """
         Ambient light intensity. Light on sensor is dimly lit blue.
         """
-        self.mode = self.MODE_COL_AMBIENT
+        self._ensure_mode(self.MODE_COL_AMBIENT)
         return self.value(0)
 
     @property
@@ -206,7 +206,7 @@ class ColorSensor(Sensor):
           - 6: White
           - 7: Brown
         """
-        self.mode = self.MODE_COL_COLOR
+        self._ensure_mode(self.MODE_COL_COLOR)
         return self.value(0)
 
     @property
@@ -226,7 +226,7 @@ class ColorSensor(Sensor):
 
         If this is an issue, check out the rgb() and calibrate_white() methods.
         """
-        self.mode = self.MODE_RGB_RAW
+        self._ensure_mode(self.MODE_RGB_RAW)
         return self.value(0), self.value(1), self.value(2)
 
     def calibrate_white(self):
@@ -384,7 +384,7 @@ class ColorSensor(Sensor):
         """
         Red component of the detected color, in the range 0-1020.
         """
-        self.mode = self.MODE_RGB_RAW
+        self._ensure_mode(self.MODE_RGB_RAW)
         return self.value(0)
 
     @property
@@ -392,7 +392,7 @@ class ColorSensor(Sensor):
         """
         Green component of the detected color, in the range 0-1020.
         """
-        self.mode = self.MODE_RGB_RAW
+        self._ensure_mode(self.MODE_RGB_RAW)
         return self.value(1)
 
     @property
@@ -400,7 +400,7 @@ class ColorSensor(Sensor):
         """
         Blue component of the detected color, in the range 0-1020.
         """
-        self.mode = self.MODE_RGB_RAW
+        self._ensure_mode(self.MODE_RGB_RAW)
         return self.value(2)
 
 
@@ -440,11 +440,35 @@ class UltrasonicSensor(Sensor):
 
     @property
     def distance_centimeters_continuous(self):
-        self.mode = self.MODE_US_DIST_CM
+        """
+        Measurement of the distance detected by the sensor,
+        in centimeters.
+
+        The sensor will continue to take measurements so
+        they are available for future reads.
+
+        Prefer using the equivalent :meth:`UltrasonicSensor.distance_centimeters` property.
+        """
+        self._ensure_mode(self.MODE_US_DIST_CM)
         return self.value(0) * self._scale('US_DIST_CM')
 
     @property
     def distance_centimeters_ping(self):
+        """
+        Measurement of the distance detected by the sensor,
+        in centimeters.
+
+        The sensor will take a single measurement then stop
+        broadcasting.
+
+        If you use this property too frequently (e.g. every
+        100msec), the sensor will sometimes lock up and writing
+        to the mode attribute will return an error. A delay of
+        250msec between each usage seems sufficient to keep the
+        sensor from locking up.
+        """
+        # This mode is special; setting the mode causes the sensor to send out
+        # a "ping", but the mode isn't actually changed.
         self.mode = self.MODE_US_SI_CM
         return self.value(0) * self._scale('US_DIST_CM')
 
@@ -453,16 +477,42 @@ class UltrasonicSensor(Sensor):
         """
         Measurement of the distance detected by the sensor,
         in centimeters.
+
+        Equivalent to :meth:`UltrasonicSensor.distance_centimeters_continuous`.
         """
         return self.distance_centimeters_continuous
 
     @property
     def distance_inches_continuous(self):
-        self.mode = self.MODE_US_DIST_IN
+        """
+        Measurement of the distance detected by the sensor,
+        in inches.
+
+        The sensor will continue to take measurements so
+        they are available for future reads.
+
+        Prefer using the equivalent :meth:`UltrasonicSensor.distance_inches` property.
+        """
+        self._ensure_mode(self.MODE_US_DIST_IN)
         return self.value(0) * self._scale('US_DIST_IN')
 
     @property
     def distance_inches_ping(self):
+        """
+        Measurement of the distance detected by the sensor,
+        in inches.
+
+        The sensor will take a single measurement then stop
+        broadcasting.
+
+        If you use this property too frequently (e.g. every
+        100msec), the sensor will sometimes lock up and writing
+        to the mode attribute will return an error. A delay of
+        250msec between each usage seems sufficient to keep the
+        sensor from locking up.
+        """
+        # This mode is special; setting the mode causes the sensor to send out
+        # a "ping", but the mode isn't actually changed.
         self.mode = self.MODE_US_SI_IN
         return self.value(0) * self._scale('US_DIST_IN')
 
@@ -471,16 +521,18 @@ class UltrasonicSensor(Sensor):
         """
         Measurement of the distance detected by the sensor,
         in inches.
+
+        Equivalent to :meth:`UltrasonicSensor.distance_inches_continuous`.
         """
         return self.distance_inches_continuous
 
     @property
     def other_sensor_present(self):
         """
-        Value indicating whether another ultrasonic sensor could
+        Boolean indicating whether another ultrasonic sensor could
         be heard nearby.
         """
-        self.mode = self.MODE_US_LISTEN
+        self._ensure_mode(self.MODE_US_LISTEN)
         return bool(self.value(0))
 
 
@@ -533,7 +585,7 @@ class GyroSensor(Sensor):
         The number of degrees that the sensor has been rotated
         since it was put into this mode.
         """
-        self.mode = self.MODE_GYRO_ANG
+        self._ensure_mode(self.MODE_GYRO_ANG)
         return self.value(0)
 
     @property
@@ -541,7 +593,7 @@ class GyroSensor(Sensor):
         """
         The rate at which the sensor is rotating, in degrees/second.
         """
-        self.mode = self.MODE_GYRO_RATE
+        self._ensure_mode(self.MODE_GYRO_RATE)
         return self.value(0)
 
     @property
@@ -549,21 +601,21 @@ class GyroSensor(Sensor):
         """
         Angle (degrees) and Rotational Speed (degrees/second).
         """
-        self.mode = self.MODE_GYRO_G_A
+        self._ensure_mode(self.MODE_GYRO_G_A)
         return self.value(0), self.value(1)
 
     @property
     def tilt_angle(self):
-        self.mode = self.MODE_TILT_ANG
+        self._ensure_mode(self.MODE_TILT_ANG)
         return self.value(0)
 
     @property
     def tilt_rate(self):
-        self.mode = self.MODE_TILT_RATE
+        self._ensure_mode(self.MODE_TILT_RATE)
         return self.value(0)
 
     def reset(self):
-        self.mode = self.MODE_GYRO_ANG
+        self._ensure_mode(self.MODE_GYRO_ANG)
         self._direct = self.set_attr_raw(self._direct, 'direct', 17)
 
     def wait_until_angle_changed_by(self, delta):
@@ -644,33 +696,48 @@ class InfraredSensor(Sensor, ButtonBase):
     TOP_LEFT_BOTTOM_LEFT = 10
     TOP_RIGHT_BOTTOM_RIGHT = 11
 
-    # See process() for an explanation on how to use these
-    #: Handles ``Red Up``, etc events on channel 1
+    #: Handler for top-left button events on channel 1. See :meth:`InfraredSensor.process`.
     on_channel1_top_left = None
+    #: Handler for bottom-left button events on channel 1. See :meth:`InfraredSensor.process`.
     on_channel1_bottom_left = None
+    #: Handler for top-right button events on channel 1. See :meth:`InfraredSensor.process`.
     on_channel1_top_right = None
+    #: Handler for bottom-right button events on channel 1. See :meth:`InfraredSensor.process`.
     on_channel1_bottom_right = None
+    #: Handler for beacon button events on channel 1. See :meth:`InfraredSensor.process`.
     on_channel1_beacon = None
 
-    #: Handles ``Red Up``, etc events on channel 2
+    #: Handler for top-left button events on channel 2. See :meth:`InfraredSensor.process`.
     on_channel2_top_left = None
+    #: Handler for bottom-left button events on channel 2. See :meth:`InfraredSensor.process`.
     on_channel2_bottom_left = None
+    #: Handler for top-right button events on channel 2. See :meth:`InfraredSensor.process`.
     on_channel2_top_right = None
+    #: Handler for bottom-right button events on channel 2. See :meth:`InfraredSensor.process`.
     on_channel2_bottom_right = None
+    #: Handler for beacon button events on channel 2. See :meth:`InfraredSensor.process`.
     on_channel2_beacon = None
 
-    #: Handles ``Red Up``, etc events on channel 3
+    #: Handler for top-left button events on channel 3. See :meth:`InfraredSensor.process`.
     on_channel3_top_left = None
+    #: Handler for bottom-left button events on channel 3. See :meth:`InfraredSensor.process`.
     on_channel3_bottom_left = None
+    #: Handler for top-right button events on channel 3. See :meth:`InfraredSensor.process`.
     on_channel3_top_right = None
+    #: Handler for bottom-right button events on channel 3. See :meth:`InfraredSensor.process`.
     on_channel3_bottom_right = None
+    #: Handler for beacon button events on channel 3. See :meth:`InfraredSensor.process`.
     on_channel3_beacon = None
 
-    #: Handles ``Red Up``, etc events on channel 4
+    #: Handler for top-left button events on channel 4. See :meth:`InfraredSensor.process`.
     on_channel4_top_left = None
+    #: Handler for bottom-left button events on channel 4. See :meth:`InfraredSensor.process`.
     on_channel4_bottom_left = None
+    #: Handler for top-right button events on channel 4. See :meth:`InfraredSensor.process`.
     on_channel4_top_right = None
+    #: Handler for bottom-right button events on channel 4. See :meth:`InfraredSensor.process`.
     on_channel4_bottom_right = None
+    #: Handler for beacon button events on channel 4. See :meth:`InfraredSensor.process`.
     on_channel4_beacon = None
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
@@ -687,14 +754,14 @@ class InfraredSensor(Sensor, ButtonBase):
         A measurement of the distance between the sensor and the remote,
         as a percentage. 100% is approximately 70cm/27in.
         """
-        self.mode = self.MODE_IR_PROX
+        self._ensure_mode(self.MODE_IR_PROX)
         return self.value(0)
 
     def heading(self, channel=1):
         """
         Returns heading (-25, 25) to the beacon on the given channel.
         """
-        self.mode = self.MODE_IR_SEEK
+        self._ensure_mode(self.MODE_IR_SEEK)
         channel = self._normalize_channel(channel)
         return self.value(channel * 2)
 
@@ -703,7 +770,7 @@ class InfraredSensor(Sensor, ButtonBase):
         Returns distance (0, 100) to the beacon on the given channel.
         Returns None when beacon is not found.
         """
-        self.mode = self.MODE_IR_SEEK
+        self._ensure_mode(self.MODE_IR_SEEK)
         channel = self._normalize_channel(channel)
         ret_value = self.value((channel * 2) + 1)
 
@@ -719,31 +786,31 @@ class InfraredSensor(Sensor, ButtonBase):
 
     def top_left(self, channel=1):
         """
-        Checks if `top_left` button is pressed.
+        Checks if ``top_left`` button is pressed.
         """
         return 'top_left' in self.buttons_pressed(channel)
 
     def bottom_left(self, channel=1):
         """
-        Checks if `bottom_left` button is pressed.
+        Checks if ``bottom_left`` button is pressed.
         """
         return 'bottom_left' in self.buttons_pressed(channel)
 
     def top_right(self, channel=1):
         """
-        Checks if `top_right` button is pressed.
+        Checks if ``top_right`` button is pressed.
         """
         return 'top_right' in self.buttons_pressed(channel)
 
     def bottom_right(self, channel=1):
         """
-        Checks if `bottom_right` button is pressed.
+        Checks if ``bottom_right`` button is pressed.
         """
         return 'bottom_right' in self.buttons_pressed(channel)
 
     def beacon(self, channel=1):
         """
-        Checks if `beacon` button is pressed.
+        Checks if ``beacon`` button is pressed.
         """
         return 'beacon' in self.buttons_pressed(channel)
 
@@ -751,7 +818,7 @@ class InfraredSensor(Sensor, ButtonBase):
         """
         Returns list of currently pressed buttons.
         """
-        self.mode = self.MODE_IR_REMOTE
+        self._ensure_mode(self.MODE_IR_REMOTE)
         channel = self._normalize_channel(channel)
         return self._BUTTON_VALUES.get(self.value(channel), [])
 
@@ -761,20 +828,23 @@ class InfraredSensor(Sensor, ButtonBase):
         old state, call the appropriate button event handlers.
 
         To use the on_channel1_top_left, etc handlers your program would do something like:
+        
+        .. code:: python
 
-        def top_left_channel_1_action(state):
-            print("top left on channel 1: %s" % state)
+            def top_left_channel_1_action(state):
+                print("top left on channel 1: %s" % state)
 
-        def bottom_right_channel_4_action(state):
-            print("bottom right on channel 4: %s" % state)
+            def bottom_right_channel_4_action(state):
+                print("bottom right on channel 4: %s" % state)
 
-        ir = InfraredSensor()
-        ir.on_channel1_top_left = top_left_channel_1_action
-        ir.on_channel4_bottom_right = bottom_right_channel_4_action
+            ir = InfraredSensor()
+            ir.on_channel1_top_left = top_left_channel_1_action
+            ir.on_channel4_bottom_right = bottom_right_channel_4_action
 
-        while True:
-            ir.process()
-            time.sleep(0.01)
+            while True:
+                ir.process()
+                time.sleep(0.01)
+        
         """
         new_state = []
         state_diff = []
@@ -834,7 +904,7 @@ class SoundSensor(Sensor):
         A measurement of the measured sound pressure level, as a
         percent. Uses a flat weighting.
         """
-        self.mode = self.MODE_DB
+        self._ensure_mode(self.MODE_DB)
         return self.value(0) * self._scale('DB')
 
     @property
@@ -843,7 +913,7 @@ class SoundSensor(Sensor):
         A measurement of the measured sound pressure level, as a
         percent. Uses A-weighting, which focuses on levels up to 55 dB.
         """
-        self.mode = self.MODE_DBA
+        self._ensure_mode(self.MODE_DBA)
         return self.value(0) * self._scale('DBA')
 
 
@@ -874,7 +944,7 @@ class LightSensor(Sensor):
         """
         A measurement of the reflected light intensity, as a percentage.
         """
-        self.mode = self.MODE_REFLECT
+        self._ensure_mode(self.MODE_REFLECT)
         return self.value(0) * self._scale('REFLECT')
 
     @property
@@ -882,5 +952,5 @@ class LightSensor(Sensor):
         """
         A measurement of the ambient light intensity, as a percentage.
         """
-        self.mode = self.MODE_AMBIENT
+        self._ensure_mode(self.MODE_AMBIENT)
         return self.value(0) * self._scale('AMBIENT')
