@@ -172,6 +172,21 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(drive.right_motor.position, 0)
         self.assertEqual(drive.right_motor.position_sp, 5 * 360)
         self.assertEqual(drive.right_motor.speed_sp, 200)
+    
+    def test_steering_large_value(self):
+        clean_arena()
+        populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
+
+        drive = MoveSteering(OUTPUT_A, OUTPUT_B)
+        drive.on_for_rotations(-100, SpeedDPS(400), 10)
+
+        self.assertEqual(drive.left_motor.position, 0)
+        self.assertEqual(drive.left_motor.position_sp, 10 * 360)
+        self.assertEqual(drive.left_motor.speed_sp, -400)
+
+        self.assertEqual(drive.right_motor.position, 0)
+        self.assertEqual(drive.right_motor.position_sp, 10 * 360)
+        self.assertEqual(drive.right_motor.speed_sp, 400)
 
     def test_joystick_units(self):
         clean_arena()

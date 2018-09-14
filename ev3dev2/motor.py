@@ -1808,9 +1808,9 @@ class MoveTank(MotorSet):
 
         if left_speed_native_units > right_speed_native_units:
             left_degrees = degrees
-            right_degrees = float(right_speed / left_speed_native_units) * degrees
+            right_degrees = abs(float(right_speed_native_units / left_speed_native_units) * degrees)
         else:
-            left_degrees = float(left_speed_native_units / right_speed_native_units) * degrees
+            left_degrees = abs(float(left_speed_native_units / right_speed_native_units) * degrees)
             right_degrees = degrees
 
         # Set all parameters
