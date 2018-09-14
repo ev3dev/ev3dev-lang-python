@@ -15,6 +15,17 @@ from ev3dev2.motor import Motor, MediumMotor, MoveTank, MoveSteering, MoveJoysti
 
 ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 
+_internal_set_attribute = ev3dev2.Device._set_attribute
+def _set_attribute(self, attribute, name, value):
+    # After writing, clear the rest of the file to remove any residual text from
+    # the last write. On the real device we're writing to sysfs attributes where
+    # there isn't any persistent buffer, but in the test environment they're
+    # normal files on disk.
+    attribute = _internal_set_attribute(self, attribute, name, value)
+    attribute.truncate()
+
+ev3dev2.Device._set_attribute = _set_attribute
+
 def dummy_wait(self, cond, timeout=None):
     pass
 
@@ -93,6 +104,19 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(s.num_values,      1)
         self.assertEqual(s.address,         'in1')
         self.assertEqual(s.value(0),        16)
+        self.assertEqual(s.mode,            "IR-PROX")
+
+        s.mode = "IR-REMOTE"
+        self.assertEqual(s.mode,            "IR-REMOTE")
+
+        val = s.proximity
+        # Our test environment writes to actual files on disk, so while "seek(0) write(...)" works on the real device, it leaves trailing characters from previous writes in tests. "s.mode" returns "IR-PROXTE" here.
+        self.assertEqual(s.mode, "IR-PROX")
+        self.assertEqual(val,               16)
+
+        val = s.buttons_pressed()
+        self.assertEqual(s.mode, "IR-REMOTE")
+        self.assertEqual(val,               [])
 
     def test_medium_motor_write(self):
         clean_arena()
@@ -171,7 +195,6 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(SpeedDPM(30000).to_native_units(m), (30000 / 60))
         self.assertEqual(SpeedRPS(2).to_native_units(m), 360 * 2)
         self.assertEqual(SpeedRPM(100).to_native_units(m), (360 * 100 / 60))
-
 
 if __name__ == "__main__":
     unittest.main()
