@@ -17,14 +17,21 @@ ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 
 _internal_set_attribute = ev3dev2.Device._set_attribute
 def _set_attribute(self, attribute, name, value):
-    # After writing, clear the rest of the file to remove any residual text from
-    # the last write. On the real device we're writing to sysfs attributes where
-    # there isn't any persistent buffer, but in the test environment they're
-    # normal files on disk.
+    # Follow the text with a newline to separate new content from stuff that
+    # already existed in the buffer. On the real device we're writing to sysfs
+    # attributes where there isn't any persistent buffer, but in the test
+    # environment they're normal files on disk which retain previous data.
     attribute = _internal_set_attribute(self, attribute, name, value)
-    attribute.truncate()
-
+    attribute.write(b'\n')
+    return attribute
 ev3dev2.Device._set_attribute = _set_attribute
+
+_internal_get_attribute = ev3dev2.Device._get_attribute
+def _get_attribute(self, attribute, name):
+    # Split on newline delimiter; see _set_attribute above
+    attribute, value = _internal_get_attribute(self, attribute, name)
+    return attribute, value.split('\n', 1)[0]
+ev3dev2.Device._get_attribute = _get_attribute
 
 def dummy_wait(self, cond, timeout=None):
     pass
@@ -110,7 +117,6 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(s.mode,            "IR-REMOTE")
 
         val = s.proximity
-        # Our test environment writes to actual files on disk, so while "seek(0) write(...)" works on the real device, it leaves trailing characters from previous writes in tests. "s.mode" returns "IR-PROXTE" here.
         self.assertEqual(s.mode, "IR-PROX")
         self.assertEqual(val,               16)
 

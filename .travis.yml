@@ -4,7 +4,10 @@ env:
   - USE_MICROPYTHON=true
 python:
 - 3.4
-cache: pip
+cache:
+  pip
+  directories:
+  - ~/micropython
 sudo: false
 git:
   depth: 100

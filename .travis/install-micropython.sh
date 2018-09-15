@@ -1,6 +1,11 @@
 #!/bin/sh
 set -ex
 
+if [ -e ~/micropython/ports/unix/micropython ]; then
+    # the micropython binary already exists, which means that the cached folder was restored
+    exit 0
+fi
+
 cd ~/
 
 # Build micropython from source
