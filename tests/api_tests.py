@@ -11,7 +11,11 @@ from clean_arena    import clean_arena
 
 import ev3dev2
 from ev3dev2.sensor.lego import InfraredSensor
-from ev3dev2.motor import Motor, MediumMotor, MoveTank, MoveSteering, MoveJoystick, SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits, OUTPUT_A, OUTPUT_B
+from ev3dev2.motor import \
+    Motor, MediumMotor, LargeMotor, \
+    MoveTank, MoveSteering, MoveJoystick, \
+    SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits, \
+    OUTPUT_A, OUTPUT_B
 
 ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 
@@ -128,11 +132,78 @@ class TestAPI(unittest.TestCase):
         m.speed_sp = 500
         self.assertEqual(m.speed_sp, 500)
 
+    def test_motor_on_for_degrees(self):
+        clean_arena()
+        populate_arena([('large_motor', 0, 'outA')])
+
+        m = LargeMotor()
+
+        # simple case
+        m.on_for_degrees(75, 100)
+        self.assertEqual(m.speed_sp, int(round(0.75 * 1050)))
+        self.assertEqual(m.position_sp, 100)
+    
+        # various negative cases; values act like multiplication
+        m.on_for_degrees(-75, 100)
+        self.assertEqual(m.speed_sp, int(round(0.75 * 1050)))
+        self.assertEqual(m.position_sp, -100)
+        
+        m.on_for_degrees(75, -100)
+        self.assertEqual(m.speed_sp, int(round(0.75 * 1050)))
+        self.assertEqual(m.position_sp, -100)
+        
+        m.on_for_degrees(-75, -100)
+        self.assertEqual(m.speed_sp, int(round(0.75 * 1050)))
+        self.assertEqual(m.position_sp, 100)
+
+        # zero speed (on-device, this will return immediately due to reported stall)
+        m.on_for_degrees(0, 100)
+        self.assertEqual(m.speed_sp, 0)
+        self.assertEqual(m.position_sp, 100)
+        
+        # zero distance
+        m.on_for_degrees(75, 0)
+        self.assertEqual(m.speed_sp, int(round(0.75 * 1050)))
+        self.assertEqual(m.position_sp, 0)
+
+        # zero speed and distance
+        m.on_for_degrees(0, 0)
+        self.assertEqual(m.speed_sp, 0)
+        self.assertEqual(m.position_sp, 0)
+
+        # None speed
+        with self.assertRaises(ValueError):
+            m.on_for_degrees(None, 100)
+        
+        # None distance
+        with self.assertRaises(ValueError):
+            m.on_for_degrees(75, None)
+    
+    def test_motor_on_for_rotations(self):
+        clean_arena()
+        populate_arena([('large_motor', 0, 'outA')])
+
+        m = LargeMotor()
+
+        # simple case
+        m.on_for_rotations(75, 5)
+        self.assertEqual(m.speed_sp, int(round(0.75 * 1050)))
+        self.assertEqual(m.position_sp, 5 * 360)
+
+        # None speed
+        with self.assertRaises(ValueError):
+            m.on_for_rotations(None, 5)
+        
+        # None distance
+        with self.assertRaises(ValueError):
+            m.on_for_rotations(75, None)
+
     def test_move_tank(self):
         clean_arena()
         populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
 
         drive = MoveTank(OUTPUT_A, OUTPUT_B)
+
         drive.on_for_rotations(50, 25, 10)
 
         self.assertEqual(drive.left_motor.position, 0)
@@ -181,8 +252,8 @@ class TestAPI(unittest.TestCase):
         drive.on_for_rotations(-100, SpeedDPS(400), 10)
 
         self.assertEqual(drive.left_motor.position, 0)
-        self.assertEqual(drive.left_motor.position_sp, 10 * 360)
-        self.assertEqual(drive.left_motor.speed_sp, -400)
+        self.assertEqual(drive.left_motor.position_sp, -10 * 360)
+        self.assertEqual(drive.left_motor.speed_sp, 400)
 
         self.assertEqual(drive.right_motor.position, 0)
         self.assertEqual(drive.right_motor.position_sp, 10 * 360)
