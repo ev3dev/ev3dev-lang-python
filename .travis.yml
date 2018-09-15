@@ -5,7 +5,7 @@ env:
 python:
 - 3.4
 cache:
-  pip
+  pip: true
   directories:
   - ~/micropython
 sudo: false
