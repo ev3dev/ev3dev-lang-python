@@ -1752,12 +1752,12 @@ class MoveTank(MotorSet):
         # v_l = d_l/t, v_r = d_r/t
         # therefore, t = d_l/v_l = d_r/v_r
 
-        # TODO: this is wrong. consider negatives.
-        if left_speed_native_units > right_speed_native_units:
+        # larger speed by magnitude is the "outer" wheel, and rotates the full "rotations"
+        if abs(left_speed_native_units) > abs(right_speed_native_units):
             left_rotations = rotations
-            right_rotations = abs(float(right_speed_native_units / left_speed_native_units)) * rotations
+            right_rotations = abs(right_speed_native_units / left_speed_native_units) * rotations
         else:
-            left_rotations = abs(float(left_speed_native_units / right_speed_native_units)) * rotations
+            left_rotations = abs(left_speed_native_units / right_speed_native_units) * rotations
             right_rotations = rotations
 
         # Set all parameters
@@ -1786,11 +1786,12 @@ class MoveTank(MotorSet):
         """
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
-        if left_speed_native_units > right_speed_native_units:
+        # larger speed by magnitude is the "outer" wheel, and rotates the full "degrees"
+        if abs(left_speed_native_units) > abs(right_speed_native_units):
             left_degrees = degrees
-            right_degrees = abs(float(right_speed_native_units / left_speed_native_units)) * degrees
+            right_degrees = abs(right_speed_native_units / left_speed_native_units) * degrees
         else:
-            left_degrees = abs(float(left_speed_native_units / right_speed_native_units)) * degrees
+            left_degrees = abs(left_speed_native_units / right_speed_native_units) * degrees
             right_degrees = degrees
 
         # Set all parameters
