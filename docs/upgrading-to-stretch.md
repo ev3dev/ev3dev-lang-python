@@ -37,11 +37,11 @@ To match the name used by LEGO's "EV3-G" graphical programming tools, we have re
 
 The `RemoteControl` and `BeaconSeeker` classes have been removed; you will now use `InfraredSensor` for all purposes.
 
-Additionally, we have renamed many of the properties on the `InfraredSensor` class to make the meaning more obvious. Check out [the `InfraredSensor` documentation](docs/sensors#infrared-sensor) for more info.
+Additionally, we have renamed many of the properties on the `InfraredSensor` class to make the meaning more obvious. Check out [the `InfraredSensor` documentation](sensors.html#infrared-sensor) for more info.
 
 ## Re-designed `Sound` class
 
-The names and interfaces of some of the `Sound` class methods have changed. Check out [the `Sound` class docs](docs/other#sound) for details.
+The names and interfaces of some of the `Sound` class methods have changed. Check out [the `Sound` class docs](other.html#sound) for details.
 
 # Once you've adapted to breaking changes, check out the cool new features!
 
