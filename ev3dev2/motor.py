@@ -1746,33 +1746,7 @@ class MoveTank(MotorSet):
         ``rotations`` while the motor on the inside will have its requested
         distance calculated according to the expected turn.
         """
-        (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
-
-        # proof of the following distance calculation: consider the circle formed by each wheel's path
-        # v_l = d_l/t, v_r = d_r/t
-        # therefore, t = d_l/v_l = d_r/v_r
-
-        # larger speed by magnitude is the "outer" wheel, and rotates the full "rotations"
-        if abs(left_speed_native_units) > abs(right_speed_native_units):
-            left_rotations = rotations
-            right_rotations = abs(right_speed_native_units / left_speed_native_units) * rotations
-        else:
-            left_rotations = abs(left_speed_native_units / right_speed_native_units) * rotations
-            right_rotations = rotations
-
-        # Set all parameters
-        self.left_motor._set_rel_position_degrees_and_speed_sp(left_rotations * 360, left_speed_native_units)
-        self.left_motor._set_brake(brake)
-        self.right_motor.speed_sp = int(round(right_speed_native_units))
-        self.right_motor._set_rel_position_degrees_and_speed_sp(right_rotations * 360, right_speed_native_units)
-        self.right_motor._set_brake(brake)
-
-        # Start the motors
-        self.left_motor.run_to_rel_pos()
-        self.right_motor.run_to_rel_pos()
-
-        if block:
-            self._block()
+        MoveTank.on_for_degrees(self, left_speed, right_speed, rotations * 360, brake, block)
 
     def on_for_degrees(self, left_speed, right_speed, degrees, brake=True, block=True):
         """
@@ -1784,10 +1758,21 @@ class MoveTank(MotorSet):
         ``degrees`` while the motor on the inside will have its requested
         distance calculated according to the expected turn.
         """
+
+        if left_speed == 0 and right_speed == 0 and degrees != 0:
+            raise ValueError("Can't travel a nonzero distance at zero speed")
+
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
+        # proof of the following distance calculation: consider the circle formed by each wheel's path
+        # v_l = d_l/t, v_r = d_r/t
+        # therefore, t = d_l/v_l = d_r/v_r
+
         # larger speed by magnitude is the "outer" wheel, and rotates the full "degrees"
-        if abs(left_speed_native_units) > abs(right_speed_native_units):
+        if degrees == 0:
+            left_degrees = 0
+            right_degrees = 0
+        elif abs(left_speed_native_units) > abs(right_speed_native_units):
             left_degrees = degrees
             right_degrees = abs(right_speed_native_units / left_speed_native_units) * degrees
         else:
