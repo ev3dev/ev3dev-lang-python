@@ -8,6 +8,7 @@ cache:
   pip: true
   directories:
   - ~/micropython
+  - ~/.micropython
 sudo: false
 git:
   depth: 100
