@@ -240,8 +240,11 @@ class TestAPI(unittest.TestCase):
         self.assertAlmostEqual(drive.right_motor.speed_sp, 0.25 * 1050, delta=0.5)
 
         # both speeds zero but nonzero distance
-        with self.assertRaises(ValueError):
-            drive.on_for_rotations(0, 0, 10)
+        drive.on_for_rotations(0, 0, 10)
+        self.assertEqual(drive.left_motor.position_sp, 10 * 360)
+        self.assertAlmostEqual(drive.left_motor.speed_sp, 0)
+        self.assertEqual(drive.right_motor.position_sp, 10 * 360)
+        self.assertAlmostEqual(drive.right_motor.speed_sp, 0)
         
         # zero distance
         drive.on_for_rotations(25, 50, 0)
