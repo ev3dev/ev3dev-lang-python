@@ -803,13 +803,13 @@ class Motor(Device):
             self._poll.register(self._state, select.POLLPRI)
 
         while True:
+            if cond(self.state):
+                return True
+            
             self._poll.poll(None if timeout is None else timeout)
 
             if timeout is not None and time.time() >= tic + timeout / 1000:
                 return False
-
-            if cond(self.state):
-                return True
 
     def wait_until_not_moving(self, timeout=None):
         """
