@@ -1,3 +1,19 @@
+python-ev3dev2 (2.0.0~beta2) stable; urgency=medium
+
+  * Mitigate performance regression when using Display.update() on the EV3
+  * Fix erroneous values in InfraredSensor and other sensor classes caused by
+    rapid mode reset when using new properties
+  * Improve performance of reading sensor values when using new properties
+  * Rename SpeedInteger to SpeedValue
+  * Support floating-point values in SpeedValue
+  * Rename "speed_pct" parameters to "speed"
+  * Fix error when calling Sound.play_tone
+  * Support negative and zero speed/distance combinations in on_for_* methods
+    for both single motors and motor pairs
+  * Experimental support for motors and sensors on Micropython
+
+ -- Kaelin Laundry <wasabifan@outlook.com>  Sun, 23 Sep 2018 16:03:00 -0700
+
 python-ev3dev2 (2.0.0~beta1) stable; urgency=medium
 
   Initial beta release for ev3dev-stretch.
