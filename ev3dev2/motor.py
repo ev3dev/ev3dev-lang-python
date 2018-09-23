@@ -803,13 +803,13 @@ class Motor(Device):
             self._poll.register(self._state, select.POLLPRI)
 
         while True:
+            if cond(self.state):
+                return True
+            
             self._poll.poll(None if timeout is None else timeout)
 
             if timeout is not None and time.time() >= tic + timeout / 1000:
                 return False
-
-            if cond(self.state):
-                return True
 
     def wait_until_not_moving(self, timeout=None):
         """
@@ -867,25 +867,15 @@ class Motor(Device):
 
         return speed.to_native_units(self)
 
-    def _set_position_rotations(self, speed, rotations):
+    def _set_rel_position_degrees_and_speed_sp(self, degrees, speed):
+        degrees = degrees if speed >= 0 else -degrees
+        speed = abs(speed)
 
-        # +/- speed is used to control direction, rotations must be positive
-        assert rotations >= 0, "rotations is {}, must be >= 0".format(rotations)
+        position_delta = int(round((degrees * self.count_per_rot)/360))
+        speed_sp = int(round(speed))
 
-        if speed > 0:
-            self.position_sp = self.position + int(round(rotations * self.count_per_rot))
-        else:
-            self.position_sp = self.position - int(round(rotations * self.count_per_rot))
-
-    def _set_position_degrees(self, speed, degrees):
-
-        # +/- speed is used to control direction, degrees must be positive
-        assert degrees >= 0, "degrees is %s, must be >= 0" % degrees
-
-        if speed > 0:
-            self.position_sp = self.position + int((degrees * self.count_per_rot)/360)
-        else:
-            self.position_sp = self.position - int((degrees * self.count_per_rot)/360)
+        self.position_sp = position_delta
+        self.speed_sp = speed_sp
 
     def _set_brake(self, brake):
         if brake:
@@ -900,17 +890,13 @@ class Motor(Device):
         ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
-        speed = self._speed_native_units(speed)
+        if speed is None or rotations is None:
+            raise ValueError("Either speed ({}) or rotations ({}) is None".format(self, speed, rotations))
 
-        if not speed or not rotations:
-            log.warning("({}) Either speed ({}) or rotations ({}) is invalid, motor will not move" .format(self, speed, rotations))
-            self._set_brake(brake)
-            return
-
-        self.speed_sp = int(round(speed))
-        self._set_position_rotations(speed, rotations)
+        speed_sp = self._speed_native_units(speed)
+        self._set_rel_position_degrees_and_speed_sp(rotations * 360, speed_sp)
         self._set_brake(brake)
-        self.run_to_abs_pos()
+        self.run_to_rel_pos()
 
         if block:
             self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
@@ -923,17 +909,13 @@ class Motor(Device):
         ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
-        speed = self._speed_native_units(speed)
+        if speed is None or degrees is None:
+            raise ValueError("Either speed ({}) or degrees ({}) is None".format(self, speed, degrees))
 
-        if not speed or not degrees:
-            log.warning("({}) Either speed ({}) or degrees ({}) is invalid, motor will not move".format(self, speed, degrees))
-            self._set_brake(brake)
-            return
-
-        self.speed_sp = int(round(speed))
-        self._set_position_degrees(speed, degrees)
+        speed_sp = self._speed_native_units(speed)
+        self._set_rel_position_degrees_and_speed_sp(degrees, speed_sp)
         self._set_brake(brake)
-        self.run_to_abs_pos()
+        self.run_to_rel_pos()
 
         if block:
             self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
@@ -1748,9 +1730,6 @@ class MoveTank(MotorSet):
     def _unpack_speeds_to_native_units(self, left_speed, right_speed):
         left_speed = self.left_motor._speed_native_units(left_speed, "left_speed")
         right_speed = self.right_motor._speed_native_units(right_speed, "right_speed")
-
-        assert left_speed or right_speed,\
-            "Either left_speed or right_speed must be non-zero"
         
         return (
             left_speed,
@@ -1767,32 +1746,7 @@ class MoveTank(MotorSet):
         ``rotations`` while the motor on the inside will have its requested
         distance calculated according to the expected turn.
         """
-        (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
-
-        # proof of the following distance calculation: consider the circle formed by each wheel's path
-        # v_l = d_l/t, v_r = d_r/t
-        # therefore, t = d_l/v_l = d_r/v_r
-        if left_speed_native_units > right_speed_native_units:
-            left_rotations = rotations
-            right_rotations = abs(float(right_speed_native_units / left_speed_native_units)) * rotations
-        else:
-            left_rotations = abs(float(left_speed_native_units / right_speed_native_units)) * rotations
-            right_rotations = rotations
-
-        # Set all parameters
-        self.left_motor.speed_sp = int(round(left_speed_native_units))
-        self.left_motor._set_position_rotations(left_speed_native_units, left_rotations)
-        self.left_motor._set_brake(brake)
-        self.right_motor.speed_sp = int(round(right_speed_native_units))
-        self.right_motor._set_position_rotations(right_speed_native_units, right_rotations)
-        self.right_motor._set_brake(brake)
-
-        # Start the motors
-        self.left_motor.run_to_abs_pos()
-        self.right_motor.run_to_abs_pos()
-
-        if block:
-            self._block()
+        MoveTank.on_for_degrees(self, left_speed, right_speed, rotations * 360, brake, block)
 
     def on_for_degrees(self, left_speed, right_speed, degrees, brake=True, block=True):
         """
@@ -1806,24 +1760,30 @@ class MoveTank(MotorSet):
         """
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
-        if left_speed_native_units > right_speed_native_units:
+        # proof of the following distance calculation: consider the circle formed by each wheel's path
+        # v_l = d_l/t, v_r = d_r/t
+        # therefore, t = d_l/v_l = d_r/v_r
+        
+        if degrees == 0 or (left_speed_native_units == 0 and right_speed_native_units == 0):
             left_degrees = degrees
-            right_degrees = float(right_speed / left_speed_native_units) * degrees
+            right_degrees = degrees
+        # larger speed by magnitude is the "outer" wheel, and rotates the full "degrees"
+        elif abs(left_speed_native_units) > abs(right_speed_native_units):
+            left_degrees = degrees
+            right_degrees = abs(right_speed_native_units / left_speed_native_units) * degrees
         else:
-            left_degrees = float(left_speed_native_units / right_speed_native_units) * degrees
+            left_degrees = abs(left_speed_native_units / right_speed_native_units) * degrees
             right_degrees = degrees
 
         # Set all parameters
-        self.left_motor.speed_sp = int(round(left_speed_native_units))
-        self.left_motor._set_position_degrees(left_speed_native_units, left_degrees)
+        self.left_motor._set_rel_position_degrees_and_speed_sp(left_degrees, left_speed_native_units)
         self.left_motor._set_brake(brake)
-        self.right_motor.speed_sp = int(round(right_speed_native_units))
-        self.right_motor._set_position_degrees(right_speed_native_units, right_degrees)
+        self.right_motor._set_rel_position_degrees_and_speed_sp(right_degrees, right_speed_native_units)
         self.right_motor._set_brake(brake)
 
         # Start the motors
-        self.left_motor.run_to_abs_pos()
-        self.right_motor.run_to_abs_pos()
+        self.left_motor.run_to_rel_pos()
+        self.right_motor.run_to_rel_pos()
 
         if block:
             self._block()
