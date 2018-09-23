@@ -211,10 +211,7 @@ class Sensor(Device):
         an error. The values are fixed point numbers, so check decimals to see
         if you need to divide to get the actual value.
         """
-        if isinstance(n, numbers.Real):
-            n = int(n)
-        elif isinstance(n, str):
-            n = int(n)
+        n = int(n)
 
         self._value[n], value = self.get_attr_int(self._value[n], 'value'+str(n))
         return value

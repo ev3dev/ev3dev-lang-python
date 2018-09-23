@@ -1,17 +1,24 @@
 language: python
+env:
+  - USE_MICROPYTHON=false
+  - USE_MICROPYTHON=true
 python:
 - 3.4
-cache: pip
+cache:
+  pip: true
+  directories:
+  - ~/micropython
+  - ~/.micropython
 sudo: false
 git:
   depth: 100
 install:
-- pip install Pillow Sphinx sphinx_bootstrap_theme recommonmark evdev==1.0.0
-- pip install -r ./docs/requirements.txt
+- if [ $USE_MICROPYTHON = false ]; then pip install Pillow Sphinx sphinx_bootstrap_theme recommonmark evdev==1.0.0 && pip install -r ./docs/requirements.txt; fi
+- if [ $USE_MICROPYTHON = true ]; then ./.travis/install-micropython.sh && PYTHON=~/micropython/ports/unix/micropython; else PYTHON=python3; fi
 script:
 - chmod -R g+rw ./tests/fake-sys/devices/**/*
-- ./tests/api_tests.py
-- sphinx-build -nW -b html ./docs/ ./docs/_build/html
+- $PYTHON tests/api_tests.py
+- if [ $USE_MICROPYTHON = false ]; then sphinx-build -nW -b html ./docs/ ./docs/_build/html; fi
 deploy:
   provider: pypi
   user: Denis.Demidov
@@ -19,5 +26,7 @@ deploy:
     secure: cTDN4WMJEjxZ0zwFwkLPpOIOSG/1JlHbQsHzd/tV9LfjBMR0nJR5HrmyiIO1TE5Wo6AFSFd7S3JmKdEnFO1ByvN/EFtsKGRUR9L6Yst4KfFi4nHwdZ7vgPTV0nNdvgC1YM/3bx8W8PcjFSm/k8awx7aicwXj09yDA8ENTf5XedaX22Z+9OKhb1mKola1cqEoc0GwaYzd8UX0Ruwh9/6RRbvTt7zn8BCZc9vIVqNd6mZgBWY9zAU40ZZsjYORbiZmDNCygEI+RViZ51M58WYkPPhoivzcG9em8DMRS7SC3CjWGapiOaXUHa3Fhnn+IQ+Q8Xv9YU5+qmj65MWQy3SSnMnvuxmrLf4aLoOlSJUMhDarjni4tdBOTX5PdOkdmhskyQt1DqDrw0+WhPItYfGe5zQfQwqW+YOpGbOipAeU+844arPo5jvZG/IOBX2qVUwdSxo8Y/98ocjqoZOq8b5xkWtJef0Kh1RCkp1bR2XELQVe76qeWqQxWz3OPqq+wK3xeNvj5kMQmytl3dCEB//D6UcES7Qr8YxD+LWoaIf32JIj/4LaCXXuxMVH+PJ68Oc72/ox0qLmXK0qhbea2QvaqXyGDrO+a2X6VbMdH32D2xHzH4Mg75xLnXnSaFvGovhYl1zEVcYUDioxrXZEuDmymGf9nH2mivJ24Fon6u+C3QQ=
   on:
     tags: true
-    condition: $TRAVIS_TAG != ev3dev-stretch/*
+    condition:
+      - $TRAVIS_TAG != ev3dev-stretch/*
+      - $USE_MICROPYTHON = false
     repo: ev3dev/ev3dev-lang-python

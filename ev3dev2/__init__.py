@@ -28,6 +28,15 @@ import sys
 if sys.version_info < (3,4):
     raise SystemError('Must be using Python 3.4 or higher')
 
+def is_micropython():
+    return sys.implementation.name == "micropython"
+
+def chain_exception(exception, cause):
+    if is_micropython():
+        raise exception
+    else:
+        raise exception from cause
+
 import os
 import io
 import fnmatch
@@ -188,7 +197,8 @@ class Device(object):
             except StopIteration:
                 self._path = None
                 self._device_index = None
-                raise DeviceNotFound("%s is not connected." % self) from None
+
+                chain_exception(DeviceNotFound("%s is not connected." % self), None)
 
     def __str__(self):
         if 'address' in self.kwargs:
@@ -206,13 +216,13 @@ class Device(object):
         w_ok = mode & stat.S_IWGRP
 
         if r_ok and w_ok:
-            mode = 'r+'
+            mode_str = 'r+'
         elif w_ok:
-            mode = 'w'
+            mode_str = 'w'
         else:
-            mode = 'r'
+            mode_str = 'r'
 
-        return io.FileIO(path, mode)
+        return io.FileIO(path, mode_str)
 
     def _get_attribute(self, attribute, name):
         """Device attribute getter"""
@@ -245,20 +255,22 @@ class Device(object):
         if not isinstance(driver_error, OSError):
             raise driver_error
 
-        if driver_error.errno == errno.EINVAL:
+        driver_errorno = driver_error.args[0] if is_micropython() else driver_error.errno
+
+        if driver_errorno == errno.EINVAL:
             if attribute == "speed_sp":
                 try:
                     max_speed = self.max_speed
                 except (AttributeError, Exception):
-                    raise ValueError("The given speed value was out of range") from driver_error
+                    chain_exception(ValueError("The given speed value was out of range"), driver_error)
                 else:
-                    raise ValueError("The given speed value was out of range. Max speed: +/-" + str(max_speed)) from driver_error
-            raise ValueError("One or more arguments were out of range or invalid") from driver_error
-        elif driver_error.errno == errno.ENODEV or driver_error.errno == errno.ENOENT:
+                    chain_exception(ValueError("The given speed value was out of range. Max speed: +/-" + str(max_speed)), driver_error)
+            chain_exception(ValueError("One or more arguments were out of range or invalid"), driver_error)
+        elif driver_errorno == errno.ENODEV or driver_errorno == errno.ENOENT:
             # We will assume that a file-not-found error is the result of a disconnected device
             # rather than a library error. If that isn't the case, at a minimum the underlying
             # error info will be printed for debugging.
-            raise DeviceNotFound("%s is no longer connected" % self) from driver_error
+            chain_exception(DeviceNotFound("%s is no longer connected" % self), driver_error)
         raise driver_error
 
     def get_attr_int(self, attribute, name):

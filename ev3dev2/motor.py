@@ -31,7 +31,7 @@ if sys.version_info < (3,4):
 import select
 import time
 from logging import getLogger
-from math import atan2, degrees as math_degrees, hypot
+from math import atan2, degrees as math_degrees, sqrt
 from os.path import abspath
 from ev3dev2 import get_current_platform, Device, list_device_names
 
@@ -1905,7 +1905,7 @@ class MoveSteering(MoveTank):
         """
 
         assert steering >= -100 and steering <= 100,\
-            "%{} is an invalid steering, must be between -100 and 100 (inclusive)".format(steering)
+            "{} is an invalid steering, must be between -100 and 100 (inclusive)".format(steering)
 
         # We don't have a good way to make this generic for the pair... so we
         # assume that the left motor's speed stats are the same as the right
@@ -1957,7 +1957,7 @@ class MoveJoystick(MoveTank):
             MoveTank.off()
             return
 
-        vector_length = hypot(x, y)
+        vector_length = sqrt(x*x + y*y)
         angle = math_degrees(atan2(y, x))
 
         if angle < 0:
