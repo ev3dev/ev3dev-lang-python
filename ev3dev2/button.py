@@ -188,9 +188,15 @@ class ButtonBase(object):
                     return False
 
     def wait_for_pressed(self, buttons, timeout_ms=None):
+        """
+        Wait for the button to be pressed down.
+        """
         return self._wait(buttons, [], timeout_ms)
 
     def wait_for_released(self, buttons, timeout_ms=None):
+        """
+        Wait for the button to be released.
+        """
         return self._wait([], buttons, timeout_ms)
 
     def wait_for_bump(self, buttons, timeout_ms=None):

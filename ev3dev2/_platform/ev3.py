@@ -39,7 +39,7 @@ INPUT_3 = 'ev3-ports:in3'
 INPUT_4 = 'ev3-ports:in4'
 
 BUTTONS_FILENAME = '/dev/input/by-path/platform-gpio_keys-event'
-EVDEV_DEVICE_NAME = 'EV3 brick buttons'
+EVDEV_DEVICE_NAME = 'EV3 Brick Buttons'
 
 LEDS = OrderedDict()
 LEDS['red_left'] = 'led0:red:brick-status'
