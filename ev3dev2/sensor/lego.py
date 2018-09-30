@@ -81,9 +81,15 @@ class TouchSensor(Sensor):
                 time.sleep(sleep_ms)
 
     def wait_for_pressed(self, timeout_ms=None, sleep_ms=10):
+        """
+        Wait for the touch sensor to be pressed down.
+        """
         return self._wait(True, timeout_ms, sleep_ms)
 
     def wait_for_released(self, timeout_ms=None, sleep_ms=10):
+        """
+        Wait for the touch sensor to be released.
+        """
         return self._wait(False, timeout_ms, sleep_ms)
 
     def wait_for_bump(self, timeout_ms=None, sleep_ms=10):
