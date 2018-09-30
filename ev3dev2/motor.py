@@ -1837,7 +1837,7 @@ class MoveTank(MotorSet):
 
 class MoveSteering(MoveTank):
     """
-    Controls a pair of motors simultaneously, via a single "steering" value.
+    Controls a pair of motors simultaneously, via a single "steering" value and a speed.
 
     steering [-100, 100]:
         * -100 means turn left on the spot (right motor at 100% forward, left motor at 100% backward),
@@ -1881,7 +1881,8 @@ class MoveSteering(MoveTank):
 
     def on(self, steering, speed):
         """
-        Start rotating the motors according to the provided ``steering`` forever.
+        Start rotating the motors according to the provided ``steering`` and
+        ``speed`` forever.
         """
         (left_speed, right_speed) = self.get_speed_steering(steering, speed)
         MoveTank.on(self, SpeedNativeUnits(left_speed), SpeedNativeUnits(right_speed))

@@ -180,7 +180,7 @@ class ColorSensor(Sensor):
     @property
     def reflected_light_intensity(self):
         """
-        Reflected light intensity as a percentage. Light on sensor is red.
+        Reflected light intensity as a percentage (0 to 100). Light on sensor is red.
         """
         self._ensure_mode(self.MODE_COL_REFLECT)
         return self.value(0)
@@ -188,7 +188,7 @@ class ColorSensor(Sensor):
     @property
     def ambient_light_intensity(self):
         """
-        Ambient light intensity. Light on sensor is dimly lit blue.
+        Ambient light intensity, as a percentage (0 to 100). Light on sensor is dimly lit blue.
         """
         self._ensure_mode(self.MODE_COL_AMBIENT)
         return self.value(0)
@@ -219,10 +219,12 @@ class ColorSensor(Sensor):
     @property
     def raw(self):
         """
-        Red, green, and blue components of the detected color, officially in the
-        range 0-1020 but the values returned will never be that high. We do not
-        yet know why the values returned are low, but pointing the color sensor
-        at a well lit sheet of white paper will return values in the 250-400 range.
+        Red, green, and blue components of the detected color, as a tuple.
+        
+        Officially in the range 0-1020 but the values returned will never be
+        that high. We do not yet know why the values returned are low, but
+        pointing the color sensor at a well lit sheet of white paper will return
+        values in the 250-400 range.
 
         If this is an issue, check out the rgb() and calibrate_white() methods.
         """
