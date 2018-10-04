@@ -825,6 +825,8 @@ class InfraredSensor(Sensor, ButtonBase):
     def buttons_pressed(self, channel=1):
         """
         Returns list of currently pressed buttons.
+
+        Note that the sensor can only identify up to two buttons pressed at once.
         """
         self._ensure_mode(self.MODE_IR_REMOTE)
         channel = self._normalize_channel(channel)
