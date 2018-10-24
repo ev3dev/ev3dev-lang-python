@@ -1055,6 +1055,9 @@ class MediumMotor(Motor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
+        if platform in ('brickpi', 'brickpi3'):
+            raise Exception("%s is unaware of different motor types, use LargeMotor instead" % platform)
+
         super(MediumMotor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-m-motor'], **kwargs)
 
 
