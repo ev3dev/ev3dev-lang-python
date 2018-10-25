@@ -209,6 +209,9 @@ class Device(object):
     def __repr__(self):
         return self.__str__()
 
+    def __lt__(self, other):
+        return str(self) < str(other)
+
     def _attribute_file_open(self, name):
         path = os.path.join(self._path, name)
         mode = stat.S_IMODE(os.stat(path)[stat.ST_MODE])
