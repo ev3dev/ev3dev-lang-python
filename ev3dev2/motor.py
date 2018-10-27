@@ -1841,7 +1841,6 @@ class MoveTank(MotorSet):
         if degrees == 0 or (left_speed_native_units == 0 and right_speed_native_units == 0):
             log.warning("{}: degrees {}, left_speed_native_units {}, right_speed_native_units {}, robot will not move"
                 .format(self, degrees, left_speed_native_units, right_speed_native_units))
-            self._set_brake(brake)
             return
 
         elif left_speed_native_units == right_speed_native_units:
