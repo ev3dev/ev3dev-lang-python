@@ -316,10 +316,12 @@ class TestAPI(unittest.TestCase):
         populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
 
         drive = MoveJoystick(OUTPUT_A, OUTPUT_B)
-        drive.on(100, 100, max_speed=SpeedPercent(50))
 
+        # With the joystick at (x, y) of (0, 50) we should drive straigh ahead
+        # at 50% of max_speed
+        drive.on(0, 50)
         self.assertEqual(drive.left_motor.speed_sp, 1050 / 2)
-        self.assertAlmostEqual(drive.right_motor.speed_sp, 0)
+        self.assertEqual(drive.right_motor.speed_sp, 1050 / 2)
 
     def test_units(self):
         clean_arena()
