@@ -209,6 +209,7 @@ class Device(object):
     def __repr__(self):
         return self.__str__()
 
+    # This allows us to sort lists of Device objects
     def __lt__(self, other):
         return str(self) < str(other)
 

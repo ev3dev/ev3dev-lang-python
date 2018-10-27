@@ -96,19 +96,14 @@ class SpeedPercent(SpeedValue):
         return str(self.percent) + "%"
 
     def __mul__(self, other):
-
-        if isinstance(other, SpeedPercent):
-            return SpeedPercent(self.percent * other.percent)
-        elif isinstance(other, (float, int)):
-            return SpeedPercent(self.percent * other)
-        else:
-            raise Exception("{} can only be multiplied by a SpeedPercent, int, or float".format(self))
+        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        return SpeedPercent(self.percent * other)
 
     def to_native_units(self, motor):
         """
         Return this SpeedPercent in native motor units
         """
-        return round((self.percent * motor.max_speed) / 100)
+        return self.percent / 100 * motor.max_speed
 
 
 class SpeedNativeUnits(SpeedValue):
@@ -117,19 +112,14 @@ class SpeedNativeUnits(SpeedValue):
     """
 
     def __init__(self, native_counts):
-        self.native_counts = round(native_counts)
+        self.native_counts = native_counts
     
     def __str__(self):
         return str(self.native_counts) + " counts/sec"
 
     def __mul__(self, other):
-
-        if isinstance(other, SpeedNativeUnits):
-            return SpeedNativeUnits(self.native_counts * other.native_counts)
-        elif isinstance(other, (float, int)):
-            return SpeedNativeUnits(self.native_counts * other)
-        else:
-            raise Exception("{} can only be multiplied by a SpeedNativeUnits, int, or float".format(self))
+        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        return SpeedNativeUnits(self.native_counts * other)
 
     def to_native_units(self, motor):
         """
@@ -150,21 +140,17 @@ class SpeedRPS(SpeedValue):
         return str(self.rotations_per_second) + " rot/sec"
 
     def __mul__(self, other):
-
-        if isinstance(other, SpeedRPS):
-            return SpeedRPS(self.rotations_per_second * other.rotations_per_second)
-        elif isinstance(other, (float, int)):
-            return SpeedRPS(self.rotations_per_second * other)
-        else:
-            raise Exception("{} can only be multiplied by a SpeedRPS, int, or float".format(self))
+        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        return SpeedRPS(self.rotations_per_second * other)
 
     def to_native_units(self, motor):
         """
         Return the native speed measurement required to achieve desired rotations-per-second
         """
         assert abs(self.rotations_per_second) <= motor.max_rps,\
-            "invalid rotations-per-second: {} max RPS is {}, {} was requested".format(motor, motor.max_rps, self.rotations_per_second)
-        return round((self.rotations_per_second * motor.max_speed) / motor.max_rps)
+            "invalid rotations-per-second: {} max RPS is {}, {} was requested".format(
+            motor, motor.max_rps, self.rotations_per_second)
+        return self.rotations_per_second/motor.max_rps * motor.max_speed
 
 
 class SpeedRPM(SpeedValue):
@@ -179,21 +165,17 @@ class SpeedRPM(SpeedValue):
         return str(self.rotations_per_minute) + " rot/min"
 
     def __mul__(self, other):
-
-        if isinstance(other, SpeedRPM):
-            return SpeedRPM(self.rotations_per_minute * other.rotations_per_minute)
-        elif isinstance(other, (float, int)):
-            return SpeedRPM(self.rotations_per_minute * other)
-        else:
-            raise Exception("{} can only be multiplied by a SpeedRPM, int, or float".format(self))
+        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        return SpeedRPM(self.rotations_per_minute * other)
 
     def to_native_units(self, motor):
         """
         Return the native speed measurement required to achieve desired rotations-per-minute
         """
         assert abs(self.rotations_per_minute) <= motor.max_rpm,\
-            "invalid rotations-per-minute: {} max RPM is {}, {} was requested".format(motor, motor.max_rpm, self.rotations_per_minute)
-        return round((self.rotations_per_minute * motor.max_speed) / motor.max_rpm)
+            "invalid rotations-per-minute: {} max RPM is {}, {} was requested".format(
+            motor, motor.max_rpm, self.rotations_per_minute)
+        return self.rotations_per_minute/motor.max_rpm * motor.max_speed
 
 
 class SpeedDPS(SpeedValue):
@@ -208,21 +190,17 @@ class SpeedDPS(SpeedValue):
         return str(self.degrees_per_second) + " deg/sec"
 
     def __mul__(self, other):
-
-        if isinstance(other, SpeedDPS):
-            return SpeedDPS(self.degrees_per_second * other.degrees_per_second)
-        elif isinstance(other, (float, int)):
-            return SpeedDPS(self.degrees_per_second * other)
-        else:
-            raise Exception("{} can only be multiplied by a SpeedDPS, int, or float".format(self))
+        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        return SpeedDPS(self.degrees_per_second * other)
 
     def to_native_units(self, motor):
         """
         Return the native speed measurement required to achieve desired degrees-per-second
         """
         assert abs(self.degrees_per_second) <= motor.max_dps,\
-            "invalid degrees-per-second: {} max DPS is {}, {} was requested".format(motor, motor.max_dps, self.degrees_per_second)
-        return round((self.degrees_per_second * motor.max_speed) / motor.max_dps)
+            "invalid degrees-per-second: {} max DPS is {}, {} was requested".format(
+            motor, motor.max_dps, self.degrees_per_second)
+        return self.degrees_per_second/motor.max_dps * motor.max_speed
 
 
 class SpeedDPM(SpeedValue):
@@ -237,21 +215,17 @@ class SpeedDPM(SpeedValue):
         return str(self.degrees_per_minute) + " deg/min"
 
     def __mul__(self, other):
-
-        if isinstance(other, SpeedDPM):
-            return SpeedDPM(self.degrees_per_minute * other.degrees_per_minute)
-        elif isinstance(other, (float, int)):
-            return SpeedDPM(self.degrees_per_minute * other)
-        else:
-            raise Exception("{} can only be multiplied by a SpeedDPM, int, or float".format(self))
+        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        return SpeedDPM(self.degrees_per_minute * other)
 
     def to_native_units(self, motor):
         """
         Return the native speed measurement required to achieve desired degrees-per-minute
         """
         assert abs(self.degrees_per_minute) <= motor.max_dpm,\
-            "invalid degrees-per-minute: {} max DPM is {}, {} was requested".format(motor, motor.max_dpm, self.degrees_per_minute)
-        return round((self.degrees_per_minute * motor.max_speed) / motor.max_dpm)
+            "invalid degrees-per-minute: {} max DPM is {}, {} was requested".format(
+            motor, motor.max_dpm, self.degrees_per_minute)
+        return self.degrees_per_minute/motor.max_dpm * motor.max_speed
 
 
 class Motor(Device):
@@ -1652,8 +1626,7 @@ class MotorSet(object):
         for motor_port in sorted(motor_specs.keys()):
             motor_class = motor_specs[motor_port]
             self.motors[motor_port] = motor_class(motor_port)
-            self.motors[motor_port].ramp_up_sp = 0
-            self.motors[motor_port].ramp_down_sp = 0
+            self.motors[motor_port].reset()
 
         self.desc = desc
 
@@ -1726,10 +1699,25 @@ class MotorSet(object):
             motor.reset()
 
     def stop(self, motors=None):
+        """
+        stop the motors without setting the stop_action (brake, hold, coast)
+        """
         motors = motors if motors is not None else self.motors.values()
 
         for motor in motors:
             motor.stop()
+
+    def off(self, brake=True, motors=None):
+        """
+        set the stop_action prior to stopping the motors
+        """
+        motors = motors if motors is not None else self.motors.values()
+
+        for motor in motors:
+            motor._set_brake(brake)
+
+        for motor in motors:
+            motor.stop(brake)
 
     def _is_state(self, motors, state):
         motors = motors if motors is not None else self.motors.values()
@@ -1796,6 +1784,10 @@ class MotorSet(object):
         for motor in motors:
             motor.wait_while(s, timeout)
 
+    def _block(self):
+        self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
+        self.wait_until_not_moving()
+
 
 class MoveTank(MotorSet):
     """
@@ -1820,10 +1812,6 @@ class MoveTank(MotorSet):
         self.left_motor = self.motors[left_motor_port]
         self.right_motor = self.motors[right_motor_port]
         self.max_speed = self.left_motor.max_speed
-
-    def _block(self):
-        self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
-        self.wait_until_not_moving()
 
     def _unpack_speeds_to_native_units(self, left_speed, right_speed):
         left_speed = self.left_motor._speed_native_units(left_speed, "left_speed")
@@ -1958,16 +1946,6 @@ class MoveTank(MotorSet):
         # Start the motors
         self.left_motor.run_forever()
         self.right_motor.run_forever()
-
-    def off(self, brake=True):
-        """
-        Stop both motors immediately. Configure both to brake if ``brake`` is
-        set.
-        """
-        self.left_motor._set_brake(brake)
-        self.right_motor._set_brake(brake)
-        self.left_motor.stop()
-        self.right_motor.stop()
 
 
 class MoveSteering(MoveTank):
@@ -2105,9 +2083,6 @@ class MoveDifferential(MoveTank):
 
         MoveTank.on_for_rotations(self, speed, speed, rotations, brake, block)
 
-    # Distance here could be
-    # - percentage of the circle to drive
-    # - mm, cm, in, etc of the circle to drive
     def _on_arc(self, speed, radius_mm, distance_mm, brake, block, arc_right):
         """
         Drive in a circle with 'radius' for 'distance'
@@ -2123,7 +2098,8 @@ class MoveDifferential(MoveTank):
             abort = True
 
         if radius_mm < self.min_circle_radius_mm:
-            log.warning("{}: radius_mm is {}, the smallest radius we can make is {}".format(self, radius_mm, self.min_circle_radius_mm))
+            log.warning("{}: radius_mm is {}, the smallest radius we can make is {}".format(
+                self, radius_mm, self.min_circle_radius_mm))
             abort = True
 
         if distance_mm is not None and distance_mm < 0:

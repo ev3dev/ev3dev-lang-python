@@ -21,7 +21,40 @@ class Wheel(object):
         self.circumference_mm = diameter_mm * pi
 
 
-class EV3RubberWheel(Wheel):
+class EV3Rim(Wheel):
+    """
+    part number 56145
+    comes in set 31313
+    """
+    def __init__(self):
+        Wheel.__init__(self, 30, 20)
+
+
+class EV3Tire(Wheel):
+    """
+    part number 44309
+    comes in set 31313
+    """
 
     def __init__(self):
         Wheel.__init__(self, 43.2, 21)
+
+
+class EV3EducationSetRim(Wheel):
+    """
+    part number 56908
+    comes in set 45544
+    """
+
+    def __init__(self):
+        Wheel.__init__(self, 43, 26)
+
+
+class EV3EducationSetTire(Wheel):
+    """
+    part number 41897
+    comes in set 45544
+    """
+
+    def __init__(self):
+        Wheel.__init__(self, 56, 28)
