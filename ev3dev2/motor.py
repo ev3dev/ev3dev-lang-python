@@ -1987,8 +1987,9 @@ class MoveJoystick(MoveTank):
     #         init_left_speed_percentage, init_right_speed_percentage,
     #         left_speed_percentage, right_speed_percentage))
 
-        MoveTank.on(self, SpeedNativeUnits(left_speed_percentage / 100 * self.left_motor._speed_native_units(max_speed)), SpeedNativeUnits(right_speed_percentage / 100 * self.right_motor._speed_native_units(max_speed)))
-
+        MoveTank.on(self,
+            SpeedPercent(left_speed_percentage),
+            SpeedPercent(right_speed_percentage))
 
     @staticmethod
     def angle_to_speed_percentage(angle):
