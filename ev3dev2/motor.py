@@ -1929,7 +1929,7 @@ class MoveJoystick(MoveTank):
     Used to control a pair of motors via a single joystick vector.
     """
 
-    def on(self, x, y, max_speed=100.0, radius=100.0):
+    def on(self, x, y, radius=100.0):
         """
         Convert x,y joystick coordinates to left/right motor speed percentages
         and move the motors.
@@ -1944,13 +1944,9 @@ class MoveJoystick(MoveTank):
             The X and Y coordinates of the joystick's position, with
             (0,0) representing the center position. X is horizontal and Y is vertical.
         
-        max_speed (default 100%):
-            A percentage or other SpeedValue, controlling the maximum motor speed.
-        
         radius (default 100):
             The radius of the joystick, controlling the range of the input (x, y) values.
             e.g. if "x" and "y" can be between -1 and 1, radius should be set to "1".
-        
         """
 
         # If joystick is in the middle stop the tank
@@ -1987,8 +1983,9 @@ class MoveJoystick(MoveTank):
     #         init_left_speed_percentage, init_right_speed_percentage,
     #         left_speed_percentage, right_speed_percentage))
 
-        MoveTank.on(self, SpeedNativeUnits(left_speed_percentage / 100 * self.left_motor._speed_native_units(max_speed)), SpeedNativeUnits(right_speed_percentage / 100 * self.right_motor._speed_native_units(max_speed)))
-
+        MoveTank.on(self,
+            SpeedPercent(left_speed_percentage),
+            SpeedPercent(right_speed_percentage))
 
     @staticmethod
     def angle_to_speed_percentage(angle):

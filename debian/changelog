@@ -1,5 +1,6 @@
 python-ev3dev2 (2.0.0~beta3) stable; urgency=medium
 
+  * MoveJoyStick should use SpeedPercent
   * renamed GyroSensor rate_and_angle to angle_and_rate
 
  -- Kaelin Laundry <wasabifan@outlook.com>  Sat, 27 Oct 2018 21:18:00 -0700

@@ -209,7 +209,7 @@ class TankWebHandler(RobotWebHandler):
 
             if joystick_engaged:
                 if seq > max_move_xy_seq:
-                    self.robot.on(x, y, motor_max_speed)
+                    self.robot.on(x, y)
                     max_move_xy_seq = seq
                     log.debug("seq %d: (x, y) (%4d, %4d)" % (seq, x, y))
                 else:
