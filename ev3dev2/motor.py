@@ -89,7 +89,7 @@ class SpeedPercent(SpeedValue):
     def __init__(self, percent):
         assert -100 <= percent <= 100,\
             "{} is an invalid percentage, must be between -100 and 100 (inclusive)".format(percent)
-        
+
         self.percent = percent
 
     def __str__(self):
@@ -113,7 +113,7 @@ class SpeedNativeUnits(SpeedValue):
 
     def __init__(self, native_counts):
         self.native_counts = native_counts
-    
+
     def __str__(self):
         return str(self.native_counts) + " counts/sec"
 
@@ -160,7 +160,7 @@ class SpeedRPM(SpeedValue):
 
     def __init__(self, rotations_per_minute):
         self.rotations_per_minute = rotations_per_minute
-    
+
     def __str__(self):
         return str(self.rotations_per_minute) + " rot/min"
 
@@ -185,7 +185,7 @@ class SpeedDPS(SpeedValue):
 
     def __init__(self, degrees_per_second):
         self.degrees_per_second = degrees_per_second
-    
+
     def __str__(self):
         return str(self.degrees_per_second) + " deg/sec"
 
@@ -856,7 +856,7 @@ class Motor(Device):
         while True:
             if cond(self.state):
                 return True
-            
+
             self._poll.poll(None if timeout is None else timeout)
 
             if timeout is not None and time.time() >= tic + timeout / 1000:
@@ -941,8 +941,8 @@ class Motor(Device):
         ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
-        if speed is None or rotations is None:
-            raise ValueError("Either speed ({}) or rotations ({}) is None".format(self, speed, rotations))
+        assert speed, "{}: speed is invalid ({}), motor will not move".format(self, speed)
+        assert rotations, "{}: rotations is invalid ({}), motor will not move".format(self, rotations)
 
         speed_sp = self._speed_native_units(speed)
         self._set_rel_position_degrees_and_speed_sp(rotations * 360, speed_sp)
@@ -960,8 +960,8 @@ class Motor(Device):
         ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
-        if speed is None or degrees is None:
-            raise ValueError("Either speed ({}) or degrees ({}) is None".format(self, speed, degrees))
+        assert speed, "{}: speed is invalid ({}), motor will not move".format(self, speed)
+        assert degrees, "{}: degrees is invalid ({}), motor will not move".format(self, degrees)
 
         speed_sp = self._speed_native_units(speed)
         self._set_rel_position_degrees_and_speed_sp(degrees, speed_sp)
@@ -980,11 +980,7 @@ class Motor(Device):
         object, enabling use of other units.
         """
         speed = self._speed_native_units(speed)
-
-        if not speed:
-            log.warning("({}) speed is invalid ({}), motor will not move".format(self, speed))
-            self._set_brake(brake)
-            return
+        assert speed, "{}: speed is invalid ({}), motor will not move".format(self, speed)
 
         self.speed_sp = int(round(speed))
         self.position_sp = position
@@ -1003,11 +999,8 @@ class Motor(Device):
         object, enabling use of other units.
         """
         speed = self._speed_native_units(speed)
-
-        if not speed or not seconds:
-            log.warning("({}) Either speed ({}) or seconds ({}) is invalid, motor will not move" .format(self, speed, seconds))
-            self._set_brake(brake)
-            return
+        assert speed, "{}: speed is invalid ({}), motor will not move".format(self, speed)
+        assert seconds, "{}: seconds is invalid ({}), motor will not move".format(self, seconds)
 
         self.speed_sp = int(round(speed))
         self.time_sp = int(seconds * 1000)
@@ -1029,11 +1022,7 @@ class Motor(Device):
         other `on_for_XYZ` methods.
         """
         speed = self._speed_native_units(speed)
-
-        if not speed:
-            log.warning("({}) speed is invalid ({}), motor will not move".format(self, speed))
-            self._set_brake(brake)
-            return
+        assert speed, "{}: speed is invalid ({}), motor will not move".format(self, speed)
 
         self.speed_sp = int(round(speed))
         self._set_brake(brake)
@@ -1699,25 +1688,10 @@ class MotorSet(object):
             motor.reset()
 
     def stop(self, motors=None):
-        """
-        stop the motors without setting the stop_action (brake, hold, coast)
-        """
         motors = motors if motors is not None else self.motors.values()
 
         for motor in motors:
             motor.stop()
-
-    def off(self, brake=True, motors=None):
-        """
-        set the stop_action prior to stopping the motors
-        """
-        motors = motors if motors is not None else self.motors.values()
-
-        for motor in motors:
-            motor._set_brake(brake)
-
-        for motor in motors:
-            motor.stop(brake)
 
     def _is_state(self, motors, state):
         motors = motors if motors is not None else self.motors.values()
@@ -1816,7 +1790,7 @@ class MoveTank(MotorSet):
     def _unpack_speeds_to_native_units(self, left_speed, right_speed):
         left_speed = self.left_motor._speed_native_units(left_speed, "left_speed")
         right_speed = self.right_motor._speed_native_units(right_speed, "right_speed")
-        
+
         return (
             left_speed,
             right_speed
@@ -1837,7 +1811,7 @@ class MoveTank(MotorSet):
         # proof of the following distance calculation: consider the circle formed by each wheel's path
         # v_l = d_l/t, v_r = d_r/t
         # therefore, t = d_l/v_l = d_r/v_r
-        
+
         if degrees == 0 or (left_speed_native_units == 0 and right_speed_native_units == 0):
             log.warning("{}: degrees {}, left_speed_native_units {}, right_speed_native_units {}, robot will not move"
                 .format(self, degrees, left_speed_native_units, right_speed_native_units))
@@ -1863,20 +1837,13 @@ class MoveTank(MotorSet):
         self.right_motor._set_rel_position_degrees_and_speed_sp(right_degrees, right_speed_native_units)
         self.right_motor._set_brake(brake)
 
-        left_motor_runtime_eta = float(left_degrees / left_speed_native_units)
-        right_motor_runtime_eta = float(right_degrees / right_speed_native_units)
-        left_motor_position_init = self.left_motor.position
-        right_motor_position_init = self.right_motor.position
-
         log.debug("{}: on_for_degrees {}".format(self, degrees))
-        log.debug("{}: left_speed {}, left_speed_native_units {}, left_degrees {}, left-position {}->{}, ETA {}s".format(
+        log.debug("{}: left_speed {}, left_speed_native_units {}, left_degrees {}, left-position {}->{}".format(
             self, left_speed, left_speed_native_units, left_degrees,
-            self.left_motor.position, self.left_motor.position_sp,
-            left_motor_runtime_eta))
-        log.debug("{}: right_speed {}, right_speed_native_units {}, right_degrees {}, right-position {}->{}, ETA {}s".format(
+            self.left_motor.position, self.left_motor.position_sp))
+        log.debug("{}: right_speed {}, right_speed_native_units {}, right_degrees {}, right-position {}->{}".format(
             self, right_speed, right_speed_native_units, right_degrees,
-            self.right_motor.position, self.right_motor.position_sp,
-            right_motor_runtime_eta))
+            self.right_motor.position, self.right_motor.position_sp))
 
         # Start the motors
         self.left_motor.run_to_rel_pos()
@@ -1884,13 +1851,6 @@ class MoveTank(MotorSet):
 
         if block:
             self._block()
-
-            log.debug("{}: left-position {}->{}, moved {} degrees".format(
-                self, left_motor_position_init, self.left_motor.position,
-                abs(self.left_motor.position - left_motor_position_init)))
-            log.debug("{}: right-position {}->{}, moved {} degrees".format(
-                self, right_motor_position_init, self.right_motor.position,
-                abs(self.right_motor.position - right_motor_position_init)))
 
     def on_for_rotations(self, left_speed, right_speed, rotations, brake=True, block=True):
         """
@@ -1947,6 +1907,16 @@ class MoveTank(MotorSet):
         self.left_motor.run_forever()
         self.right_motor.run_forever()
 
+    def off(self, brake=True):
+        """
+        Stop both motors immediately. Configure both to brake if ``brake`` is
+        set.
+        """
+        self.left_motor._set_brake(brake)
+        self.right_motor._set_brake(brake)
+        self.left_motor.stop()
+        self.right_motor.stop()
+
 
 class MoveSteering(MoveTank):
     """
@@ -1956,7 +1926,7 @@ class MoveSteering(MoveTank):
         * -100 means turn left on the spot (right motor at 100% forward, left motor at 100% backward),
         *  0   means drive in a straight line, and
         *  100 means turn right on the spot (left motor at 100% forward, right motor at 100% backward).
-    
+
     "steering" can be any number between -100 and 100.
 
     Example:
@@ -2033,26 +2003,49 @@ class MoveSteering(MoveTank):
             right_speed *= speed_factor
         else:
             left_speed *= speed_factor
-        
+
         return (left_speed, right_speed)
 
 
 class MoveDifferential(MoveTank):
     """
-    For all methods speed can be an integer or a SpeedInteger object
+    MoveDifferential is a child of MoveTank that adds the following capabilities:
+
+    - drive in a straight line for a specified distance
+
+    - rotate in place in a circle (clockwise or counter clockwise) for a
+      specified number of degrees
+
+    - drive in an arc (clockwise or counter clockwise) of a specified radius
+      for a specified distance
+
+    New arguements:
+
+    wheel_class - A class typically from ev3dev2/wheel.py. This is used to
+    get the circumference of the wheels of the robot. The circumference is
+    needed for several calculations in this class.
+
+    wheel_distance_mm - The distance between the mid point of the two
+    wheels of the robot. You may need to do some test drives to find
+    the correct value for your robot.  It is not as simple as measuring
+    the distance between the midpoints of the two wheels. The weight of
+    the robot, center of gravity, etc come into play.
+
+    You can use utils/move_differential.py to call on_arc_left() to do
+    some test drives of circles with a radius of 200mm. Adjust your
+    wheel_distance_mm until your robot can drive in a perfect circle
+    and stop exactly where it started. It does not have to be a circle
+    with a radius of 200mm, you can test with any size circle but you do
+    not want it to be too small or it will be difficult to test small
+    adjustments to wheel_distance_mm.
     """
 
-    def __init__(self, left_motor_port, right_motor_port, wheel_class, wheel_distance_mm, desc=None, motor_class=LargeMotor):
+    def __init__(self, left_motor_port, right_motor_port,
+            wheel_class, wheel_distance_mm,
+            desc=None, motor_class=LargeMotor):
+
         MoveTank.__init__(self, left_motor_port, right_motor_port, desc, motor_class)
         self.wheel = wheel_class()
-
-        # The distance between the mid point of the wheels.  You may need to
-        # do some test drives to find the correct value for your robot.  It
-        # is not as simple as measuring the distance between the midpoints of
-        # the two wheels. The weight of the robot, center of gravity, etc come
-        # into play.  You can use utils/move_differential.py to call on_arc_left()
-        # to do some test drives in 1-foot circles.  Tweak wheel_distam_mm until
-        # your robot can drive in a 1-foot circle and stop exactly where it started.
         self.wheel_distance_mm = wheel_distance_mm
 
         # The circumference of the circle made if this robot were to rotate in place
@@ -2062,21 +2055,10 @@ class MoveDifferential(MoveTank):
 
     def on_for_distance(self, speed, distance_mm, brake=True, block=True):
         """
-        Drive forward distance_mm
+        Drive distance_mm
         """
-        abort = False
-
-        if not speed:
-            log.warning("{}: speed is invalid ({}), tank will not move".format(self, speed))
-            abort = True
-
-        if not distance_mm:
-            log.warning("{}: distance_mm is invalid ({}), tank will not move".format(self, distance_mm))
-            abort = True
-
-        if abort:
-            self._set_brake(brake)
-            return
+        assert speed, "{}: speed is invalid ({}), tank will not move".format(self, speed)
+        assert distance_mm, "{}: distance_mm is invalid ({}), tank will not move".format(self, distance_mm)
 
         rotations = distance_mm / self.wheel.circumference_mm
         log.debug("%s: on_for_rotations distance_mm %s, rotations %s, speed %s" % (self, distance_mm, rotations, speed))
@@ -2087,28 +2069,11 @@ class MoveDifferential(MoveTank):
         """
         Drive in a circle with 'radius' for 'distance'
         """
-        abort = False
-
-        if not speed:
-            log.warning("{}: speed is invalid ({}), tank will not move".format(self, speed))
-            abort = True
-
-        if radius_mm <= 0:
-            log.warning("{}: radius_mm is invalid ({}), tank will not move".format(self, radius_mm))
-            abort = True
-
-        if radius_mm < self.min_circle_radius_mm:
-            log.warning("{}: radius_mm is {}, the smallest radius we can make is {}".format(
-                self, radius_mm, self.min_circle_radius_mm))
-            abort = True
-
-        if distance_mm is not None and distance_mm < 0:
-            log.warning("{}: distance_mm is {}, it must be None or greater than 0".format(self, distance_mm))
-            abort = True
-
-        if abort:
-            self._set_brake(brake)
-            return
+        assert speed, "{}: speed is invalid ({}), tank will not move".format(self, speed)
+        assert radius_mm > 0, "{}: radius_mm is invalid ({}), tank will not move".format(self, radius_mm)
+        assert distance_mm, "{}: distance_mm is invalid ({}), tank will not move".format(self, distance_mm)
+        assert radius_mm >= self.min_circle_radius_mm, "{}: radius_mm is {}, the smallest radius we can make is {}".format(
+            self, radius_mm, self.min_circle_radius_mm)
 
         # The circle formed at the halfway point between the two wheels is the
         # circle that must have a radius of radius_mm
@@ -2135,39 +2100,36 @@ class MoveDifferential(MoveTank):
             )
         )
 
-        if distance_mm is None:
-            MoveTank.on(self, left_speed, right_speed, brake, block)
-        else:
-            # We know we want the middle circle to be of length distance_mm so
-            # calculate the percentage of circle_middle_mm we must travel for the
-            # middle of the robot to travel distance_mm.
-            circle_middle_percentage = float(distance_mm / circle_middle_mm)
+        # We know we want the middle circle to be of length distance_mm so
+        # calculate the percentage of circle_middle_mm we must travel for the
+        # middle of the robot to travel distance_mm.
+        circle_middle_percentage = float(distance_mm / circle_middle_mm)
 
-            # Now multiple that percentage by circle_outer_mm to calculate how
-            # many mm the outer wheel should travel.
-            circle_outer_final_mm = circle_middle_percentage * circle_outer_mm
+        # Now multiple that percentage by circle_outer_mm to calculate how
+        # many mm the outer wheel should travel.
+        circle_outer_final_mm = circle_middle_percentage * circle_outer_mm
 
-            outer_wheel_rotations = float(circle_outer_final_mm / self.wheel.circumference_mm)
-            outer_wheel_degrees = outer_wheel_rotations * 360
+        outer_wheel_rotations = float(circle_outer_final_mm / self.wheel.circumference_mm)
+        outer_wheel_degrees = outer_wheel_rotations * 360
 
-            log.debug("%s: arc %s, circle_middle_percentage %s, circle_outer_final_mm %s, outer_wheel_rotations %s, outer_wheel_degrees %s" %
-                (self, "right" if arc_right else "left",
-                 circle_middle_percentage, circle_outer_final_mm,
-                 outer_wheel_rotations, outer_wheel_degrees
-                )
+        log.debug("%s: arc %s, circle_middle_percentage %s, circle_outer_final_mm %s, outer_wheel_rotations %s, outer_wheel_degrees %s" %
+            (self, "right" if arc_right else "left",
+             circle_middle_percentage, circle_outer_final_mm,
+             outer_wheel_rotations, outer_wheel_degrees
             )
+        )
 
-            MoveTank.on_for_degrees(self, left_speed, right_speed, outer_wheel_degrees, brake, block)
+        MoveTank.on_for_degrees(self, left_speed, right_speed, outer_wheel_degrees, brake, block)
 
     def on_arc_right(self, speed, radius_mm, distance_mm, brake=True, block=True):
         """
-        Drive clockwise in a circle with 'radius' for 'distance'
+        Drive clockwise in a circle with 'radius_mm' for 'distance_mm'
         """
         self._on_arc(speed, radius_mm, distance_mm, brake, block, True)
 
     def on_arc_left(self, speed, radius_mm, distance_mm, brake=True, block=True):
         """
-        Drive counter-clockwise in a circle with 'radius' for 'distance'
+        Drive counter-clockwise in a circle with 'radius_mm' for 'distance_mm'
         """
         self._on_arc(speed, radius_mm, distance_mm, brake, block, False)
 
@@ -2176,17 +2138,8 @@ class MoveDifferential(MoveTank):
         Rotate in place 'degrees'. Both wheels must turn at the same speed for us
         to rotate in place.
         """
-
-        if not degrees or not speed:
-
-            if not speed:
-                log.warning("{}: speed is invalid ({}), tank will not move".format(self, speed))
-
-            if not degrees:
-                log.warning("{}: degrees is invalid ({}), tank will not move".format(self, degrees))
-
-            self._set_brake(brake)
-            return
+        assert speed, "{}: speed is invalid ({}), tank will not move".format(self, speed)
+        assert degrees, "{}: degrees is invalid ({}), tank will not move".format(self, degrees)
 
         # The distance each wheel needs to travel
         distance_mm = (abs(degrees) / 360) * self.circumference_mm
@@ -2206,9 +2159,15 @@ class MoveDifferential(MoveTank):
             MoveTank.on_for_rotations(self, speed * -1, speed, rotations, brake, block)
 
     def turn_right(self, speed, degrees, brake=True, block=True):
+        """
+        Rotate clockwise 'degrees' in place
+        """
         self._turn(speed, abs(degrees), brake, block)
 
     def turn_left(self, speed, degrees, brake=True, block=True):
+        """
+        Rotate counter-clockwise 'degrees' in place
+        """
         self._turn(speed, abs(degrees) * -1, brake, block)
 
 

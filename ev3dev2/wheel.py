@@ -10,15 +10,22 @@ from math import pi
 
 class Wheel(object):
     """
-    A base class for various types of wheels, tires, etc
-    All units are in mm
+    A base class for various types of wheels, tires, etc.  All units are in mm.
+
+    One scenario where one of the child classes below would be used is when the
+    user needs their robot to drive at a specific speed or drive for a specific
+    distance. Both of those calculations require the circumference of the wheel
+    of the robot.
     """
 
     def __init__(self, diameter_mm, width_mm):
         self.diameter_mm = float(diameter_mm)
         self.width_mm = float(width_mm)
-        self.radius_mm = float(diameter_mm / 2)
         self.circumference_mm = diameter_mm * pi
+
+    @property
+    def radius_mm(self):
+        return float(self.diameter_mm / 2)
 
 
 class EV3Rim(Wheel):
