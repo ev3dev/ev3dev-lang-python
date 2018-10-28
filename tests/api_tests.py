@@ -162,29 +162,6 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(m.speed_sp, int(round(0.75 * 1050)))
         self.assertEqual(m.position_sp, 100)
 
-        # zero speed (on-device, this will return immediately due to reported stall)
-        m.on_for_degrees(0, 100)
-        self.assertEqual(m.speed_sp, 0)
-        self.assertEqual(m.position_sp, 100)
-        
-        # zero distance
-        m.on_for_degrees(75, 0)
-        self.assertEqual(m.speed_sp, int(round(0.75 * 1050)))
-        self.assertEqual(m.position_sp, 0)
-
-        # zero speed and distance
-        m.on_for_degrees(0, 0)
-        self.assertEqual(m.speed_sp, 0)
-        self.assertEqual(m.position_sp, 0)
-
-        # None speed
-        with self.assertRaises(ValueError):
-            m.on_for_degrees(None, 100)
-        
-        # None distance
-        with self.assertRaises(ValueError):
-            m.on_for_degrees(75, None)
-    
     def test_motor_on_for_rotations(self):
         clean_arena()
         populate_arena([('large_motor', 0, 'outA')])
