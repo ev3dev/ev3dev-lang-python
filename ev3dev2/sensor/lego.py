@@ -605,7 +605,7 @@ class GyroSensor(Sensor):
         return self.value(0)
 
     @property
-    def rate_and_angle(self):
+    def angle_and_rate(self):
         """
         Angle (degrees) and Rotational Speed (degrees/second).
         """
