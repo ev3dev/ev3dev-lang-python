@@ -196,14 +196,6 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(m.speed_sp, int(round(0.75 * 1050)))
         self.assertEqual(m.position_sp, 5 * 360)
 
-        # None speed
-        with self.assertRaises(ValueError):
-            m.on_for_rotations(None, 5)
-        
-        # None distance
-        with self.assertRaises(ValueError):
-            m.on_for_rotations(75, None)
-
     def test_move_tank_relative_distance(self):
         clean_arena()
         populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
