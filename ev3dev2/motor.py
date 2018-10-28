@@ -2190,7 +2190,7 @@ class MoveJoystick(MoveTank):
         "x", "y":
             The X and Y coordinates of the joystick's position, with
             (0,0) representing the center position. X is horizontal and Y is vertical.
-        
+
         radius (default 100):
             The radius of the joystick, controlling the range of the input (x, y) values.
             e.g. if "x" and "y" can be between -1 and 1, radius should be set to "1".
