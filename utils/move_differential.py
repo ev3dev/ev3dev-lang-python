@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Used to adjust the position of a motor in an already assembled robot
-where you can"t move the motor by hand.
+Used to experiment with the MoveDifferential class
 """
 
 from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveDifferential, SpeedRPM

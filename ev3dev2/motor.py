@@ -30,6 +30,7 @@ if sys.version_info < (3,4):
 
 import select
 import time
+from collections import OrderedDict
 from logging import getLogger
 from math import atan2, degrees as math_degrees, sqrt, pi
 from os.path import abspath
@@ -941,8 +942,8 @@ class Motor(Device):
         ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
-        assert speed, "{}: speed is invalid ({}), motor will not move".format(self, speed)
-        assert rotations, "{}: rotations is invalid ({}), motor will not move".format(self, rotations)
+        if speed is None or rotations is None:
+            raise ValueError("Either speed ({}) or rotations ({}) is None".format(self, speed, rotations))
 
         speed_sp = self._speed_native_units(speed)
         self._set_rel_position_degrees_and_speed_sp(rotations * 360, speed_sp)
@@ -960,8 +961,8 @@ class Motor(Device):
         ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
-        assert speed, "{}: speed is invalid ({}), motor will not move".format(self, speed)
-        assert degrees, "{}: degrees is invalid ({}), motor will not move".format(self, degrees)
+        if speed is None or degrees is None:
+            raise ValueError("Either speed ({}) or degrees ({}) is None".format(self, speed, degrees))
 
         speed_sp = self._speed_native_units(speed)
         self._set_rel_position_degrees_and_speed_sp(degrees, speed_sp)
@@ -999,8 +1000,11 @@ class Motor(Device):
         object, enabling use of other units.
         """
         speed = self._speed_native_units(speed)
-        assert speed, "{}: speed is invalid ({}), motor will not move".format(self, speed)
-        assert seconds, "{}: seconds is invalid ({}), motor will not move".format(self, seconds)
+
+        if not speed or not seconds:
+            log.warning("({}) Either speed ({}) or seconds ({}) is invalid, motor will not move" .format(self, speed, seconds))
+            self._set_brake(brake)
+            return
 
         self.speed_sp = int(round(speed))
         self.time_sp = int(seconds * 1000)
@@ -1022,7 +1026,11 @@ class Motor(Device):
         other `on_for_XYZ` methods.
         """
         speed = self._speed_native_units(speed)
-        assert speed, "{}: speed is invalid ({}), motor will not move".format(self, speed)
+
+        if not speed:
+            log.warning("({}) speed is invalid ({}), motor will not move".format(self, speed))
+            self._set_brake(brake)
+            return
 
         self.speed_sp = int(round(speed))
         self._set_brake(brake)
@@ -1094,9 +1102,6 @@ class MediumMotor(Motor):
     __slots__ = []
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-
-        if platform in ('brickpi', 'brickpi3'):
-            raise Exception("%s is unaware of different motor types, use LargeMotor instead" % platform)
 
         super(MediumMotor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-m-motor'], **kwargs)
 
@@ -1611,7 +1616,7 @@ class MotorSet(object):
             OUTPUT_C : LargeMotor,
         }
         """
-        self.motors = {}
+        self.motors = OrderedDict()
         for motor_port in sorted(motor_specs.keys()):
             motor_class = motor_specs[motor_port]
             self.motors[motor_port] = motor_class(motor_port)
@@ -1731,29 +1736,17 @@ class MotorSet(object):
     def wait_until_not_moving(self, timeout=None, motors=None):
         motors = motors if motors is not None else self.motors.values()
 
-        # sort the motors so the robot always waits on the motors in the
-        # same order everytime it runs. This makes troubleshooting easier.
-        motors = sorted(list(motors))
-
         for motor in motors:
             motor.wait_until_not_moving(timeout)
 
     def wait_until(self, s, timeout=None, motors=None):
         motors = motors if motors is not None else self.motors.values()
 
-        # sort the motors so the robot always waits on the motors in the
-        # same order everytime it runs. This makes troubleshooting easier.
-        motors = sorted(list(motors))
-
         for motor in motors:
             motor.wait_until(s, timeout)
 
     def wait_while(self, s, timeout=None, motors=None):
         motors = motors if motors is not None else self.motors.values()
-
-        # sort the motors so the robot always waits on the motors in the
-        # same order everytime it runs. This makes troubleshooting easier.
-        motors = sorted(list(motors))
 
         for motor in motors:
             motor.wait_while(s, timeout)
@@ -1838,12 +1831,15 @@ class MoveTank(MotorSet):
         self.right_motor._set_brake(brake)
 
         log.debug("{}: on_for_degrees {}".format(self, degrees))
-        log.debug("{}: left_speed {}, left_speed_native_units {}, left_degrees {}, left-position {}->{}".format(
-            self, left_speed, left_speed_native_units, left_degrees,
-            self.left_motor.position, self.left_motor.position_sp))
-        log.debug("{}: right_speed {}, right_speed_native_units {}, right_degrees {}, right-position {}->{}".format(
-            self, right_speed, right_speed_native_units, right_degrees,
-            self.right_motor.position, self.right_motor.position_sp))
+
+        # These debugs involve disk I/O to pull position and position_sp so only uncomment
+        # if you need to troubleshoot in more detail.
+        # log.debug("{}: left_speed {}, left_speed_native_units {}, left_degrees {}, left-position {}->{}".format(
+        #     self, left_speed, left_speed_native_units, left_degrees,
+        #     self.left_motor.position, self.left_motor.position_sp))
+        # log.debug("{}: right_speed {}, right_speed_native_units {}, right_degrees {}, right-position {}->{}".format(
+        #     self, right_speed, right_speed_native_units, right_degrees,
+        #     self.right_motor.position, self.right_motor.position_sp))
 
         # Start the motors
         self.left_motor.run_to_rel_pos()
@@ -1900,8 +1896,10 @@ class MoveTank(MotorSet):
         self.left_motor.speed_sp = int(round(left_speed_native_units))
         self.right_motor.speed_sp = int(round(right_speed_native_units))
 
-        log.debug("%s: on at left-speed %s, right-speed %s" %
-            (self, self.left_motor.speed_sp, self.right_motor.speed_sp))
+        # This debug involves disk I/O to pull speed_sp so only uncomment
+        # if you need to troubleshoot in more detail.
+        # log.debug("%s: on at left-speed %s, right-speed %s" %
+        #     (self, self.left_motor.speed_sp, self.right_motor.speed_sp))
 
         # Start the motors
         self.left_motor.run_forever()
@@ -2019,7 +2017,7 @@ class MoveDifferential(MoveTank):
     - drive in an arc (clockwise or counter clockwise) of a specified radius
       for a specified distance
 
-    New arguements:
+    New arguments:
 
     wheel_class - A class typically from ev3dev2/wheel.py. This is used to
     get the circumference of the wheels of the robot. The circumference is
@@ -2057,8 +2055,11 @@ class MoveDifferential(MoveTank):
         """
         Drive distance_mm
         """
-        assert speed, "{}: speed is invalid ({}), tank will not move".format(self, speed)
-        assert distance_mm, "{}: distance_mm is invalid ({}), tank will not move".format(self, distance_mm)
+
+        if not speed or not distance_mm:
+            log.warning("({}) Either speed ({}) or distance_mm ({}) is invalid, motor will not move" .format(self, speed, distance_mm))
+            self._set_brake(brake)
+            return
 
         rotations = distance_mm / self.wheel.circumference_mm
         log.debug("%s: on_for_rotations distance_mm %s, rotations %s, speed %s" % (self, distance_mm, rotations, speed))
@@ -2069,11 +2070,17 @@ class MoveDifferential(MoveTank):
         """
         Drive in a circle with 'radius' for 'distance'
         """
-        assert speed, "{}: speed is invalid ({}), tank will not move".format(self, speed)
-        assert radius_mm > 0, "{}: radius_mm is invalid ({}), tank will not move".format(self, radius_mm)
-        assert distance_mm, "{}: distance_mm is invalid ({}), tank will not move".format(self, distance_mm)
-        assert radius_mm >= self.min_circle_radius_mm, "{}: radius_mm is {}, the smallest radius we can make is {}".format(
-            self, radius_mm, self.min_circle_radius_mm)
+
+        if not speed or not distance_mm or radius_mm < self.min_circle_radius_mm:
+            log.warning("{}: one of speed ({}), radius_mm ({}), or distance_mm ({}) are invalid, motor will not move" .format(
+                self, speed, radius_mm, distance_mm))
+
+            if radius_mm < self.min_circle_radius_mm:
+                log.warning("{}: radius_mm {} is less than min_circle_radius_mm {}" .format(
+                    self, radius_mm, self.min_circle_radius_mm))
+
+            self._set_brake(brake)
+            return
 
         # The circle formed at the halfway point between the two wheels is the
         # circle that must have a radius of radius_mm
@@ -2138,8 +2145,11 @@ class MoveDifferential(MoveTank):
         Rotate in place 'degrees'. Both wheels must turn at the same speed for us
         to rotate in place.
         """
-        assert speed, "{}: speed is invalid ({}), tank will not move".format(self, speed)
-        assert degrees, "{}: degrees is invalid ({}), tank will not move".format(self, degrees)
+
+        if not speed or not degrees:
+            log.warning("({}) Either speed ({}) or degrees ({}) is invalid, motor will not move" .format(self, speed, degrees))
+            self._set_brake(brake)
+            return
 
         # The distance each wheel needs to travel
         distance_mm = (abs(degrees) / 360) * self.circumference_mm
