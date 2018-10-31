@@ -311,6 +311,13 @@ class Motor(Device):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
+        # brickpi(3) cannot detect different motor types, it treats every
+        # motor as a large motor. One pitfall here is that the max_speed
+        # reported will be the max_speed of a large motor, not the max_speed
+        # of the motor being used.
+        if platform in ('brickpi', 'brickpi3'):
+            kwargs['driver_name'] = LargeMotor.DRIVERS
+
         if address is not None:
             kwargs['address'] = address
         super(Motor, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
@@ -1034,11 +1041,12 @@ class LargeMotor(Motor):
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
+    DRIVERS = ['lego-ev3-l-motor', 'lego-nxt-motor']
     __slots__ = []
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
-        super(LargeMotor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-l-motor', 'lego-nxt-motor'], **kwargs)
+        super(LargeMotor, self).__init__(address, name_pattern, name_exact, driver_name=LargeMotor.DRIVERS, **kwargs)
 
 
 class MediumMotor(Motor):
