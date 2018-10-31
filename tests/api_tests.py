@@ -351,9 +351,9 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(DistanceDeciMeters(42).mm, 4200)
         self.assertEqual(DistanceMeters(42).mm, 42000)
 
-        self.assertEqual(DistanceInches(42).mm, 1066.8)
-        self.assertEqual(DistanceFeet(42).mm, 12801.6)
-        self.assertEqual(DistanceYards(42).mm, 38404.799999999996)
+        self.assertAlmostEqual(DistanceInches(42).mm, 1066.8)
+        self.assertAlmostEqual(DistanceFeet(42).mm, 12801.6)
+        self.assertAlmostEqual(DistanceYards(42).mm, 38404.799999999996)
 
         self.assertEqual(DistanceStuds(42).mm, 336)
 
