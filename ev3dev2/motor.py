@@ -30,7 +30,14 @@ if sys.version_info < (3,4):
 
 import select
 import time
-from collections import OrderedDict
+
+# pytyon3 uses collections
+# micropython uses ucollections
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ucollections import OrderedDict
+
 from logging import getLogger
 from math import atan2, degrees as math_degrees, sqrt, pi
 from os.path import abspath
@@ -2030,6 +2037,29 @@ class MoveDifferential(MoveTank):
     with a radius of 200mm, you can test with any size circle but you do
     not want it to be too small or it will be difficult to test small
     adjustments to wheel_distance_mm.
+
+    Example:
+
+    .. code:: python
+        from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveDifferential, SpeedRPM
+        from ev3dev2.wheel import EV3Tire
+
+        STUD_MM = 8
+
+        # test with a robot that:
+        # - uses the standard wheels known as EV3Tire
+        # - wheels are 16 studs apart
+        mdiff = MoveDifferential(OUTPUT_A, OUTPUT_B, EV3Tire, 16 * STUD_MM)
+
+        # Rotate 90 degrees clockwise
+        mdiff.turn_right(SpeedRPM(40), 90)
+
+        # Drive forward 500 mm
+        mdiff.on_for_distance(SpeedRPM(40), 500)
+
+        # Drive in arc to the right along an imaginary circle of radius 150 mm.
+        # Drive for 700 mm around this imaginary circle.
+        mdiff.on_arc_right(SpeedRPM(80), 150, 700)
     """
 
     def __init__(self, left_motor_port, right_motor_port,

@@ -16,6 +16,17 @@ class Wheel(object):
     user needs their robot to drive at a specific speed or drive for a specific
     distance. Both of those calculations require the circumference of the wheel
     of the robot.
+
+    Example:
+
+    .. code:: python
+
+        from ev3dev2.wheel import EV3Tire
+
+        tire = EV3Tire()
+
+        # calculate the number of rotations needed to travel forward 500 mm
+        rotations_for_500mm = 500 / tire.circumference_mm
     """
 
     def __init__(self, diameter_mm, width_mm):
