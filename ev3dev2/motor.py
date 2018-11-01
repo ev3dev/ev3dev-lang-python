@@ -2079,12 +2079,6 @@ class MoveDifferential(MoveTank):
         """
         Drive distance_mm
         """
-
-        if not speed or not distance_mm:
-            log.warning("({}) Either speed ({}) or distance_mm ({}) is invalid, motor will not move" .format(self, speed, distance_mm))
-            self._set_brake(brake)
-            return
-
         rotations = distance_mm / self.wheel.circumference_mm
         log.debug("%s: on_for_rotations distance_mm %s, rotations %s, speed %s" % (self, distance_mm, rotations, speed))
 
@@ -2095,16 +2089,9 @@ class MoveDifferential(MoveTank):
         Drive in a circle with 'radius' for 'distance'
         """
 
-        if not speed or not distance_mm or radius_mm < self.min_circle_radius_mm:
-            log.warning("{}: one of speed ({}), radius_mm ({}), or distance_mm ({}) are invalid, motor will not move" .format(
-                self, speed, radius_mm, distance_mm))
-
-            if radius_mm < self.min_circle_radius_mm:
-                log.warning("{}: radius_mm {} is less than min_circle_radius_mm {}" .format(
+        if radius_mm < self.min_circle_radius_mm:
+            raise ValueError("{}: radius_mm {} is less than min_circle_radius_mm {}" .format(
                     self, radius_mm, self.min_circle_radius_mm))
-
-            self._set_brake(brake)
-            return
 
         # The circle formed at the halfway point between the two wheels is the
         # circle that must have a radius of radius_mm
@@ -2169,11 +2156,6 @@ class MoveDifferential(MoveTank):
         Rotate in place 'degrees'. Both wheels must turn at the same speed for us
         to rotate in place.
         """
-
-        if not speed or not degrees:
-            log.warning("({}) Either speed ({}) or degrees ({}) is invalid, motor will not move" .format(self, speed, degrees))
-            self._set_brake(brake)
-            return
 
         # The distance each wheel needs to travel
         distance_mm = (abs(degrees) / 360) * self.circumference_mm
