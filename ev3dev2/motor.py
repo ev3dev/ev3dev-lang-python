@@ -890,9 +890,6 @@ class Motor(Device):
         ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
-        if speed is None or rotations is None:
-            raise ValueError("Either speed ({}) or rotations ({}) is None".format(self, speed, rotations))
-
         speed_sp = self._speed_native_units(speed)
         self._set_rel_position_degrees_and_speed_sp(rotations * 360, speed_sp)
         self._set_brake(brake)
@@ -909,9 +906,6 @@ class Motor(Device):
         ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
-        if speed is None or degrees is None:
-            raise ValueError("Either speed ({}) or degrees ({}) is None".format(self, speed, degrees))
-
         speed_sp = self._speed_native_units(speed)
         self._set_rel_position_degrees_and_speed_sp(degrees, speed_sp)
         self._set_brake(brake)
@@ -929,12 +923,6 @@ class Motor(Device):
         object, enabling use of other units.
         """
         speed = self._speed_native_units(speed)
-
-        if not speed:
-            log.warning("({}) speed is invalid ({}), motor will not move".format(self, speed))
-            self._set_brake(brake)
-            return
-
         self.speed_sp = int(round(speed))
         self.position_sp = position
         self._set_brake(brake)
@@ -951,13 +939,11 @@ class Motor(Device):
         ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
+
+        if seconds < 0:
+            raise ValueError("seconds is negative ({})".format(seconds))
+
         speed = self._speed_native_units(speed)
-
-        if not speed or not seconds:
-            log.warning("({}) Either speed ({}) or seconds ({}) is invalid, motor will not move" .format(self, speed, seconds))
-            self._set_brake(brake)
-            return
-
         self.speed_sp = int(round(speed))
         self.time_sp = int(seconds * 1000)
         self._set_brake(brake)
@@ -978,12 +964,6 @@ class Motor(Device):
         other `on_for_XYZ` methods.
         """
         speed = self._speed_native_units(speed)
-
-        if not speed:
-            log.warning("({}) speed is invalid ({}), motor will not move".format(self, speed))
-            self._set_brake(brake)
-            return
-
         self.speed_sp = int(round(speed))
         self._set_brake(brake)
         self.run_forever()
@@ -1793,6 +1773,10 @@ class MoveTank(MotorSet):
         Rotate the motors at 'left_speed & right_speed' for 'seconds'. Speeds
         can be percentages or any SpeedValue implementation.
         """
+
+        if seconds < 0:
+            raise ValueError("seconds is negative ({})".format(seconds))
+
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
         # Set all parameters
