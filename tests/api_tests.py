@@ -14,8 +14,11 @@ from ev3dev2.sensor.lego import InfraredSensor
 from ev3dev2.motor import \
     Motor, MediumMotor, LargeMotor, \
     MoveTank, MoveSteering, MoveJoystick, \
-    SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits, \
-    OUTPUT_A, OUTPUT_B
+    SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits
+
+# We force OUTPUT_A and OUTPUT_B to be imported from platform "fake" so that
+# we can run these test cases on an EV3, brickpi3, etc.
+from ev3dev2._platform.fake import OUTPUT_A, OUTPUT_B
 
 ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 
