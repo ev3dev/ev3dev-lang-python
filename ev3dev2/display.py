@@ -347,7 +347,7 @@ class Display(FbMem):
         if clear_screen:
             self.clear()
 
-        return self.draw.rectangle((x, y, width, height), fill=fill_color, outline=outline_color)
+        return self.draw.rectangle((x, y, x+width, y+height), fill=fill_color, outline=outline_color)
 
     def point(self, clear_screen=True, x=10, y=10, point_color='black'):
         """
