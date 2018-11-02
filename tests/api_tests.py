@@ -43,6 +43,14 @@ def dummy_wait(self, cond, timeout=None):
 Motor.wait = dummy_wait
 
 class TestAPI(unittest.TestCase):
+
+    def setUp(self):
+        # micropython does not have _testMethodName
+        try:
+            print("\n\n{}\n{}".format(self._testMethodName, "=" * len(self._testMethodName,)))
+        except AttributeError:
+            pass
+
     def test_device(self):
         clean_arena()
         populate_arena([('medium_motor', 0, 'outA'), ('infrared_sensor', 0, 'in1')])

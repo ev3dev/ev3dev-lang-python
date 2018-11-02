@@ -1,5 +1,6 @@
 python-ev3dev2 (2.0.0~beta3) stable; urgency=medium
 
+  * suppress unittest ResourceWarning messages
   * MoveJoyStick should use SpeedPercent
   * renamed GyroSensor rate_and_angle to angle_and_rate
 
