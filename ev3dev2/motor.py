@@ -31,7 +31,7 @@ if sys.version_info < (3,4):
 import select
 import time
 
-# pytyon3 uses collections
+# python3 uses collections
 # micropython uses ucollections
 try:
     from collections import OrderedDict

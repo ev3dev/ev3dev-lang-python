@@ -144,7 +144,7 @@ Lego Port
 
 Wheels
 ------
-All Wheel class units are in millimeters.  The ``diameter_mm`` and ``width_mm`` of the wheel must be specified whenever a new child Wheel class is added to ``ev3dev2/wheel.py``. The diameter and width for various lego wheels can be found at http://wheels.sariel.pl/
+All Wheel class units are in millimeters.  The diameter and width for various lego wheels can be found at http://wheels.sariel.pl/
 
 .. autoclass:: ev3dev2.wheel.Wheel
     :members:
