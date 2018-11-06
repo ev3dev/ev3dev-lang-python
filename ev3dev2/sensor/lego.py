@@ -626,14 +626,14 @@ class GyroSensor(Sensor):
         self._ensure_mode(self.MODE_GYRO_ANG)
         self._direct = self.set_attr_raw(self._direct, 'direct', 17)
 
-    def wait_until_angle_changed_by(self, delta, honor_direction=False):
+    def wait_until_angle_changed_by(self, delta, direction_sensitive=False):
         """
         Wait until angle has changed by specified amount.
 
-        If ``honor_direction`` is True we will wait until angle has changed
+        If ``direction_sensitive`` is True we will wait until angle has changed
         by ``delta`` and with the correct sign.
 
-        If ``honor_direction`` is False (default) we will wait until angle has changed
+        If ``direction_sensitive`` is False (default) we will wait until angle has changed
         by ``delta`` in either direction.
         """
         assert self.mode in (self.MODE_GYRO_G_A, self.MODE_GYRO_ANG,
@@ -641,7 +641,7 @@ class GyroSensor(Sensor):
             'Gyro mode should be MODE_GYRO_ANG, MODE_GYRO_G_A or MODE_TILT_ANG'
         start_angle = self.value(0)
 
-        if honor_direction:
+        if direction_sensitive:
             if delta > 0:
                 while (self.value(0) - start_angle) < delta:
                     time.sleep(0.01)
