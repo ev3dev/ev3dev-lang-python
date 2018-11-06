@@ -1,8 +1,5 @@
 # -----------------------------------------------------------------------------
-# Copyright (c) 2015 Ralph Hempel <rhempel@hempeldesigngroup.com>
-# Copyright (c) 2015 Anton Vanhoucke <antonvh@gmail.com>
-# Copyright (c) 2015 Denis Demidov <dennis.demidov@gmail.com>
-# Copyright (c) 2015 Eric Pascual <eric@pobot.org>
+# Copyright (c) 2015 Ralph Hempel
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +38,7 @@ STUD_MM = 8
 class DistanceValue(object):
     """
     A base class for other unit types. Don't use this directly; instead, see
-    :class:`DistanceMilliMeters`, :class:`DistanceCentiMeters`, :class:`DistanceDeciMeters`, :class:`DistanceMeters`,
+    :class:`DistanceMillimeters`, :class:`DistanceCentimeters`, :class:`DistanceDecimeters`, :class:`DistanceMeters`,
     :class:`DistanceInches`, :class:`DistanceFeet`, :class:`DistanceYards` and :class:`DistanceStuds`.
     """
 
@@ -53,7 +50,7 @@ class DistanceValue(object):
         return self.__mul__(other)
 
 
-class DistanceMilliMeters(DistanceValue):
+class DistanceMillimeters(DistanceValue):
     """
     Distance in millimeters
     """
@@ -66,14 +63,14 @@ class DistanceMilliMeters(DistanceValue):
 
     def __mul__(self, other):
         assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
-        return DistanceMilliMeters(self.millimeters * other)
+        return DistanceMillimeters(self.millimeters * other)
 
     @property
     def mm(self):
         return self.millimeters
 
 
-class DistanceCentiMeters(DistanceValue):
+class DistanceCentimeters(DistanceValue):
     """
     Distance in centimeters
     """
@@ -86,14 +83,14 @@ class DistanceCentiMeters(DistanceValue):
 
     def __mul__(self, other):
         assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
-        return DistanceCentiMeters(self.centimeters * other)
+        return DistanceCentimeters(self.centimeters * other)
 
     @property
     def mm(self):
         return self.centimeters * CENTIMETER_MM
 
 
-class DistanceDeciMeters(DistanceValue):
+class DistanceDecimeters(DistanceValue):
     """
     Distance in decimeters
     """
@@ -106,7 +103,7 @@ class DistanceDeciMeters(DistanceValue):
 
     def __mul__(self, other):
         assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
-        return DistanceDeciMeters(self.decimeters * other)
+        return DistanceDecimeters(self.decimeters * other)
 
     @property
     def mm(self):
