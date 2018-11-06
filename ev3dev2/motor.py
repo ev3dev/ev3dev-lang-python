@@ -813,10 +813,13 @@ class Motor(Device):
 
     def wait_until_not_moving(self, timeout=None):
         """
-        Blocks until ``running`` is not in ``self.state`` or ``stalled``
-        or ``holding` are in ``self.state``.  The condition is checked
-        when there is an I/O event related to the ``state`` attribute.
-        Exits early when ``timeout`` (in milliseconds) is reached.
+        Blocks until one of the following conditions are met:
+        - ``running`` is not in ``self.state``
+        - ``stalled`` is in ``self.state``
+        - ``holding`` is in ``self.state``
+        The condition is checked when there is an I/O event related to
+        the ``state`` attribute.  Exits early when ``timeout`` (in
+        milliseconds) is reached.
 
         Returns ``True`` if the condition is met, and ``False`` if the timeout
         is reached.
