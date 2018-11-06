@@ -261,7 +261,7 @@ class Sound(object):
         if not 0 < volume <= 100:
             raise ValueError('invalid volume (%s)' % volume)
 
-        if wav_file.endswith(".mp3"):
+        if not wav_file.endswith(".wav"):
             raise ValueError('invalid sound file (%s), only .wav files are supported' % wav_file)
 
         if not os.path.isfile(wav_file):
