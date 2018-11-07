@@ -2020,7 +2020,7 @@ class MoveDifferential(MoveTank):
 
     New arguments:
 
-    wheel_class - A class typically from ev3dev2/wheel.py. This is used to
+    wheel_class - Typically a child class of :class:`ev3dev2.wheel.Wheel`. This is used to
     get the circumference of the wheels of the robot. The circumference is
     needed for several calculations in this class.
 
