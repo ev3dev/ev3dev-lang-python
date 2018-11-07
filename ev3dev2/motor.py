@@ -27,8 +27,16 @@ if sys.version_info < (3,4):
 
 import select
 import time
+
+# python3 uses collections
+# micropython uses ucollections
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ucollections import OrderedDict
+
 from logging import getLogger
-from math import atan2, degrees as math_degrees, sqrt
+from math import atan2, degrees as math_degrees, sqrt, pi
 from os.path import abspath
 from ev3dev2 import get_current_platform, Device, list_device_names
 
@@ -64,13 +72,19 @@ else:
     raise Exception("Unsupported platform '%s'" % platform)
 
 
-class SpeedValue():
+class SpeedValue(object):
     """
     A base class for other unit types. Don't use this directly; instead, see
     :class:`SpeedPercent`, :class:`SpeedRPS`, :class:`SpeedRPM`,
     :class:`SpeedDPS`, and :class:`SpeedDPM`.
     """
-    pass
+
+    def __lt__(self, other):
+        return self.to_native_units() < other.to_native_units()
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
 
 class SpeedPercent(SpeedValue):
     """
@@ -80,11 +94,15 @@ class SpeedPercent(SpeedValue):
     def __init__(self, percent):
         assert -100 <= percent <= 100,\
             "{} is an invalid percentage, must be between -100 and 100 (inclusive)".format(percent)
-        
+
         self.percent = percent
 
     def __str__(self):
         return str(self.percent) + "%"
+
+    def __mul__(self, other):
+        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        return SpeedPercent(self.percent * other)
 
     def to_native_units(self, motor):
         """
@@ -100,15 +118,20 @@ class SpeedNativeUnits(SpeedValue):
 
     def __init__(self, native_counts):
         self.native_counts = native_counts
-    
+
     def __str__(self):
         return str(self.native_counts) + " counts/sec"
+
+    def __mul__(self, other):
+        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        return SpeedNativeUnits(self.native_counts * other)
 
     def to_native_units(self, motor):
         """
         Return this SpeedNativeUnits as a number
         """
         return self.native_counts
+
 
 class SpeedRPS(SpeedValue):
     """
@@ -121,11 +144,17 @@ class SpeedRPS(SpeedValue):
     def __str__(self):
         return str(self.rotations_per_second) + " rot/sec"
 
+    def __mul__(self, other):
+        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        return SpeedRPS(self.rotations_per_second * other)
+
     def to_native_units(self, motor):
         """
         Return the native speed measurement required to achieve desired rotations-per-second
         """
-        assert abs(self.rotations_per_second) <= motor.max_rps, "invalid rotations-per-second: {} max RPS is {}, {} was requested".format(motor, motor.max_rps, self.rotations_per_second)
+        assert abs(self.rotations_per_second) <= motor.max_rps,\
+            "invalid rotations-per-second: {} max RPS is {}, {} was requested".format(
+            motor, motor.max_rps, self.rotations_per_second)
         return self.rotations_per_second/motor.max_rps * motor.max_speed
 
 
@@ -136,15 +165,21 @@ class SpeedRPM(SpeedValue):
 
     def __init__(self, rotations_per_minute):
         self.rotations_per_minute = rotations_per_minute
-    
+
     def __str__(self):
         return str(self.rotations_per_minute) + " rot/min"
+
+    def __mul__(self, other):
+        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        return SpeedRPM(self.rotations_per_minute * other)
 
     def to_native_units(self, motor):
         """
         Return the native speed measurement required to achieve desired rotations-per-minute
         """
-        assert abs(self.rotations_per_minute) <= motor.max_rpm, "invalid rotations-per-minute: {} max RPM is {}, {} was requested".format(motor, motor.max_rpm, self.rotations_per_minute)
+        assert abs(self.rotations_per_minute) <= motor.max_rpm,\
+            "invalid rotations-per-minute: {} max RPM is {}, {} was requested".format(
+            motor, motor.max_rpm, self.rotations_per_minute)
         return self.rotations_per_minute/motor.max_rpm * motor.max_speed
 
 
@@ -155,15 +190,21 @@ class SpeedDPS(SpeedValue):
 
     def __init__(self, degrees_per_second):
         self.degrees_per_second = degrees_per_second
-    
+
     def __str__(self):
         return str(self.degrees_per_second) + " deg/sec"
+
+    def __mul__(self, other):
+        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        return SpeedDPS(self.degrees_per_second * other)
 
     def to_native_units(self, motor):
         """
         Return the native speed measurement required to achieve desired degrees-per-second
         """
-        assert abs(self.degrees_per_second) <= motor.max_dps, "invalid degrees-per-second: {} max DPS is {}, {} was requested".format(motor, motor.max_dps, self.degrees_per_second)
+        assert abs(self.degrees_per_second) <= motor.max_dps,\
+            "invalid degrees-per-second: {} max DPS is {}, {} was requested".format(
+            motor, motor.max_dps, self.degrees_per_second)
         return self.degrees_per_second/motor.max_dps * motor.max_speed
 
 
@@ -178,11 +219,17 @@ class SpeedDPM(SpeedValue):
     def __str__(self):
         return str(self.degrees_per_minute) + " deg/min"
 
+    def __mul__(self, other):
+        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        return SpeedDPM(self.degrees_per_minute * other)
+
     def to_native_units(self, motor):
         """
         Return the native speed measurement required to achieve desired degrees-per-minute
         """
-        assert abs(self.degrees_per_minute) <= motor.max_dpm, "invalid degrees-per-minute: {} max DPM is {}, {} was requested".format(motor, motor.max_dpm, self.degrees_per_minute)
+        assert abs(self.degrees_per_minute) <= motor.max_dpm,\
+            "invalid degrees-per-minute: {} max DPM is {}, {} was requested".format(
+            motor, motor.max_dpm, self.degrees_per_minute)
         return self.degrees_per_minute/motor.max_dpm * motor.max_speed
 
 
@@ -697,14 +744,16 @@ class Motor(Device):
         self._time_sp = self.set_attr_int(self._time_sp, 'time_sp', value)
 
     def run_forever(self, **kwargs):
-        """Run the motor until another command is sent.
+        """
+        Run the motor until another command is sent.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
         self.command = self.COMMAND_RUN_FOREVER
 
     def run_to_abs_pos(self, **kwargs):
-        """Run to an absolute position specified by `position_sp` and then
+        """
+        Run to an absolute position specified by `position_sp` and then
         stop using the action specified in `stop_action`.
         """
         for key in kwargs:
@@ -712,7 +761,8 @@ class Motor(Device):
         self.command = self.COMMAND_RUN_TO_ABS_POS
 
     def run_to_rel_pos(self, **kwargs):
-        """Run to a position relative to the current `position` value.
+        """
+        Run to a position relative to the current `position` value.
         The new position will be current `position` + `position_sp`.
         When the new position is reached, the motor will stop using
         the action specified by `stop_action`.
@@ -722,7 +772,8 @@ class Motor(Device):
         self.command = self.COMMAND_RUN_TO_REL_POS
 
     def run_timed(self, **kwargs):
-        """Run the motor for the amount of time specified in `time_sp`
+        """
+        Run the motor for the amount of time specified in `time_sp`
         and then stop the motor using the action specified by `stop_action`.
         """
         for key in kwargs:
@@ -730,7 +781,8 @@ class Motor(Device):
         self.command = self.COMMAND_RUN_TIMED
 
     def run_direct(self, **kwargs):
-        """Run the motor at the duty cycle specified by `duty_cycle_sp`.
+        """
+        Run the motor at the duty cycle specified by `duty_cycle_sp`.
         Unlike other run commands, changing `duty_cycle_sp` while running *will*
         take effect immediately.
         """
@@ -739,7 +791,8 @@ class Motor(Device):
         self.command = self.COMMAND_RUN_DIRECT
 
     def stop(self, **kwargs):
-        """Stop any of the run commands before they are complete using the
+        """
+        Stop any of the run commands before they are complete using the
         action specified by `stop_action`.
         """
         for key in kwargs:
@@ -747,7 +800,8 @@ class Motor(Device):
         self.command = self.COMMAND_STOP
 
     def reset(self, **kwargs):
-        """Reset all of the motor parameter attributes to their default value.
+        """
+        Reset all of the motor parameter attributes to their default value.
         This will also have the effect of stopping the motor.
         """
         for key in kwargs:
@@ -756,31 +810,36 @@ class Motor(Device):
 
     @property
     def is_running(self):
-        """Power is being sent to the motor.
+        """
+        Power is being sent to the motor.
         """
         return self.STATE_RUNNING in self.state
 
     @property
     def is_ramping(self):
-        """The motor is ramping up or down and has not yet reached a constant output level.
+        """
+        The motor is ramping up or down and has not yet reached a constant output level.
         """
         return self.STATE_RAMPING in self.state
 
     @property
     def is_holding(self):
-        """The motor is not turning, but rather attempting to hold a fixed position.
+        """
+        The motor is not turning, but rather attempting to hold a fixed position.
         """
         return self.STATE_HOLDING in self.state
 
     @property
     def is_overloaded(self):
-        """The motor is turning, but cannot reach its `speed_sp`.
+        """
+        The motor is turning, but cannot reach its `speed_sp`.
         """
         return self.STATE_OVERLOADED in self.state
 
     @property
     def is_stalled(self):
-        """The motor is not turning when it should be.
+        """
+        The motor is not turning when it should be.
         """
         return self.STATE_STALLED in self.state
 
@@ -805,7 +864,7 @@ class Motor(Device):
         while True:
             if cond(self.state):
                 return True
-            
+
             self._poll.poll(None if timeout is None else timeout)
 
             if timeout is not None and time.time() >= tic + timeout / 1000:
@@ -1303,14 +1362,16 @@ class DcMotor(Device):
     STOP_ACTION_BRAKE = 'brake'
 
     def run_forever(self, **kwargs):
-        """Run the motor until another command is sent.
+        """
+        Run the motor until another command is sent.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
         self.command = self.COMMAND_RUN_FOREVER
 
     def run_timed(self, **kwargs):
-        """Run the motor for the amount of time specified in `time_sp`
+        """
+        Run the motor for the amount of time specified in `time_sp`
         and then stop the motor using the action specified by `stop_action`.
         """
         for key in kwargs:
@@ -1318,7 +1379,8 @@ class DcMotor(Device):
         self.command = self.COMMAND_RUN_TIMED
 
     def run_direct(self, **kwargs):
-        """Run the motor at the duty cycle specified by `duty_cycle_sp`.
+        """
+        Run the motor at the duty cycle specified by `duty_cycle_sp`.
         Unlike other run commands, changing `duty_cycle_sp` while running *will*
         take effect immediately.
         """
@@ -1327,7 +1389,8 @@ class DcMotor(Device):
         self.command = self.COMMAND_RUN_DIRECT
 
     def stop(self, **kwargs):
-        """Stop any of the run commands before they are complete using the
+        """
+        Stop any of the run commands before they are complete using the
         action specified by `stop_action`.
         """
         for key in kwargs:
@@ -1523,14 +1586,16 @@ class ServoMotor(Device):
     POLARITY_INVERSED = 'inversed'
 
     def run(self, **kwargs):
-        """Drive servo to the position set in the `position_sp` attribute.
+        """
+        Drive servo to the position set in the `position_sp` attribute.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
         self.command = self.COMMAND_RUN
 
     def float(self, **kwargs):
-        """Remove power from the motor.
+        """
+        Remove power from the motor.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -1547,10 +1612,11 @@ class MotorSet(object):
             OUTPUT_C : LargeMotor,
         }
         """
-        self.motors = {}
+        self.motors = OrderedDict()
         for motor_port in sorted(motor_specs.keys()):
             motor_class = motor_specs[motor_port]
             self.motors[motor_port] = motor_class(motor_port)
+            self.motors[motor_port].reset()
 
         self.desc = desc
 
@@ -1681,6 +1747,10 @@ class MotorSet(object):
         for motor in motors:
             motor.wait_while(s, timeout)
 
+    def _block(self):
+        self.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
+        self.wait_until_not_moving()
+
 
 class MoveTank(MotorSet):
     """
@@ -1706,32 +1776,14 @@ class MoveTank(MotorSet):
         self.right_motor = self.motors[right_motor_port]
         self.max_speed = self.left_motor.max_speed
 
-    def _block(self):
-        self.left_motor.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
-        self.right_motor.wait_until('running', timeout=WAIT_RUNNING_TIMEOUT)
-        self.left_motor.wait_until_not_moving()
-        self.right_motor.wait_until_not_moving()
-
     def _unpack_speeds_to_native_units(self, left_speed, right_speed):
         left_speed = self.left_motor._speed_native_units(left_speed, "left_speed")
         right_speed = self.right_motor._speed_native_units(right_speed, "right_speed")
-        
+
         return (
             left_speed,
             right_speed
         )
-
-    def on_for_rotations(self, left_speed, right_speed, rotations, brake=True, block=True):
-        """
-        Rotate the motors at 'left_speed & right_speed' for 'rotations'. Speeds
-        can be percentages or any SpeedValue implementation.
-
-        If the left speed is not equal to the right speed (i.e., the robot will
-        turn), the motor on the outside of the turn will rotate for the full
-        ``rotations`` while the motor on the inside will have its requested
-        distance calculated according to the expected turn.
-        """
-        MoveTank.on_for_degrees(self, left_speed, right_speed, rotations * 360, brake, block)
 
     def on_for_degrees(self, left_speed, right_speed, degrees, brake=True, block=True):
         """
@@ -1748,14 +1800,16 @@ class MoveTank(MotorSet):
         # proof of the following distance calculation: consider the circle formed by each wheel's path
         # v_l = d_l/t, v_r = d_r/t
         # therefore, t = d_l/v_l = d_r/v_r
-        
+
         if degrees == 0 or (left_speed_native_units == 0 and right_speed_native_units == 0):
             left_degrees = degrees
             right_degrees = degrees
+
         # larger speed by magnitude is the "outer" wheel, and rotates the full "degrees"
         elif abs(left_speed_native_units) > abs(right_speed_native_units):
             left_degrees = degrees
             right_degrees = abs(right_speed_native_units / left_speed_native_units) * degrees
+
         else:
             left_degrees = abs(left_speed_native_units / right_speed_native_units) * degrees
             right_degrees = degrees
@@ -1766,12 +1820,35 @@ class MoveTank(MotorSet):
         self.right_motor._set_rel_position_degrees_and_speed_sp(right_degrees, right_speed_native_units)
         self.right_motor._set_brake(brake)
 
+        log.debug("{}: on_for_degrees {}".format(self, degrees))
+
+        # These debugs involve disk I/O to pull position and position_sp so only uncomment
+        # if you need to troubleshoot in more detail.
+        # log.debug("{}: left_speed {}, left_speed_native_units {}, left_degrees {}, left-position {}->{}".format(
+        #     self, left_speed, left_speed_native_units, left_degrees,
+        #     self.left_motor.position, self.left_motor.position_sp))
+        # log.debug("{}: right_speed {}, right_speed_native_units {}, right_degrees {}, right-position {}->{}".format(
+        #     self, right_speed, right_speed_native_units, right_degrees,
+        #     self.right_motor.position, self.right_motor.position_sp))
+
         # Start the motors
         self.left_motor.run_to_rel_pos()
         self.right_motor.run_to_rel_pos()
 
         if block:
             self._block()
+
+    def on_for_rotations(self, left_speed, right_speed, rotations, brake=True, block=True):
+        """
+        Rotate the motors at 'left_speed & right_speed' for 'rotations'. Speeds
+        can be percentages or any SpeedValue implementation.
+
+        If the left speed is not equal to the right speed (i.e., the robot will
+        turn), the motor on the outside of the turn will rotate for the full
+        ``rotations`` while the motor on the inside will have its requested
+        distance calculated according to the expected turn.
+        """
+        MoveTank.on_for_degrees(self, left_speed, right_speed, rotations * 360, brake, block)
 
     def on_for_seconds(self, left_speed, right_speed, seconds, brake=True, block=True):
         """
@@ -1792,6 +1869,9 @@ class MoveTank(MotorSet):
         self.right_motor.time_sp = int(seconds * 1000)
         self.right_motor._set_brake(brake)
 
+        log.debug("%s: on_for_seconds %ss at left-speed %s, right-speed %s" %
+            (self, seconds, left_speed, right_speed))
+
         # Start the motors
         self.left_motor.run_timed()
         self.right_motor.run_timed()
@@ -1806,8 +1886,14 @@ class MoveTank(MotorSet):
         """
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
+        # Set all parameters
         self.left_motor.speed_sp = int(round(left_speed_native_units))
         self.right_motor.speed_sp = int(round(right_speed_native_units))
+
+        # This debug involves disk I/O to pull speed_sp so only uncomment
+        # if you need to troubleshoot in more detail.
+        # log.debug("%s: on at left-speed %s, right-speed %s" %
+        #     (self, self.left_motor.speed_sp, self.right_motor.speed_sp))
 
         # Start the motors
         self.left_motor.run_forever()
@@ -1832,7 +1918,7 @@ class MoveSteering(MoveTank):
         * -100 means turn left on the spot (right motor at 100% forward, left motor at 100% backward),
         *  0   means drive in a straight line, and
         *  100 means turn right on the spot (left motor at 100% forward, right motor at 100% backward).
-    
+
     "steering" can be any number between -100 and 100.
 
     Example:
@@ -1909,8 +1995,189 @@ class MoveSteering(MoveTank):
             right_speed *= speed_factor
         else:
             left_speed *= speed_factor
-        
+
         return (left_speed, right_speed)
+
+
+class MoveDifferential(MoveTank):
+    """
+    MoveDifferential is a child of MoveTank that adds the following capabilities:
+
+    - drive in a straight line for a specified distance
+
+    - rotate in place in a circle (clockwise or counter clockwise) for a
+      specified number of degrees
+
+    - drive in an arc (clockwise or counter clockwise) of a specified radius
+      for a specified distance
+
+    New arguments:
+
+    wheel_class - Typically a child class of :class:`ev3dev2.wheel.Wheel`. This is used to
+    get the circumference of the wheels of the robot. The circumference is
+    needed for several calculations in this class.
+
+    wheel_distance_mm - The distance between the mid point of the two
+    wheels of the robot. You may need to do some test drives to find
+    the correct value for your robot.  It is not as simple as measuring
+    the distance between the midpoints of the two wheels. The weight of
+    the robot, center of gravity, etc come into play.
+
+    You can use utils/move_differential.py to call on_arc_left() to do
+    some test drives of circles with a radius of 200mm. Adjust your
+    wheel_distance_mm until your robot can drive in a perfect circle
+    and stop exactly where it started. It does not have to be a circle
+    with a radius of 200mm, you can test with any size circle but you do
+    not want it to be too small or it will be difficult to test small
+    adjustments to wheel_distance_mm.
+
+    Example:
+
+    .. code:: python
+        from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveDifferential, SpeedRPM
+        from ev3dev2.wheel import EV3Tire
+
+        STUD_MM = 8
+
+        # test with a robot that:
+        # - uses the standard wheels known as EV3Tire
+        # - wheels are 16 studs apart
+        mdiff = MoveDifferential(OUTPUT_A, OUTPUT_B, EV3Tire, 16 * STUD_MM)
+
+        # Rotate 90 degrees clockwise
+        mdiff.turn_right(SpeedRPM(40), 90)
+
+        # Drive forward 500 mm
+        mdiff.on_for_distance(SpeedRPM(40), 500)
+
+        # Drive in arc to the right along an imaginary circle of radius 150 mm.
+        # Drive for 700 mm around this imaginary circle.
+        mdiff.on_arc_right(SpeedRPM(80), 150, 700)
+    """
+
+    def __init__(self, left_motor_port, right_motor_port,
+            wheel_class, wheel_distance_mm,
+            desc=None, motor_class=LargeMotor):
+
+        MoveTank.__init__(self, left_motor_port, right_motor_port, desc, motor_class)
+        self.wheel = wheel_class()
+        self.wheel_distance_mm = wheel_distance_mm
+
+        # The circumference of the circle made if this robot were to rotate in place
+        self.circumference_mm = self.wheel_distance_mm * pi
+
+        self.min_circle_radius_mm = self.wheel_distance_mm / 2
+
+    def on_for_distance(self, speed, distance_mm, brake=True, block=True):
+        """
+        Drive distance_mm
+        """
+        rotations = distance_mm / self.wheel.circumference_mm
+        log.debug("%s: on_for_rotations distance_mm %s, rotations %s, speed %s" % (self, distance_mm, rotations, speed))
+
+        MoveTank.on_for_rotations(self, speed, speed, rotations, brake, block)
+
+    def _on_arc(self, speed, radius_mm, distance_mm, brake, block, arc_right):
+        """
+        Drive in a circle with 'radius' for 'distance'
+        """
+
+        if radius_mm < self.min_circle_radius_mm:
+            raise ValueError("{}: radius_mm {} is less than min_circle_radius_mm {}" .format(
+                    self, radius_mm, self.min_circle_radius_mm))
+
+        # The circle formed at the halfway point between the two wheels is the
+        # circle that must have a radius of radius_mm
+        circle_outer_mm = 2 * pi * (radius_mm + (self.wheel_distance_mm / 2))
+        circle_middle_mm = 2 * pi * radius_mm
+        circle_inner_mm = 2 * pi * (radius_mm - (self.wheel_distance_mm / 2))
+
+        if arc_right:
+            # The left wheel is making the larger circle and will move at 'speed'
+            # The right wheel is making a smaller circle so its speed will be a fraction of the left motor's speed
+            left_speed = speed
+            right_speed = float(circle_inner_mm/circle_outer_mm) * left_speed
+
+        else:
+            # The right wheel is making the larger circle and will move at 'speed'
+            # The left wheel is making a smaller circle so its speed will be a fraction of the right motor's speed
+            right_speed = speed
+            left_speed = float(circle_inner_mm/circle_outer_mm) * right_speed
+
+        log.debug("%s: arc %s, radius %s, distance %s, left-speed %s, right-speed %s, circle_outer_mm %s, circle_middle_mm %s, circle_inner_mm %s" %
+            (self, "right" if arc_right else "left",
+             radius_mm, distance_mm, left_speed, right_speed,
+             circle_outer_mm, circle_middle_mm, circle_inner_mm
+            )
+        )
+
+        # We know we want the middle circle to be of length distance_mm so
+        # calculate the percentage of circle_middle_mm we must travel for the
+        # middle of the robot to travel distance_mm.
+        circle_middle_percentage = float(distance_mm / circle_middle_mm)
+
+        # Now multiple that percentage by circle_outer_mm to calculate how
+        # many mm the outer wheel should travel.
+        circle_outer_final_mm = circle_middle_percentage * circle_outer_mm
+
+        outer_wheel_rotations = float(circle_outer_final_mm / self.wheel.circumference_mm)
+        outer_wheel_degrees = outer_wheel_rotations * 360
+
+        log.debug("%s: arc %s, circle_middle_percentage %s, circle_outer_final_mm %s, outer_wheel_rotations %s, outer_wheel_degrees %s" %
+            (self, "right" if arc_right else "left",
+             circle_middle_percentage, circle_outer_final_mm,
+             outer_wheel_rotations, outer_wheel_degrees
+            )
+        )
+
+        MoveTank.on_for_degrees(self, left_speed, right_speed, outer_wheel_degrees, brake, block)
+
+    def on_arc_right(self, speed, radius_mm, distance_mm, brake=True, block=True):
+        """
+        Drive clockwise in a circle with 'radius_mm' for 'distance_mm'
+        """
+        self._on_arc(speed, radius_mm, distance_mm, brake, block, True)
+
+    def on_arc_left(self, speed, radius_mm, distance_mm, brake=True, block=True):
+        """
+        Drive counter-clockwise in a circle with 'radius_mm' for 'distance_mm'
+        """
+        self._on_arc(speed, radius_mm, distance_mm, brake, block, False)
+
+    def _turn(self, speed, degrees, brake=True, block=True):
+        """
+        Rotate in place 'degrees'. Both wheels must turn at the same speed for us
+        to rotate in place.
+        """
+
+        # The distance each wheel needs to travel
+        distance_mm = (abs(degrees) / 360) * self.circumference_mm
+
+        # The number of rotations to move distance_mm
+        rotations = distance_mm/self.wheel.circumference_mm
+
+        log.debug("%s: turn() degrees %s, distance_mm %s, rotations %s, degrees %s" % (self, degrees, distance_mm, rotations, degrees))
+
+        # If degrees is positive rotate clockwise
+        if degrees > 0:
+            MoveTank.on_for_rotations(self, speed, speed * -1, rotations, brake, block)
+
+        # If degrees is negative rotate counter-clockwise
+        else:
+            rotations = distance_mm / self.wheel.circumference_mm
+            MoveTank.on_for_rotations(self, speed * -1, speed, rotations, brake, block)
+
+    def turn_right(self, speed, degrees, brake=True, block=True):
+        """
+        Rotate clockwise 'degrees' in place
+        """
+        self._turn(speed, abs(degrees), brake, block)
+
+    def turn_left(self, speed, degrees, brake=True, block=True):
+        """
+        Rotate counter-clockwise 'degrees' in place
+        """
+        self._turn(speed, abs(degrees) * -1, brake, block)
 
 
 class MoveJoystick(MoveTank):
@@ -1932,7 +2199,7 @@ class MoveJoystick(MoveTank):
         "x", "y":
             The X and Y coordinates of the joystick's position, with
             (0,0) representing the center position. X is horizontal and Y is vertical.
-        
+
         radius (default 100):
             The radius of the joystick, controlling the range of the input (x, y) values.
             e.g. if "x" and "y" can be between -1 and 1, radius should be set to "1".
