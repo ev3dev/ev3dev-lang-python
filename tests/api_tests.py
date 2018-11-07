@@ -16,6 +16,16 @@ from ev3dev2.motor import \
     MoveTank, MoveSteering, MoveJoystick, \
     SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits, \
     OUTPUT_A, OUTPUT_B
+from ev3dev2.unit import (
+    DistanceMillimeters,
+    DistanceCentimeters,
+    DistanceDecimeters,
+    DistanceMeters,
+    DistanceInches,
+    DistanceFeet,
+    DistanceYards,
+    DistanceStuds
+)
 
 ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 
@@ -335,6 +345,18 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(SpeedDPM(30000).to_native_units(m), (30000 / 60))
         self.assertEqual(SpeedRPS(2).to_native_units(m), 360 * 2)
         self.assertEqual(SpeedRPM(100).to_native_units(m), (360 * 100 / 60))
+
+        self.assertEqual(DistanceMillimeters(42).mm, 42)
+        self.assertEqual(DistanceCentimeters(42).mm, 420)
+        self.assertEqual(DistanceDecimeters(42).mm, 4200)
+        self.assertEqual(DistanceMeters(42).mm, 42000)
+
+        self.assertAlmostEqual(DistanceInches(42).mm, 1066.8)
+        self.assertAlmostEqual(DistanceFeet(42).mm, 12801.6)
+        self.assertAlmostEqual(DistanceYards(42).mm, 38404.8)
+
+        self.assertEqual(DistanceStuds(42).mm, 336)
+
 
 if __name__ == "__main__":
     unittest.main()
