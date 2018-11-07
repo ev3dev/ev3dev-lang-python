@@ -14,8 +14,8 @@ from ev3dev2.sensor.lego import InfraredSensor
 from ev3dev2.motor import \
     Motor, MediumMotor, LargeMotor, \
     MoveTank, MoveSteering, MoveJoystick, \
-    SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits, \
-    OUTPUT_A, OUTPUT_B
+    SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits
+
 from ev3dev2.unit import (
     DistanceMillimeters,
     DistanceCentimeters,
@@ -26,6 +26,10 @@ from ev3dev2.unit import (
     DistanceYards,
     DistanceStuds
 )
+
+# We force OUTPUT_A and OUTPUT_B to be imported from platform "fake" so that
+# we can run these test cases on an EV3, brickpi3, etc.
+from ev3dev2._platform.fake import OUTPUT_A, OUTPUT_B
 
 ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 
@@ -53,6 +57,14 @@ def dummy_wait(self, cond, timeout=None):
 Motor.wait = dummy_wait
 
 class TestAPI(unittest.TestCase):
+
+    def setUp(self):
+        # micropython does not have _testMethodName
+        try:
+            print("\n\n{}\n{}".format(self._testMethodName, "=" * len(self._testMethodName,)))
+        except AttributeError:
+            pass
+
     def test_device(self):
         clean_arena()
         populate_arena([('medium_motor', 0, 'outA'), ('infrared_sensor', 0, 'in1')])

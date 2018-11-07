@@ -8,20 +8,13 @@ already cloned the ev3dev-lang-python repo you can use the `--recursive` option
 when you git clone.  Example:
 
 ```
-$ git clone --recursive https://github.com/rhempel/ev3dev-lang-python.git
+$ git clone --recursive https://github.com/ev3dev/ev3dev-lang-python.git
 ```
 
 # Running Tests
 To run the tests do:
 ```
-$ ./api_tests.py
-```
-
-# Misc
-Commands used to copy the /sys/class node:
-
-```
-$ node=lego-sensor/sensor0
-$ mkdir -p ./${node}
-$ cp -P --copy-contents -r /sys/class/${node}/* ./${node}/
+$ cd ev3dev-lang-python/
+$ chmod -R g+rw ./tests/fake-sys/devices/**/*
+$ python3 -W ignore ./tests/api_tests.py
 ```
