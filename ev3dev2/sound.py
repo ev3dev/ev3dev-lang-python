@@ -56,7 +56,7 @@ class Sound(object):
     Examples::
 
         # Play 'bark.wav':
-        Sound.play('bark.wav')
+        Sound.play_file('bark.wav')
 
         # Introduce yourself:
         Sound.speak('Hello, I am Robot')
@@ -98,7 +98,7 @@ class Sound(object):
         See `beep man page`_ and google `linux beep music`_ for inspiration.
 
         :param string args: Any additional arguments to be passed to ``beep`` (see the `beep man page`_ for details)
-        
+
         :param play_type: The behavior of ``beep`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE`` or  ``Sound.PLAY_NO_WAIT_FOR_COMPLETE``
 
@@ -247,16 +247,27 @@ class Sound(object):
 
         return self.play_tone(freq, duration=duration, volume=volume, play_type=play_type)
 
-    def play(self, wav_file, play_type=PLAY_WAIT_FOR_COMPLETE):
-        """ Play a sound file (wav format).
+    def play_file(self, wav_file, volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
+        """ Play a sound file (wav format) at a given volume.
 
         :param string wav_file: The sound file path
+        :param int volume: The play volume, in percent of maximum volume
 
-        :param play_type: The behavior of ``play`` once playback has been initiated
+        :param play_type: The behavior of ``play_file`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
 
         :returns: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
+        if not 0 < volume <= 100:
+            raise ValueError('invalid volume (%s)' % volume)
+
+        if not wav_file.endswith(".wav"):
+            raise ValueError('invalid sound file (%s), only .wav files are supported' % wav_file)
+
+        if not os.path.isfile(wav_file):
+            raise ValueError("%s does not exist" % wav_file)
+
+        self.set_volume(volume)
         self._validate_play_type(play_type)
 
         with open(os.devnull, 'w') as n:
@@ -273,21 +284,6 @@ class Sound(object):
                 while True:
                     pid = Popen(shlex.split('/usr/bin/aplay -q "%s"' % wav_file), stdout=n)
                     pid.wait()
-
-    def play_file(self, wav_file, volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
-        """ Play a sound file (wav format) at a given volume.
-
-        
-        :param string wav_file: The sound file path
-        :param int volume: The play volume, in percent of maximum volume
-
-        :param play_type: The behavior of ``play_file`` once playback has been initiated
-        :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
-
-        :returns: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
-        """
-        self.set_volume(volume)
-        self.play(wav_file, play_type)
 
     def speak(self, text, espeak_opts='-a 200 -s 130', volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
         """ Speak the given text aloud.

@@ -1,6 +1,11 @@
 python-ev3dev2 (2.0.0~beta3) stable; urgency=medium
 
   * GyroSensor wait_until_angle_changed_by added honor_direction option
+  * Sound: removed play() in favor of play_file()
+  * suppress unittest ResourceWarning messages
+  * Added DistanceValue classes
+  * wait_until_not_moving should consider "running holding" as "not moving"
+  * brickpi(3) raise exception if LargeMotor not used for a motor
   * MoveJoyStick should use SpeedPercent
   * renamed GyroSensor rate_and_angle to angle_and_rate
 
