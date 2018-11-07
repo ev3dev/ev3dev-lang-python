@@ -14,8 +14,22 @@ from ev3dev2.sensor.lego import InfraredSensor
 from ev3dev2.motor import \
     Motor, MediumMotor, LargeMotor, \
     MoveTank, MoveSteering, MoveJoystick, \
-    SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits, \
-    OUTPUT_A, OUTPUT_B
+    SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits
+
+from ev3dev2.unit import (
+    DistanceMillimeters,
+    DistanceCentimeters,
+    DistanceDecimeters,
+    DistanceMeters,
+    DistanceInches,
+    DistanceFeet,
+    DistanceYards,
+    DistanceStuds
+)
+
+# We force OUTPUT_A and OUTPUT_B to be imported from platform "fake" so that
+# we can run these test cases on an EV3, brickpi3, etc.
+from ev3dev2._platform.fake import OUTPUT_A, OUTPUT_B
 
 ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 
@@ -43,6 +57,14 @@ def dummy_wait(self, cond, timeout=None):
 Motor.wait = dummy_wait
 
 class TestAPI(unittest.TestCase):
+
+    def setUp(self):
+        # micropython does not have _testMethodName
+        try:
+            print("\n\n{}\n{}".format(self._testMethodName, "=" * len(self._testMethodName,)))
+        except AttributeError:
+            pass
+
     def test_device(self):
         clean_arena()
         populate_arena([('medium_motor', 0, 'outA'), ('infrared_sensor', 0, 'in1')])
@@ -177,14 +199,6 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(m.speed_sp, 0)
         self.assertEqual(m.position_sp, 0)
 
-        # None speed
-        with self.assertRaises(ValueError):
-            m.on_for_degrees(None, 100)
-
-        # None distance
-        with self.assertRaises(ValueError):
-            m.on_for_degrees(75, None)
-
     def test_motor_on_for_rotations(self):
         clean_arena()
         populate_arena([('large_motor', 0, 'outA')])
@@ -195,14 +209,6 @@ class TestAPI(unittest.TestCase):
         m.on_for_rotations(75, 5)
         self.assertEqual(m.speed_sp, int(round(0.75 * 1050)))
         self.assertEqual(m.position_sp, 5 * 360)
-
-        # None speed
-        with self.assertRaises(ValueError):
-            m.on_for_rotations(None, 5)
-
-        # None distance
-        with self.assertRaises(ValueError):
-            m.on_for_rotations(75, None)
 
     def test_move_tank_relative_distance(self):
         clean_arena()
@@ -335,6 +341,18 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(SpeedDPM(30000).to_native_units(m), (30000 / 60))
         self.assertEqual(SpeedRPS(2).to_native_units(m), 360 * 2)
         self.assertEqual(SpeedRPM(100).to_native_units(m), (360 * 100 / 60))
+
+        self.assertEqual(DistanceMillimeters(42).mm, 42)
+        self.assertEqual(DistanceCentimeters(42).mm, 420)
+        self.assertEqual(DistanceDecimeters(42).mm, 4200)
+        self.assertEqual(DistanceMeters(42).mm, 42000)
+
+        self.assertAlmostEqual(DistanceInches(42).mm, 1066.8)
+        self.assertAlmostEqual(DistanceFeet(42).mm, 12801.6)
+        self.assertAlmostEqual(DistanceYards(42).mm, 38404.8)
+
+        self.assertEqual(DistanceStuds(42).mm, 336)
+
 
 if __name__ == "__main__":
     unittest.main()

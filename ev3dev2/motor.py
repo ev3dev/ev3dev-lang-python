@@ -1,8 +1,5 @@
 # -----------------------------------------------------------------------------
 # Copyright (c) 2015 Ralph Hempel <rhempel@hempeldesigngroup.com>
-# Copyright (c) 2015 Anton Vanhoucke <antonvh@gmail.com>
-# Copyright (c) 2015 Denis Demidov <dennis.demidov@gmail.com>
-# Copyright (c) 2015 Eric Pascual <eric@pobot.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -357,6 +354,9 @@ class Motor(Device):
     STOP_ACTION_HOLD = 'hold'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+
+        if platform in ('brickpi', 'brickpi3') and not isinstance(self, LargeMotor):
+            raise Exception("{} is unaware of different motor types, use LargeMotor instead".format(platform))
 
         if address is not None:
             kwargs['address'] = address
@@ -872,10 +872,13 @@ class Motor(Device):
 
     def wait_until_not_moving(self, timeout=None):
         """
-        Blocks until ``running`` is not in ``self.state`` or ``stalled`` is in
-        ``self.state``.  The condition is checked when there is an I/O event
-        related to the ``state`` attribute.  Exits early when ``timeout``
-        (in milliseconds) is reached.
+        Blocks until one of the following conditions are met:
+        - ``running`` is not in ``self.state``
+        - ``stalled`` is in ``self.state``
+        - ``holding`` is in ``self.state``
+        The condition is checked when there is an I/O event related to
+        the ``state`` attribute.  Exits early when ``timeout`` (in
+        milliseconds) is reached.
 
         Returns ``True`` if the condition is met, and ``False`` if the timeout
         is reached.
@@ -884,7 +887,9 @@ class Motor(Device):
 
             m.wait_until_not_moving()
         """
-        return self.wait(lambda state: self.STATE_RUNNING not in state or self.STATE_STALLED in state, timeout)
+        return self.wait(
+            lambda state: self.STATE_RUNNING not in state or self.STATE_STALLED in state or self.STATE_HOLDING in state,
+            timeout)
 
     def wait_until(self, s, timeout=None):
         """
@@ -949,9 +954,6 @@ class Motor(Device):
         ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
-        if speed is None or rotations is None:
-            raise ValueError("Either speed ({}) or rotations ({}) is None".format(self, speed, rotations))
-
         speed_sp = self._speed_native_units(speed)
         self._set_rel_position_degrees_and_speed_sp(rotations * 360, speed_sp)
         self._set_brake(brake)
@@ -968,9 +970,6 @@ class Motor(Device):
         ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
-        if speed is None or degrees is None:
-            raise ValueError("Either speed ({}) or degrees ({}) is None".format(self, speed, degrees))
-
         speed_sp = self._speed_native_units(speed)
         self._set_rel_position_degrees_and_speed_sp(degrees, speed_sp)
         self._set_brake(brake)
@@ -988,8 +987,6 @@ class Motor(Device):
         object, enabling use of other units.
         """
         speed = self._speed_native_units(speed)
-        assert speed, "{}: speed is invalid ({}), motor will not move".format(self, speed)
-
         self.speed_sp = int(round(speed))
         self.position_sp = position
         self._set_brake(brake)
@@ -1006,13 +1003,11 @@ class Motor(Device):
         ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
+
+        if seconds < 0:
+            raise ValueError("seconds is negative ({})".format(seconds))
+
         speed = self._speed_native_units(speed)
-
-        if not speed or not seconds:
-            log.warning("({}) Either speed ({}) or seconds ({}) is invalid, motor will not move" .format(self, speed, seconds))
-            self._set_brake(brake)
-            return
-
         self.speed_sp = int(round(speed))
         self.time_sp = int(seconds * 1000)
         self._set_brake(brake)
@@ -1033,12 +1028,6 @@ class Motor(Device):
         other `on_for_XYZ` methods.
         """
         speed = self._speed_native_units(speed)
-
-        if not speed:
-            log.warning("({}) speed is invalid ({}), motor will not move".format(self, speed))
-            self._set_brake(brake)
-            return
-
         self.speed_sp = int(round(speed))
         self._set_brake(brake)
         self.run_forever()
@@ -1866,6 +1855,10 @@ class MoveTank(MotorSet):
         Rotate the motors at 'left_speed & right_speed' for 'seconds'. Speeds
         can be percentages or any SpeedValue implementation.
         """
+
+        if seconds < 0:
+            raise ValueError("seconds is negative ({})".format(seconds))
+
         (left_speed_native_units, right_speed_native_units) = self._unpack_speeds_to_native_units(left_speed, right_speed)
 
         # Set all parameters
