@@ -56,7 +56,7 @@ class Sound(object):
     Examples::
 
         # Play 'bark.wav':
-        Sound.play('bark.wav')
+        Sound.play_file('bark.wav')
 
         # Introduce yourself:
         Sound.speak('Hello, I am Robot')
