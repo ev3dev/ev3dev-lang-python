@@ -339,15 +339,16 @@ class Display(FbMem):
 
         return self.draw.ellipse((x1, y1, x2, y2), fill=fill_color, outline=outline_color)
 
-    def rectangle(self, clear_screen=True, x=10, y=10, width=80, height=40, fill_color='black', outline_color='black'):
+    def rectangle(self, clear_screen=True, x1=10, y1=10, x2=80, y2=40, fill_color='black', outline_color='black'):
         """
-        Draw a rectangle 'width x height' where the top left corner is at (x, y)
+        Draw a rectangle where the top left corner is at (x1, y1) and the
+        bottom right corner is at (x2, y2)
         """
 
         if clear_screen:
             self.clear()
 
-        return self.draw.rectangle((x, y, width, height), fill=fill_color, outline=outline_color)
+        return self.draw.rectangle((x1, y1, x2, y2), fill=fill_color, outline=outline_color)
 
     def point(self, clear_screen=True, x=10, y=10, point_color='black'):
         """
