@@ -1688,8 +1688,15 @@ class MotorSet(object):
         for motor in motors:
             motor.reset()
 
-    def stop(self, motors=None):
+    def off(self, motors=None, brake=True):
+        """
+        Stop motors immediately. Configure motors to brake if ``brake`` is set.
+        """
         motors = motors if motors is not None else self.motors.values()
+
+        if brake:
+            for motor in motors:
+                motor._set_brake(brake)
 
         for motor in motors:
             motor.stop()
@@ -1898,16 +1905,6 @@ class MoveTank(MotorSet):
         # Start the motors
         self.left_motor.run_forever()
         self.right_motor.run_forever()
-
-    def off(self, brake=True):
-        """
-        Stop both motors immediately. Configure both to brake if ``brake`` is
-        set.
-        """
-        self.left_motor._set_brake(brake)
-        self.right_motor._set_brake(brake)
-        self.left_motor.stop()
-        self.right_motor.stop()
 
 
 class MoveSteering(MoveTank):

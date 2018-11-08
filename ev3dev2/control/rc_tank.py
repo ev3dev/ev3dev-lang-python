@@ -43,4 +43,4 @@ class RemoteControlledTank(MoveTank):
         # Exit cleanly so that all motors are stopped
         except (KeyboardInterrupt, Exception) as e:
             log.exception(e)
-            self.stop()
+            self.off()
