@@ -19,7 +19,7 @@ $ chmod -R g+rw ./tests/fake-sys/devices/**/*
 $ python3 -W ignore::ResourceWarning tests/api_tests.py
 ```
 
-If not on a Linux platform, the `chmod` command can be ignored.
+If on Windows, the `chmod` command can be ignored.
 
 # Running Tests with Micropython
 
@@ -28,7 +28,7 @@ This library also supports a subset of functionality on [Micropython](http://mic
 You can follow the instructions on [the Micropython wiki](https://github.com/micropython/micropython/wiki/Getting-Started)
 or check out our [installation script for Travis CI workers](https://github.com/ev3dev/ev3dev-lang-python/blob/ev3dev-stretch/.travis/install-micropython.sh)
 to get Micropython installed. If following the official instructions,
-make sure you install the relevant micropython-lib modules as well.
+make sure you install the relevant micropython-lib modules listed in the linked script as well.
 
 Once Micropython is installed, you can run the tests with:
 
