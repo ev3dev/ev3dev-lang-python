@@ -144,7 +144,7 @@ class Sensor(Device):
         Returns a list of the valid commands for the sensor.
         Returns -EOPNOTSUPP if no commands are supported.
         """
-        self._commands, value = self.get_attr_set(self._commands, 'commands')
+        (self._commands, value) = self.get_cached_attr_set(self._commands, 'commands')
         return value
 
     @property
@@ -162,7 +162,7 @@ class Sensor(Device):
         Returns the name of the sensor device/driver. See the list of [supported
         sensors] for a complete list of drivers.
         """
-        self._driver_name, value = self.get_attr_string(self._driver_name, 'driver_name')
+        (self._driver_name, value) = self.get_cached_attr_string(self._driver_name, 'driver_name')
         return value
 
     @property
@@ -183,7 +183,7 @@ class Sensor(Device):
         """
         Returns a list of the valid modes for the sensor.
         """
-        self._modes, value = self.get_attr_set(self._modes, 'modes')
+        (self._modes, value) = self.get_cached_attr_set(self._modes, 'modes')
         return value
 
     @property
@@ -313,7 +313,7 @@ class I2cSensor(Sensor):
         Returns the firmware version of the sensor if available. Currently only
         I2C/NXT sensors support this.
         """
-        self._fw_version, value = self.get_attr_string(self._fw_version, 'fw_version')
+        (self._fw_version, value) = self.get_cached_attr_string(self._fw_version, 'fw_version')
         return value
 
     @property

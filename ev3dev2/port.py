@@ -98,7 +98,7 @@ class LegoPort(Device):
         Returns the name of the driver that loaded this device. You can find the
         complete list of drivers in the [list of port drivers].
         """
-        self._driver_name, value = self.get_attr_string(self._driver_name, 'driver_name')
+        (self._driver_name, value) = self.get_cached_attr_string(self._driver_name, 'driver_name')
         return value
 
     @property
@@ -106,7 +106,7 @@ class LegoPort(Device):
         """
         Returns a list of the available modes of the port.
         """
-        self._modes, value = self.get_attr_set(self._modes, 'modes')
+        (self._modes, value) = self.get_cached_attr_set(self._modes, 'modes')
         return value
 
     @property
