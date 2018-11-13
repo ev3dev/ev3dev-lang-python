@@ -1065,7 +1065,7 @@ def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     """
     class_path = abspath(Device.DEVICE_ROOT_PATH + '/' + Motor.SYSTEM_CLASS_NAME)
 
-    return (LargeMotor(name_pattern=name, name_exact=True)
+    return (Motor(name_pattern=name, name_exact=True)
             for name in list_device_names(class_path, name_pattern, **kwargs))
 
 class LargeMotor(Motor):

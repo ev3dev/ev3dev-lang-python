@@ -57,7 +57,7 @@ def get_current_platform():
     """
     board_info_dir = '/sys/class/board-info/'
 
-    if not os.path.exists(board_info_dir):
+    if not os.path.exists(board_info_dir) or os.environ.get("FAKE_SYS"):
         return 'fake'
 
     for board in os.listdir(board_info_dir):
@@ -291,7 +291,7 @@ class Device(object):
         value = self._attr_cache.get(keyword)
 
         if value is None:
-            (filehandle, value) = self.get_attr_int(self._count_per_rot, keyword)
+            (filehandle, value) = self.get_attr_int(filehandle, keyword)
             self._attr_cache[keyword] = value
 
         return (filehandle, value)
@@ -309,7 +309,7 @@ class Device(object):
         value = self._attr_cache.get(keyword)
 
         if value is None:
-            (filehandle, value) = self.get_attr_string(self._count_per_rot, keyword)
+            (filehandle, value) = self.get_attr_string(filehandle, keyword)
             self._attr_cache[keyword] = value
 
         return (filehandle, value)
@@ -328,7 +328,7 @@ class Device(object):
         value = self._attr_cache.get(keyword)
 
         if value is None:
-            (filehandle, value) = self.get_attr_set(self._count_per_rot, keyword)
+            (filehandle, value) = self.get_attr_set(filehandle, keyword)
             self._attr_cache[keyword] = value
 
         return (filehandle, value)
