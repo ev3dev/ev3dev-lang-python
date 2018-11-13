@@ -57,7 +57,7 @@ def get_current_platform():
     """
     board_info_dir = '/sys/class/board-info/'
 
-    if not os.path.exists(board_info_dir):
+    if not os.path.exists(board_info_dir) or os.environ.get("FAKE_SYS"):
         return 'fake'
 
     for board in os.listdir(board_info_dir):
