@@ -150,7 +150,6 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(val,               [])
 
     def test_medium_motor_write(self):
-
         clean_arena()
         populate_arena([('medium_motor', 0, 'outA')])
 
@@ -333,7 +332,7 @@ class TestAPI(unittest.TestCase):
         clean_arena()
         populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
 
-        m = LargeMotor()
+        m = Motor()
 
         self.assertEqual(SpeedPercent(35).to_native_units(m), 35 / 100 * m.max_speed)
         self.assertEqual(SpeedDPS(300).to_native_units(m), 300)
