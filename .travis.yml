@@ -14,11 +14,11 @@ git:
   depth: 100
 install:
 - if [ $USE_MICROPYTHON = false ]; then pip install Pillow Sphinx sphinx_bootstrap_theme recommonmark evdev==1.0.0 && pip install -r ./docs/requirements.txt; fi
-- if [ $USE_MICROPYTHON = true ]; then ./.travis/install-micropython.sh && PYTHON=~/micropython/ports/unix/micropython; else PYTHON=python3; fi
+- if [ $USE_MICROPYTHON = true ]; then ./.travis/install-micropython.sh && MICROPYTHON=~/micropython/ports/unix/micropython; fi
 script:
 - chmod -R g+rw ./tests/fake-sys/devices/**/*
-- if [ $USE_MICROPYTHON = false ]; then $PYTHON -W ignore tests/api_tests.py; fi
-- if [ $USE_MICROPYTHON = true ]; then $PYTHON tests/api_tests.py; fi
+- if [ $USE_MICROPYTHON = false ]; then python3 -W ignore::ResourceWarning tests/api_tests.py; fi
+- if [ $USE_MICROPYTHON = true ]; then $MICROPYTHON tests/api_tests.py; fi
 - if [ $USE_MICROPYTHON = false ]; then sphinx-build -nW -b html ./docs/ ./docs/_build/html; fi
 deploy:
   provider: pypi
