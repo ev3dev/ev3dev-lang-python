@@ -1688,11 +1688,25 @@ class MotorSet(object):
         for motor in motors:
             motor.reset()
 
-    def stop(self, motors=None):
+    def off(self, motors=None, brake=True):
+        """
+        Stop motors immediately. Configure motors to brake if ``brake`` is set.
+        """
         motors = motors if motors is not None else self.motors.values()
 
         for motor in motors:
+            motor._set_brake(brake)
+
+        for motor in motors:
             motor.stop()
+
+    def stop(self, motors=None, brake=True):
+        """
+        ``stop`` is an alias of ``off``.  This is deprecated but helps keep
+        the API for MotorSet somewhat similar to Motor which has both ``stop``
+        and ``off``.
+        """
+        self.off(motors, brake)
 
     def _is_state(self, motors, state):
         motors = motors if motors is not None else self.motors.values()
@@ -1898,16 +1912,6 @@ class MoveTank(MotorSet):
         # Start the motors
         self.left_motor.run_forever()
         self.right_motor.run_forever()
-
-    def off(self, brake=True):
-        """
-        Stop both motors immediately. Configure both to brake if ``brake`` is
-        set.
-        """
-        self.left_motor._set_brake(brake)
-        self.right_motor._set_brake(brake)
-        self.left_motor.stop()
-        self.right_motor.stop()
 
 
 class MoveSteering(MoveTank):
