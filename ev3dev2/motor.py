@@ -1702,9 +1702,9 @@ class MotorSet(object):
 
     def stop(self, motors=None, brake=True):
         """
-        ``stop`` is an alias of ``off``.  This is here for historical purposes
-        and to keep the API for MotorSet somewhat similar to Motor which has
-        both ``stop`` and ``off``.
+        ``stop`` is an alias of ``off``.  This is deprecated but helps keep
+        the API for MotorSet somewhat similar to Motor which has both ``stop``
+        and ``off``.
         """
         self.off(motors, brake)
 
