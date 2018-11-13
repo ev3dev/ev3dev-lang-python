@@ -1701,6 +1701,14 @@ class MotorSet(object):
         for motor in motors:
             motor.stop()
 
+    def stop(self, motors=None, brake=True):
+        """
+        ``stop`` is an alias of ``off``.  This is here for historical purposes
+        and to keep the API for MotorSet somewhat similar to Motor which has
+        both ``stop`` and ``off``.
+        """
+        self.off(motors, brake)
+
     def _is_state(self, motors, state):
         motors = motors if motors is not None else self.motors.values()
 
