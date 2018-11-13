@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import unittest, sys, os.path
+import os
 
 FAKE_SYS = os.path.join(os.path.dirname(__file__), 'fake-sys')
+os.environ["FAKE_SYS"] = "1"
 
 sys.path.append(FAKE_SYS)
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -12,6 +14,7 @@ from clean_arena    import clean_arena
 import ev3dev2
 from ev3dev2.sensor.lego import InfraredSensor
 from ev3dev2.motor import \
+    OUTPUT_A, OUTPUT_B, \
     Motor, MediumMotor, LargeMotor, \
     MoveTank, MoveSteering, MoveJoystick, \
     SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits
@@ -26,10 +29,6 @@ from ev3dev2.unit import (
     DistanceYards,
     DistanceStuds
 )
-
-# We force OUTPUT_A and OUTPUT_B to be imported from platform "fake" so that
-# we can run these test cases on an EV3, brickpi3, etc.
-from ev3dev2._platform.fake import OUTPUT_A, OUTPUT_B
 
 ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 
@@ -356,3 +355,4 @@ class TestAPI(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+    del os.environ["FAKE_SYS"]

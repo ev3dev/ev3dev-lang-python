@@ -1,6 +1,7 @@
 python-ev3dev2 (2.0.0~beta3) stable; urgency=medium
 
   [Daniel Walton]
+  * cache attributes that never change
   * Display: correct xy variable names passed to Display.rectangle()
   * GyroSensor wait_until_angle_changed_by added direction_sensitive option
   * Added MoveDifferential

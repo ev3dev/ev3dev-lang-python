@@ -57,7 +57,7 @@ def get_current_platform():
     """
     board_info_dir = '/sys/class/board-info/'
 
-    if not os.path.exists(board_info_dir):
+    if not os.path.exists(board_info_dir) or os.environ.get("FAKE_SYS"):
         return 'fake'
 
     for board in os.listdir(board_info_dir):
@@ -145,7 +145,12 @@ class DeviceNotFound(Exception):
 class Device(object):
     """The ev3dev device base class"""
 
-    __slots__ = ['_path', '_device_index', 'kwargs']
+    __slots__ = [
+        '_path',
+        '_device_index',
+        '_attr_cache',
+        'kwargs',
+    ]
 
     DEVICE_ROOT_PATH = '/sys/class'
 
@@ -178,6 +183,7 @@ class Device(object):
 
         classpath = abspath(Device.DEVICE_ROOT_PATH + '/' + class_name)
         self.kwargs = kwargs
+        self._attr_cache = {}
 
         def get_index(file):
             match = Device._DEVICE_INDEX.match(file)
@@ -281,6 +287,15 @@ class Device(object):
         attribute, value = self._get_attribute(attribute, name)
         return attribute, int(value)
 
+    def get_cached_attr_int(self, filehandle, keyword):
+        value = self._attr_cache.get(keyword)
+
+        if value is None:
+            (filehandle, value) = self.get_attr_int(filehandle, keyword)
+            self._attr_cache[keyword] = value
+
+        return (filehandle, value)
+
     def set_attr_int(self, attribute, name, value):
         return self._set_attribute(attribute, name, str(int(value)))
 
@@ -289,6 +304,15 @@ class Device(object):
 
     def get_attr_string(self, attribute, name):
         return self._get_attribute(attribute, name)
+
+    def get_cached_attr_string(self, filehandle, keyword):
+        value = self._attr_cache.get(keyword)
+
+        if value is None:
+            (filehandle, value) = self.get_attr_string(filehandle, keyword)
+            self._attr_cache[keyword] = value
+
+        return (filehandle, value)
 
     def set_attr_string(self, attribute, name, value):
         return self._set_attribute(attribute, name, value)
@@ -299,6 +323,15 @@ class Device(object):
     def get_attr_set(self, attribute, name):
         attribute, value = self.get_attr_line(attribute, name)
         return attribute, [v.strip('[]') for v in value.split()]
+
+    def get_cached_attr_set(self, filehandle, keyword):
+        value = self._attr_cache.get(keyword)
+
+        if value is None:
+            (filehandle, value) = self.get_attr_set(filehandle, keyword)
+            self._attr_cache[keyword] = value
+
+        return (filehandle, value)
 
     def get_attr_from_set(self, attribute, name):
         attribute, value = self.get_attr_line(attribute, name)
