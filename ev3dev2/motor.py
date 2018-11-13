@@ -438,7 +438,7 @@ class Motor(Device):
         - `reset` will reset all of the motor parameter attributes to their default value.
           This will also have the effect of stopping the motor.
         """
-        self._commands, value = self.get_attr_set(self._commands, 'commands')
+        (self._commands, value) = self.get_cached_attr_set(self._commands, 'commands')
         return value
 
     @property
@@ -448,7 +448,7 @@ class Motor(Device):
         are used by the position and speed attributes, so you can use this value
         to convert rotations or degrees to tacho counts. (rotation motors only)
         """
-        self._count_per_rot, value = self.get_attr_int(self._count_per_rot, 'count_per_rot')
+        (self._count_per_rot, value) = self.get_cached_attr_int(self._count_per_rot, 'count_per_rot')
         return value
 
     @property
@@ -458,7 +458,7 @@ class Motor(Device):
         counts are used by the position and speed attributes, so you can use this
         value to convert from distance to tacho counts. (linear motors only)
         """
-        self._count_per_m, value = self.get_attr_int(self._count_per_m, 'count_per_m')
+        (self._count_per_m, value) = self.get_cached_attr_int(self._count_per_m, 'count_per_m')
         return value
 
     @property
@@ -466,7 +466,7 @@ class Motor(Device):
         """
         Returns the name of the driver that provides this tacho motor device.
         """
-        self._driver_name, value = self.get_attr_string(self._driver_name, 'driver_name')
+        (self._driver_name, value) = self.get_cached_attr_string(self._driver_name, 'driver_name')
         return value
 
     @property
@@ -499,7 +499,7 @@ class Motor(Device):
         combined with the `count_per_m` atribute, you can use this value to
         calculate the maximum travel distance of the motor. (linear motors only)
         """
-        self._full_travel_count, value = self.get_attr_int(self._full_travel_count, 'full_travel_count')
+        (self._full_travel_count, value) = self.get_cached_attr_int(self._full_travel_count, 'full_travel_count')
         return value
 
     @property
@@ -590,7 +590,7 @@ class Motor(Device):
         may be slightly different than the maximum speed that a particular motor can
         reach - it's the maximum theoretical speed.
         """
-        self._max_speed, value = self.get_attr_int(self._max_speed, 'max_speed')
+        (self._max_speed, value) = self.get_cached_attr_int(self._max_speed, 'max_speed')
         return value
 
     @property
@@ -726,7 +726,7 @@ class Motor(Device):
         position. If an external force tries to turn the motor, the motor will 'push
         back' to maintain its position.
         """
-        self._stop_actions, value = self.get_attr_set(self._stop_actions, 'stop_actions')
+        (self._stop_actions, value) = self.get_cached_attr_set(self._stop_actions, 'stop_actions')
         return value
 
     @property
@@ -1065,7 +1065,7 @@ def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     """
     class_path = abspath(Device.DEVICE_ROOT_PATH + '/' + Motor.SYSTEM_CLASS_NAME)
 
-    return (Motor(name_pattern=name, name_exact=True)
+    return (LargeMotor(name_pattern=name, name_exact=True)
             for name in list_device_names(class_path, name_pattern, **kwargs))
 
 class LargeMotor(Motor):
