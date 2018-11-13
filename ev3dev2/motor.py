@@ -1694,9 +1694,8 @@ class MotorSet(object):
         """
         motors = motors if motors is not None else self.motors.values()
 
-        if brake:
-            for motor in motors:
-                motor._set_brake(brake)
+        for motor in motors:
+            motor._set_brake(brake)
 
         for motor in motors:
             motor.stop()
