@@ -355,7 +355,7 @@ class Motor(Device):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
-        if platform in ('brickpi', 'brickpi3') and not isinstance(self, LargeMotor):
+        if platform in ('brickpi', 'brickpi3') and type(self).__name__ != 'Motor' and not isinstance(self, LargeMotor):
             raise Exception("{} is unaware of different motor types, use LargeMotor instead".format(platform))
 
         if address is not None:
