@@ -363,8 +363,8 @@ class Leds(object):
         if not self.leds:
             return
 
-        self.leds.set_color('LEFT', 'GREEN')
-        self.leds.set_color('RIGHT', 'GREEN')
+        self.set_color('LEFT', 'GREEN')
+        self.set_color('RIGHT', 'GREEN')
 
 
 class LedAnimate(threading.Thread):
