@@ -31,8 +31,10 @@ if sys.version_info < (3,4):
 import os
 import stat
 import time
+import threading
 from collections import OrderedDict
 from ev3dev2 import get_current_platform, Device
+from time import sleep
 
 # Import the LED settings, this is platform specific
 platform = get_current_platform()
@@ -102,7 +104,7 @@ class Led(Device):
         """
         Returns the maximum allowable brightness value.
         """
-        self._max_brightness, value = self.get_attr_int(self._max_brightness, 'max_brightness')
+        self._max_brightness, value = self.get_cached_attr_int(self._max_brightness, 'max_brightness')
         return value
 
     @property
@@ -128,11 +130,11 @@ class Led(Device):
     @property
     def trigger(self):
         """
-        Sets the led trigger. A trigger
-        is a kernel based source of led events. Triggers can either be simple or
-        complex. A simple trigger isn't configurable and is designed to slot into
-        existing subsystems with minimal additional code. Examples are the `ide-disk` and
-        `nand-disk` triggers.
+        Sets the LED trigger. A trigger is a kernel based source of LED events.
+        Triggers can either be simple or complex. A simple trigger isn't
+        configurable and is designed to slot into existing subsystems with
+        minimal additional code. Examples are the `ide-disk` and `nand-disk`
+        triggers.
 
         Complex triggers whilst available to all LEDs have LED specific
         parameters and work on a per LED basis. The `timer` trigger is an example.
@@ -257,7 +259,7 @@ class Led(Device):
     @property
     def brightness_pct(self):
         """
-        Returns led brightness as a fraction of max_brightness
+        Returns LED brightness as a fraction of max_brightness
         """
         return float(self.brightness) / self.max_brightness
 
@@ -287,15 +289,15 @@ class Leds(object):
 
     def set_color(self, group, color, pct=1):
         """
-        Sets brigthness of leds in the given group to the values specified in
-        color tuple. When percentage is specified, brightness of each led is
+        Sets brightness of LEDs in the given group to the values specified in
+        color tuple. When percentage is specified, brightness of each LED is
         reduced proportionally.
 
         Example::
 
             my_leds = Leds()
             my_leds.set_color('LEFT', 'AMBER')
-        
+
         With a custom color::
 
             my_leds = Leds()
@@ -307,17 +309,21 @@ class Leds(object):
 
         color_tuple = color
         if isinstance(color, str):
-            assert color in self.led_colors, "%s is an invalid LED color, valid choices are %s" % (color, ','.join(self.led_colors.keys()))
+            assert color in self.led_colors, \
+                "%s is an invalid LED color, valid choices are %s" % \
+                (color, ','.join(self.led_colors.keys()))
             color_tuple = self.led_colors[color]
 
-        assert group in self.led_groups, "%s is an invalid LED group, valid choices are %s" % (group, ','.join(self.led_groups.keys()))
+        assert group in self.led_groups, \
+            "%s is an invalid LED group, valid choices are %s" % \
+            (group, ','.join(self.led_groups.keys()))
 
         for led, value in zip(self.led_groups[group], color_tuple):
             led.brightness_pct = value * pct
 
     def set(self, group, **kwargs):
         """
-        Set attributes for each led in group.
+        Set attributes for each LED in group.
 
         Example::
 
@@ -329,7 +335,9 @@ class Leds(object):
         if not self.leds:
             return
 
-        assert group in self.led_groups, "%s is an invalid LED group, valid choices are %s" % (group, ','.join(self.led_groups.keys()))
+        assert group in self.led_groups, \
+            "%s is an invalid LED group, valid choices are %s" % \
+            (group, ','.join(self.led_groups.keys()))
 
         for led in self.led_groups[group]:
             for k in kwargs:
@@ -337,7 +345,7 @@ class Leds(object):
 
     def all_off(self):
         """
-        Turn all leds off
+        Turn all LEDs off
         """
 
         # If this is a platform without LEDs there is nothing to do
@@ -346,3 +354,197 @@ class Leds(object):
 
         for led in self.leds.values():
             led.brightness = 0
+
+
+class LedAnimate(threading.Thread):
+
+    def __init__(self):
+        super(LedAnimate, self).__init__()
+        self.leds = Leds()
+
+        # Stop event for animate thread
+        self.done = threading.Event()
+
+    def join(self, timeout=None):
+        self.done.set()
+        super(LedAnimate, self).join(timeout)
+
+
+class LedPoliceLights(LedAnimate):
+    """
+    Cycle the LEFT/RIGHT LEDs between ``color1`` and ``color2``
+    to give the effect of police lights.  Alternate the LEFT/RIGHT
+    LEDs every ``sleeptime`` seconds.
+
+    Example:
+
+    .. code:: python
+        from ev3dev2.led import LedPoliceLights
+        from time import sleep
+        leds = LedPoliceLights('GREEN', 'RED')
+
+        leds.start()
+        sleep(10)
+        leds.join()
+    """
+
+    def __init__(self, color1, color2, sleeptime=0.5):
+        super(LedPoliceLights, self).__init__()
+        self.color1 = color1
+        self.color2 = color2
+        self.sleeptime = sleeptime
+
+    def run(self):
+        self.leds.all_off()
+        even = True
+
+        while not self.done.isSet():
+            if even:
+                self.leds.set_color('LEFT', self.color1)
+                self.leds.set_color('RIGHT', self.color2)
+            else:
+                self.leds.set_color('LEFT', self.color2)
+                self.leds.set_color('RIGHT', self.color1)
+
+            even = not even
+            sleep(self.sleeptime)
+
+
+class LedFlash(LedAnimate):
+    """
+    Turn all LEDs off/on to ``color`` every ``sleeptime`` seconds
+
+    Example:
+
+    .. code:: python
+        from ev3dev2.led import LedFlash
+        from time import sleep
+        leds = LedFlash('AMBER')
+
+        leds.start()
+        sleep(10)
+        leds.join()
+    """
+
+    def __init__(self, color, sleeptime=0.5):
+        super(LedFlash, self).__init__()
+        self.color = color
+        self.sleeptime = sleeptime
+
+    def run(self):
+        even = True
+
+        while not self.done.isSet():
+            if even:
+                self.leds.set_color('LEFT', self.color)
+                self.leds.set_color('RIGHT', self.color)
+            else:
+                self.leds.all_off()
+
+            even = not even
+            sleep(self.sleeptime)
+
+
+class LedCycle(LedAnimate):
+    """
+    Cycle all LEDs through ``colors``. Do this on a loop where
+    we display each color for ``sleeptime`` seconds.
+
+    Example:
+
+    .. code:: python
+        from ev3dev2.led import LedCycle
+        from time import sleep
+        leds = LedCycle(('AMBER', 'RED', 'GREEN'))
+
+        leds.start()
+        sleep(10)
+        leds.join()
+    """
+
+    def __init__(self, colors, sleeptime=0.5):
+        super(LedCycle, self).__init__()
+        self.colors = colors
+        self.sleeptime = sleeptime
+
+    def run(self):
+        index = 0
+        max_index = len(self.colors)
+
+        while not self.done.isSet():
+            self.leds.set_color('LEFT', self.colors[index])
+            self.leds.set_color('RIGHT', self.colors[index])
+            index += 1
+
+            if index == max_index:
+                index = 0
+
+            sleep(self.sleeptime)
+
+
+class LedRainbow(LedAnimate):
+    """
+    Gradually fade from one color to the next
+
+    Example:
+    .. code:: python
+        from ev3dev2.led import LedRainbow
+        from time import sleep
+        leds = LedRainbow()
+
+        leds.start()
+        sleep(10)
+        leds.join()
+    """
+
+    def __init__(self, increment_by=0.1, sleeptime=0.1):
+        super(LedRainbow, self).__init__()
+        self.increment_by = increment_by
+        self.sleeptime = sleeptime
+
+    def run(self):
+        """
+        state 0: (LEFT,RIGHT) from (0,0) to (1,0)...RED
+        state 1: (LEFT,RIGHT) from (1,0) to (1,1)...AMBER
+        state 2: (LEFT,RIGHT) from (1,1) to (0,1)...GREEN
+        state 3: (LEFT,RIGHT) from (0,1) to (0,0)...OFF
+        """
+        state = 0
+        left_value = 0
+        right_value = 0
+        MIN_VALUE = 0
+        MAX_VALUE = 1
+        self.leds.all_off()
+
+        while not self.done.isSet():
+
+            if state == 0:
+                left_value += self.increment_by
+            elif state == 1:
+                right_value += self.increment_by
+            elif state == 2:
+                left_value -= self.increment_by
+            elif state == 3:
+                right_value -= self.increment_by
+            else:
+                raise Exception("Invalid state {}".format(state))
+
+            # Keep left_value and right_value within the MIN/MAX values
+            left_value = min(left_value, MAX_VALUE)
+            right_value = min(right_value, MAX_VALUE)
+            left_value = max(left_value, MIN_VALUE)
+            right_value = max(right_value, MIN_VALUE)
+
+            self.leds.set_color('LEFT', (left_value, right_value))
+            self.leds.set_color('RIGHT', (left_value, right_value))
+
+            if state == 0 and left_value == MAX_VALUE:
+                state = 1
+            elif state == 1 and right_value == MAX_VALUE:
+                state = 2
+            elif state == 2 and left_value == MIN_VALUE:
+                state = 3
+            elif state == 3 and right_value == MIN_VALUE:
+                state = 0
+
+            sleep(self.sleeptime)
