@@ -355,6 +355,17 @@ class Leds(object):
         for led in self.leds.values():
             led.brightness = 0
 
+    def reset(self):
+        """
+        Put the LEDs back to their default state of GREEN
+        """
+
+        if not self.leds:
+            return
+
+        self.leds.set_color('LEFT', 'GREEN')
+        self.leds.set_color('RIGHT', 'GREEN')
+
 
 class LedAnimate(threading.Thread):
 
@@ -388,10 +399,12 @@ class LedPoliceLights(LedAnimate):
         leds.join()
     """
 
-    def __init__(self, color1, color2, sleeptime=0.5):
+    def __init__(self, color1, color2, group1='LEFT', group2='RIGHT', sleeptime=0.5):
         super(LedPoliceLights, self).__init__()
         self.color1 = color1
         self.color2 = color2
+        self.group1 = group1
+        self.group2 = group2
         self.sleeptime = sleeptime
 
     def run(self):
@@ -400,11 +413,11 @@ class LedPoliceLights(LedAnimate):
 
         while not self.done.isSet():
             if even:
-                self.leds.set_color('LEFT', self.color1)
-                self.leds.set_color('RIGHT', self.color2)
+                self.leds.set_color(self.group1, self.color1)
+                self.leds.set_color(self.group2, self.color2)
             else:
-                self.leds.set_color('LEFT', self.color2)
-                self.leds.set_color('RIGHT', self.color1)
+                self.leds.set_color(self.group1, self.color2)
+                self.leds.set_color(self.group2, self.color1)
 
             even = not even
             sleep(self.sleeptime)
@@ -426,9 +439,10 @@ class LedFlash(LedAnimate):
         leds.join()
     """
 
-    def __init__(self, color, sleeptime=0.5):
+    def __init__(self, color, groups=('LEFT', 'RIGHT'), sleeptime=0.5):
         super(LedFlash, self).__init__()
         self.color = color
+        self.groups = groups
         self.sleeptime = sleeptime
 
     def run(self):
@@ -436,8 +450,8 @@ class LedFlash(LedAnimate):
 
         while not self.done.isSet():
             if even:
-                self.leds.set_color('LEFT', self.color)
-                self.leds.set_color('RIGHT', self.color)
+                for group in self.groups:
+                    self.leds.set_color(group, self.color)
             else:
                 self.leds.all_off()
 
@@ -462,9 +476,10 @@ class LedCycle(LedAnimate):
         leds.join()
     """
 
-    def __init__(self, colors, sleeptime=0.5):
+    def __init__(self, colors, groups=('LEFT', 'RIGHT'), sleeptime=0.5):
         super(LedCycle, self).__init__()
         self.colors = colors
+        self.groups = groups
         self.sleeptime = sleeptime
 
     def run(self):
@@ -472,8 +487,8 @@ class LedCycle(LedAnimate):
         max_index = len(self.colors)
 
         while not self.done.isSet():
-            self.leds.set_color('LEFT', self.colors[index])
-            self.leds.set_color('RIGHT', self.colors[index])
+            for group in self.groups:
+                self.leds.set_color(group, self.colors[index])
             index += 1
 
             if index == max_index:
@@ -497,8 +512,10 @@ class LedRainbow(LedAnimate):
         leds.join()
     """
 
-    def __init__(self, increment_by=0.1, sleeptime=0.1):
+    def __init__(self, group1='LEFT', group2='RIGHT', increment_by=0.1, sleeptime=0.1):
         super(LedRainbow, self).__init__()
+        self.group1 = group1
+        self.group2 = group2
         self.increment_by = increment_by
         self.sleeptime = sleeptime
 
@@ -535,8 +552,8 @@ class LedRainbow(LedAnimate):
             left_value = max(left_value, MIN_VALUE)
             right_value = max(right_value, MIN_VALUE)
 
-            self.leds.set_color('LEFT', (left_value, right_value))
-            self.leds.set_color('RIGHT', (left_value, right_value))
+            self.leds.set_color(self.group1, (left_value, right_value))
+            self.leds.set_color(self.group2, (left_value, right_value))
 
             if state == 0 and left_value == MAX_VALUE:
                 state = 1
