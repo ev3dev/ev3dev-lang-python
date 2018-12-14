@@ -63,7 +63,10 @@ elif platform == 'brickpi':
     from ev3dev2._platform.brickpi import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
 
 elif platform == 'brickpi3':
-    from ev3dev2._platform.brickpi3 import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+    from ev3dev2._platform.brickpi3 import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D, \
+                                           OUTPUT_E, OUTPUT_F, OUTPUT_G, OUTPUT_H, \
+                                           OUTPUT_I, OUTPUT_J, OUTPUT_K, OUTPUT_L, \
+                                           OUTPUT_M, OUTPUT_N, OUTPUT_O, OUTPUT_P
 
 elif platform == 'fake':
     from ev3dev2._platform.fake import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
