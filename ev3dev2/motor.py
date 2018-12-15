@@ -1737,7 +1737,7 @@ class MotorSet(object):
         return self._is_state(motors, LargeMotor.STATE_OVERLOADED)
 
     @property
-    def is_stalled(self):
+    def is_stalled(self, motors=None):
         return self._is_state(motors, LargeMotor.STATE_STALLED)
 
     def wait(self, cond, timeout=None, motors=None):
