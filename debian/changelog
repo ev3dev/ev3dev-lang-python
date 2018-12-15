@@ -15,6 +15,9 @@ python-ev3dev2 (2.0.0~beta3) stable; urgency=medium
   * brickpi(3) raise exception if LargeMotor not used for a motor
   * MoveJoyStick should use SpeedPercent
   * renamed GyroSensor rate_and_angle to angle_and_rate
+  
+  [Viktor Garske]
+  * Fixed error when using Motor.is_stalled
 
  -- Kaelin Laundry <wasabifan@outlook.com>  Sat, 27 Oct 2018 21:18:00 -0700
 
