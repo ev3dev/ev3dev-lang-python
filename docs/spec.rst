@@ -20,7 +20,7 @@ Each class in ev3dev module inherits from the base :py:class:`ev3dev2.Device` cl
 
     motors
     sensors
-    buttons
+    button
     leds
     power-supply
     sound
