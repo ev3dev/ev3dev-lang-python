@@ -16,6 +16,7 @@
 import sys
 import os
 import shlex
+import subprocess
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from git_version import git_version
