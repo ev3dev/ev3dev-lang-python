@@ -23,10 +23,7 @@ from git_version import git_version
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 if on_rtd:
-    import pip
-    pip.main(['install', 'sphinx_bootstrap_theme'])
-    pip.main(['install', 'recommonmark'])
-    pip.main(['install', 'evdev'])
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sphinx_bootstrap_theme', 'recommonmark', 'evdev'])
 
 import sphinx_bootstrap_theme
 from recommonmark.parser import CommonMarkParser
@@ -325,6 +322,7 @@ nitpick_ignore = [
     ('py:class', 'tuple'),
     ('py:class', 'list'),
     ('py:exc', 'ValueError')
+    
 ]
 
 def setup(app):
