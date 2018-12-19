@@ -1,11 +1,60 @@
 #!/usr/bin/make -f
+#export DH_VERBOSE=1
 
-export PYBUILD_NAME=python3-ev3dev
+export PYBUILD_NAME=ev3dev2
 
 VERSION=$(shell dpkg-parsechangelog | sed -rne 's,^Version: (.*),\1,p' | sed 's,~,,')
 
+mpy_files = \
+	ev3dev2/__init__.mpy \
+	ev3dev2/_platform/__init__.mpy \
+	ev3dev2/_platform/brickpi.mpy \
+	ev3dev2/_platform/brickpi3.mpy \
+	ev3dev2/_platform/ev3.mpy \
+	ev3dev2/_platform/evb.mpy \
+	ev3dev2/_platform/fake.mpy \
+	ev3dev2/_platform/pistorms.mpy \
+	ev3dev2/auto.mpy \
+	ev3dev2/button.mpy \
+	ev3dev2/control/__init__.mpy \
+	ev3dev2/control/GyroBalancer.mpy \
+	ev3dev2/control/rc_tank.mpy \
+	ev3dev2/control/webserver.mpy \
+	ev3dev2/display.mpy \
+	ev3dev2/fonts/__init__.mpy \
+	ev3dev2/led.mpy \
+	ev3dev2/motor.mpy \
+	ev3dev2/port.mpy \
+	ev3dev2/power.mpy \
+	ev3dev2/sensor/__init__.mpy \
+	ev3dev2/sensor/lego.mpy \
+	ev3dev2/sound.mpy \
+	ev3dev2/unit.mpy \
+	ev3dev2/version.mpy \
+	ev3dev2/wheel.mpy
+
 %:
 	dh $@ --with python3 --buildsystem=pybuild
+
+%.mpy: %.py
+	mpy-cross -v -v -mcache-lookup-bc $<
+
+# compile .py > .mpy
+override_dh_auto_build: $(mpy_files)
+	# build python3 package
+	dh_auto_build
+
+# fail build if any files aren't installed into a package
+override_dh_install:
+	dh_install --fail-missing
+
+override_dh_auto_install:
+	# install python3 package
+	dh_auto_install
+	# install .mpy files for micropython
+	for d in $(mpy_files); do \
+		install -D --mode=644 $$d debian/micropython-ev3dev2/usr/lib/micropython/ev3dev2/$${d#*/}; \
+	done
 
 override_dh_auto_configure:
 	echo $(VERSION) > RELEASE-VERSION
