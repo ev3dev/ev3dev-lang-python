@@ -2214,7 +2214,7 @@ class MoveJoystick(MoveTank):
 
         # If joystick is in the middle stop the tank
         if not x and not y:
-            MoveTank.off()
+            self.off()
             return
 
         vector_length = sqrt(x*x + y*y)
