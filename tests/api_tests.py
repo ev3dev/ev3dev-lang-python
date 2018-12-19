@@ -327,6 +327,8 @@ class TestAPI(unittest.TestCase):
         drive.on(0, 50)
         self.assertEqual(drive.left_motor.speed_sp, 1050 / 2)
         self.assertEqual(drive.right_motor.speed_sp, 1050 / 2)
+        self.assertEqual(drive.left_motor._get_attribute(None, 'command')[1], 'run-forever')
+        self.assertEqual(drive.right_motor._get_attribute(None, 'command')[1], 'run-forever')
 
         # With the joystick centered, motors should both be stopped
         drive.on(0, 0)
