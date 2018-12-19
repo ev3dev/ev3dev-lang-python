@@ -316,7 +316,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(drive.right_motor.position_sp, 10 * 360)
         self.assertEqual(drive.right_motor.speed_sp, 400)
 
-    def test_joystick_units(self):
+    def test_joystick(self):
         clean_arena()
         populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
 
@@ -327,6 +327,13 @@ class TestAPI(unittest.TestCase):
         drive.on(0, 50)
         self.assertEqual(drive.left_motor.speed_sp, 1050 / 2)
         self.assertEqual(drive.right_motor.speed_sp, 1050 / 2)
+        self.assertEqual(drive.left_motor._get_attribute(None, 'command')[1], 'run-forever')
+        self.assertEqual(drive.right_motor._get_attribute(None, 'command')[1], 'run-forever')
+
+        # With the joystick centered, motors should both be stopped
+        drive.on(0, 0)
+        self.assertEqual(drive.left_motor._get_attribute(None, 'command')[1], 'stop')
+        self.assertEqual(drive.right_motor._get_attribute(None, 'command')[1], 'stop')
 
     def test_units(self):
         clean_arena()
