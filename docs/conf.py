@@ -323,7 +323,6 @@ nitpick_ignore = [
     ('py:class', 'tuple'),
     ('py:class', 'list'),
     ('py:exc', 'ValueError')
-    
 ]
 
 def setup(app):
