@@ -18,7 +18,7 @@ Description: Python language bindings for ev3dev
 
 Package: micropython-ev3dev2
 Architecture: all
-Depends: ${misc:Depends}, micropython
+Depends: ${misc:Depends}, micropython, micropython-lib
 Description: Python language bindings for ev3dev for MicroPython
  This package is a pure Python binding to the peripheral
  devices on hardware that is supported by ev3dev.org - a
