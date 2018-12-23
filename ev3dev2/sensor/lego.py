@@ -775,8 +775,8 @@ class InfraredSensor(Sensor, ButtonBase):
     @property
     def proximity(self):
         """
-        A measurement of the distance between the sensor and the remote,
-        as a percentage. 100% is approximately 70cm/27in.
+        An estimate of the distance between the sensor and objects in front of
+        it, as a percentage. 100% is approximately 70cm/27in.
         """
         self._ensure_mode(self.MODE_IR_PROX)
         return self.value(0)
