@@ -63,7 +63,10 @@ elif platform == 'brickpi':
     from ev3dev2._platform.brickpi import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
 
 elif platform == 'brickpi3':
-    from ev3dev2._platform.brickpi3 import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+    from ev3dev2._platform.brickpi3 import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D, \
+                                           OUTPUT_E, OUTPUT_F, OUTPUT_G, OUTPUT_H, \
+                                           OUTPUT_I, OUTPUT_J, OUTPUT_K, OUTPUT_L, \
+                                           OUTPUT_M, OUTPUT_N, OUTPUT_O, OUTPUT_P
 
 elif platform == 'fake':
     from ev3dev2._platform.fake import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
@@ -355,7 +358,7 @@ class Motor(Device):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
-        if platform in ('brickpi', 'brickpi3') and not isinstance(self, LargeMotor):
+        if platform in ('brickpi', 'brickpi3') and type(self).__name__ != 'Motor' and not isinstance(self, LargeMotor):
             raise Exception("{} is unaware of different motor types, use LargeMotor instead".format(platform))
 
         if address is not None:
@@ -1734,7 +1737,7 @@ class MotorSet(object):
         return self._is_state(motors, LargeMotor.STATE_OVERLOADED)
 
     @property
-    def is_stalled(self):
+    def is_stalled(self, motors=None):
         return self._is_state(motors, LargeMotor.STATE_STALLED)
 
     def wait(self, cond, timeout=None, motors=None):
@@ -2211,7 +2214,7 @@ class MoveJoystick(MoveTank):
 
         # If joystick is in the middle stop the tank
         if not x and not y:
-            MoveTank.off()
+            self.off()
             return
 
         vector_length = sqrt(x*x + y*y)
