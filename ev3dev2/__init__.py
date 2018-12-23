@@ -45,10 +45,6 @@ import stat
 import errno
 from os.path import abspath
 
-INPUT_AUTO = ''
-OUTPUT_AUTO = ''
-
-
 def get_current_platform():
     """
     Look in /sys/class/board-info/ to determine the platform type.
