@@ -3,7 +3,7 @@ Maintainer: ev3dev Python team <python-team@ev3dev.org>
 Section: python
 Priority: optional
 Standards-Version: 3.9.8
-Build-Depends: python3-setuptools (>= 0.6b3), python3-all (>= 3.4), debhelper (>= 9), dh-python, python3-pillow
+Build-Depends: python3-setuptools (>= 0.6b3), python3-all (>= 3.4), debhelper (>= 9), dh-python, python3-pillow, mpy-cross
 VCS-Git: https://github.com/ev3dev/ev3dev-lang-python.git
 VCS-Browser: https://github.com/ev3dev/ev3dev-lang-python
 
@@ -15,3 +15,12 @@ Description: Python language bindings for ev3dev
  devices on hardware that is supported by ev3dev.org - a
  minimal Debian distribution optimized for the LEGO
  MINDSTORMS EV3.
+
+Package: micropython-ev3dev2
+Architecture: all
+Depends: ${misc:Depends}, micropython, micropython-lib
+Description: Python language bindings for ev3dev for MicroPython
+ This package is a pure Python binding to the peripheral
+ devices on hardware that is supported by ev3dev.org - a
+ minimal Debian distribution optimized for the LEGO
+ MINDSTORMS EV3. This package is designed to run on MicroPython.
