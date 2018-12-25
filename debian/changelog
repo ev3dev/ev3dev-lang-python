@@ -1,4 +1,4 @@
-python-ev3dev2 (2.0.0~beta3) stable; urgency=medium
+python-ev3dev2 (2.0.0~beta3) UNRELEASED; urgency=medium
 
   [Daniel Walton]
   * brickpi(3) support use of the Motor class
@@ -16,6 +16,9 @@ python-ev3dev2 (2.0.0~beta3) stable; urgency=medium
   * MoveJoyStick should use SpeedPercent
   * renamed GyroSensor rate_and_angle to angle_and_rate
   
+  [Kaelin Laundry]
+  * Added new binary package for Micropython
+
   [Viktor Garske]
   * Fixed error when using Motor.is_stalled
 
