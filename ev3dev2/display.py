@@ -375,14 +375,19 @@ class Display(FbMem):
 
         'font' : can be any font displayed here
             http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/ev3dev-stretch/other.html#bitmap-fonts
+        - If font is a string, it is the name of a font to be loaded.
+        - If font is a Font object, returned from fonts.load(), then it is
+          used directly.  This is desirable for faster display times.
         """
 
         if clear_screen:
             self.clear()
 
         if font is not None:
-            assert font in fonts.available(), "%s is an invalid font" % font
-            return self.draw.text((x, y), text, fill=text_color, font=fonts.load(font))
+            if isinstance(font, str):
+                assert font in fonts.available(), "%s is an invalid font" % font
+                font = fonts.load(font)
+            return self.draw.text((x, y), text, fill=text_color, font=font)
         else:
             return self.draw.text((x, y), text, fill=text_color)
 
