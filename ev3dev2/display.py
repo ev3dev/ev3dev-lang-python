@@ -365,6 +365,7 @@ class Display(FbMem):
         Display `text` starting at pixel (x, y).
 
         The EV3 display is 178x128 pixels
+
         - (0, 0) would be the top left corner of the display
         - (89, 64) would be right in the middle of the display
 
@@ -374,10 +375,12 @@ class Display(FbMem):
         https://www.w3schools.com/colors/colors_names.asp
 
         'font' : can be any font displayed here
-            http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/ev3dev-stretch/other.html#bitmap-fonts
+            http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/ev3dev-stretch/display.html#bitmap-fonts
+
         - If font is a string, it is the name of a font to be loaded.
-        - If font is a Font object, returned from fonts.load(), then it is
+        - If font is a Font object, returned from :meth:`ev3dev2.fonts.load`, then it is
           used directly.  This is desirable for faster display times.
+
         """
 
         if clear_screen:
@@ -405,7 +408,12 @@ class Display(FbMem):
         https://www.w3schools.com/colors/colors_names.asp
 
         'font' : can be any font displayed here
-            http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/ev3dev-stretch/other.html#bitmap-fonts
+            http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/ev3dev-stretch/display.html#bitmap-fonts
+
+        - If font is a string, it is the name of a font to be loaded.
+        - If font is a Font object, returned from :meth:`ev3dev2.fonts.load`, then it is
+          used directly.  This is desirable for faster display times.
+
         """
 
         assert 0 <= x < Display.GRID_COLUMNS,\
