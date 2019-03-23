@@ -40,22 +40,22 @@ from time import sleep
 platform = get_current_platform()
 
 if platform == 'ev3':
-    from ev3dev2._platform.ev3 import LEDS, LED_GROUPS, LED_COLORS
+    from ev3dev2._platform.ev3 import LEDS, LED_GROUPS, LED_COLORS, LED_DEFAULT_COLOR
 
 elif platform == 'evb':
-    from ev3dev2._platform.evb import LEDS, LED_GROUPS, LED_COLORS
+    from ev3dev2._platform.evb import LEDS, LED_GROUPS, LED_COLORS, LED_DEFAULT_COLOR
 
 elif platform == 'pistorms':
-    from ev3dev2._platform.pistorms import LEDS, LED_GROUPS, LED_COLORS
+    from ev3dev2._platform.pistorms import LEDS, LED_GROUPS, LED_COLORS, LED_DEFAULT_COLOR
 
 elif platform == 'brickpi':
-    from ev3dev2._platform.brickpi import LEDS, LED_GROUPS, LED_COLORS
+    from ev3dev2._platform.brickpi import LEDS, LED_GROUPS, LED_COLORS, LED_DEFAULT_COLOR
 
 elif platform == 'brickpi3':
-    from ev3dev2._platform.brickpi3 import LEDS, LED_GROUPS, LED_COLORS
+    from ev3dev2._platform.brickpi3 import LEDS, LED_GROUPS, LED_COLORS, LED_DEFAULT_COLOR
 
 elif platform == 'fake':
-    from ev3dev2._platform.fake import LEDS, LED_GROUPS, LED_COLORS
+    from ev3dev2._platform.fake import LEDS, LED_GROUPS, LED_COLORS, LED_DEFAULT_COLOR
 
 else:
     raise Exception("Unsupported platform '%s'" % platform)
@@ -357,14 +357,14 @@ class Leds(object):
 
     def reset(self):
         """
-        Put the LEDs back to their default state of GREEN
+        Put all LEDs back to their default color
         """
 
         if not self.leds:
             return
 
-        self.set_color('LEFT', 'GREEN')
-        self.set_color('RIGHT', 'GREEN')
+        for group in self.led_groups:
+            self.set_color(group, LED_DEFAULT_COLOR)
 
 
 class LedAnimate(threading.Thread):
@@ -392,11 +392,11 @@ class LedPoliceLights(LedAnimate):
     .. code:: python
         from ev3dev2.led import LedPoliceLights
         from time import sleep
-        leds = LedPoliceLights('GREEN', 'RED')
+        police_leds = LedPoliceLights('GREEN', 'RED')
 
-        leds.start()
+        police_leds.start()
         sleep(10)
-        leds.join()
+        police_leds.join()
     """
 
     def __init__(self, color1, color2, group1='LEFT', group2='RIGHT', sleeptime=0.5):
@@ -432,11 +432,11 @@ class LedFlash(LedAnimate):
     .. code:: python
         from ev3dev2.led import LedFlash
         from time import sleep
-        leds = LedFlash('AMBER')
+        flash_leds = LedFlash('AMBER')
 
-        leds.start()
+        flash_leds.start()
         sleep(10)
-        leds.join()
+        flash_leds.join()
     """
 
     def __init__(self, color, groups=('LEFT', 'RIGHT'), sleeptime=0.5):
@@ -469,11 +469,11 @@ class LedCycle(LedAnimate):
     .. code:: python
         from ev3dev2.led import LedCycle
         from time import sleep
-        leds = LedCycle(('AMBER', 'RED', 'GREEN'))
+        cycle_leds = LedCycle(('AMBER', 'RED', 'GREEN'))
 
-        leds.start()
+        cycle_leds.start()
         sleep(10)
-        leds.join()
+        cycle_leds.join()
     """
 
     def __init__(self, colors, groups=('LEFT', 'RIGHT'), sleeptime=0.5):
@@ -505,11 +505,11 @@ class LedRainbow(LedAnimate):
     .. code:: python
         from ev3dev2.led import LedRainbow
         from time import sleep
-        leds = LedRainbow()
+        rainbow_leds = LedRainbow()
 
-        leds.start()
+        rainbow_leds.start()
         sleep(10)
-        leds.join()
+        rainbow_leds.join()
     """
 
     def __init__(self, group1='LEFT', group2='RIGHT', increment_by=0.1, sleeptime=0.1):

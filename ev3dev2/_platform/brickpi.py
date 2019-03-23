@@ -52,3 +52,5 @@ LED_GROUPS['LED2'] = ('blue_led2',)
 LED_COLORS = OrderedDict()
 LED_COLORS['BLACK'] = (0,)
 LED_COLORS['BLUE'] = (1,)
+
+LED_DEFAULT_COLOR = 'BLUE'
