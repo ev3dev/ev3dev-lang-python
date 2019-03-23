@@ -35,10 +35,10 @@ import threading
 import math
 import signal
 from collections import deque
-from ev3dev.power import PowerSupply
-from ev3dev.motor import LargeMotor, OUTPUT_A, OUTPUT_D
-from ev3dev.sensor.lego import GyroSensor, TouchSensor
-from ev3dev.sound import Sound
+from ev3dev2.power import PowerSupply
+from ev3dev2.motor import LargeMotor, OUTPUT_A, OUTPUT_D
+from ev3dev2.sensor.lego import GyroSensor, TouchSensor
+from ev3dev2.sound import Sound
 from collections import OrderedDict
 
 log = logging.getLogger(__name__)
