@@ -28,10 +28,11 @@ import sys
 if sys.version_info < (3,4):
     raise SystemError('Must be using Python 3.4 or higher')
 
+import datetime as dt
 import os
 import stat
 import time
-import threading
+import _thread
 from collections import OrderedDict
 from ev3dev2 import get_current_platform, Device
 from time import sleep
@@ -59,6 +60,35 @@ elif platform == 'fake':
 
 else:
     raise Exception("Unsupported platform '%s'" % platform)
+
+
+def datetime_delta_to_ms(delta):
+    """
+    Given a datetime.timedelta object, return the delta in milliseconds
+    """
+    delta_ms = delta.days * 24 * 60 * 60 * 1000
+    delta_ms += delta.seconds * 1000
+    delta_ms += delta.microseconds / 1000
+    delta_ms = int(delta_ms)
+    return delta_ms
+
+
+def datetime_delta_to_seconds(delta):
+    return int(datetime_delta_to_ms(delta) / 1000)
+
+
+def duration_expired(start_time, duration_seconds):
+    """
+    Return True if ``duration_seconds`` have expired since ``start_time``
+    """
+
+    if duration_seconds is not None:
+        delta_seconds = datetime_delta_to_seconds(dt.datetime.now() - start_time)
+
+        if delta_seconds >= duration_seconds:
+            return True
+
+    return False
 
 
 class Led(Device):
@@ -274,6 +304,8 @@ class Leds(object):
         self.leds = OrderedDict()
         self.led_groups = OrderedDict()
         self.led_colors = LED_COLORS
+        self.animate_thread_id = None
+        self.animate_thread_stop = False
 
         for (key, value) in LEDS.items():
             self.leds[key] = Led(name_pattern=value, desc=key)
@@ -366,202 +398,214 @@ class Leds(object):
         for group in self.led_groups:
             self.set_color(group, LED_DEFAULT_COLOR)
 
-
-class LedAnimate(threading.Thread):
-
-    def __init__(self):
-        super(LedAnimate, self).__init__()
-        self.leds = Leds()
-
-        # Stop event for animate thread
-        self.done = threading.Event()
-
-    def join(self, timeout=None):
-        self.done.set()
-        super(LedAnimate, self).join(timeout)
-
-
-class LedPoliceLights(LedAnimate):
-    """
-    Cycle the LEFT/RIGHT LEDs between ``color1`` and ``color2``
-    to give the effect of police lights.  Alternate the LEFT/RIGHT
-    LEDs every ``sleeptime`` seconds.
-
-    Example:
-
-    .. code:: python
-        from ev3dev2.led import LedPoliceLights
-        from time import sleep
-        police_leds = LedPoliceLights('GREEN', 'RED')
-
-        police_leds.start()
-        sleep(10)
-        police_leds.join()
-    """
-
-    def __init__(self, color1, color2, group1='LEFT', group2='RIGHT', sleeptime=0.5):
-        super(LedPoliceLights, self).__init__()
-        self.color1 = color1
-        self.color2 = color2
-        self.group1 = group1
-        self.group2 = group2
-        self.sleeptime = sleeptime
-
-    def run(self):
-        self.leds.all_off()
-        even = True
-
-        while not self.done.isSet():
-            if even:
-                self.leds.set_color(self.group1, self.color1)
-                self.leds.set_color(self.group2, self.color2)
-            else:
-                self.leds.set_color(self.group1, self.color2)
-                self.leds.set_color(self.group2, self.color1)
-
-            even = not even
-            sleep(self.sleeptime)
-
-
-class LedFlash(LedAnimate):
-    """
-    Turn all LEDs off/on to ``color`` every ``sleeptime`` seconds
-
-    Example:
-
-    .. code:: python
-        from ev3dev2.led import LedFlash
-        from time import sleep
-        flash_leds = LedFlash('AMBER')
-
-        flash_leds.start()
-        sleep(10)
-        flash_leds.join()
-    """
-
-    def __init__(self, color, groups=('LEFT', 'RIGHT'), sleeptime=0.5):
-        super(LedFlash, self).__init__()
-        self.color = color
-        self.groups = groups
-        self.sleeptime = sleeptime
-
-    def run(self):
-        even = True
-
-        while not self.done.isSet():
-            if even:
-                for group in self.groups:
-                    self.leds.set_color(group, self.color)
-            else:
-                self.leds.all_off()
-
-            even = not even
-            sleep(self.sleeptime)
-
-
-class LedCycle(LedAnimate):
-    """
-    Cycle all LEDs through ``colors``. Do this on a loop where
-    we display each color for ``sleeptime`` seconds.
-
-    Example:
-
-    .. code:: python
-        from ev3dev2.led import LedCycle
-        from time import sleep
-        cycle_leds = LedCycle(('AMBER', 'RED', 'GREEN'))
-
-        cycle_leds.start()
-        sleep(10)
-        cycle_leds.join()
-    """
-
-    def __init__(self, colors, groups=('LEFT', 'RIGHT'), sleeptime=0.5):
-        super(LedCycle, self).__init__()
-        self.colors = colors
-        self.groups = groups
-        self.sleeptime = sleeptime
-
-    def run(self):
-        index = 0
-        max_index = len(self.colors)
-
-        while not self.done.isSet():
-            for group in self.groups:
-                self.leds.set_color(group, self.colors[index])
-            index += 1
-
-            if index == max_index:
-                index = 0
-
-            sleep(self.sleeptime)
-
-
-class LedRainbow(LedAnimate):
-    """
-    Gradually fade from one color to the next
-
-    Example:
-    .. code:: python
-        from ev3dev2.led import LedRainbow
-        from time import sleep
-        rainbow_leds = LedRainbow()
-
-        rainbow_leds.start()
-        sleep(10)
-        rainbow_leds.join()
-    """
-
-    def __init__(self, group1='LEFT', group2='RIGHT', increment_by=0.1, sleeptime=0.1):
-        super(LedRainbow, self).__init__()
-        self.group1 = group1
-        self.group2 = group2
-        self.increment_by = increment_by
-        self.sleeptime = sleeptime
-
-    def run(self):
+    def animate_stop(self):
         """
-        state 0: (LEFT,RIGHT) from (0,0) to (1,0)...RED
-        state 1: (LEFT,RIGHT) from (1,0) to (1,1)...AMBER
-        state 2: (LEFT,RIGHT) from (1,1) to (0,1)...GREEN
-        state 3: (LEFT,RIGHT) from (0,1) to (0,0)...OFF
+        Signal the current animation thread to exit and wait for it to exit
         """
-        state = 0
-        left_value = 0
-        right_value = 0
-        MIN_VALUE = 0
-        MAX_VALUE = 1
-        self.leds.all_off()
 
-        while not self.done.isSet():
+        if self.animate_thread_id:
+            self.animate_thread_stop = True
 
-            if state == 0:
-                left_value += self.increment_by
-            elif state == 1:
-                right_value += self.increment_by
-            elif state == 2:
-                left_value -= self.increment_by
-            elif state == 3:
-                right_value -= self.increment_by
-            else:
-                raise Exception("Invalid state {}".format(state))
+            while self.animate_thread_id:
+                pass
 
-            # Keep left_value and right_value within the MIN/MAX values
-            left_value = min(left_value, MAX_VALUE)
-            right_value = min(right_value, MAX_VALUE)
-            left_value = max(left_value, MIN_VALUE)
-            right_value = max(right_value, MIN_VALUE)
+    def animate_police_lights(self, color1, color2, group1='LEFT', group2='RIGHT', sleeptime=0.5, duration=5, block=True):
+        """
+        Cycle the ``group1`` and ``group2`` LEDs between ``color1`` and ``color2``
+        to give the effect of police lights.  Alternate the ``group1`` and ``group2``
+        LEDs every ``sleeptime`` seconds.
 
-            self.leds.set_color(self.group1, (left_value, right_value))
-            self.leds.set_color(self.group2, (left_value, right_value))
+        Animate for ``duration`` seconds.  If ``duration`` is None animate for forever.
 
-            if state == 0 and left_value == MAX_VALUE:
-                state = 1
-            elif state == 1 and right_value == MAX_VALUE:
-                state = 2
-            elif state == 2 and left_value == MIN_VALUE:
-                state = 3
-            elif state == 3 and right_value == MIN_VALUE:
-                state = 0
+        Example:
 
-            sleep(self.sleeptime)
+        .. code:: python
+            from ev3dev2.led import Leds
+            leds = Leds()
+            leds.animate_police_lights('RED', 'GREEN')
+        """
+
+        def _animate_police_lights():
+            self.all_off()
+            even = True
+            start_time = dt.datetime.now()
+
+            while True:
+                if even:
+                    self.set_color(group1, color1)
+                    self.set_color(group2, color2)
+                else:
+                    self.set_color(group1, color2)
+                    self.set_color(group2, color1)
+
+                if self.animate_thread_stop or duration_expired(start_time, duration):
+                    break
+
+                even = not even
+                sleep(sleeptime)
+
+            self.animate_thread_stop = False
+            self.animate_thread_id = None
+
+        self.animate_stop()
+
+        if block:
+            _animate_police_lights()
+        else:
+            self.animate_thread_id = _thread.start_new_thread(_animate_police_lights, ())
+
+    def animate_flash(self, color, groups=('LEFT', 'RIGHT'), sleeptime=0.5, duration=5, block=True):
+        """
+        Turn all LEDs in ``groups`` off/on to ``color`` every ``sleeptime`` seconds
+
+        Animate for ``duration`` seconds.  If ``duration`` is None animate for forever.
+
+        Example:
+
+        .. code:: python
+            from ev3dev2.led import Leds
+            leds = Leds()
+            leds.animate_flash('AMBER')
+        """
+
+        def _animate_flash():
+            even = True
+            start_time = dt.datetime.now()
+
+            while True:
+                if even:
+                    for group in groups:
+                        self.set_color(group, color)
+                else:
+                    self.all_off()
+
+                if self.animate_thread_stop or duration_expired(start_time, duration):
+                    break
+
+                even = not even
+                sleep(sleeptime)
+
+            self.animate_thread_stop = False
+            self.animate_thread_id = None
+
+        self.animate_stop()
+
+        if block:
+            _animate_flash()
+        else:
+            self.animate_thread_id = _thread.start_new_thread(_animate_flash, ())
+
+    def animate_cycle(self, colors, groups=('LEFT', 'RIGHT'), sleeptime=0.5, duration=5, block=True):
+        """
+        Cycle ``groups`` LEDs through ``colors``. Do this in a loop where
+        we display each color for ``sleeptime`` seconds.
+
+        Animate for ``duration`` seconds.  If ``duration`` is None animate for forever.
+
+        Example:
+
+        .. code:: python
+            from ev3dev2.led import Leds
+            leds = Leds()
+            leds.animate_cyle(('RED', 'GREEN', 'AMBER'))
+        """
+        def _animate_cycle():
+            index = 0
+            max_index = len(colors)
+            start_time = dt.datetime.now()
+
+            while True:
+                for group in groups:
+                    self.set_color(group, colors[index])
+
+                index += 1
+
+                if index == max_index:
+                    index = 0
+
+                if self.animate_thread_stop or duration_expired(start_time, duration):
+                    break
+
+                sleep(sleeptime)
+
+            self.animate_thread_stop = False
+            self.animate_thread_id = None
+
+        self.animate_stop()
+
+        if block:
+            _animate_cycle()
+        else:
+            self.animate_thread_id = _thread.start_new_thread(_animate_cycle, ())
+
+    def animate_rainbow(self, group1='LEFT', group2='RIGHT', increment_by=0.1, sleeptime=0.1, duration=5, block=True):
+        """
+        Gradually fade from one color to the next
+
+        Animate for ``duration`` seconds.  If ``duration`` is None animate for forever.
+
+        Example:
+        .. code:: python
+            from ev3dev2.led import Leds
+            leds = Leds()
+            leds.animate_rainbow()
+        """
+
+        def _animate_rainbow():
+            # state 0: (LEFT,RIGHT) from (0,0) to (1,0)...RED
+            # state 1: (LEFT,RIGHT) from (1,0) to (1,1)...AMBER
+            # state 2: (LEFT,RIGHT) from (1,1) to (0,1)...GREEN
+            # state 3: (LEFT,RIGHT) from (0,1) to (0,0)...OFF
+            state = 0
+            left_value = 0
+            right_value = 0
+            MIN_VALUE = 0
+            MAX_VALUE = 1
+            self.all_off()
+            start_time = dt.datetime.now()
+
+            while True:
+
+                if state == 0:
+                    left_value += increment_by
+                elif state == 1:
+                    right_value += increment_by
+                elif state == 2:
+                    left_value -= increment_by
+                elif state == 3:
+                    right_value -= increment_by
+                else:
+                    raise Exception("Invalid state {}".format(state))
+
+                # Keep left_value and right_value within the MIN/MAX values
+                left_value = min(left_value, MAX_VALUE)
+                right_value = min(right_value, MAX_VALUE)
+                left_value = max(left_value, MIN_VALUE)
+                right_value = max(right_value, MIN_VALUE)
+
+                self.set_color(group1, (left_value, right_value))
+                self.set_color(group2, (left_value, right_value))
+
+                if state == 0 and left_value == MAX_VALUE:
+                    state = 1
+                elif state == 1 and right_value == MAX_VALUE:
+                    state = 2
+                elif state == 2 and left_value == MIN_VALUE:
+                    state = 3
+                elif state == 3 and right_value == MIN_VALUE:
+                    state = 0
+
+                if self.animate_thread_stop or duration_expired(start_time, duration):
+                    break
+
+                sleep(sleeptime)
+
+            self.animate_thread_stop = False
+            self.animate_thread_id = None
+
+        self.animate_stop()
+
+        if block:
+            _animate_rainbow()
+        else:
+            self.animate_thread_id = _thread.start_new_thread(_animate_rainbow, ())
