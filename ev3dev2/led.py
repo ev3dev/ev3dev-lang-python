@@ -113,15 +113,14 @@ class Led(Device):
     def __init__(self,
                  name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False,
                  desc=None, **kwargs):
+        self.desc = desc
         super(Led, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
-
         self._max_brightness = None
         self._brightness = None
         self._triggers = None
         self._trigger = None
         self._delay_on = None
         self._delay_off = None
-        self.desc = desc
 
     def __str__(self):
         if self.desc:
@@ -343,12 +342,12 @@ class Leds(object):
         if isinstance(color, str):
             assert color in self.led_colors, \
                 "%s is an invalid LED color, valid choices are %s" % \
-                (color, ','.join(self.led_colors.keys()))
+                (color, ', '.join(self.led_colors.keys()))
             color_tuple = self.led_colors[color]
 
         assert group in self.led_groups, \
             "%s is an invalid LED group, valid choices are %s" % \
-            (group, ','.join(self.led_groups.keys()))
+            (group, ', '.join(self.led_groups.keys()))
 
         for led, value in zip(self.led_groups[group], color_tuple):
             led.brightness_pct = value * pct
@@ -369,7 +368,7 @@ class Leds(object):
 
         assert group in self.led_groups, \
             "%s is an invalid LED group, valid choices are %s" % \
-            (group, ','.join(self.led_groups.keys()))
+            (group, ', '.join(self.led_groups.keys()))
 
         for led in self.led_groups[group]:
             for k in kwargs:
@@ -420,6 +419,7 @@ class Leds(object):
         Example:
 
         .. code-block:: python
+
             from ev3dev2.led import Leds
             leds = Leds()
             leds.animate_police_lights('RED', 'GREEN')
@@ -463,6 +463,7 @@ class Leds(object):
         Example:
 
         .. code-block:: python
+
             from ev3dev2.led import Leds
             leds = Leds()
             leds.animate_flash('AMBER')
@@ -505,6 +506,7 @@ class Leds(object):
         Example:
 
         .. code-block:: python
+
             from ev3dev2.led import Leds
             leds = Leds()
             leds.animate_cyle(('RED', 'GREEN', 'AMBER'))
@@ -547,6 +549,7 @@ class Leds(object):
         Example:
 
         .. code-block:: python
+
             from ev3dev2.led import Leds
             leds = Leds()
             leds.animate_rainbow()
