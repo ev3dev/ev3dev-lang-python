@@ -419,7 +419,7 @@ class Leds(object):
 
         Example:
 
-        .. code:: python
+        .. code-block:: python
             from ev3dev2.led import Leds
             leds = Leds()
             leds.animate_police_lights('RED', 'GREEN')
@@ -462,7 +462,7 @@ class Leds(object):
 
         Example:
 
-        .. code:: python
+        .. code-block:: python
             from ev3dev2.led import Leds
             leds = Leds()
             leds.animate_flash('AMBER')
@@ -504,7 +504,7 @@ class Leds(object):
 
         Example:
 
-        .. code:: python
+        .. code-block:: python
             from ev3dev2.led import Leds
             leds = Leds()
             leds.animate_cyle(('RED', 'GREEN', 'AMBER'))
@@ -546,7 +546,7 @@ class Leds(object):
 
         Example:
 
-        .. code:: python
+        .. code-block:: python
             from ev3dev2.led import Leds
             leds = Leds()
             leds.animate_rainbow()
