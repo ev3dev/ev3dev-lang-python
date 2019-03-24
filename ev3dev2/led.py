@@ -545,6 +545,7 @@ class Leds(object):
         Animate for ``duration`` seconds.  If ``duration`` is None animate for forever.
 
         Example:
+
         .. code:: python
             from ev3dev2.led import Leds
             leds = Leds()
