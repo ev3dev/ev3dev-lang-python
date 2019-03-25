@@ -623,6 +623,15 @@ class GyroSensor(Sensor):
         return self.value(0)
 
     def reset(self):
+        """Resets the angle to 0.
+
+        Caveats:
+            - This function sets the sensor to `GYRO-ANG` mode if it is not
+              already in that mode.
+            - This function only resets the angle to 0, it does not fix drift.
+            - This function only works on EV3, it does not work on BrickPi,
+              PiStorms, or with any sensor multiplexors.
+        """
         self._ensure_mode(self.MODE_GYRO_ANG)
         # 17 comes from inspecting the .vix file of the Gyro sensor block in EV3-G
         self._direct = self.set_attr_raw(self._direct, 'direct', bytes(17,))
