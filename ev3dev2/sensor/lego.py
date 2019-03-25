@@ -624,7 +624,8 @@ class GyroSensor(Sensor):
 
     def reset(self):
         self._ensure_mode(self.MODE_GYRO_ANG)
-        self._direct = self.set_attr_raw(self._direct, 'direct', 17)
+        # 17 comes from inspecting the .vix file of the Gyro sensor block in EV3-G
+        self._direct = self.set_attr_raw(self._direct, 'direct', bytes(17,))
 
     def wait_until_angle_changed_by(self, delta, direction_sensitive=False):
         """
