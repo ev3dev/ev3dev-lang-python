@@ -155,7 +155,9 @@ class FbMem(object):
     def __del__(self):
         """Close the FbMem framebuffer memory object."""
         self.mmap.close()
-        FbMem._close_fbdev(self.fid)
+
+        if FbMem:
+            FbMem._close_fbdev(self.fid)
 
     @staticmethod
     def _open_fbdev(fbdev=None):
