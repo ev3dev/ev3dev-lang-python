@@ -47,6 +47,15 @@ try:
 except ImportError:
     log.warning(library_load_warning_message("fcntl", "Display"))
 
+
+# pistorms also has an HDMI port but it does not use it for display, the
+# pistorms has a screen
+platforms_with_hdmi_display = {
+    'brickpi',
+    'brickpi3',
+}
+
+
 class FbMem(object):
 
     """The framebuffer memory object.
@@ -222,7 +231,8 @@ class Display(FbMem):
             im_type = "1"
         elif self.var_info.bits_per_pixel == 16:
             im_type = "RGB"
-        elif self.platform in ("ev3", "brickpi3") and self.var_info.bits_per_pixel == 32:
+        elif ((self.platform == "ev3" or self.platform in platforms_with_hdmi_display) and
+                self.var_info.bits_per_pixel == 32):
             im_type = "L"
         else:
             raise Exception("Not supported - platform %s with bits_per_pixel %s" %
@@ -309,7 +319,8 @@ class Display(FbMem):
             self.mmap[:len(b)] = b
         elif self.var_info.bits_per_pixel == 16:
             self.mmap[:] = self._img_to_rgb565_bytes()
-        elif self.platform in ("ev3", "brickpi3") and self.var_info.bits_per_pixel == 32:
+        elif ((self.platform == "ev3" or self.platform in platforms_with_hdmi_display) and
+                self.var_info.bits_per_pixel == 32):
             self.mmap[:] = self._img.convert("RGB").tobytes("raw", "XRGB")
         else:
             raise Exception("Not supported - platform %s with bits_per_pixel %s" %
