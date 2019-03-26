@@ -1,6 +1,7 @@
 python-ev3dev2 (2.0.0~beta4) UNRELEASED; urgency=medium
 
   [Daniel Walton]
+  * Display support for brickpi3
   * Sound: fallback to regular case of 'note' if uppercase is not found
   * wait_until_not_moving should consider "running holding" as "moving"
 

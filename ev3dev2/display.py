@@ -114,6 +114,10 @@ class FbMem(object):
                 ('msb_right', ctypes.c_uint32),
             ]
 
+            def __str__(self):
+                return "%s (offset %s, length %s, msg_right %s)" %\
+                    (self.__class__.__name__, self.offset, self.length, self.msb_right)
+
         """The fb_var_screeninfo struct from fb.h."""
 
         _fields_ = [
@@ -132,6 +136,11 @@ class FbMem(object):
             ('blue', FbBitField),
             ('transp', FbBitField),
         ]
+
+        def __str__(self):
+            return ("%sx%s at (%s,%s), bpp %s, grayscale %s, red %s, green %s, blue %s, transp %s" %
+                (self.xres, self.yres, self.xoffset, self.yoffset, self.bits_per_pixel, self.grayscale,
+                self.red, self.green, self.blue, self.transp))
 
     def __init__(self, fbdev=None):
         """Create the FbMem framebuffer memory object."""
@@ -211,10 +220,11 @@ class Display(FbMem):
             im_type = "1"
         elif self.var_info.bits_per_pixel == 16:
             im_type = "RGB"
-        elif self.platform == "ev3" and self.var_info.bits_per_pixel == 32:
+        elif self.platform in ("ev3", "brickpi3") and self.var_info.bits_per_pixel == 32:
             im_type = "L"
         else:
-            raise Exception("Not supported")
+            raise Exception("Not supported - platform %s with bits_per_pixel %s" %
+                (self.platform, self.var_info.bits_per_pixel))
 
         self._img = Image.new(
                 im_type,
@@ -297,10 +307,11 @@ class Display(FbMem):
             self.mmap[:len(b)] = b
         elif self.var_info.bits_per_pixel == 16:
             self.mmap[:] = self._img_to_rgb565_bytes()
-        elif self.platform == "ev3" and self.var_info.bits_per_pixel == 32:
+        elif self.platform in ("ev3", "brickpi3") and self.var_info.bits_per_pixel == 32:
             self.mmap[:] = self._img.convert("RGB").tobytes("raw", "XRGB")
         else:
-            raise Exception("Not supported")
+            raise Exception("Not supported - platform %s with bits_per_pixel %s" %
+                (self.platform, self.var_info.bits_per_pixel))
 
     def image_filename(self, filename, clear_screen=True, x1=0, y1=0, x2=None, y2=None):
 
