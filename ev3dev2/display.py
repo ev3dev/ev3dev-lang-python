@@ -48,14 +48,6 @@ except ImportError:
     log.warning(library_load_warning_message("fcntl", "Display"))
 
 
-# pistorms also has an HDMI port but it does not use it for display, the
-# pistorms has a screen
-platforms_with_hdmi_display = {
-    'brickpi',
-    'brickpi3',
-}
-
-
 class FbMem(object):
 
     """The framebuffer memory object.
@@ -161,13 +153,6 @@ class FbMem(object):
         self.var_info = FbMem._get_var_info(fid)
         self.mmap = fbmmap
 
-    def __del__(self):
-        """Close the FbMem framebuffer memory object."""
-        self.mmap.close()
-
-        if FbMem:
-            FbMem._close_fbdev(self.fid)
-
     @staticmethod
     def _open_fbdev(fbdev=None):
         """Return the framebuffer file descriptor.
@@ -179,11 +164,6 @@ class FbMem(object):
         dev = fbdev or os.getenv('FRAMEBUFFER', '/dev/fb0')
         fbfid = os.open(dev, os.O_RDWR)
         return fbfid
-
-    @staticmethod
-    def _close_fbdev(fbfid):
-        """Close the framebuffer file descriptor."""
-        os.close(fbfid)
 
     @staticmethod
     def _get_fix_info(fbfid):
@@ -229,11 +209,13 @@ class Display(FbMem):
 
         if self.var_info.bits_per_pixel == 1:
             im_type = "1"
-        elif self.var_info.bits_per_pixel == 16:
-            im_type = "RGB"
-        elif ((self.platform == "ev3" or self.platform in platforms_with_hdmi_display) and
-                self.var_info.bits_per_pixel == 32):
+
+        elif self.platform == "ev3" and self.var_info.bits_per_pixel == 32:
             im_type = "L"
+
+        elif self.var_info.bits_per_pixel == 16 or self.var_info.bits_per_pixel == 32:
+            im_type = "RGB"
+
         else:
             raise Exception("Not supported - platform %s with bits_per_pixel %s" %
                 (self.platform, self.var_info.bits_per_pixel))
@@ -317,11 +299,13 @@ class Display(FbMem):
         if self.var_info.bits_per_pixel == 1:
             b = self._img.tobytes("raw", "1;R")
             self.mmap[:len(b)] = b
+
         elif self.var_info.bits_per_pixel == 16:
             self.mmap[:] = self._img_to_rgb565_bytes()
-        elif ((self.platform == "ev3" or self.platform in platforms_with_hdmi_display) and
-                self.var_info.bits_per_pixel == 32):
+
+        elif self.var_info.bits_per_pixel == 32:
             self.mmap[:] = self._img.convert("RGB").tobytes("raw", "XRGB")
+
         else:
             raise Exception("Not supported - platform %s with bits_per_pixel %s" %
                 (self.platform, self.var_info.bits_per_pixel))
