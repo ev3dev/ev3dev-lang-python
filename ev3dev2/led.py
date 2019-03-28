@@ -394,6 +394,8 @@ class Leds(object):
         if not self.leds:
             return
 
+        self.animate_stop()
+
         for group in self.led_groups:
             self.set_color(group, LED_DEFAULT_COLOR)
 
@@ -422,7 +424,7 @@ class Leds(object):
 
             from ev3dev2.led import Leds
             leds = Leds()
-            leds.animate_police_lights('RED', 'GREEN')
+            leds.animate_police_lights('RED', 'GREEN', sleeptime=0.75, duration=10)
         """
 
         def _animate_police_lights():
@@ -466,7 +468,7 @@ class Leds(object):
 
             from ev3dev2.led import Leds
             leds = Leds()
-            leds.animate_flash('AMBER')
+            leds.animate_flash('AMBER', sleeptime=0.75, duration=10)
         """
 
         def _animate_flash():
