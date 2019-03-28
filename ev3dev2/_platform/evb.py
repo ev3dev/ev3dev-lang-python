@@ -20,3 +20,4 @@ EVDEV_DEVICE_NAME = 'evb-input'
 LEDS = {}
 LED_GROUPS = {}
 LED_COLORS = {}
+LED_DEFAULT_COLOR = ''
