@@ -23,7 +23,7 @@ To run the docs, docstring, etc tests:
 ```
 $ sudo apt-get install python3-sphinx python3-sphinx-bootstrap-theme python3-recommonmark
 $ cd ev3dev-lang-python/
-$ sphinx-build -n -D suppress_warnings='image.nonlocal_uri' -b html ./docs/ ./docs/_build/html
+$ sudo sphinx-build -nW -b html ./docs/ ./docs/_build/html
 ```
 
 If on Windows, the `chmod` command can be ignored.
