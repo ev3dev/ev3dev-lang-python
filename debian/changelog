@@ -10,7 +10,6 @@ python-ev3dev2 (2.0.0~beta4) UNRELEASED; urgency=medium
 python-ev3dev2 (2.0.0~beta3) stable; urgency=medium
 
   [Daniel Walton]
-  * LED animation support
   * brickpi(3) support use of the Motor class
   * Add port name constants for stacked brickpi3s
   * Moved MoveTank.off() to MotorSet
