@@ -2036,6 +2036,7 @@ class MoveDifferential(MoveTank):
     Example:
 
     .. code:: python
+
         from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveDifferential, SpeedRPM
         from ev3dev2.wheel import EV3Tire
 
