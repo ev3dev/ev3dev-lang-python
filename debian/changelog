@@ -2,6 +2,7 @@ python-ev3dev2 (2.0.0~beta4) UNRELEASED; urgency=medium
 
   [Daniel Walton]
   * Display support via raspberry pi HDMI 
+  * Update tests/README to include sphinx-build instructions
   * LED animation support, brickpi3 LED corrected from BLUE to AMBER
   * Sound: fallback to regular case of 'note' if uppercase is not found
   * wait_until_not_moving should consider "running holding" as "moving"

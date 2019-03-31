@@ -313,6 +313,8 @@ texinfo_documents = [
 
 autodoc_member_order = 'bysource'
 
+suppress_warnings = ['image.nonlocal_uri']
+
 nitpick_ignore = [
     ('py:class', 'ev3dev2.display.FbMem'),
     ('py:class', 'ev3dev2.button.ButtonBase'),
