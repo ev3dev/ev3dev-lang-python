@@ -27,6 +27,7 @@ if sys.version_info < (3,4):
 
 import select
 import time
+import _thread
 
 # python3 uses collections
 # micropython uses ucollections
@@ -36,7 +37,7 @@ except ImportError:
     from ucollections import OrderedDict
 
 from logging import getLogger
-from math import atan2, degrees as math_degrees, sqrt, pi
+from math import atan2, degrees as math_degrees, sqrt, pi, sin, cos
 from os.path import abspath
 from ev3dev2 import get_current_platform, Device, list_device_names
 
@@ -2071,6 +2072,12 @@ class MoveDifferential(MoveTank):
 
         self.min_circle_radius_mm = self.wheel_distance_mm / 2
 
+        # odometry variables
+        self.x_pos_mm = 0.0  # robot X position in mm
+        self.y_pos_mm = 0.0  # robot Y position in mm
+        self.odometry_thread_run = False
+        self.odometry_thread_id = None
+
     def on_for_distance(self, speed, distance_mm, brake=True, block=True):
         """
         Drive distance_mm
@@ -2181,6 +2188,84 @@ class MoveDifferential(MoveTank):
         Rotate counter-clockwise 'degrees' in place
         """
         self._turn(speed, abs(degrees) * -1, brake, block)
+
+    def odometry_start(self):
+        """
+        Ported from:
+        http://seattlerobotics.org/encoder/200610/Article3/IMU%20Odometry,%20by%20David%20Anderson.htm
+
+        A thread is started that will run util the user calls odometry_stop()
+        which will set odometry_thread_run to False
+        """
+
+        def _odometry_monitor():
+            left_previous = 0
+            right_previous = 0
+            theta = 0.0  # robot heading
+            self.x_pos_mm = 0.0  # robot X position in mm
+            self.y_pos_mm = 0.0  # robot Y position in mm
+            SLEEP_TIME = 0.05  # 50ms
+            TWO_PI = 2 * pi
+
+            while self.odometry_thread_run:
+
+                # sample the left and right encoder counts as close together
+                # in time as possible
+                left_current = self.left_motor.position
+                right_current = self.right_motor.position
+
+                # determine how many ticks since our last sampling
+                left_ticks = left_current - left_previous
+                right_ticks = right_current - right_previous
+
+                # Have we moved?
+                if not left_ticks and not right_ticks:
+                    time.sleep(SLEEP_TIME)
+                    continue
+
+                # update _previous for next time
+                left_previous = left_current
+                right_previous = right_current
+
+                # rotations = distance_mm/self.wheel.circumference_mm
+                left_rotations = float(left_ticks / self.left_motor.count_per_rot)
+                right_rotations = float(right_ticks / self.right_motor.count_per_rot)
+
+                # convert longs to floats and ticks to mm
+                left_mm = float(left_rotations * self.wheel.circumference_mm)
+                right_mm = float(right_rotations * self.wheel.circumference_mm)
+
+                # calculate distance we have traveled since last sampling
+                mm = (left_mm + right_mm) / 2.0
+
+                # accumulate total rotation around our center
+                theta += (left_mm - right_mm) / self.wheel_distance_mm
+
+                # and clip the rotation to plus or minus 360 degrees
+                theta -= float(int(theta/TWO_PI) * TWO_PI)
+
+                # now calculate and accumulate our position in mm
+                self.x_pos_mm += mm * sin(theta)
+                self.y_pos_mm += mm * cos(theta)
+
+                log.debug("%s: odometry position (%d, %d)" % (self, self.x_pos_mm, self.y_pos_mm))
+                time.sleep(SLEEP_TIME)
+
+            self.odometry_thread_id = None
+
+        self.odometry_thread_run = True
+        self.odometry_thread_id = _thread.start_new_thread(_odometry_monitor, ())
+
+    def odometry_stop(self):
+        """
+        Signal the odometry thread to exit and wait for it to exit
+        """
+
+        if self.odometry_thread_id:
+            self.odometry_thread_run = False
+
+            while self.odometry_thread_id:
+                pass
 
 
 class MoveJoystick(MoveTank):
