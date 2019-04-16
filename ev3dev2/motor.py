@@ -2077,6 +2077,7 @@ class MoveDifferential(MoveTank):
         self.y_pos_mm = 0.0  # robot Y position in mm
         self.odometry_thread_run = False
         self.odometry_thread_id = None
+        self.theta = 0.0
 
     def on_for_distance(self, speed, distance_mm, brake=True, block=True):
         """
@@ -2166,7 +2167,8 @@ class MoveDifferential(MoveTank):
         # The number of rotations to move distance_mm
         rotations = distance_mm/self.wheel.circumference_mm
 
-        log.debug("%s: turn() degrees %s, distance_mm %s, rotations %s, degrees %s" % (self, degrees, distance_mm, rotations, degrees))
+        log.debug("%s: turn() degrees %s, distance_mm %s, rotations %s, degrees %s" %
+            (self, degrees, distance_mm, rotations, degrees))
 
         # If degrees is positive rotate clockwise
         if degrees > 0:
@@ -2193,7 +2195,9 @@ class MoveDifferential(MoveTank):
         log.info("%s: odometry angle %s at (%d, %d)" %
             (self, math.degrees(self.theta), self.x_pos_mm, self.y_pos_mm))
 
-    def odometry_start(self, theta_degrees_start=0.0, x_pos_start=0.0, y_pos_start=0.0):
+    def odometry_start(self, theta_degrees_start=90.0,
+            x_pos_start=0.0, y_pos_start=0.0,
+            SLEEP_TIME=0.005):  # 5ms
         """
         Ported from:
         http://seattlerobotics.org/encoder/200610/Article3/IMU%20Odometry,%20by%20David%20Anderson.htm
@@ -2208,7 +2212,6 @@ class MoveDifferential(MoveTank):
             self.theta = math.radians(theta_degrees_start)  # robot heading
             self.x_pos_mm = x_pos_start  # robot X position in mm
             self.y_pos_mm = y_pos_start  # robot Y position in mm
-            SLEEP_TIME = 0.05  # 50ms
             TWO_PI = 2 * math.pi
 
             while self.odometry_thread_run:
@@ -2224,7 +2227,8 @@ class MoveDifferential(MoveTank):
 
                 # Have we moved?
                 if not left_ticks and not right_ticks:
-                    time.sleep(SLEEP_TIME)
+                    if SLEEP_TIME:
+                        time.sleep(SLEEP_TIME)
                     continue
 
                 # log.debug("%s: left_ticks %s (from %s to %s)" %
@@ -2248,17 +2252,17 @@ class MoveDifferential(MoveTank):
                 mm = (left_mm + right_mm) / 2.0
 
                 # accumulate total rotation around our center
-                self.theta += (left_mm - right_mm) / self.wheel_distance_mm
+                self.theta += (right_mm - left_mm) / self.wheel_distance_mm
 
                 # and clip the rotation to plus or minus 360 degrees
                 self.theta -= float(int(self.theta/TWO_PI) * TWO_PI)
 
                 # now calculate and accumulate our position in mm
-                self.x_pos_mm += mm * math.sin(self.theta)
-                self.y_pos_mm += mm * math.cos(self.theta)
+                self.x_pos_mm += mm * math.cos(self.theta)
+                self.y_pos_mm += mm * math.sin(self.theta)
 
-                self.odometry_coordinates_log()
-                time.sleep(SLEEP_TIME)
+                if SLEEP_TIME:
+                    time.sleep(SLEEP_TIME)
 
             self.odometry_thread_id = None
 
@@ -2277,7 +2281,9 @@ class MoveDifferential(MoveTank):
                 pass
 
     def turn_to_angle(self, speed, angle_target_degrees, brake=True, block=True):
+        assert self.odometry_thread_id, "odometry_start() must be called to track robot coordinates"
 
+        # Make both target and current angles positive numbers between 0 and 360
         if angle_target_degrees < 0:
             angle_target_degrees += 360
 
@@ -2286,23 +2292,30 @@ class MoveDifferential(MoveTank):
         if angle_current_degrees < 0:
             angle_current_degrees += 360
 
-        angle_delta = angle_current_degrees - angle_target_degrees
-
-        log.info("%s: turn_to_angle %s, current angle %s, delta %s" %
-            (self, angle_target_degrees, angle_current_degrees, angle_delta))
-        self.odometry_coordinates_log()
-
-        # Do we rotate left or right and by how many degrees?
+        # Is it shorter to rotate to the right or left
+        # to reach angle_target_degrees?
         if angle_current_degrees > angle_target_degrees:
-            log.info("%s: turn right %s degrees" % (self, abs(angle_delta)))
+            turn_right = True
+            angle_delta = angle_current_degrees - angle_target_degrees
+        else:
+            turn_right = False
+            angle_delta = angle_target_degrees - angle_current_degrees
+
+        if angle_delta > 180:
+            angle_delta = 360 - angle_delta
+            turn_right = not turn_right
+
+        # log.info("%s: turn_to_angle %s, current angle %s, delta %s, turn_right %s" %
+        #     (self, angle_target_degrees, angle_current_degrees, angle_delta, turn_right))
+        # self.odometry_coordinates_log()
+
+        if turn_right:
             self.turn_right(speed, angle_delta, brake, block)
         else:
-            log.info("%s: turn left %s degrees" % (self, abs(angle_delta)))
             self.turn_left(speed, angle_delta, brake, block)
 
-        self.odometry_coordinates_log()
-        log.info("\n\n\n")
-        # log.info("%s: angle is %.5f radians (%.5f degrees)." % (self, angle_rad, angle_target_degrees))
+        # self.odometry_coordinates_log()
+        # log.info("\n\n\n")
 
     def on_to_coordinates(self, speed, x_target_mm, y_target_mm, brake=True, block=True):
         assert self.odometry_thread_id, "odometry_start() must be called to track robot coordinates"
