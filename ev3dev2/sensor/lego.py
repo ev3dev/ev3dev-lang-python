@@ -568,9 +568,9 @@ class GyroSensor(Sensor):
     MODE_GYRO_CAL = 'GYRO-CAL'
 
     # Newer versions of the Gyro sensor also have an additional second axis
-    # accessible via the TILT-ANGLE and TILT-RATE modes that is not usable
+    # accessible via the TILT-ANG and TILT-RATE modes that is not usable
     # using the official EV3-G blocks
-    MODE_TILT_ANG = 'TILT-ANGLE'
+    MODE_TILT_ANG = 'TILT-ANG'
     MODE_TILT_RATE = 'TILT-RATE'
 
     MODES = (
