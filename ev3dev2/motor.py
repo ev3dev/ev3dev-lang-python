@@ -2014,6 +2014,9 @@ class MoveDifferential(MoveTank):
     - drive in an arc (clockwise or counter clockwise) of a specified radius
       for a specified distance
 
+    Odometry can be use to enable driving to specific coordinates and
+    rotating to a specific angle.
+
     New arguments:
 
     wheel_class - Typically a child class of :class:`ev3dev2.wheel.Wheel`. This is used to
@@ -2057,6 +2060,21 @@ class MoveDifferential(MoveTank):
         # Drive in arc to the right along an imaginary circle of radius 150 mm.
         # Drive for 700 mm around this imaginary circle.
         mdiff.on_arc_right(SpeedRPM(80), 150, 700)
+
+        # Enable odometry
+        mdiff.odometry_start()
+
+        # Use odometry to drive to specific coordinates
+        mdiff.on_to_coordinates(SpeedRPM(40), 300, 300)
+
+        # Use odometry to go back to where we started
+        mdiff.on_to_coordinates(SpeedRPM(40), 0, 0)
+
+        # Use odometry to rotate in place to 90 degrees
+        mdiff.turn_to_angle(SpeedRPM(40), 90)
+
+        # Disable odometry
+        mdiff.odometry_stop()
     """
 
     def __init__(self, left_motor_port, right_motor_port,
@@ -2192,7 +2210,7 @@ class MoveDifferential(MoveTank):
         self._turn(speed, abs(degrees) * -1, brake, block)
 
     def odometry_coordinates_log(self):
-        log.info("%s: odometry angle %s at (%d, %d)" %
+        log.debug("%s: odometry angle %s at (%d, %d)" %
             (self, math.degrees(self.theta), self.x_pos_mm, self.y_pos_mm))
 
     def odometry_start(self, theta_degrees_start=90.0,
@@ -2202,7 +2220,7 @@ class MoveDifferential(MoveTank):
         Ported from:
         http://seattlerobotics.org/encoder/200610/Article3/IMU%20Odometry,%20by%20David%20Anderson.htm
 
-        A thread is started that will run util the user calls odometry_stop()
+        A thread is started that will run until the user calls odometry_stop()
         which will set odometry_thread_run to False
         """
 
@@ -2281,6 +2299,9 @@ class MoveDifferential(MoveTank):
                 pass
 
     def turn_to_angle(self, speed, angle_target_degrees, brake=True, block=True):
+        """
+        Rotate in place to `angle_target_degrees` at `speed`
+        """
         assert self.odometry_thread_id, "odometry_start() must be called to track robot coordinates"
 
         # Make both target and current angles positive numbers between 0 and 360
@@ -2305,19 +2326,21 @@ class MoveDifferential(MoveTank):
             angle_delta = 360 - angle_delta
             turn_right = not turn_right
 
-        # log.info("%s: turn_to_angle %s, current angle %s, delta %s, turn_right %s" %
-        #     (self, angle_target_degrees, angle_current_degrees, angle_delta, turn_right))
-        # self.odometry_coordinates_log()
+        log.debug("%s: turn_to_angle %s, current angle %s, delta %s, turn_right %s" %
+            (self, angle_target_degrees, angle_current_degrees, angle_delta, turn_right))
+        self.odometry_coordinates_log()
 
         if turn_right:
             self.turn_right(speed, angle_delta, brake, block)
         else:
             self.turn_left(speed, angle_delta, brake, block)
 
-        # self.odometry_coordinates_log()
-        # log.info("\n\n\n")
+        self.odometry_coordinates_log()
 
     def on_to_coordinates(self, speed, x_target_mm, y_target_mm, brake=True, block=True):
+        """
+        Drive to (`x_target_mm`, `y_target_mm`) coordinates at `speed`
+        """
         assert self.odometry_thread_id, "odometry_start() must be called to track robot coordinates"
 
         # stop moving

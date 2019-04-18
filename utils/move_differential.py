@@ -6,6 +6,7 @@ Used to experiment with the MoveDifferential class
 
 from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveDifferential, SpeedRPM
 from ev3dev2.wheel import EV3Tire
+from ev3dev2.unit import DistanceFeet
 from math import pi
 import logging
 import sys
@@ -38,15 +39,15 @@ mdiff = MoveDifferential(OUTPUT_A, OUTPUT_B, EV3Tire, 16.3 * STUD_MM)
 
 # Test arc left/right turns
 #mdiff.on_arc_right(SpeedRPM(80), ONE_FOOT_CICLE_RADIUS_MM, ONE_FOOT_CICLE_CIRCUMFERENCE_MM / 4)
-#mdiff.on_arc_left(SpeedRPM(80), ONE_FOOT_CICLE_RADIUS_MM, ONE_FOOT_CICLE_CIRCUMFERENCE_MM)
+mdiff.on_arc_left(SpeedRPM(80), ONE_FOOT_CICLE_RADIUS_MM, ONE_FOOT_CICLE_CIRCUMFERENCE_MM)
 
 # Test turning in place
 #mdiff.turn_right(SpeedRPM(40), 180)
 #mdiff.turn_left(SpeedRPM(40), 180)
 
 # Test odometry
-mdiff.odometry_start()
-mdiff.odometry_coordinates_log()
+#mdiff.odometry_start()
+#mdiff.odometry_coordinates_log()
 
 #mdiff.turn_to_angle(SpeedRPM(40), 0)
 #mdiff.on_for_distance(SpeedRPM(40), DistanceFeet(2).mm)
@@ -54,15 +55,32 @@ mdiff.odometry_coordinates_log()
 #mdiff.turn_left(SpeedRPM(30), 90)
 #mdiff.on_arc_left(SpeedRPM(80), ONE_FOOT_CICLE_RADIUS_MM, ONE_FOOT_CICLE_CIRCUMFERENCE_MM)
 
-log.info("turn on arc to the right")
-mdiff.on_arc_right(SpeedRPM(40), ONE_FOOT_CICLE_RADIUS_MM, ONE_FOOT_CICLE_CIRCUMFERENCE_MM / 4)
-mdiff.odometry_coordinates_log()
+# Drive in a quarter arc to the right then go back to where you started
+#log.info("turn on arc to the right")
+#mdiff.on_arc_right(SpeedRPM(40), ONE_FOOT_CICLE_RADIUS_MM, ONE_FOOT_CICLE_CIRCUMFERENCE_MM / 4)
+#mdiff.odometry_coordinates_log()
+#log.info("\n\n\n\n")
+#log.info("go back to (0, 0)")
+#mdiff.odometry_coordinates_log()
+#mdiff.on_to_coordinates(SpeedRPM(40), 0, 0)
+#mdiff.turn_to_angle(SpeedRPM(40), 90)
 
-log.info("\n\n\n\n")
-log.info("go back to (0, 0)")
-mdiff.odometry_coordinates_log()
-mdiff.on_to_coordinates(SpeedRPM(40), 0, 0)
+# Drive in a rectangle
+#mdiff.turn_to_angle(SpeedRPM(40), 120)
+#mdiff.on_to_coordinates(SpeedRPM(40), 0, DistanceFeet(1).mm)
+#mdiff.on_to_coordinates(SpeedRPM(40), DistanceFeet(2).mm, DistanceFeet(1).mm)
+#mdiff.on_to_coordinates(SpeedRPM(40), DistanceFeet(2).mm, 0)
+#mdiff.on_to_coordinates(SpeedRPM(40), 0, 0)
+#mdiff.turn_to_angle(SpeedRPM(40), 90)
 
-mdiff.turn_to_angle(SpeedRPM(40), 90)
-mdiff.odometry_coordinates_log()
-mdiff.odometry_stop()
+
+# Use odometry to drive to specific coordinates
+#mdiff.on_to_coordinates(SpeedRPM(40), 600, 300)
+
+# Now go back to where we started and rotate in place to 90 degrees
+#mdiff.on_to_coordinates(SpeedRPM(40), 0, 0)
+#mdiff.turn_to_angle(SpeedRPM(40), 90)
+
+
+#mdiff.odometry_coordinates_log()
+#mdiff.odometry_stop()
