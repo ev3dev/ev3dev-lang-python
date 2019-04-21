@@ -865,7 +865,8 @@ class Motor(Device):
             self._poll = select.poll()
             self._poll.register(self._state, select.POLLPRI)
 
-        # Set poll timeout to something small
+        # Set poll timeout to something small. For more details, see
+        # https://github.com/ev3dev/ev3dev-lang-python/issues/583
         if timeout:
             poll_tm = min(timeout, 100)
         else:
