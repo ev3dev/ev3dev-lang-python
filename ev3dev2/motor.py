@@ -2096,19 +2096,26 @@ class MoveDifferential(MoveTank):
         self.odometry_thread_run = False
         self.odometry_thread_id = None
         self.theta = 0.0
+        self.gyro = None
 
     def on_for_distance(self, speed, distance_mm, brake=True, block=True):
         """
-        Drive distance_mm
+        Drive in a straight line for `distance_mm`
         """
+        use_gyro = bool(block and brake and self.gyro)
         rotations = distance_mm / self.wheel.circumference_mm
-        log.debug("%s: on_for_rotations distance_mm %s, rotations %s, speed %s" % (self, distance_mm, rotations, speed))
+        log.debug("%s: on_for_rotations distance_mm %s, rotations %s, speed %s, use_gyro %s" %
+            (self, distance_mm, rotations, speed, use_gyro))
 
-        MoveTank.on_for_rotations(self, speed, speed, rotations, brake, block)
+        # dwalton use gyro with a PID here
+        if use_gyro:
+            pass
+        else:
+            MoveTank.on_for_rotations(self, speed, speed, rotations, brake, block)
 
     def _on_arc(self, speed, radius_mm, distance_mm, brake, block, arc_right):
         """
-        Drive in a circle with 'radius' for 'distance'
+        Drive in a circle with `radius` for `distance`
         """
 
         if radius_mm < self.min_circle_radius_mm:
@@ -2163,28 +2170,35 @@ class MoveDifferential(MoveTank):
 
     def on_arc_right(self, speed, radius_mm, distance_mm, brake=True, block=True):
         """
-        Drive clockwise in a circle with 'radius_mm' for 'distance_mm'
+        Drive clockwise in a circle with `radius_mm` for `distance_mm`
         """
         self._on_arc(speed, radius_mm, distance_mm, brake, block, True)
 
     def on_arc_left(self, speed, radius_mm, distance_mm, brake=True, block=True):
         """
-        Drive counter-clockwise in a circle with 'radius_mm' for 'distance_mm'
+        Drive counter-clockwise in a circle with `radius_mm` for `distance_mm`
         """
         self._on_arc(speed, radius_mm, distance_mm, brake, block, False)
 
     def _turn(self, speed, degrees, brake=True, block=True):
         """
-        Rotate in place 'degrees'. Both wheels must turn at the same speed for us
+        Rotate in place `degrees`. Both wheels must turn at the same speed for us
         to rotate in place.
         """
+        use_gyro = bool(block and brake and self.gyro)
+
+        if use_gyro:
+            # If we are at 90 degrees and are rotating 5 degrees we will
+            # rotate clockwise and should end up at 85 degrees
+            gyro_target_angle = self.gyro.angle + (-1 * degrees)
 
         # The distance each wheel needs to travel
         distance_mm = (abs(degrees) / 360) * self.circumference_mm
 
         # The number of rotations to move distance_mm
-        rotations = distance_mm/self.wheel.circumference_mm
+        rotations = distance_mm / self.wheel.circumference_mm
 
+        # dwalton
         log.debug("%s: turn() degrees %s, distance_mm %s, rotations %s, degrees %s" %
             (self, degrees, distance_mm, rotations, degrees))
 
@@ -2194,24 +2208,43 @@ class MoveDifferential(MoveTank):
 
         # If degrees is negative rotate counter-clockwise
         else:
-            rotations = distance_mm / self.wheel.circumference_mm
             MoveTank.on_for_rotations(self, speed * -1, speed, rotations, brake, block)
+
+        if use_gyro:
+            # If our target was 90 degrees but we rotated to 95 degrees
+            # our degrees_error will be 5.  When we call _turn() again with
+            # degrees of 5 we will rotate clockwise to 90 degrees.
+            gyro_current_angle = self.gyro.angle
+            degrees_error = gyro_current_angle - gyro_target_angle
+
+            if degrees_error:
+                while degrees_error < -360:
+                    degrees_error += 360
+
+                while degrees_error > 360:
+                    degrees_error -= 360
+
+                log.info("%s: _turn %s degrees to target %s degrees, ended up at %s (error %s)" %
+                    (self, degrees, gyro_target_angle, gyro_current_angle, degrees_error))
+                self._turn(speed, degrees_error, brake, block)
 
     def turn_right(self, speed, degrees, brake=True, block=True):
         """
-        Rotate clockwise 'degrees' in place
+        Rotate clockwise `degrees` in place
         """
         self._turn(speed, abs(degrees), brake, block)
 
     def turn_left(self, speed, degrees, brake=True, block=True):
         """
-        Rotate counter-clockwise 'degrees' in place
+        Rotate counter-clockwise `degrees` in place
         """
         self._turn(speed, abs(degrees) * -1, brake, block)
 
     def odometry_coordinates_log(self):
-        log.debug("%s: odometry angle %s at (%d, %d)" %
-            (self, math.degrees(self.theta), self.x_pos_mm, self.y_pos_mm))
+        log.debug("%s: odometry angle %s%s at (%d, %d)" %
+            (self, math.degrees(self.theta),
+            " (gyro angle %s)" % self.gyro.angle if self.gyro else "",
+            self.x_pos_mm, self.y_pos_mm))
 
     def odometry_start(self, theta_degrees_start=90.0,
             x_pos_start=0.0, y_pos_start=0.0,
@@ -2232,60 +2265,86 @@ class MoveDifferential(MoveTank):
             self.y_pos_mm = y_pos_start  # robot Y position in mm
             TWO_PI = 2 * math.pi
 
+            if self.gyro:
+                self.gyro.reset(block=True)
+                #self.gyro.calibrate()
+                gyro_angle_offset = theta_degrees_start
+
+            log.info("_odometry_monitor running")
+            self.odometry_coordinates_log()
+            self.odometry_thread_run = True
+
             while self.odometry_thread_run:
 
-                # sample the left and right encoder counts as close together
-                # in time as possible
-                left_current = self.left_motor.position
-                right_current = self.right_motor.position
+                try:
+                    # sample the left and right encoder counts as close together
+                    # in time as possible
+                    left_current = self.left_motor.position
+                    right_current = self.right_motor.position
 
-                # determine how many ticks since our last sampling
-                left_ticks = left_current - left_previous
-                right_ticks = right_current - right_previous
+                    # determine how many ticks since our last sampling
+                    left_ticks = left_current - left_previous
+                    right_ticks = right_current - right_previous
 
-                # Have we moved?
-                if not left_ticks and not right_ticks:
+                    # Have we moved?
+                    if not left_ticks and not right_ticks:
+                        if SLEEP_TIME:
+                            time.sleep(SLEEP_TIME)
+                        continue
+
+                    # log.debug("%s: left_ticks %s (from %s to %s)" %
+                    #     (self, left_ticks, left_previous, left_current))
+                    # log.debug("%s: right_ticks %s (from %s to %s)" %
+                    #     (self, right_ticks, right_previous, right_current))
+
+                    # update _previous for next time
+                    left_previous = left_current
+                    right_previous = right_current
+
+                    # rotations = distance_mm/self.wheel.circumference_mm
+                    left_rotations = float(left_ticks / self.left_motor.count_per_rot)
+                    right_rotations = float(right_ticks / self.right_motor.count_per_rot)
+
+                    # convert longs to floats and ticks to mm
+                    left_mm = float(left_rotations * self.wheel.circumference_mm)
+                    right_mm = float(right_rotations * self.wheel.circumference_mm)
+
+                    # calculate distance we have traveled since last sampling
+                    mm = (left_mm + right_mm) / 2.0
+
+                    # accumulate total rotation around our center
+                    self.theta += (right_mm - left_mm) / self.wheel_distance_mm
+
+                    # and clip the rotation to plus or minus 360 degrees
+                    self.theta -= float(int(self.theta/TWO_PI) * TWO_PI)
+
+                    # now calculate and accumulate our position in mm
+                    if self.gyro:
+                        gyro_angle_radians = math.radians(self.gyro.angle + gyro_angle_offset)
+                        self.x_pos_mm += mm * math.cos(gyro_angle_radians)
+                        self.y_pos_mm += mm * math.sin(gyro_angle_radians)
+                    else:
+                        self.x_pos_mm += mm * math.cos(self.theta)
+                        self.y_pos_mm += mm * math.sin(self.theta)
+
                     if SLEEP_TIME:
                         time.sleep(SLEEP_TIME)
-                    continue
 
-                # log.debug("%s: left_ticks %s (from %s to %s)" %
-                #     (self, left_ticks, left_previous, left_current))
-                # log.debug("%s: right_ticks %s (from %s to %s)" %
-                #     (self, right_ticks, right_previous, right_current))
+                except Exception as e:
+                    log.info("_odometry_monitor caught an exception")
+                    log.exception(e)
+                    break
 
-                # update _previous for next time
-                left_previous = left_current
-                right_previous = right_current
-
-                # rotations = distance_mm/self.wheel.circumference_mm
-                left_rotations = float(left_ticks / self.left_motor.count_per_rot)
-                right_rotations = float(right_ticks / self.right_motor.count_per_rot)
-
-                # convert longs to floats and ticks to mm
-                left_mm = float(left_rotations * self.wheel.circumference_mm)
-                right_mm = float(right_rotations * self.wheel.circumference_mm)
-
-                # calculate distance we have traveled since last sampling
-                mm = (left_mm + right_mm) / 2.0
-
-                # accumulate total rotation around our center
-                self.theta += (right_mm - left_mm) / self.wheel_distance_mm
-
-                # and clip the rotation to plus or minus 360 degrees
-                self.theta -= float(int(self.theta/TWO_PI) * TWO_PI)
-
-                # now calculate and accumulate our position in mm
-                self.x_pos_mm += mm * math.cos(self.theta)
-                self.y_pos_mm += mm * math.sin(self.theta)
-
-                if SLEEP_TIME:
-                    time.sleep(SLEEP_TIME)
-
+            self.odometry_coordinates_log()
+            log.info("_odometry_monitor stopped")
+            self.odometry_thread_run = False
             self.odometry_thread_id = None
 
-        self.odometry_thread_run = True
         self.odometry_thread_id = _thread.start_new_thread(_odometry_monitor, ())
+
+        # Block until the thread has started doing work
+        while not self.odometry_thread_run:
+            pass
 
     def odometry_stop(self):
         """
@@ -2305,12 +2364,12 @@ class MoveDifferential(MoveTank):
         assert self.odometry_thread_id, "odometry_start() must be called to track robot coordinates"
 
         # Make both target and current angles positive numbers between 0 and 360
-        if angle_target_degrees < 0:
+        while angle_target_degrees < 0:
             angle_target_degrees += 360
 
         angle_current_degrees = math.degrees(self.theta)
 
-        if angle_current_degrees < 0:
+        while angle_current_degrees < 0:
             angle_current_degrees += 360
 
         # Is it shorter to rotate to the right or left

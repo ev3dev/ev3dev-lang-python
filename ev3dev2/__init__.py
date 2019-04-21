@@ -241,7 +241,7 @@ class Device(object):
         """Device attribute getter"""
         try:
             if attribute is None:
-                attribute = self._attribute_file_open( name )
+                attribute = self._attribute_file_open(name)
             else:
                 attribute.seek(0)
             return attribute, attribute.read().strip().decode()
@@ -252,7 +252,7 @@ class Device(object):
         """Device attribute setter"""
         try:
             if attribute is None:
-                attribute = self._attribute_file_open( name )
+                attribute = self._attribute_file_open(name)
             else:
                 attribute.seek(0)
 

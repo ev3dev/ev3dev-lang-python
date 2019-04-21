@@ -226,7 +226,7 @@ class ColorSensor(Sensor):
     def raw(self):
         """
         Red, green, and blue components of the detected color, as a tuple.
-        
+
         Officially in the range 0-1020 but the values returned will never be
         that high. We do not yet know why the values returned are low, but
         pointing the color sensor at a well lit sheet of white paper will return
@@ -622,8 +622,19 @@ class GyroSensor(Sensor):
         self._ensure_mode(self.MODE_TILT_RATE)
         return self.value(0)
 
-    def reset(self):
-        """Resets the angle to 0.
+    def calibrate(self):
+        """
+        The robot should be perfectly still when you call this
+        """
+        current_mode = self.mode
+        self._ensure_mode(self.MODE_GYRO_CAL)
+        time.sleep(2)
+        self._ensure_mode(current_mode)
+
+    def reset(self, block=False):
+        """
+        Resets the angle to 0. If `block` is True the function will wait
+        until the angle is 0 before returning.
 
         Caveats:
             - This function only resets the angle to 0, it does not fix drift.
@@ -632,6 +643,26 @@ class GyroSensor(Sensor):
         """
         # 17 comes from inspecting the .vix file of the Gyro sensor block in EV3-G
         self._direct = self.set_attr_raw(self._direct, 'direct', bytes(17,))
+
+        # If block is True wait until the angle reads 0
+        if block:
+            MAX_ATTEMPTS = 20
+            SLEEP_AMOUNT = 0.1  # 100ms
+
+            for x in range(MAX_ATTEMPTS):
+                try:
+                    if self.angle:
+                        time.sleep(SLEEP_AMOUNT)
+                    else:
+                        break
+
+                # When we reset the gyro and then attempt to read the angle the
+                # read may fail if the gyro is in the middle of reseting.
+                except OSError:
+                    time.sleep(SLEEP_AMOUNT)
+
+            else:
+                raise Exception("%s did not reset, angle %s" % (self, self.angle))
 
     def wait_until_angle_changed_by(self, delta, direction_sensitive=False):
         """
@@ -861,7 +892,7 @@ class InfraredSensor(Sensor, ButtonBase):
         old state, call the appropriate button event handlers.
 
         To use the on_channel1_top_left, etc handlers your program would do something like:
-        
+
         .. code:: python
 
             def top_left_channel_1_action(state):
@@ -877,7 +908,7 @@ class InfraredSensor(Sensor, ButtonBase):
             while True:
                 ir.process()
                 time.sleep(0.01)
-        
+
         """
         new_state = []
         state_diff = []
