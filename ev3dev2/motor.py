@@ -865,14 +865,23 @@ class Motor(Device):
             self._poll = select.poll()
             self._poll.register(self._state, select.POLLPRI)
 
+        # Set poll timeout to something small. For more details, see
+        # https://github.com/ev3dev/ev3dev-lang-python/issues/583
+        if timeout:
+            poll_tm = min(timeout, 100)
+        else:
+            poll_tm = 100
+
         while True:
+            # This check is now done every poll_tm even if poll has nothing to report:
             if cond(self.state):
                 return True
 
-            self._poll.poll(None if timeout is None else timeout)
+            self._poll.poll(poll_tm)
 
             if timeout is not None and time.time() >= tic + timeout / 1000:
-                return False
+                # Final check when user timeout is reached
+                return cond(self.state)
 
     def wait_until_not_moving(self, timeout=None):
         """
