@@ -1842,7 +1842,7 @@ class MoveTank(MotorSet):
         self.right_motor._set_rel_position_degrees_and_speed_sp(right_degrees, right_speed_native_units)
         self.right_motor._set_brake(brake)
 
-        log.debug("{}: on_for_degrees {}".format(self, degrees))
+        # log.debug("{}: on_for_degrees {}".format(self, degrees))
 
         # These debugs involve disk I/O to pull position and position_sp so only uncomment
         # if you need to troubleshoot in more detail.
@@ -2111,16 +2111,11 @@ class MoveDifferential(MoveTank):
         """
         Drive in a straight line for `distance_mm`
         """
-        use_gyro = bool(block and brake and self.gyro)
         rotations = distance_mm / self.wheel.circumference_mm
-        log.debug("%s: on_for_rotations distance_mm %s, rotations %s, speed %s, use_gyro %s" %
-            (self, distance_mm, rotations, speed, use_gyro))
+        log.debug("%s: on_for_rotations distance_mm %s, rotations %s, speed %s" %
+            (self, distance_mm, rotations, speed))
 
-        # dwalton use gyro with a PID here
-        if use_gyro:
-            pass
-        else:
-            MoveTank.on_for_rotations(self, speed, speed, rotations, brake, block)
+        MoveTank.on_for_rotations(self, speed, speed, rotations, brake, block)
 
     def _on_arc(self, speed, radius_mm, distance_mm, brake, block, arc_right):
         """
@@ -2196,20 +2191,34 @@ class MoveDifferential(MoveTank):
         """
         use_gyro = bool(block and brake and self.gyro)
 
+        if degrees > 0:
+            target_theta = self.theta - degrees
+        else:
+            target_theta = self.theta + degrees
+
+        while target_theta < -360:
+            target_theta += 360
+
+        while target_theta > 360:
+            target_theta -= 360
+
         if use_gyro:
             # If we are at 90 degrees and are rotating 5 degrees we will
             # rotate clockwise and should end up at 85 degrees
-            gyro_target_angle = self.gyro.angle + (-1 * degrees)
+            gyro_init_angle = self.gyro.angle
+            gyro_target_angle = gyro_init_angle + degrees
+            log.info("%s: _turn() %d degrees from %s to %s, gyro from %s to %s, gyro offset %s" %
+                (self, degrees, self.theta, target_theta,
+                gyro_init_angle, gyro_target_angle, self.gyro_angle_offset))
+        else:
+            log.info("%s: _turn() %d degrees from %s to %s" %
+                (self, degrees, self.theta, target_theta))
 
         # The distance each wheel needs to travel
         distance_mm = (abs(degrees) / 360) * self.circumference_mm
 
         # The number of rotations to move distance_mm
         rotations = distance_mm / self.wheel.circumference_mm
-
-        # dwalton
-        log.debug("%s: turn() degrees %s, distance_mm %s, rotations %s, degrees %s" %
-            (self, degrees, distance_mm, rotations, degrees))
 
         # If degrees is positive rotate clockwise
         if degrees > 0:
@@ -2220,21 +2229,46 @@ class MoveDifferential(MoveTank):
             MoveTank.on_for_rotations(self, speed * -1, speed, rotations, brake, block)
 
         if use_gyro:
-            # If our target was 90 degrees but we rotated to 95 degrees
-            # our degrees_error will be 5.  When we call _turn() again with
-            # degrees of 5 we will rotate clockwise to 90 degrees.
             gyro_current_angle = self.gyro.angle
-            degrees_error = gyro_current_angle - gyro_target_angle
 
-            if degrees_error:
-                while degrees_error < -360:
-                    degrees_error += 360
+            # gyro angle increases when we turn clockwise
+            if degrees > 0:
+                degrees_moved = gyro_current_angle - gyro_init_angle
+                self.gyro_angle_offset -= 2 * degrees_moved
 
-                while degrees_error > 360:
-                    degrees_error -= 360
+                # If our target was 90 degrees but we rotated to 85 degrees
+                # our degrees_error will be 5.  When we call _turn() again with
+                # degrees of 5 we will rotate clockwise to 90 degrees.
+                if degrees_moved <= degrees:
+                    degrees_error = degrees - degrees_moved
+                else:
+                    degrees_error = -1 * (degrees_moved - degrees)
 
-                log.info("%s: _turn %s degrees to target %s degrees, ended up at %s (error %s)" %
-                    (self, degrees, gyro_target_angle, gyro_current_angle, degrees_error))
+            # gyro angle decreases when we turn counter-clockwise
+            else:
+                degrees_moved = gyro_init_angle - gyro_current_angle
+                self.gyro_angle_offset += 2 * degrees_moved
+
+                # If we started at 90 and our target was 45 but we only moved 40 degrees...
+                if degrees_moved <= degrees:
+                    degrees_error = -1 * (degrees - degrees_moved)
+                else:
+                    degrees_error = degrees_moved - degrees
+
+            while degrees_error < -360:
+                degrees_error += 360
+
+            while degrees_error > 360:
+                degrees_error -= 360
+
+            log.info("%s: _turn() ended up at theta %s, gyro %s (raw %s, offset %s) moved %s, error %s" %
+               (self, self.theta,
+                gyro_current_angle + self.gyro_angle_offset,
+                gyro_current_angle, self.gyro_angle_offset,
+                degrees_moved, degrees_error))
+
+            # dwalton
+            if False and abs(degrees_error) > 2:
                 self._turn(speed, degrees_error, brake, block)
 
     def turn_right(self, speed, degrees, brake=True, block=True):
@@ -2250,10 +2284,16 @@ class MoveDifferential(MoveTank):
         self._turn(speed, abs(degrees) * -1, brake, block)
 
     def odometry_coordinates_log(self):
-        log.debug("%s: odometry angle %s%s at (%d, %d)" %
-            (self, math.degrees(self.theta),
-            " (gyro angle %s)" % self.gyro.angle if self.gyro else "",
-            self.x_pos_mm, self.y_pos_mm))
+        if self.gyro:
+            log.debug("%s: odometry angle %s, gyro angle %s (raw %s, offset %s) at (%d, %d)" %
+                (self, math.degrees(self.theta),
+                self.gyro.angle + self.gyro_angle_offset,
+                self.gyro.angle, self.gyro_angle_offset,
+                self.x_pos_mm, self.y_pos_mm))
+        else:
+            log.debug("%s: odometry angle %s at (%d, %d)" %
+                (self, math.degrees(self.theta),
+                self.x_pos_mm, self.y_pos_mm))
 
     def odometry_start(self, theta_degrees_start=90.0,
             x_pos_start=0.0, y_pos_start=0.0,
@@ -2275,11 +2315,9 @@ class MoveDifferential(MoveTank):
             TWO_PI = 2 * math.pi
 
             if self.gyro:
-                self.gyro.reset(block=True)
-                #self.gyro.calibrate()
-                gyro_angle_offset = theta_degrees_start
+                self.gyro_angle_offset = theta_degrees_start - self.gyro.angle
 
-            log.info("_odometry_monitor running")
+            log.info("_odometry_monitor running, gyro angle %s. offset %s" % (self.gyro.angle, self.gyro_angle_offset))
             self.odometry_coordinates_log()
             self.odometry_thread_run = True
 
@@ -2329,7 +2367,7 @@ class MoveDifferential(MoveTank):
 
                     # now calculate and accumulate our position in mm
                     if self.gyro:
-                        gyro_angle_radians = math.radians(self.gyro.angle + gyro_angle_offset)
+                        gyro_angle_radians = math.radians(self.gyro.angle + self.gyro_angle_offset)
                         self.x_pos_mm += mm * math.cos(gyro_angle_radians)
                         self.y_pos_mm += mm * math.sin(gyro_angle_radians)
                     else:

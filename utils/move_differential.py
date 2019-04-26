@@ -51,6 +51,11 @@ mdiff.gyro = GyroSensor()
 # Test odometry
 mdiff.odometry_start()
 mdiff.turn_to_angle(SpeedRPM(40), 0)
+print("\n\n\n\n")
+mdiff.turn_to_angle(SpeedRPM(40), 90)
+print("\n\n\n\n")
+sys.exit(0)
+
 #mdiff.on_for_distance(SpeedRPM(40), DistanceFeet(2).mm)
 #mdiff.turn_right(SpeedRPM(40), 180)
 #mdiff.turn_left(SpeedRPM(30), 90)
