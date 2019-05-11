@@ -246,7 +246,7 @@ class Device(object):
                 attribute.seek(0)
             return attribute, attribute.read().strip().decode()
         except Exception as ex:
-            self._raise_friendly_access_error(ex, name)
+            self._raise_friendly_access_error(ex, name, None)
 
     def _set_attribute(self, attribute, name, value):
         """Device attribute setter"""
@@ -261,10 +261,10 @@ class Device(object):
             attribute.write(value)
             attribute.flush()
         except Exception as ex:
-            self._raise_friendly_access_error(ex, name)
+            self._raise_friendly_access_error(ex, name, value)
         return attribute
 
-    def _raise_friendly_access_error(self, driver_error, attribute):
+    def _raise_friendly_access_error(self, driver_error, attribute, value):
         if not isinstance(driver_error, OSError):
             raise driver_error
 
@@ -275,10 +275,11 @@ class Device(object):
                 try:
                     max_speed = self.max_speed
                 except (AttributeError, Exception):
-                    chain_exception(ValueError("The given speed value was out of range"), driver_error)
+                    chain_exception(ValueError("The given speed value {} was out of range".format(value)),
+                        driver_error)
                 else:
-                    chain_exception(ValueError("The given speed value was out of range. Max speed: +/-" + str(max_speed)), driver_error)
-            chain_exception(ValueError("One or more arguments were out of range or invalid"), driver_error)
+                    chain_exception(ValueError("The given speed value {} was out of range. Max speed: +/-{}".format(value, max_speed)), driver_error)
+            chain_exception(ValueError("One or more arguments were out of range or invalid, value {}".format(value)), driver_error)
         elif driver_errorno == errno.ENODEV or driver_errorno == errno.ENOENT:
             # We will assume that a file-not-found error is the result of a disconnected device
             # rather than a library error. If that isn't the case, at a minimum the underlying

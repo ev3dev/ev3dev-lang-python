@@ -76,6 +76,14 @@ else:
     raise Exception("Unsupported platform '%s'" % platform)
 
 
+class LineFollowFailed(Exception):
+    pass
+
+
+class LineFollowTooFast(Exception):
+    pass
+
+
 class SpeedValue(object):
     """
     A base class for other unit types. Don't use this directly; instead, see
@@ -83,8 +91,23 @@ class SpeedValue(object):
     :class:`SpeedDPS`, and :class:`SpeedDPM`.
     """
 
+    def __eq__(self, other):
+        return self.to_native_units() == other.to_native_units()
+
+    def __ne__(self, other):
+        return self.to_native_units() != other.to_native_units()
+
     def __lt__(self, other):
         return self.to_native_units() < other.to_native_units()
+
+    def __le__(self, other):
+        return self.to_native_units() <= other.to_native_units()
+
+    def __gt__(self, other):
+        return self.to_native_units() > other.to_native_units()
+
+    def __ge__(self, other):
+        return self.to_native_units() >= other.to_native_units()
 
     def __rmul__(self, other):
         return self.__mul__(other)
@@ -124,13 +147,13 @@ class SpeedNativeUnits(SpeedValue):
         self.native_counts = native_counts
 
     def __str__(self):
-        return str(self.native_counts) + " counts/sec"
+        return "{:.2f}".format(self.native_counts) + " counts/sec"
 
     def __mul__(self, other):
         assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
         return SpeedNativeUnits(self.native_counts * other)
 
-    def to_native_units(self, motor):
+    def to_native_units(self, motor=None):
         """
         Return this SpeedNativeUnits as a number
         """
@@ -1798,6 +1821,9 @@ class MoveTank(MotorSet):
         self.right_motor = self.motors[right_motor_port]
         self.max_speed = self.left_motor.max_speed
 
+        # color sensor used by follow_line()
+        self.cs = None
+
     def _unpack_speeds_to_native_units(self, left_speed, right_speed):
         left_speed = self.left_motor._speed_native_units(left_speed, "left_speed")
         right_speed = self.right_motor._speed_native_units(right_speed, "right_speed")
@@ -1920,6 +1946,80 @@ class MoveTank(MotorSet):
         # Start the motors
         self.left_motor.run_forever()
         self.right_motor.run_forever()
+
+    def follow_line(self,
+            kp, ki, kd,
+            speed, keep_following_function,
+            target_light_intensity=None,
+            follow_left_edge=True,
+            WHITE=60,
+            OFF_LINE_COUNT_MAX=20,
+            SLEEP_SEC=None
+        ):
+        """
+        PID line follower
+        """
+        assert self.cs, "ColorSensor must be defined"
+
+        if target_light_intensity is None:
+            target_light_intensity = self.cs.reflected_light_intensity
+
+        integral = 0.0
+        last_error = 0.0
+        derivative = 0.0
+        off_line_count = 0
+        speed_native_units = speed.to_native_units(self.left_motor)
+        MAX_SPEED = SpeedNativeUnits(self.max_speed)
+        #log.info("%s: MIN_SPEED %s, MAX_SPEED %s, speed_native_units %s, follow_left_edge %s" %
+        #    (self, MIN_SPEED, MAX_SPEED, speed_native_units, follow_left_edge))
+
+        while keep_following_function(self):
+            reflected_light_intensity = self.cs.reflected_light_intensity
+            error = target_light_intensity - reflected_light_intensity
+            integral = integral + error
+            derivative = error - last_error
+            last_error = error
+            turn_native_units = (kp * error) + (ki * integral) + (kd * derivative)
+            #log.info("")
+            #log.info("%s: turn_native_units %s, reflected_light_intensity %s, off_line_count %s" %
+            #    (self, turn_native_units, reflected_light_intensity, off_line_count))
+
+            if follow_left_edge:
+                left_speed = SpeedNativeUnits(speed_native_units - turn_native_units)
+                right_speed = SpeedNativeUnits(speed_native_units + turn_native_units)
+                #log.info("%s: left_speed %s, right_speed %s" % (self, left_speed, right_speed))
+
+            else:
+                left_speed = SpeedNativeUnits(speed_native_units + turn_native_units)
+                right_speed = SpeedNativeUnits(speed_native_units - turn_native_units)
+                #log.info("%s: left_speed %s, right_speed %s" % (self, left_speed, right_speed))
+
+            if left_speed > MAX_SPEED:
+                log.info("%s: left_speed %s is greater than MAX_SPEED %s"  % (self, left_speed, MAX_SPEED))
+                self.stop()
+                raise LineFollowTooFast("The robot is moving too fast to follow the line")
+
+            if right_speed > MAX_SPEED:
+                log.info("%s: right_speed %s is greater than MAX_SPEED %s"  % (self, right_speed, MAX_SPEED))
+                self.stop()
+                raise LineFollowTooFast("The robot is moving too fast to follow the line")
+
+            # dwalton
+            if reflected_light_intensity >= WHITE:
+                off_line_count += 1
+
+                if off_line_count >= OFF_LINE_COUNT_MAX:
+                    self.stop()
+                    raise LineFollowFailed("we lost the line")
+            else:
+                off_line_count = 0
+
+            if SLEEP_SEC:
+                sleep(SLEEP_SEC)
+
+            self.on(left_speed, right_speed)
+
+        self.stop()
 
 
 class MoveSteering(MoveTank):
