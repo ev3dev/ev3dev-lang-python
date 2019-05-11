@@ -77,10 +77,17 @@ else:
 
 
 class LineFollowFailed(Exception):
+    """
+    Raised when a line following robot has lost the line
+    """
     pass
 
 
 class LineFollowTooFast(Exception):
+    """
+    Raised when a line following robot has been asked to follow
+    a line an an unrealistic speed
+    """
     pass
 
 
@@ -1958,6 +1965,31 @@ class MoveTank(MotorSet):
         ):
         """
         PID line follower
+
+        ``kp``, ``ki``, and ``kd`` are the PID constants.
+
+        ``speed`` is the desired speed of the midpoint of the robot
+
+        ``keep_following_function`` is called to determine if we should keep
+            following the line or stop
+
+        ``target_light_intensity`` is the reflected light intensity when the color sensor
+            is on the edge of the line.  If this is None we assume that the color sensor
+            is on the edge of the line and will take a reading to set this variable.
+
+        ``follow_left_edge`` determines if we follow the left or right edge of the line
+
+        ``WHITE`` is the reflected_light_intensity that is used to determine if we have
+            lost the line
+
+        ``OFF_LINE_COUNT`` is how many consecutive times through the loop the
+            reflected_light_intensity must be greater than ``WHITE`` before we
+            declare the line lost and raise an exception
+
+        ``SLEEP_SEC`` is how many seconds we sleep on each pass through
+            the loop.  This is to give the robot a chance to react
+            to the new motor settings. This should be something small such
+            as 0.01 (10ms).
         """
         assert self.cs, "ColorSensor must be defined"
 
@@ -1970,8 +2002,6 @@ class MoveTank(MotorSet):
         off_line_count = 0
         speed_native_units = speed.to_native_units(self.left_motor)
         MAX_SPEED = SpeedNativeUnits(self.max_speed)
-        #log.info("%s: MIN_SPEED %s, MAX_SPEED %s, speed_native_units %s, follow_left_edge %s" %
-        #    (self, MIN_SPEED, MAX_SPEED, speed_native_units, follow_left_edge))
 
         while keep_following_function(self):
             reflected_light_intensity = self.cs.reflected_light_intensity
@@ -1980,19 +2010,14 @@ class MoveTank(MotorSet):
             derivative = error - last_error
             last_error = error
             turn_native_units = (kp * error) + (ki * integral) + (kd * derivative)
-            #log.info("")
-            #log.info("%s: turn_native_units %s, reflected_light_intensity %s, off_line_count %s" %
-            #    (self, turn_native_units, reflected_light_intensity, off_line_count))
 
             if follow_left_edge:
                 left_speed = SpeedNativeUnits(speed_native_units - turn_native_units)
                 right_speed = SpeedNativeUnits(speed_native_units + turn_native_units)
-                #log.info("%s: left_speed %s, right_speed %s" % (self, left_speed, right_speed))
 
             else:
                 left_speed = SpeedNativeUnits(speed_native_units + turn_native_units)
                 right_speed = SpeedNativeUnits(speed_native_units - turn_native_units)
-                #log.info("%s: left_speed %s, right_speed %s" % (self, left_speed, right_speed))
 
             if left_speed > MAX_SPEED:
                 log.info("%s: left_speed %s is greater than MAX_SPEED %s"  % (self, left_speed, MAX_SPEED))
@@ -2004,7 +2029,7 @@ class MoveTank(MotorSet):
                 self.stop()
                 raise LineFollowTooFast("The robot is moving too fast to follow the line")
 
-            # dwalton
+            # Have we lost the line?
             if reflected_light_intensity >= WHITE:
                 off_line_count += 1
 
