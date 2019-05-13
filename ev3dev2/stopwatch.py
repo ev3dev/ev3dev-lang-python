@@ -5,7 +5,7 @@ A StopWatch class for tracking the amount of time between events
 try:
     import datetime as dt
     micropython = False
-except ImportError:
+except Exception:
     import utime
     micropython = True
 

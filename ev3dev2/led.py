@@ -28,13 +28,13 @@ import sys
 if sys.version_info < (3,4):
     raise SystemError('Must be using Python 3.4 or higher')
 
-import datetime as dt
 import os
 import stat
 import time
 import _thread
 from collections import OrderedDict
 from ev3dev2 import get_current_platform, Device
+from ev3dev2.stopwatch import StopWatch
 from time import sleep
 
 # Import the LED settings, this is platform specific
@@ -60,35 +60,6 @@ elif platform == 'fake':
 
 else:
     raise Exception("Unsupported platform '%s'" % platform)
-
-
-def datetime_delta_to_ms(delta):
-    """
-    Given a datetime.timedelta object, return the delta in milliseconds
-    """
-    delta_ms = delta.days * 24 * 60 * 60 * 1000
-    delta_ms += delta.seconds * 1000
-    delta_ms += delta.microseconds / 1000
-    delta_ms = int(delta_ms)
-    return delta_ms
-
-
-def datetime_delta_to_seconds(delta):
-    return int(datetime_delta_to_ms(delta) / 1000)
-
-
-def duration_expired(start_time, duration_seconds):
-    """
-    Return True if ``duration_seconds`` have expired since ``start_time``
-    """
-
-    if duration_seconds is not None:
-        delta_seconds = datetime_delta_to_seconds(dt.datetime.now() - start_time)
-
-        if delta_seconds >= duration_seconds:
-            return True
-
-    return False
 
 
 class Led(Device):
@@ -430,7 +401,9 @@ class Leds(object):
         def _animate_police_lights():
             self.all_off()
             even = True
-            start_time = dt.datetime.now()
+            duration_ms = duration * 1000
+            stopwatch = StopWatch()
+            stopwatch.start()
 
             while True:
                 if even:
@@ -440,7 +413,7 @@ class Leds(object):
                     self.set_color(group1, color2)
                     self.set_color(group2, color1)
 
-                if self.animate_thread_stop or duration_expired(start_time, duration):
+                if self.animate_thread_stop or stopwatch.value_ms >= duration_ms:
                     break
 
                 even = not even
@@ -473,7 +446,9 @@ class Leds(object):
 
         def _animate_flash():
             even = True
-            start_time = dt.datetime.now()
+            duration_ms = duration * 1000
+            stopwatch = StopWatch()
+            stopwatch.start()
 
             while True:
                 if even:
@@ -482,7 +457,7 @@ class Leds(object):
                 else:
                     self.all_off()
 
-                if self.animate_thread_stop or duration_expired(start_time, duration):
+                if self.animate_thread_stop or stopwatch.value_ms >= duration_ms:
                     break
 
                 even = not even
@@ -516,7 +491,9 @@ class Leds(object):
         def _animate_cycle():
             index = 0
             max_index = len(colors)
-            start_time = dt.datetime.now()
+            duration_ms = duration * 1000
+            stopwatch = StopWatch()
+            stopwatch.start()
 
             while True:
                 for group in groups:
@@ -527,7 +504,7 @@ class Leds(object):
                 if index == max_index:
                     index = 0
 
-                if self.animate_thread_stop or duration_expired(start_time, duration):
+                if self.animate_thread_stop or stopwatch.value_ms >= duration_ms:
                     break
 
                 sleep(sleeptime)
@@ -568,7 +545,9 @@ class Leds(object):
             MIN_VALUE = 0
             MAX_VALUE = 1
             self.all_off()
-            start_time = dt.datetime.now()
+            duration_ms = duration * 1000
+            stopwatch = StopWatch()
+            stopwatch.start()
 
             while True:
 
@@ -601,7 +580,7 @@ class Leds(object):
                 elif state == 3 and right_value == MIN_VALUE:
                     state = 0
 
-                if self.animate_thread_stop or duration_expired(start_time, duration):
+                if self.animate_thread_stop or stopwatch.value_ms >= duration_ms:
                     break
 
                 sleep(sleeptime)
