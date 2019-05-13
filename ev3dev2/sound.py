@@ -30,8 +30,6 @@ if sys.version_info < (3, 4):
 
 import os
 import re
-import shlex
-from subprocess import check_output, Popen, PIPE
 
 
 def _make_scales(notes):
@@ -47,11 +45,6 @@ def _make_scales(notes):
 class Sound(object):
     """
     Support beep, play wav files, or convert text to speech.
-
-    Note that all methods of the class spawn system processes and return
-    subprocess.Popen objects. The methods are asynchronous (they return
-    immediately after child process was spawned, without waiting for its
-    completion), but you can call wait() on the returned result.
 
     Examples::
 
@@ -102,19 +95,13 @@ class Sound(object):
         :param play_type: The behavior of ``beep`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE`` or  ``Sound.PLAY_NO_WAIT_FOR_COMPLETE``
 
-        :return: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
-
         .. _`beep man page`: https://linux.die.net/man/1/beep
         .. _`linux beep music`: https://www.google.com/search?q=linux+beep+music
         """
-        with open(os.devnull, 'w') as n:
-            subprocess = Popen(shlex.split('/usr/bin/beep %s' % args), stdout=n)
-            if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
-                subprocess.wait()
-                return None
-            else:
-                return subprocess
-
+        if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
+            os.system('/usr/bin/beep %s' % args)
+        else:
+            os.system('/usr/bin/beep %s &' % args)
 
     def tone(self, *args, play_type=PLAY_WAIT_FOR_COMPLETE):
         """
@@ -154,8 +141,6 @@ class Sound(object):
         :param play_type: The behavior of ``tone`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_NO_WAIT_FOR_COMPLETE``
 
-        :return: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
-
         .. rubric:: tone(frequency, duration)
 
         Play single tone of given frequency and duration.
@@ -165,8 +150,6 @@ class Sound(object):
 
         :param play_type: The behavior of ``tone`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_NO_WAIT_FOR_COMPLETE``
-
-        :return: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
         def play_tone_sequence(tone_sequence):
             def beep_args(frequency=None, duration=None, delay=None):
@@ -256,8 +239,6 @@ class Sound(object):
 
         :param play_type: The behavior of ``play_file`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
-
-        :returns: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
         if not 0 < volume <= 100:
             raise ValueError('invalid volume (%s)' % volume)
@@ -265,26 +246,22 @@ class Sound(object):
         if not wav_file.endswith(".wav"):
             raise ValueError('invalid sound file (%s), only .wav files are supported' % wav_file)
 
-        if not os.path.isfile(wav_file):
+        if not os.path.exists(wav_file):
             raise ValueError("%s does not exist" % wav_file)
 
         self.set_volume(volume)
         self._validate_play_type(play_type)
 
-        with open(os.devnull, 'w') as n:
+        if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
+            os.system('/usr/bin/aplay -q "%s"' % wav_file)
 
-            if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
-                pid = Popen(shlex.split('/usr/bin/aplay -q "%s"' % wav_file), stdout=n)
-                pid.wait()
+        # Do not wait, run in the background
+        elif play_type == Sound.PLAY_NO_WAIT_FOR_COMPLETE:
+            os.system('/usr/bin/aplay -q "%s" &' % wav_file)
 
-            # Do not wait, run in the background
-            elif play_type == Sound.PLAY_NO_WAIT_FOR_COMPLETE:
-                return Popen(shlex.split('/usr/bin/aplay -q "%s"' % wav_file), stdout=n)
-
-            elif play_type == Sound.PLAY_LOOP:
-                while True:
-                    pid = Popen(shlex.split('/usr/bin/aplay -q "%s"' % wav_file), stdout=n)
-                    pid.wait()
+        elif play_type == Sound.PLAY_LOOP:
+            while True:
+                os.system('/usr/bin/aplay -q "%s"' % wav_file)
 
     def speak(self, text, espeak_opts='-a 200 -s 130', volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
         """ Speak the given text aloud.
@@ -297,30 +274,20 @@ class Sound(object):
 
         :param play_type: The behavior of ``speak`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
-
-        :returns: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
         self._validate_play_type(play_type)
         self.set_volume(volume)
+        cmd = "/usr/bin/espeak --stdout %s '%s' | /usr/bin/aplay -q" % (espeak_opts, text)
 
-        with open(os.devnull, 'w') as n:
-            cmd_line = ['/usr/bin/espeak', '--stdout'] + shlex.split(espeak_opts) + [shlex.quote(text)]
-            aplay_cmd_line = shlex.split('/usr/bin/aplay -q')
+        if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
+            os.system(cmd)
 
-            if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
-                espeak = Popen(cmd_line, stdout=PIPE)
-                play = Popen(aplay_cmd_line, stdin=espeak.stdout, stdout=n)
-                play.wait()
+        elif play_type == Sound.PLAY_NO_WAIT_FOR_COMPLETE:
+            os.system(cmd + "&")
 
-            elif play_type == Sound.PLAY_NO_WAIT_FOR_COMPLETE:
-                espeak = Popen(cmd_line, stdout=PIPE)
-                return Popen(aplay_cmd_line, stdin=espeak.stdout, stdout=n)
-
-            elif play_type == Sound.PLAY_LOOP:
-                while True:
-                    espeak = Popen(cmd_line, stdout=PIPE)
-                    play = Popen(aplay_cmd_line, stdin=espeak.stdout, stdout=n)
-                    play.wait()
+        elif play_type == Sound.PLAY_LOOP:
+            while True:
+                os.system(cmd)
 
     def _get_channel(self):
         """
@@ -334,10 +301,10 @@ class Sound(object):
             #
             #     Simple mixer control 'Master',0
             #     Simple mixer control 'Capture',0
-            out = check_output(['amixer', 'scontrols']).decode()
-            m = re.search(r"'(?P<channel>[^']+)'", out)
+            out = os.popen('/usr/bin/amixer scontrols').read()
+            m = re.search(r"'([^']+)'", out)
             if m:
-                self.channel = m.group('channel')
+                self.channel = m.group(1)
             else:
                 self.channel = 'Playback'
 
@@ -355,8 +322,7 @@ class Sound(object):
         if channel is None:
             channel = self._get_channel()
 
-        cmd_line = '/usr/bin/amixer -q set {0} {1:d}%'.format(channel, pct)
-        Popen(shlex.split(cmd_line)).wait()
+        os.system('/usr/bin/amixer -q set {0} {1:d}%'.format(channel, pct))
 
     def get_volume(self, channel=None):
         """
@@ -370,10 +336,10 @@ class Sound(object):
         if channel is None:
             channel = self._get_channel()
 
-        out = check_output(['amixer', 'get', channel]).decode()
-        m = re.search(r'\[(?P<volume>\d+)%\]', out)
+        out = os.popen(['/usr/bin/amixer', 'get', channel]).read()
+        m = re.search(r'\[(\d+)%\]', out)
         if m:
-            return int(m.group('volume'))
+            return int(m.group(1))
         else:
             raise Exception('Failed to parse output of `amixer get {}`'.format(channel))
 
@@ -435,8 +401,6 @@ class Sound(object):
         :param iterable[tuple(string, string)] song: the song
         :param int tempo: the song tempo, given in quarters per minute
         :param float delay: delay between notes (in seconds)
-
-        :return: the spawn subprocess from ``subprocess.Popen``
 
         :raises ValueError: if invalid note in song or invalid play parameters
         """
