@@ -49,6 +49,11 @@ def _make_scales(notes):
 
 
 def get_command_processes(command):
+    """
+    :param string command: a string of command(s) to run that may include pipes
+    :return: a list of Popen objects
+    """
+
     # We must split command into sub-commands to support pipes
     if "|" in command:
         command_parts = command.split("|")
@@ -159,7 +164,7 @@ class Sound(object):
         :param play_type: The behavior of ``beep`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE`` or  ``Sound.PLAY_NO_WAIT_FOR_COMPLETE``
 
-        :return: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
+        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
 
         .. _`beep man page`: https://linux.die.net/man/1/beep
         .. _`linux beep music`: https://www.google.com/search?q=linux+beep+music
@@ -204,7 +209,7 @@ class Sound(object):
         :param play_type: The behavior of ``tone`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_NO_WAIT_FOR_COMPLETE``
 
-        :return: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
+        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
 
         .. rubric:: tone(frequency, duration)
 
@@ -216,7 +221,7 @@ class Sound(object):
         :param play_type: The behavior of ``tone`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_NO_WAIT_FOR_COMPLETE``
 
-        :return: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
+        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
         def play_tone_sequence(tone_sequence):
             def beep_args(frequency=None, duration=None, delay=None):
@@ -251,7 +256,7 @@ class Sound(object):
         :param play_type: The behavior of ``play_tone`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
 
-        :return: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the PID of the underlying beep command; ``None`` otherwise
+        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the PID of the underlying beep command; ``None`` otherwise
 
         :raises ValueError: if invalid parameter
         """
@@ -281,7 +286,7 @@ class Sound(object):
         :param play_type: The behavior of ``play_note`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
 
-        :return: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the PID of the underlying beep command; ``None`` otherwise
+        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the PID of the underlying beep command; ``None`` otherwise
 
         :raises ValueError: is invalid parameter (note, duration,...)
         """
@@ -307,7 +312,7 @@ class Sound(object):
         :param play_type: The behavior of ``play_file`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
 
-        :returns: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
+        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
         if not 0 < volume <= 100:
             raise ValueError('invalid volume (%s)' % volume)
@@ -334,7 +339,7 @@ class Sound(object):
         :param play_type: The behavior of ``speak`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
 
-        :returns: When ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
+        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
         self._validate_play_type(play_type)
         self.set_volume(volume)
@@ -343,7 +348,7 @@ class Sound(object):
 
     def _get_channel(self):
         """
-        :returns: The detected sound channel
+        :return: The detected sound channel
         :rtype: string
         """
         if self.channel is None:
@@ -454,7 +459,7 @@ class Sound(object):
         :param int tempo: the song tempo, given in quarters per minute
         :param float delay: delay between notes (in seconds)
 
-        :return: the spawn subprocess from ``subprocess.Popen``
+        :return: When python3 is used the spawn subprocess from ``subprocess.Popen`` is returned; ``None`` otherwise
 
         :raises ValueError: if invalid note in song or invalid play parameters
         """
