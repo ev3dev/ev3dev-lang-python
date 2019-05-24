@@ -29,7 +29,7 @@ if sys.version_info < (3,4):
     raise SystemError('Must be using Python 3.4 or higher')
 
 from ev3dev2.stopwatch import StopWatch
-from ev3dev2 import get_current_platform, is_micropython
+from ev3dev2 import get_current_platform, is_micropython, library_load_warning_message
 from logging import getLogger
 
 log = getLogger(__name__)
@@ -313,7 +313,6 @@ if is_micropython():
 
 # python3 implementation
 else:
-    from ev3dev2 import library_load_warning_message
     import array
 
     try:
