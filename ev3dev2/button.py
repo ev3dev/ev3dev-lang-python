@@ -202,7 +202,13 @@ class EV3ButtonCommon(object):
 # micropython implementation
 if is_micropython():
 
-    from fcntl import ioctl
+    try:
+        # This is a linux-specific module.
+        # It is required by the Button class, but failure to import it may be
+        # safely ignored if one just needs to run API tests on Windows.
+        import fcntl
+    except ImportError:
+        log.warning(library_load_warning_message("fcntl", "Button"))
 
     if platform not in ("ev3", "fake"):
         raise Exception("micropython button support has not been implemented for '%s'" % platform)
@@ -213,6 +219,9 @@ if is_micropython():
         bit = byte & (1 << (index % 8))
         return bool(bit)
 
+
+    class ButtonBase(ButtonCommon):
+        pass
 
     class Button(ButtonCommon, EV3ButtonCommon):
         """
@@ -256,7 +265,7 @@ if is_micropython():
             """
             Returns list of pressed buttons
             """
-            ioctl(self._fd, Button._EVIOCGKEY, self._buffer, mut=True)
+            fcntl.ioctl(self._fd, Button._EVIOCGKEY, self._buffer, mut=True)
 
             pressed = []
             for b in Button._BUTTONS:
