@@ -10,7 +10,7 @@ MicroPython, we recommend you run your code with it for improved performance.
 ==============================  =================
 Module                          Support status
 ==============================  =================
-`ev3dev2.button`                ❌
+`ev3dev2.button`                ️️✔️
 `ev3dev2.control` [1]_          ⚠️
 `ev3dev2.display`               ❌
 `ev3dev2.fonts` [2]_            ⚠️
@@ -19,12 +19,12 @@ Module                          Support status
 `ev3dev2.port`                  ✔️
 `ev3dev2.power`                 ✔️
 `ev3dev2.sensor.*`              ✔️
-`ev3dev2.sound`                                
+`ev3dev2.sound`                 ✔️
 `ev3dev2.unit`                  ✔️
 `ev3dev2.wheel`                 ✔️
 ==============================  =================
 
-.. [1] Untested, but probably works.
+.. [1] Untested/low-priority, but some of it might work.
 .. [2] It might work, but isn't useful without ``ev3dev2.display``.
 ```
 
@@ -34,7 +34,7 @@ See [the MicroPython differences page](http://docs.micropython.org/en/latest/gen
 
 ### Shebang
 
-You should modify the first line of your scripts to replace "python" with "micropython":
+You should modify the first line of your scripts to replace "python3" with "micropython":
 
 ```
 #!/usr/bin/env micropython
@@ -42,4 +42,4 @@ You should modify the first line of your scripts to replace "python" with "micro
 
 ### Running from the command line
 
-If you previously would have typed `python foo.py`, you should now type `micropython foo.py`.
+If you previously would have typed `python3 foo.py`, you should now type `micropython foo.py`.
