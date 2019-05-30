@@ -28,29 +28,11 @@ import sys
 if sys.version_info < (3,4):
     raise SystemError('Must be using Python 3.4 or higher')
 
-import array
-import time
-import logging
-from . import get_current_platform, library_load_warning_message
+from ev3dev2.stopwatch import StopWatch
+from ev3dev2 import get_current_platform, is_micropython, library_load_warning_message
+from logging import getLogger
 
-log = logging.getLogger(__name__)
-
-try:
-    # This is a linux-specific module.
-    # It is required by the Button class, but failure to import it may be
-    # safely ignored if one just needs to run API tests on Windows.
-    import fcntl
-except ImportError:
-    log.warning(library_load_warning_message("fcntl", "Button"))
-
-try:
-    # This is a linux-specific module.
-    # It is required by the Button class, but failure to import it may be
-    # safely ignored if one just needs to run API tests on Windows.
-    import evdev
-except ImportError:
-    log.warning(library_load_warning_message("evdev", "Button"))
-
+log = getLogger(__name__)
 
 # Import the button filenames, this is platform specific
 platform = get_current_platform()
@@ -81,11 +63,7 @@ class MissingButton(Exception):
     pass
 
 
-class ButtonBase(object):
-    """
-    Abstract button interface.
-    """
-    _state = set([])
+class ButtonCommon(object):
 
     def __str__(self):
         return self.__class__.__name__
@@ -99,6 +77,10 @@ class ButtonBase(object):
         """
         pass
 
+    @property
+    def buttons_pressed(self):
+        raise NotImplementedError()
+
     def any(self):
         """
         Checks if any button is pressed.
@@ -111,81 +93,8 @@ class ButtonBase(object):
         """
         return set(self.buttons_pressed) == set(buttons)
 
-    @property
-    def evdev_device(self):
-        """
-        Return our corresponding evdev device object
-        """
-        devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]
-
-        for device in devices:
-            if device.name == self.evdev_device_name:
-                return device
-
-        raise Exception("%s: could not find evdev device '%s'" % (self, self.evdev_device_name))
-
-    def process(self, new_state=None):
-        """
-        Check for currenly pressed buttons. If the new state differs from the
-        old state, call the appropriate button event handlers.
-        """
-        if new_state is None:
-            new_state = set(self.buttons_pressed)
-        old_state = self._state
-        self._state = new_state
-
-        state_diff = new_state.symmetric_difference(old_state)
-        for button in state_diff:
-            handler = getattr(self, 'on_' + button)
-
-            if handler is not None:
-                handler(button in new_state)
-
-        if self.on_change is not None and state_diff:
-            self.on_change([(button, button in new_state) for button in state_diff])
-
-    def process_forever(self):
-        for event in self.evdev_device.read_loop():
-            if event.type == evdev.ecodes.EV_KEY:
-                self.process()
-
-    @property
-    def buttons_pressed(self):
-        raise NotImplementedError()
-
     def _wait(self, wait_for_button_press, wait_for_button_release, timeout_ms):
-        tic = time.time()
-
-        # wait_for_button_press/release can be a list of buttons or a string
-        # with the name of a single button.  If it is a string of a single
-        # button convert that to a list.
-        if isinstance(wait_for_button_press, str):
-            wait_for_button_press = [wait_for_button_press, ]
-
-        if isinstance(wait_for_button_release, str):
-            wait_for_button_release = [wait_for_button_release, ]
-
-        for event in self.evdev_device.read_loop():
-            if event.type == evdev.ecodes.EV_KEY:
-                all_pressed = True
-                all_released = True
-                pressed = self.buttons_pressed
-
-                for button in wait_for_button_press:
-                    if button not in pressed:
-                        all_pressed = False
-                        break
-
-                for button in wait_for_button_release:
-                    if button in pressed:
-                        all_released = False
-                        break
-
-                if all_pressed and all_released:
-                    return True
-
-                if timeout_ms is not None and time.time() >= tic + timeout_ms / 1000:
-                    return False
+        raise NotImplementedError()
 
     def wait_for_pressed(self, buttons, timeout_ms=None):
         """
@@ -204,91 +113,42 @@ class ButtonBase(object):
         Wait for the button to be pressed down and then released.
         Both actions must happen within timeout_ms.
         """
-        start_time = time.time()
+        stopwatch = StopWatch()
+        stopwatch.start()
 
         if self.wait_for_pressed(buttons, timeout_ms):
             if timeout_ms is not None:
-                timeout_ms -= int((time.time() - start_time) * 1000)
+                timeout_ms -= stopwatch.value_ms
             return self.wait_for_released(buttons, timeout_ms)
 
         return False
 
-
-class ButtonEVIO(ButtonBase):
-    """
-    Provides a generic button reading mechanism that works with event interface
-    and may be adapted to platform specific implementations.
-
-    This implementation depends on the availability of the EVIOCGKEY ioctl
-    to be able to read the button state buffer. See Linux kernel source
-    in /include/uapi/linux/input.h for details.
-    """
-
-    KEY_MAX = 0x2FF
-    KEY_BUF_LEN = int((KEY_MAX + 7) / 8)
-    EVIOCGKEY = (2 << (14 + 8 + 8) | KEY_BUF_LEN << (8 + 8) | ord('E') << 8 | 0x18)
-
-    _buttons = {}
-
-    def __init__(self):
-        ButtonBase.__init__(self)
-        self._file_cache = {}
-        self._buffer_cache = {}
-
-        for b in self._buttons:
-            name = self._buttons[b]['name']
-
-            if name is None:
-                raise MissingButton("Button '%s' is not available on this platform" % b)
-
-            if name not in self._file_cache:
-                self._file_cache[name] = open(name, 'rb', 0)
-                self._buffer_cache[name] = array.array('B', [0] * self.KEY_BUF_LEN)
-
-    def _button_file(self, name):
-        return self._file_cache[name]
-
-    def _button_buffer(self, name):
-        return self._buffer_cache[name]
-
-    @property
-    def buttons_pressed(self):
+    def process(self, new_state=None):
         """
-        Returns list of names of pressed buttons.
+        Check for currenly pressed buttons. If the new state differs from the
+        old state, call the appropriate button event handlers (on_up, on_down, etc).
         """
-        for b in self._buffer_cache:
-            fcntl.ioctl(self._button_file(b), self.EVIOCGKEY, self._buffer_cache[b])
+        if new_state is None:
+            new_state = set(self.buttons_pressed)
+        old_state = self._state
+        self._state = new_state
 
-        pressed = []
-        for k, v in self._buttons.items():
-            buf = self._buffer_cache[v['name']]
-            bit = v['value']
+        state_diff = new_state.symmetric_difference(old_state)
+        for button in state_diff:
+            handler = getattr(self, 'on_' + button)
 
-            if bool(buf[int(bit / 8)] & 1 << bit % 8):
-                pressed.append(k)
+            if handler is not None:
+                handler(button in new_state)
 
-        return pressed
+        if self.on_change is not None and state_diff:
+            self.on_change([(button, button in new_state) for button in state_diff])
 
 
-class Button(ButtonEVIO):
-    """
-    EVB Buttons
-    """
+class EV3ButtonCommon(object):
 
-    _buttons = {
-            'up': {'name': BUTTONS_FILENAME, 'value': 103},
-            'down': {'name': BUTTONS_FILENAME, 'value': 108},
-            'left': {'name': BUTTONS_FILENAME, 'value': 105},
-            'right': {'name': BUTTONS_FILENAME, 'value': 106},
-            'enter': {'name': BUTTONS_FILENAME, 'value': 28},
-            'backspace': {'name': BUTTONS_FILENAME, 'value': 14},
-        }
-    evdev_device_name = EVDEV_DEVICE_NAME
-
-    '''
-    These handlers are called by `process()` whenever state of 'up', 'down',
-    etc buttons have changed since last `process()` call
-    '''
+    # These handlers are called by `ButtonCommon.process()` whenever the
+    # state of 'up', 'down', etc buttons have changed since last
+    # `ButtonCommon.process()` call
     on_up = None
     on_down = None
     on_left = None
@@ -337,3 +197,268 @@ class Button(ButtonEVIO):
         Check if 'backspace' button is pressed.
         """
         return 'backspace' in self.buttons_pressed
+
+
+# micropython implementation
+if is_micropython():
+
+    try:
+        # This is a linux-specific module.
+        # It is required by the Button class, but failure to import it may be
+        # safely ignored if one just needs to run API tests on Windows.
+        import fcntl
+    except ImportError:
+        log.warning(library_load_warning_message("fcntl", "Button"))
+
+    if platform not in ("ev3", "fake"):
+        raise Exception("micropython button support has not been implemented for '%s'" % platform)
+
+
+    def _test_bit(buf, index):
+        byte = buf[int(index >> 3)]
+        bit = byte & (1 << (index % 8))
+        return bool(bit)
+
+
+    class ButtonBase(ButtonCommon):
+        pass
+
+    class Button(ButtonCommon, EV3ButtonCommon):
+        """
+        EV3 Buttons
+        """
+
+        # Button key codes
+        UP = 103
+        DOWN = 108
+        LEFT = 105
+        RIGHT = 106
+        ENTER = 28
+        BACK = 14
+
+        # Note, this order is intentional and comes from the EV3-G software
+        _BUTTONS = (UP, DOWN, LEFT, RIGHT, ENTER, BACK)
+        _BUTTON_DEV = '/dev/input/by-path/platform-gpio_keys-event'
+
+        _BUTTON_TO_STRING = {
+            UP : "up",
+            DOWN : "down",
+            LEFT : "left",
+            RIGHT : "right",
+            ENTER : "enter",
+            BACK : "backspace",
+        }
+
+        # stuff from linux/input.h and linux/input-event-codes.h
+        _KEY_MAX = 0x2FF
+        _KEY_BUF_LEN = (_KEY_MAX + 7) // 8
+        _EVIOCGKEY = 2 << (14 + 8 + 8) | _KEY_BUF_LEN << (8 + 8) | ord('E') << 8 | 0x18
+
+        def __init__(self):
+            super(Button, self).__init__()
+            self._devnode = open(Button._BUTTON_DEV, 'b')
+            self._fd = self._devnode.fileno()
+            self._buffer = bytearray(Button._KEY_BUF_LEN)
+
+        @property
+        def buttons_pressed(self):
+            """
+            Returns list of pressed buttons
+            """
+            fcntl.ioctl(self._fd, Button._EVIOCGKEY, self._buffer, mut=True)
+
+            pressed = []
+            for b in Button._BUTTONS:
+                if _test_bit(self._buffer, b):
+                    pressed.append(Button._BUTTON_TO_STRING[b])
+            return pressed
+
+        def process_forever(self):
+            while True:
+                self.process()
+
+        def _wait(self, wait_for_button_press, wait_for_button_release, timeout_ms):
+            stopwatch = StopWatch()
+            stopwatch.start()
+
+            # wait_for_button_press/release can be a list of buttons or a string
+            # with the name of a single button.  If it is a string of a single
+            # button convert that to a list.
+            if isinstance(wait_for_button_press, str):
+                wait_for_button_press = [wait_for_button_press, ]
+
+            if isinstance(wait_for_button_release, str):
+                wait_for_button_release = [wait_for_button_release, ]
+
+            while True:
+                all_pressed = True
+                all_released = True
+                pressed = self.buttons_pressed
+
+                for button in wait_for_button_press:
+                    if button not in pressed:
+                        all_pressed = False
+                        break
+
+                for button in wait_for_button_release:
+                    if button in pressed:
+                        all_released = False
+                        break
+
+                if all_pressed and all_released:
+                    return True
+
+                if timeout_ms is not None and stopwatch.value_ms >= timeout_ms:
+                    return False
+
+# python3 implementation
+else:
+    import array
+
+    try:
+        # This is a linux-specific module.
+        # It is required by the Button class, but failure to import it may be
+        # safely ignored if one just needs to run API tests on Windows.
+        import fcntl
+    except ImportError:
+        log.warning(library_load_warning_message("fcntl", "Button"))
+
+    try:
+        # This is a linux-specific module.
+        # It is required by the Button class, but failure to import it may be
+        # safely ignored if one just needs to run API tests on Windows.
+        import evdev
+    except ImportError:
+        log.warning(library_load_warning_message("evdev", "Button"))
+
+
+    class ButtonBase(ButtonCommon):
+        """
+        Abstract button interface.
+        """
+        _state = set([])
+
+        @property
+        def evdev_device(self):
+            """
+            Return our corresponding evdev device object
+            """
+            devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]
+
+            for device in devices:
+                if device.name == self.evdev_device_name:
+                    return device
+
+            raise Exception("%s: could not find evdev device '%s'" % (self, self.evdev_device_name))
+
+        def process_forever(self):
+            for event in self.evdev_device.read_loop():
+                if event.type == evdev.ecodes.EV_KEY:
+                    self.process()
+
+
+    class ButtonEVIO(ButtonBase):
+        """
+        Provides a generic button reading mechanism that works with event interface
+        and may be adapted to platform specific implementations.
+
+        This implementation depends on the availability of the EVIOCGKEY ioctl
+        to be able to read the button state buffer. See Linux kernel source
+        in /include/uapi/linux/input.h for details.
+        """
+
+        KEY_MAX = 0x2FF
+        KEY_BUF_LEN = int((KEY_MAX + 7) / 8)
+        EVIOCGKEY = (2 << (14 + 8 + 8) | KEY_BUF_LEN << (8 + 8) | ord('E') << 8 | 0x18)
+
+        _buttons = {}
+
+        def __init__(self):
+            super(ButtonEVIO, self).__init__()
+            self._file_cache = {}
+            self._buffer_cache = {}
+
+            for b in self._buttons:
+                name = self._buttons[b]['name']
+
+                if name is None:
+                    raise MissingButton("Button '%s' is not available on this platform" % b)
+
+                if name not in self._file_cache:
+                    self._file_cache[name] = open(name, 'rb', 0)
+                    self._buffer_cache[name] = array.array('B', [0] * self.KEY_BUF_LEN)
+
+        def _button_file(self, name):
+            return self._file_cache[name]
+
+        def _button_buffer(self, name):
+            return self._buffer_cache[name]
+
+        @property
+        def buttons_pressed(self):
+            """
+            Returns list of names of pressed buttons.
+            """
+            for b in self._buffer_cache:
+                fcntl.ioctl(self._button_file(b), self.EVIOCGKEY, self._buffer_cache[b])
+
+            pressed = []
+            for k, v in self._buttons.items():
+                buf = self._buffer_cache[v['name']]
+                bit = v['value']
+
+                if bool(buf[int(bit / 8)] & 1 << bit % 8):
+                    pressed.append(k)
+
+            return pressed
+
+        def _wait(self, wait_for_button_press, wait_for_button_release, timeout_ms):
+            stopwatch = StopWatch()
+            stopwatch.start()
+
+            # wait_for_button_press/release can be a list of buttons or a string
+            # with the name of a single button.  If it is a string of a single
+            # button convert that to a list.
+            if isinstance(wait_for_button_press, str):
+                wait_for_button_press = [wait_for_button_press, ]
+
+            if isinstance(wait_for_button_release, str):
+                wait_for_button_release = [wait_for_button_release, ]
+
+            for event in self.evdev_device.read_loop():
+                if event.type == evdev.ecodes.EV_KEY:
+                    all_pressed = True
+                    all_released = True
+                    pressed = self.buttons_pressed
+
+                    for button in wait_for_button_press:
+                        if button not in pressed:
+                            all_pressed = False
+                            break
+
+                    for button in wait_for_button_release:
+                        if button in pressed:
+                            all_released = False
+                            break
+
+                    if all_pressed and all_released:
+                        return True
+
+                    if timeout_ms is not None and stopwatch.value_ms >= timeout_ms:
+                        return False
+
+
+    class Button(ButtonEVIO, EV3ButtonCommon):
+        """
+        EV3 Buttons
+        """
+
+        _buttons = {
+            'up': {'name': BUTTONS_FILENAME, 'value': 103},
+            'down': {'name': BUTTONS_FILENAME, 'value': 108},
+            'left': {'name': BUTTONS_FILENAME, 'value': 105},
+            'right': {'name': BUTTONS_FILENAME, 'value': 106},
+            'enter': {'name': BUTTONS_FILENAME, 'value': 28},
+            'backspace': {'name': BUTTONS_FILENAME, 'value': 14},
+        }
+        evdev_device_name = EVDEV_DEVICE_NAME

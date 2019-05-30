@@ -19,7 +19,7 @@ make
 ~/micropython/tools/bootstrap_upip.sh
 
 # Install micropython library modules
-~/micropython/ports/unix/micropython -m upip install micropython-unittest micropython-os micropython-os.path micropython-shutil micropython-io micropython-fnmatch micropython-numbers micropython-struct micropython-time micropython-logging micropython-select
+~/micropython/ports/unix/micropython -m upip install micropython-unittest micropython-os micropython-os.path micropython-shutil micropython-io micropython-fnmatch micropython-numbers micropython-struct micropython-time micropython-logging micropython-select micropython-fcntl
 # Make unittest module show error output; will run until failure then print first error
 # See https://github.com/micropython/micropython-lib/blob/f20d89c6aad9443a696561ca2a01f7ef0c8fb302/unittest/unittest.py#L203
 sed -i 's/#raise/raise/g' ~/.micropython/lib/unittest.py
