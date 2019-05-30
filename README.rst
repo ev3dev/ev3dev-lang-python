@@ -163,6 +163,12 @@ If you want to make your robot speak, you can use the ``Sound.speak`` method:
 Make sure to check out the `User Resources`_ section for more detailed
 information on these features and many others.
 
+Using Micropython
+-----------------
+
+Normal Python too slow? Try `Micropython`_ if it supports the features your
+project needs.
+
 User Resources
 --------------
 
@@ -236,12 +242,9 @@ but this library is compatible only with Python 3.
 .. _ev3python.com: http://ev3python.com/
 .. _FAQ: http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/faq.html
 .. _our FAQ page: FAQ_
-.. _ev3dev-lang-python: https://github.com/rhempel/ev3dev-lang-python
-.. _our Issues tracker: https://github.com/rhempel/ev3dev-lang-python/issues
+.. _our Issues tracker: https://github.com/ev3dev/ev3dev-lang-python/issues
 .. _EXPLOR3R: demo-robot_
 .. _demo-robot: http://robotsquare.com/2015/10/06/explor3r-building-instructions/
-.. _demo programs: demo-code_
-.. _demo-code: https://github.com/rhempel/ev3dev-lang-python/tree/master/demo
 .. _robot-square: http://robotsquare.com/
 .. _Python 2.x: python2_
 .. _python2: https://docs.python.org/2/
@@ -254,3 +257,4 @@ but this library is compatible only with Python 3.
 .. _ev3dev Visual Studio Code extension: https://github.com/ev3dev/vscode-ev3dev-browser
 .. _Python + VSCode introduction tutorial: https://github.com/ev3dev/vscode-hello-python
 .. _nano: http://www.ev3dev.org/docs/tutorials/nano-cheat-sheet/
+.. _Micropython: http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/micropython.html
