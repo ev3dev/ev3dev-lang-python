@@ -45,11 +45,13 @@ BUTTONS_FILENAME = None
 EVDEV_DEVICE_NAME = None
 
 LEDS = OrderedDict()
-LEDS['blue_led'] = 'led0:blue:brick-status'
+LEDS['amber_led'] = 'led1:amber:brick-status'
 
 LED_GROUPS = OrderedDict()
-LED_GROUPS['LED'] = ('blue_led',)
+LED_GROUPS['LED'] = ('amber_led',)
 
 LED_COLORS = OrderedDict()
 LED_COLORS['BLACK'] = (0,)
-LED_COLORS['BLUE'] = (1,)
+LED_COLORS['AMBER'] = (1,)
+
+LED_DEFAULT_COLOR = 'AMBER'

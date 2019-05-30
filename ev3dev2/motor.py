@@ -25,8 +25,10 @@ import sys
 if sys.version_info < (3,4):
     raise SystemError('Must be using Python 3.4 or higher')
 
+import math
 import select
 import time
+import _thread
 
 # python3 uses collections
 # micropython uses ucollections
@@ -36,7 +38,6 @@ except ImportError:
     from ucollections import OrderedDict
 
 from logging import getLogger
-from math import atan2, degrees as math_degrees, sqrt, pi
 from os.path import abspath
 from ev3dev2 import get_current_platform, Device, list_device_names
 
@@ -864,14 +865,23 @@ class Motor(Device):
             self._poll = select.poll()
             self._poll.register(self._state, select.POLLPRI)
 
+        # Set poll timeout to something small. For more details, see
+        # https://github.com/ev3dev/ev3dev-lang-python/issues/583
+        if timeout:
+            poll_tm = min(timeout, 100)
+        else:
+            poll_tm = 100
+
         while True:
+            # This check is now done every poll_tm even if poll has nothing to report:
             if cond(self.state):
                 return True
 
-            self._poll.poll(None if timeout is None else timeout)
+            self._poll.poll(poll_tm)
 
             if timeout is not None and time.time() >= tic + timeout / 1000:
-                return False
+                # Final check when user timeout is reached
+                return cond(self.state)
 
     def wait_until_not_moving(self, timeout=None):
         """
@@ -2013,6 +2023,9 @@ class MoveDifferential(MoveTank):
     - drive in an arc (clockwise or counter clockwise) of a specified radius
       for a specified distance
 
+    Odometry can be use to enable driving to specific coordinates and
+    rotating to a specific angle.
+
     New arguments:
 
     wheel_class - Typically a child class of :class:`ev3dev2.wheel.Wheel`. This is used to
@@ -2036,6 +2049,7 @@ class MoveDifferential(MoveTank):
     Example:
 
     .. code:: python
+
         from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveDifferential, SpeedRPM
         from ev3dev2.wheel import EV3Tire
 
@@ -2055,6 +2069,21 @@ class MoveDifferential(MoveTank):
         # Drive in arc to the right along an imaginary circle of radius 150 mm.
         # Drive for 700 mm around this imaginary circle.
         mdiff.on_arc_right(SpeedRPM(80), 150, 700)
+
+        # Enable odometry
+        mdiff.odometry_start()
+
+        # Use odometry to drive to specific coordinates
+        mdiff.on_to_coordinates(SpeedRPM(40), 300, 300)
+
+        # Use odometry to go back to where we started
+        mdiff.on_to_coordinates(SpeedRPM(40), 0, 0)
+
+        # Use odometry to rotate in place to 90 degrees
+        mdiff.turn_to_angle(SpeedRPM(40), 90)
+
+        # Disable odometry
+        mdiff.odometry_stop()
     """
 
     def __init__(self, left_motor_port, right_motor_port,
@@ -2066,9 +2095,16 @@ class MoveDifferential(MoveTank):
         self.wheel_distance_mm = wheel_distance_mm
 
         # The circumference of the circle made if this robot were to rotate in place
-        self.circumference_mm = self.wheel_distance_mm * pi
+        self.circumference_mm = self.wheel_distance_mm * math.pi
 
         self.min_circle_radius_mm = self.wheel_distance_mm / 2
+
+        # odometry variables
+        self.x_pos_mm = 0.0  # robot X position in mm
+        self.y_pos_mm = 0.0  # robot Y position in mm
+        self.odometry_thread_run = False
+        self.odometry_thread_id = None
+        self.theta = 0.0
 
     def on_for_distance(self, speed, distance_mm, brake=True, block=True):
         """
@@ -2090,9 +2126,9 @@ class MoveDifferential(MoveTank):
 
         # The circle formed at the halfway point between the two wheels is the
         # circle that must have a radius of radius_mm
-        circle_outer_mm = 2 * pi * (radius_mm + (self.wheel_distance_mm / 2))
-        circle_middle_mm = 2 * pi * radius_mm
-        circle_inner_mm = 2 * pi * (radius_mm - (self.wheel_distance_mm / 2))
+        circle_outer_mm = 2 * math.pi * (radius_mm + (self.wheel_distance_mm / 2))
+        circle_middle_mm = 2 * math.pi * radius_mm
+        circle_inner_mm = 2 * math.pi * (radius_mm - (self.wheel_distance_mm / 2))
 
         if arc_right:
             # The left wheel is making the larger circle and will move at 'speed'
@@ -2158,7 +2194,8 @@ class MoveDifferential(MoveTank):
         # The number of rotations to move distance_mm
         rotations = distance_mm/self.wheel.circumference_mm
 
-        log.debug("%s: turn() degrees %s, distance_mm %s, rotations %s, degrees %s" % (self, degrees, distance_mm, rotations, degrees))
+        log.debug("%s: turn() degrees %s, distance_mm %s, rotations %s, degrees %s" %
+            (self, degrees, distance_mm, rotations, degrees))
 
         # If degrees is positive rotate clockwise
         if degrees > 0:
@@ -2180,6 +2217,154 @@ class MoveDifferential(MoveTank):
         Rotate counter-clockwise 'degrees' in place
         """
         self._turn(speed, abs(degrees) * -1, brake, block)
+
+    def odometry_coordinates_log(self):
+        log.debug("%s: odometry angle %s at (%d, %d)" %
+            (self, math.degrees(self.theta), self.x_pos_mm, self.y_pos_mm))
+
+    def odometry_start(self, theta_degrees_start=90.0,
+            x_pos_start=0.0, y_pos_start=0.0,
+            SLEEP_TIME=0.005):  # 5ms
+        """
+        Ported from:
+        http://seattlerobotics.org/encoder/200610/Article3/IMU%20Odometry,%20by%20David%20Anderson.htm
+
+        A thread is started that will run until the user calls odometry_stop()
+        which will set odometry_thread_run to False
+        """
+
+        def _odometry_monitor():
+            left_previous = 0
+            right_previous = 0
+            self.theta = math.radians(theta_degrees_start)  # robot heading
+            self.x_pos_mm = x_pos_start  # robot X position in mm
+            self.y_pos_mm = y_pos_start  # robot Y position in mm
+            TWO_PI = 2 * math.pi
+
+            while self.odometry_thread_run:
+
+                # sample the left and right encoder counts as close together
+                # in time as possible
+                left_current = self.left_motor.position
+                right_current = self.right_motor.position
+
+                # determine how many ticks since our last sampling
+                left_ticks = left_current - left_previous
+                right_ticks = right_current - right_previous
+
+                # Have we moved?
+                if not left_ticks and not right_ticks:
+                    if SLEEP_TIME:
+                        time.sleep(SLEEP_TIME)
+                    continue
+
+                # log.debug("%s: left_ticks %s (from %s to %s)" %
+                #     (self, left_ticks, left_previous, left_current))
+                # log.debug("%s: right_ticks %s (from %s to %s)" %
+                #     (self, right_ticks, right_previous, right_current))
+
+                # update _previous for next time
+                left_previous = left_current
+                right_previous = right_current
+
+                # rotations = distance_mm/self.wheel.circumference_mm
+                left_rotations = float(left_ticks / self.left_motor.count_per_rot)
+                right_rotations = float(right_ticks / self.right_motor.count_per_rot)
+
+                # convert longs to floats and ticks to mm
+                left_mm = float(left_rotations * self.wheel.circumference_mm)
+                right_mm = float(right_rotations * self.wheel.circumference_mm)
+
+                # calculate distance we have traveled since last sampling
+                mm = (left_mm + right_mm) / 2.0
+
+                # accumulate total rotation around our center
+                self.theta += (right_mm - left_mm) / self.wheel_distance_mm
+
+                # and clip the rotation to plus or minus 360 degrees
+                self.theta -= float(int(self.theta/TWO_PI) * TWO_PI)
+
+                # now calculate and accumulate our position in mm
+                self.x_pos_mm += mm * math.cos(self.theta)
+                self.y_pos_mm += mm * math.sin(self.theta)
+
+                if SLEEP_TIME:
+                    time.sleep(SLEEP_TIME)
+
+            self.odometry_thread_id = None
+
+        self.odometry_thread_run = True
+        self.odometry_thread_id = _thread.start_new_thread(_odometry_monitor, ())
+
+    def odometry_stop(self):
+        """
+        Signal the odometry thread to exit and wait for it to exit
+        """
+
+        if self.odometry_thread_id:
+            self.odometry_thread_run = False
+
+            while self.odometry_thread_id:
+                pass
+
+    def turn_to_angle(self, speed, angle_target_degrees, brake=True, block=True):
+        """
+        Rotate in place to `angle_target_degrees` at `speed`
+        """
+        assert self.odometry_thread_id, "odometry_start() must be called to track robot coordinates"
+
+        # Make both target and current angles positive numbers between 0 and 360
+        if angle_target_degrees < 0:
+            angle_target_degrees += 360
+
+        angle_current_degrees = math.degrees(self.theta)
+
+        if angle_current_degrees < 0:
+            angle_current_degrees += 360
+
+        # Is it shorter to rotate to the right or left
+        # to reach angle_target_degrees?
+        if angle_current_degrees > angle_target_degrees:
+            turn_right = True
+            angle_delta = angle_current_degrees - angle_target_degrees
+        else:
+            turn_right = False
+            angle_delta = angle_target_degrees - angle_current_degrees
+
+        if angle_delta > 180:
+            angle_delta = 360 - angle_delta
+            turn_right = not turn_right
+
+        log.debug("%s: turn_to_angle %s, current angle %s, delta %s, turn_right %s" %
+            (self, angle_target_degrees, angle_current_degrees, angle_delta, turn_right))
+        self.odometry_coordinates_log()
+
+        if turn_right:
+            self.turn_right(speed, angle_delta, brake, block)
+        else:
+            self.turn_left(speed, angle_delta, brake, block)
+
+        self.odometry_coordinates_log()
+
+    def on_to_coordinates(self, speed, x_target_mm, y_target_mm, brake=True, block=True):
+        """
+        Drive to (`x_target_mm`, `y_target_mm`) coordinates at `speed`
+        """
+        assert self.odometry_thread_id, "odometry_start() must be called to track robot coordinates"
+
+        # stop moving
+        self.off(brake='hold')
+
+        # rotate in place so we are pointed straight at our target
+        x_delta = x_target_mm - self.x_pos_mm
+        y_delta = y_target_mm - self.y_pos_mm
+        angle_target_radians = math.atan2(y_delta, x_delta)
+        angle_target_degrees = math.degrees(angle_target_radians)
+        self.turn_to_angle(speed, angle_target_degrees, brake=True, block=True)
+
+        # drive in a straight line to the target coordinates
+        distance_mm = math.sqrt(pow(self.x_pos_mm - x_target_mm, 2) + pow(self.y_pos_mm - y_target_mm, 2))
+        self.on_for_distance(speed, distance_mm, brake, block)
 
 
 class MoveJoystick(MoveTank):
@@ -2212,8 +2397,8 @@ class MoveJoystick(MoveTank):
             self.off()
             return
 
-        vector_length = sqrt(x*x + y*y)
-        angle = math_degrees(atan2(y, x))
+        vector_length = math.sqrt((x * x) + (y * y))
+        angle = math.degrees(math.atan2(y, x))
 
         if angle < 0:
             angle += 360
