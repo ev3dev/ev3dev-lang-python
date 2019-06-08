@@ -76,14 +76,14 @@ else:
     raise Exception("Unsupported platform '%s'" % platform)
 
 
-class LineFollowFailed(Exception):
+class LineFollowError(Exception):
     """
     Raised when a line following robot has lost the line
     """
     pass
 
 
-class LineFollowTooFast(Exception):
+class LineFollowErrorTooFast(Exception):
     """
     Raised when a line following robot has been asked to follow
     a line an an unrealistic speed
@@ -102,7 +102,7 @@ class SpeedValue(object):
         return self.to_native_units() == other.to_native_units()
 
     def __ne__(self, other):
-        return self.to_native_units() != other.to_native_units()
+        return not self.__eq__(other)
 
     def __lt__(self, other):
         return self.to_native_units() < other.to_native_units()
@@ -1961,7 +1961,7 @@ class MoveTank(MotorSet):
             follow_left_edge=True,
             WHITE=60,
             OFF_LINE_COUNT_MAX=20,
-            SLEEP_SEC=None
+            SLEEP_TIME=0.01
         ):
         """
         PID line follower
@@ -1986,7 +1986,7 @@ class MoveTank(MotorSet):
             reflected_light_intensity must be greater than ``WHITE`` before we
             declare the line lost and raise an exception
 
-        ``SLEEP_SEC`` is how many seconds we sleep on each pass through
+        ``SLEEP_TIME`` is how many seconds we sleep on each pass through
             the loop.  This is to give the robot a chance to react
             to the new motor settings. This should be something small such
             as 0.01 (10ms).
@@ -2011,23 +2011,21 @@ class MoveTank(MotorSet):
             last_error = error
             turn_native_units = (kp * error) + (ki * integral) + (kd * derivative)
 
-            if follow_left_edge:
-                left_speed = SpeedNativeUnits(speed_native_units - turn_native_units)
-                right_speed = SpeedNativeUnits(speed_native_units + turn_native_units)
+            if not follow_left_edge:
+                turn_native_units *= -1
 
-            else:
-                left_speed = SpeedNativeUnits(speed_native_units + turn_native_units)
-                right_speed = SpeedNativeUnits(speed_native_units - turn_native_units)
+            left_speed = SpeedNativeUnits(speed_native_units - turn_native_units)
+            right_speed = SpeedNativeUnits(speed_native_units + turn_native_units)
 
             if left_speed > MAX_SPEED:
                 log.info("%s: left_speed %s is greater than MAX_SPEED %s"  % (self, left_speed, MAX_SPEED))
                 self.stop()
-                raise LineFollowTooFast("The robot is moving too fast to follow the line")
+                raise LineFollowErrorTooFast("The robot is moving too fast to follow the line")
 
             if right_speed > MAX_SPEED:
                 log.info("%s: right_speed %s is greater than MAX_SPEED %s"  % (self, right_speed, MAX_SPEED))
                 self.stop()
-                raise LineFollowTooFast("The robot is moving too fast to follow the line")
+                raise LineFollowErrorTooFast("The robot is moving too fast to follow the line")
 
             # Have we lost the line?
             if reflected_light_intensity >= WHITE:
@@ -2035,12 +2033,12 @@ class MoveTank(MotorSet):
 
                 if off_line_count >= OFF_LINE_COUNT_MAX:
                     self.stop()
-                    raise LineFollowFailed("we lost the line")
+                    raise LineFollowError("we lost the line")
             else:
                 off_line_count = 0
 
-            if SLEEP_SEC:
-                sleep(SLEEP_SEC)
+            if SLEEP_TIME:
+                time.sleep(SLEEP_TIME)
 
             self.on(left_speed, right_speed)
 

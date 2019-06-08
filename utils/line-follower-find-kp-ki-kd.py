@@ -14,7 +14,7 @@ have your robot follow that oval when running this program.
 http://robotsquare.com/2012/11/28/line-following/
 """
 
-from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveTank, SpeedPercent, LineFollowFailed
+from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveTank, SpeedPercent, LineFollowError
 from ev3dev2.sensor.lego import ColorSensor
 from time import sleep
 import datetime as dt
@@ -100,7 +100,7 @@ def find_kp_ki_kd(start, end, increment, speed, kx_to_tweak, kp, ki, kd):
             else:
                 raise Exception("Invalid kx_to_tweak %s" % kx_to_tweak)
 
-        except LineFollowFailed:
+        except LineFollowError:
             continue
 
         except:
