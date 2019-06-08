@@ -2,6 +2,9 @@ python-ev3dev2 (2.0.0~beta4) UNRELEASED; urgency=medium
 
   [Daniel Walton]
   * PID line follower
+  * micropython Button support
+  * micropython Sound support
+  * micropython support for LED animations
   * StopWatch class
   * Avoid race condition due to poll(None)
   * MoveDifferential odometry support, tracks robot's (x,y) position

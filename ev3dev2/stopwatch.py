@@ -2,16 +2,16 @@
 A StopWatch class for tracking the amount of time between events
 """
 
-try:
-    import datetime as dt
-    micropython = False
-except ImportError:
+from ev3dev2 import is_micropython
+
+if is_micropython():
     import utime
-    micropython = True
+else:
+    import datetime as dt
 
 
 def get_ticks_ms():
-    if micropython:
+    if is_micropython():
         return utime.ticks_ms()
     else:
         return int(dt.datetime.timestamp(dt.datetime.now()) * 1000)

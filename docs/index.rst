@@ -5,6 +5,7 @@
 .. toctree::
    :maxdepth: 3
 
+   micropython
    upgrading-to-stretch
    spec
    rpyc
