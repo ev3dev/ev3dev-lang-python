@@ -75,6 +75,7 @@ if is_micropython():
                 y (int): Where to start the top of the text
                 color (bool): ``True`` for white, otherwise black
                 font (int): The size of the font [0..2]
+
             """
             pass
 
@@ -485,7 +486,7 @@ else:
 
             - If font is a string, it is the name of a font to be loaded.
             - If font is a Font object, returned from :meth:`ev3dev2.fonts.load`, then it is
-            used directly.  This is desirable for faster display times.
+              used directly.  This is desirable for faster display times.
 
             """
 
@@ -518,7 +519,7 @@ else:
 
             - If font is a string, it is the name of a font to be loaded.
             - If font is a Font object, returned from :meth:`ev3dev2.fonts.load`, then it is
-            used directly.  This is desirable for faster display times.
+              used directly.  This is desirable for faster display times.
 
             """
 
