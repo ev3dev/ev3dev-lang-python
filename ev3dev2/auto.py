@@ -36,6 +36,7 @@ else:
     raise Exception("Unsupported platform '%s'" % platform)
 
 from ev3dev2.button import *
+from ev3dev2.console import *
 from ev3dev2.display import *
 from ev3dev2.fonts import *
 from ev3dev2.led import *
