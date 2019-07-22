@@ -2030,8 +2030,7 @@ class MoveTank(MotorSet):
         Example:
 
         .. code:: python
-        from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveTank, SpeedPercent
-        from ev3dev2.motor import LineFollowError, LineFollowErrorTooFast
+        from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveTank, SpeedPercent, follow_for_ms
         from ev3dev2.sensor.lego import ColorSensor
 
         tank = MoveTank(OUTPUT_A, OUTPUT_B)
