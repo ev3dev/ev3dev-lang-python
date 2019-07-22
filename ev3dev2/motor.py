@@ -1827,9 +1827,9 @@ def follow_for_ms(_tank, ms):
         stopwatch.start()
 
     if stopwatch.value_ms >= ms:
+        stopwatch = None
         return False
     else:
-        stopwatch = None
         return True
 
 
@@ -1992,7 +1992,7 @@ class MoveTank(MotorSet):
             off_line_count_max=20,
             sleep_time=0.01,
             follow_for=follow_for_forever,
-            **kwargs,
+            **kwargs
         ):
         """
         PID line follower
