@@ -40,6 +40,7 @@ except ImportError:
 from logging import getLogger
 from os.path import abspath
 from ev3dev2 import get_current_platform, Device, list_device_names
+from ev3dev2.stopwatch import StopWatch
 
 log = getLogger(__name__)
 
@@ -47,6 +48,7 @@ log = getLogger(__name__)
 # update to 'running' in the "on_for_XYZ" methods of the Motor class
 WAIT_RUNNING_TIMEOUT = 100
 
+stopwatch = None
 
 # OUTPUT ports have platform specific values that we must import
 platform = get_current_platform()
@@ -74,21 +76,6 @@ elif platform == 'fake':
 
 else:
     raise Exception("Unsupported platform '%s'" % platform)
-
-
-class LineFollowError(Exception):
-    """
-    Raised when a line following robot has lost the line
-    """
-    pass
-
-
-class LineFollowErrorTooFast(Exception):
-    """
-    Raised when a line following robot has been asked to follow
-    a line an an unrealistic speed
-    """
-    pass
 
 
 class SpeedValue(object):
@@ -1804,6 +1791,48 @@ class MotorSet(object):
         self.wait_until_not_moving()
 
 
+# line follower classes
+class LineFollowError(Exception):
+    """
+    Raised when a line following robot has lost the line
+    """
+    pass
+
+
+class LineFollowErrorTooFast(Exception):
+    """
+    Raised when a line following robot has been asked to follow
+    a line at an unrealistic speed
+    """
+    pass
+
+
+# line follower functions
+def follow_for_forever(_tank):
+    """
+    ``_tank``: the MoveTank object that is following a line
+    """
+    return True
+
+
+def follow_for_ms(_tank, ms):
+    """
+    ``_tank``: the MoveTank object that is following a line
+    ``ms`` : the number of milliseconds to follow the line
+    """
+    global stopwatch
+
+    if stopwatch is None:
+        stopwatch = StopWatch()
+        stopwatch.start()
+
+    if stopwatch.value_ms >= ms:
+        return False
+    else:
+        stopwatch = None
+        return True
+
+
 class MoveTank(MotorSet):
     """
     Controls a pair of motors simultaneously, via individual speed setpoints for each motor.
@@ -1956,12 +1985,14 @@ class MoveTank(MotorSet):
 
     def follow_line(self,
             kp, ki, kd,
-            speed, keep_following_function,
+            speed,
             target_light_intensity=None,
             follow_left_edge=True,
-            WHITE=60,
-            OFF_LINE_COUNT_MAX=20,
-            SLEEP_TIME=0.01
+            white=60,
+            off_line_count_max=20,
+            sleep_time=0.01,
+            follow_for=follow_for_forever,
+            **kwargs,
         ):
         """
         PID line follower
@@ -1970,26 +2001,53 @@ class MoveTank(MotorSet):
 
         ``speed`` is the desired speed of the midpoint of the robot
 
-        ``keep_following_function`` is called to determine if we should keep
-            following the line or stop
-
         ``target_light_intensity`` is the reflected light intensity when the color sensor
             is on the edge of the line.  If this is None we assume that the color sensor
             is on the edge of the line and will take a reading to set this variable.
 
         ``follow_left_edge`` determines if we follow the left or right edge of the line
 
-        ``WHITE`` is the reflected_light_intensity that is used to determine if we have
+        ``white`` is the reflected_light_intensity that is used to determine if we have
             lost the line
 
         ``OFF_LINE_COUNT`` is how many consecutive times through the loop the
-            reflected_light_intensity must be greater than ``WHITE`` before we
+            reflected_light_intensity must be greater than ``white`` before we
             declare the line lost and raise an exception
 
-        ``SLEEP_TIME`` is how many seconds we sleep on each pass through
+        ``sleep_time`` is how many seconds we sleep on each pass through
             the loop.  This is to give the robot a chance to react
             to the new motor settings. This should be something small such
             as 0.01 (10ms).
+
+        ``follow_for`` is called to determine if we should keep following the
+            line or stop.  This function will be passed ``self`` (the current
+            ``MoveTank`` object). Current supported options are:
+            - ``follow_for_forever``
+            - ``follow_for_ms``
+
+        ``**kwargs`` will be passed to the ``follow_for`` function
+
+        Example:
+
+        .. code:: python
+        from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveTank, SpeedPercent
+        from ev3dev2.motor import LineFollowError, LineFollowErrorTooFast
+        from ev3dev2.sensor.lego import ColorSensor
+
+        tank = MoveTank(OUTPUT_A, OUTPUT_B)
+        tank.cs = ColorSensor()
+
+        try:
+            # Follow the line for 4500ms
+            tank.follow_line(
+                kp=11.3, ki=0.05, kd=3.2,
+                speed=SpeedPercent(30),
+                follow_for=follow_for_ms,
+                ms=4500
+            )
+        except Exception:
+            tank.stop()
+            raise
         """
         assert self.cs, "ColorSensor must be defined"
 
@@ -2003,7 +2061,7 @@ class MoveTank(MotorSet):
         speed_native_units = speed.to_native_units(self.left_motor)
         MAX_SPEED = SpeedNativeUnits(self.max_speed)
 
-        while keep_following_function(self):
+        while follow_for(self, **kwargs):
             reflected_light_intensity = self.cs.reflected_light_intensity
             error = target_light_intensity - reflected_light_intensity
             integral = integral + error
@@ -2028,17 +2086,17 @@ class MoveTank(MotorSet):
                 raise LineFollowErrorTooFast("The robot is moving too fast to follow the line")
 
             # Have we lost the line?
-            if reflected_light_intensity >= WHITE:
+            if reflected_light_intensity >= white:
                 off_line_count += 1
 
-                if off_line_count >= OFF_LINE_COUNT_MAX:
+                if off_line_count >= off_line_count_max:
                     self.stop()
                     raise LineFollowError("we lost the line")
             else:
                 off_line_count = 0
 
-            if SLEEP_TIME:
-                time.sleep(SLEEP_TIME)
+            if sleep_time:
+                time.sleep(sleep_time)
 
             self.on(left_speed, right_speed)
 
@@ -2347,7 +2405,7 @@ class MoveDifferential(MoveTank):
 
     def odometry_start(self, theta_degrees_start=90.0,
             x_pos_start=0.0, y_pos_start=0.0,
-            SLEEP_TIME=0.005):  # 5ms
+            sleep_time=0.005):  # 5ms
         """
         Ported from:
         http://seattlerobotics.org/encoder/200610/Article3/IMU%20Odometry,%20by%20David%20Anderson.htm
@@ -2377,8 +2435,8 @@ class MoveDifferential(MoveTank):
 
                 # Have we moved?
                 if not left_ticks and not right_ticks:
-                    if SLEEP_TIME:
-                        time.sleep(SLEEP_TIME)
+                    if sleep_time:
+                        time.sleep(sleep_time)
                     continue
 
                 # log.debug("%s: left_ticks %s (from %s to %s)" %
@@ -2411,8 +2469,8 @@ class MoveDifferential(MoveTank):
                 self.x_pos_mm += mm * math.cos(self.theta)
                 self.y_pos_mm += mm * math.sin(self.theta)
 
-                if SLEEP_TIME:
-                    time.sleep(SLEEP_TIME)
+                if sleep_time:
+                    time.sleep(sleep_time)
 
             self.odometry_thread_id = None
 
