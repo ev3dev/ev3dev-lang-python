@@ -2030,23 +2030,24 @@ class MoveTank(MotorSet):
         Example:
 
         .. code:: python
-        from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveTank, SpeedPercent, follow_for_ms
-        from ev3dev2.sensor.lego import ColorSensor
 
-        tank = MoveTank(OUTPUT_A, OUTPUT_B)
-        tank.cs = ColorSensor()
+            from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveTank, SpeedPercent, follow_for_ms
+            from ev3dev2.sensor.lego import ColorSensor
 
-        try:
-            # Follow the line for 4500ms
-            tank.follow_line(
-                kp=11.3, ki=0.05, kd=3.2,
-                speed=SpeedPercent(30),
-                follow_for=follow_for_ms,
-                ms=4500
-            )
-        except Exception:
-            tank.stop()
-            raise
+            tank = MoveTank(OUTPUT_A, OUTPUT_B)
+            tank.cs = ColorSensor()
+
+            try:
+                # Follow the line for 4500ms
+                tank.follow_line(
+                    kp=11.3, ki=0.05, kd=3.2,
+                    speed=SpeedPercent(30),
+                    follow_for=follow_for_ms,
+                    ms=4500
+                )
+            except Exception:
+                tank.stop()
+                raise
         """
         assert self.cs, "ColorSensor must be defined"
 
