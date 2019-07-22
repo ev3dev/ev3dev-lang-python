@@ -2010,7 +2010,7 @@ class MoveTank(MotorSet):
         ``white`` is the reflected_light_intensity that is used to determine if we have
             lost the line
 
-        ``OFF_LINE_COUNT`` is how many consecutive times through the loop the
+        ``off_line_count_max`` is how many consecutive times through the loop the
             reflected_light_intensity must be greater than ``white`` before we
             declare the line lost and raise an exception
 
