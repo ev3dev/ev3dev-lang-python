@@ -9,5 +9,8 @@ ${OUT}/%.mpy: %.py
 	@mkdir -p $(dir $@)
 	${MPYCROSS} ${MPYC_FLAGS} -o $@ $<
 
-install: ${MPYS}
+install:
+	python3 setup.py install
+
+micropython-install: ${MPYS}
 	cp -R $(OUT)/* /usr/lib/micropython/

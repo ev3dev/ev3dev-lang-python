@@ -67,7 +67,7 @@ In an SSH Terminal window with an EV3 with Internet access, run the following co
 ```shell
 git clone https://github.com/ev3dev/ev3dev-lang-python.git
 cd ev3dev-lang-python
-sudo make
+sudo make micropython-install
 ```
 
 To update the module, use the following commands:
@@ -75,5 +75,5 @@ To update the module, use the following commands:
 ```shell
 cd ev3dev-lang-python
 git pull
-sudo make
+sudo make micropython-install
 ```
