@@ -11,12 +11,14 @@ Examples:
     #!/usr/bin/env micropython
     from ev3dev2.console import Console
 
-    # create a Console instance, which uses the default font, clears the screen,
-    # and turns off the cursor
+    # create a Console instance, which uses the default font
     console = Console()
 
-    # display 'Hello World!' at row 5, column 1 in inverse, but clear the console first
-    console.text_at('Hello World!', row=5, column=1, clear_screen=True, inverse=True)
+    # reset the console to clear it, home the cursor at 1,1, and then turn off the cursor
+    console.reset_console()
+
+    # display 'Hello World!' at row 5, column 1 in inverse, but reset the EV3 LCD console first
+    console.text_at('Hello World!', column=1, row=5, reset_console=True, inverse=True)
 
 .. code-block:: py
 
@@ -38,12 +40,12 @@ Examples:
         left = color_sensor_left.reflected_light_intensity
         right = color_sensor_right.reflected_light_intensity
 
-        # show angle in inverse color when pointing at 0
-        console.text_at("G: %03d" % (angle), column=5, row=1, clear_screen=True, text_color=(angle == 0))
+        # show angle; in inverse color when pointing at 0
+        console.text_at("G: %03d" % (angle), column=5, row=1, reset_console=True, inverse=(angle == 0))
 
-        # show light intensity values in inverse when 'dark'
-        console.text_at("L: %02d" % (left), column=0, row=3, clear_screen=False, inverse=(left < 10))
-        console.text_at("R: %02d" % (right), clear_screen=False, x=10, y=3, inverse=(right < 10))
+        # show light intensity values; in inverse when 'dark'
+        console.text_at("L: %02d" % (left), column=0, row=3, reset_console=False, inverse=(left < 10))
+        console.text_at("R: %02d" % (right), column=10, row=3, reset_console=False, inverse=(right < 10))
 
         sleep(0.5)
 
@@ -61,42 +63,9 @@ font. Each font face is available in multiple sizes.
 For Codeset information, see
 `<https://www.systutorials.com/docs/linux/man/5-console-setup/#lbAP>`.
 
-- Lat15: Covers entirely ISO-8859-1, ISO-8859-9 and ISO-8859-15. Suitable for
-  the so called Latin1 and Latin5 languages - Afar, Afrikaans, Albanian,
-  Aragonese, Asturian, Aymara, Basque, Bislama, Breton, Catalan, Chamorro,
-  Danish, Dutch, English, Estonian, Faroese, Fijian, Finnish, French, Frisian,
-  Friulian, Galician, German, Hiri Motu, Icelandic, Ido, Indonesian,
-  Interlingua, Interlingue, Italian, Low Saxon, Lule Sami, Luxembourgish,
-  Malagasy, Manx Gaelic, Norwegian Bokmal, Norwegian Nynorsk, Occitan, Oromo
-  or Galla, Portuguese, Rhaeto-Romance (Romansch), Scots Gaelic, Somali,
-  South Sami, Spanish, Swahili, Swedish, Tswana, Turkish, Volapuk, Votic,
-  Walloon, Xhosa, Yapese and Zulu. Completely covered by the following font
-  faces: Fixed (all sizes), Terminus (all sizes), TerminusBold (all sizes),
-  TerminusBoldVGA (all sizes), VGA (sizes 8x16 and 16x32).
-
-- Lat2: Covers entirely ISO-8859-2. The Euro sign and the Romanian letters with
-  comma below are also supported. Suitable for the so called Latin2 languages:
-  Bosnian, Croatian, Czech, Hungarian, Polish, Romanian, Slovak, Slovenian and
-  Sorbian (lower and upper). Completely covered by the following font faces:
-  Fixed (all sizes), Terminus (all sizes), TerminusBold (all sizes),
-  TerminusBoldVGA (all sizes), VGA (sizes 8x16 and 16x32).
-
-- Lat38: Covers entirely ISO-8859-3 and ISO-8859-14. Suitable for Chichewa
-  Esperanto, Irish, Maltese and Welsh. Completely covered by the following font
-  faces: Fixed (all sizes) and VGA (sizes 8x16 and 16x32).
-
-- Lat7: Covers entirely ISO-8859-13. Suitable for Lithuanian, Latvian, Maori
-  and Marshallese. Completely covered by the following font faces: Fixed (all
-  sizes), Terminus (all sizes), TerminusBold (all sizes), TerminusBoldVGA (all
-  sizes), VGA (sizes 8x16 and 16x32).
-
-- There are other codesets suitable for other languages including: Arabic,
-  Armenian, CyrAsia, CyrKoi, CyrSlav, Ethiopian, Georgian, Greek, Hebrew, Lao,
-  Thai, Uni1, Uni2, Uni3, and Vietnamese.
-
-Note: Terminus fonts are "thinner"; TerminusBold and VGA offer more contrast on
-the LCD console and are thus more readable; the TomThumb font is too small to
-read!
+Note: `Terminus` fonts are "thinner"; `TerminusBold` and `VGA` offer more
+contrast on the LCD console and are thus more readable; the `TomThumb` font is
+too small to read!
 
 Depending on the font used, the EV3 LCD console will support various maximum
 rows and columns, as follows for the `Lat15` fonts. See
@@ -170,12 +139,11 @@ Example:
     #!/usr/bin/env micropython
     from ev3dev2.console import Console
 
-    # create a Console instance, which uses the default font, clears the screen,
-    # and turns off the cursor
+    # create a Console instance, which uses the default font
     console = Console()
 
-    # change the console font
-    console.set_font('Lat15-TerminusBold16.psf.gz')
+    # change the console font and reset the console to clear it and turn off the cursor
+    console.set_font('Lat15-TerminusBold16.psf.gz', True)
 
-    # display 'Hello World!' at  column 1, row 5
+    # display 'Hello World!' at column 1, row 5
     console.text_at('Hello World!', column=1, row=5)

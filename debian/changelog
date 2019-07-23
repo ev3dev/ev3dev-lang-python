@@ -7,7 +7,7 @@ python-ev3dev2 (2.0.0~beta4) UNRELEASED; urgency=medium
   * StopWatch class
   * Avoid race condition due to poll(None)
   * MoveDifferential odometry support, tracks robot's (x,y) position
-  * Display support via raspberry pi HDMI 
+  * Display support via raspberry pi HDMI
   * Update tests/README to include sphinx-build instructions
   * LED animation support, brickpi3 LED corrected from BLUE to AMBER
   * Sound: fallback to regular case of 'note' if uppercase is not found
@@ -15,6 +15,14 @@ python-ev3dev2 (2.0.0~beta4) UNRELEASED; urgency=medium
 
   [David Lechner]
   * Fix and document ev3dev2.sensors.lego.GyroSensor.reset()
+
+  [Brady Merkel]
+  * Added the Console() class for positional text display and font support
+    on the EV3 LCD console
+  * Added a utility program to demonstrate the Console() functionality and
+    show the various system fonts
+  * Added documentation for the Console() class
+  * Updated the micropython documentation to reflect the Console() class
 
  -- Kaelin Laundry <wasabifan@outlook.com>  Sun, 24 Mar 2019 00:25:00 -0800
 
@@ -35,7 +43,7 @@ python-ev3dev2 (2.0.0~beta3) stable; urgency=medium
   * brickpi(3) raise exception if LargeMotor not used for a motor
   * MoveJoyStick should use SpeedPercent
   * renamed GyroSensor rate_and_angle to angle_and_rate
-  
+
   [Kaelin Laundry]
   * Added new binary package for Micropython
 

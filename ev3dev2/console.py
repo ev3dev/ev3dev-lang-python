@@ -29,25 +29,25 @@ import os
 class Console():
     """
     A class that represents the EV3 LCD console, which implements ANSI codes
-    for cursor positioning, text color, and clearing the screen. Supports changing
+    for cursor positioning, text color, and resetting the screen. Supports changing
     the console font using standard system fonts.
     """
 
     def __init__(self, font="Lat15-TerminusBold24x12"):
         """
         Construct the Console instance, optionally with a font name specified.
-        This also resets the console: clearing it and turning off the cursor.
+
         Parameter:
 
         - `font` (string): Font name, as found in `/usr/share/consolefonts/`
 
         """
         self._font = None
-        self.set_font(font)
+        self.set_font(font, False)  # don't reset the screen during construction
 
-    def text_at(self, text, column=1, row=1, clear_screen=False, inverse=False):
+    def text_at(self, text, column=1, row=1, reset_console=False, inverse=False):
         """
-        Display 'text' (string) starting at grid (column, row).
+        Display `text` (string) starting at grid (`column`, `row`).
         Note that the grid locations are 1-based (not 0-based).
 
         Depending on the font, the EV3 LCD console can show text within 4 to 21 rows, and 11 to 44 columns.
@@ -59,46 +59,51 @@ class Console():
         - `column` (int): LCD column position to start the text (1 = left column);
           text will wrap when it reaches the right edge
         - `row` (int): LCD row position to start the text (1 = top row)
-        - `clear_screen` (bool): ``True`` to clear the screen before showing the text; default is ``False``
+        - `reset_console` (bool): ``True`` to reset the EV3 LCD console before showing
+          the text; default is ``False``
         - `inverse` (bool): ``True`` for white, otherwise black; default is ``False``
 
         """
 
-        if clear_screen:
-            self.reset_screen()
+        if reset_console:
+            self.reset_console()
 
         if inverse:
             text = "\x1b[7m%s\x1b[m" % (text)
 
         print("\x1b[%d;%dH%s" % (row, column, text), end='')
 
-    def set_font(self, font):
+    def set_font(self, font, reset_console=True):
         """
-        Set the LCD console font, clear the screen and turn off the cursor.
+        Set the EV3 LCD console font and optionally reset the EV3 LCD console
+        to clear it and turn off the cursor.
         Parameter:
 
         - `font` (string): Font name, as found in `/usr/share/consolefonts/`
+        - `reset_console` (bool): ``True`` to reset the EV3 LCD console
+          after the font change; default is ``True``
 
         """
         if font is not None and font != self._font:
             self._font = font
             os.system("setfont %s" % (font))
-        self.reset_screen()
+
+        if reset_console:
+            self.reset_console()
 
     def set_cursor(self, on=False):
         """
-        Use ANSI codes to turn LCD console cursor on or off
+        Use ANSI codes to turn the EV3 LCD console cursor on or off
         Parameter:
 
-        - `on` (bool): ``True`` to turn on the screen cursor; default is ``False``
+        - `on` (bool): ``True`` to turn on the cursor; default is ``False``
 
         """
-        # use escape code to turn cursor on or off
         print("\x1b[?25%s" % ('h' if on else 'l'), end='')
 
-    def reset_screen(self):
+    def reset_console(self):
         """
-        Clear the EV3 LCD console using ANSI codes and turn off the cursor.
+        Use ANSI codes to clear the EV3 LCD console, move the cursor to 1,1, then turn off the cursor.
         """
         print("\x1b[2J\x1b[H", end='')
         self.set_cursor(False)

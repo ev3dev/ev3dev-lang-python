@@ -15,28 +15,6 @@ font face is available in certain possible sizes.
 
 For Codeset clarity, see https://www.systutorials.com/docs/linux/man/5-console-setup/#lbAP
 
-    Lat15: Covers entirely ISO-8859-1, ISO-8859-9 and ISO-8859-15. Suitable for the so called Latin1 and
-    Latin5 languages - Afar, Afrikaans, Albanian, Aragonese, Asturian, Aymara, Basque, Bislama, Breton, Catalan,
-    Chamorro, Danish, Dutch, English, Estonian, Faroese, Fijian, Finnish, French, Frisian, Friulian, Galician,
-    German, Hiri Motu, Icelandic, Ido, Indonesian, Interlingua, Interlingue, Italian, Low Saxon, Lule Sami,
-    Luxembourgish, Malagasy, Manx Gaelic, Norwegian Bokmal, Norwegian Nynorsk, Occitan, Oromo or Galla,
-    Portuguese, Rhaeto-Romance (Romansch), Scots Gaelic, Somali, South Sami, Spanish, Swahili, Swedish, Tswana,
-    Turkish, Volapuk, Votic, Walloon, Xhosa, Yapese and Zulu. Completely covered by the following font faces:
-    Fixed (all sizes), Terminus (all sizes), TerminusBold (all sizes), TerminusBoldVGA (all sizes),
-    VGA (sizes 8x16 and 16x32).
-
-    Lat2: Covers entirely ISO-8859-2. The Euro sign and the Romanian letters with comma below are also supported.
-    Suitable for the so called Latin2 languages - Bosnian, Croatian, Czech, Hungarian, Polish, Romanian,
-    Slovak, Slovenian and Sorbian (lower and upper). Completely covered by the following font faces:
-    Fixed (all sizes), Terminus (all sizes), TerminusBold (all sizes), TerminusBoldVGA (all sizes),
-    VGA (sizes 8x16 and 16x32).
-
-    Lat38: Covers entirely ISO-8859-3 and ISO-8859-14. Suitable for Chichewa Esperanto, Irish, Maltese and Welsh.
-    Completely covered by the following font faces: Fixed (all sizes) and VGA (sizes 8x16 and 16x32).
-
-    Lat7: Covers entirely ISO-8859-13. Suitable for Lithuanian, Latvian, Maori and Marshallese.
-    Completely covered by the following font faces: Fixed (all sizes), Terminus (all sizes),
-    TerminusBold (all sizes), TerminusBoldVGA (all sizes), VGA (sizes 8x16 and 16x32).
 """
 
 
@@ -50,7 +28,7 @@ def calc_fonts():
     files = [f for f in listdir("/usr/share/consolefonts/") if f.startswith("Lat15") and f.endswith(".psf.gz")]
     files.sort()
     for font in files:
-        console.set_font(font)
+        console.set_font(font, True)
 
         # position cursor at 50, 50, and ask the console to report its actual cursor position
         console.text_at("\x1b[6n", 50, 50, False)
@@ -74,8 +52,8 @@ def calc_fonts():
 def show_fonts():
     """
     Iterate over the known Latin "1 & 5" fonts and display each on the EV3 LCD console.
-    Note: Terminus fonts are "thinner"; TerminusBold and VGA offer more contrast on the LCD console
-    and are thus more readable; the TomThumb font is waaaaay too small to read!
+    Note: `Terminus` fonts are "thinner"; `TerminusBold` and `VGA` offer more contrast on the LCD console
+    and are thus more readable; the `TomThumb` font is waaaaay too small to read!
     """
     # Create a list of tuples with calulated rows, columns, font filename
     fonts = [
@@ -113,7 +91,7 @@ def show_fonts():
     console = Console()
     for rows, cols, font in fonts:
         print(rows, cols, font, file=stderr)
-        console.set_font(font)
+        console.set_font(font, True)
         for row in range(1, rows+1):
             for col in range(1, cols+1):
                 console.text_at("%d" % (col % 10), col, row, False, (row % 2 == 0))
@@ -121,11 +99,12 @@ def show_fonts():
         sleep(.5)
 
 
-# Uncomment the calc_fonts() call to iterate through each font
+# Uncomment the calc_fonts() call to iterate through each system font
 # and use ANSI codes to find the max row/column the screen will accommodate for
 # each font. Remember to press the center EV3 button for each font.
 # Also, you may want to adjust the `startswith` filter to show other codesets.
 # calc_fonts()
+
 
 # show the fonts
 show_fonts()
