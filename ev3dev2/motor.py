@@ -48,7 +48,6 @@ log = getLogger(__name__)
 # update to 'running' in the "on_for_XYZ" methods of the Motor class
 WAIT_RUNNING_TIMEOUT = 100
 
-stopwatch = None
 
 # OUTPUT ports have platform specific values that we must import
 platform = get_current_platform()
@@ -1792,7 +1791,7 @@ class MotorSet(object):
 
 
 # line follower classes
-class LineFollowError(Exception):
+class LineFollowErrorLostLine(Exception):
     """
     Raised when a line following robot has lost the line
     """
@@ -1808,26 +1807,24 @@ class LineFollowErrorTooFast(Exception):
 
 
 # line follower functions
-def follow_for_forever(_tank):
+def follow_for_forever(tank):
     """
-    ``_tank``: the MoveTank object that is following a line
+    ``tank``: the MoveTank object that is following a line
     """
     return True
 
 
-def follow_for_ms(_tank, ms):
+def follow_for_ms(tank, ms):
     """
-    ``_tank``: the MoveTank object that is following a line
+    ``tank``: the MoveTank object that is following a line
     ``ms`` : the number of milliseconds to follow the line
     """
-    global stopwatch
+    if not hasattr(tank, 'stopwatch') or tank.stopwatch is None:
+        tank.stopwatch = StopWatch()
+        tank.stopwatch.start()
 
-    if stopwatch is None:
-        stopwatch = StopWatch()
-        stopwatch.start()
-
-    if stopwatch.value_ms >= ms:
-        stopwatch = None
+    if tank.stopwatch.value_ms >= ms:
+        tank.stopwatch = None
         return False
     else:
         return True
@@ -2091,7 +2088,7 @@ class MoveTank(MotorSet):
 
                 if off_line_count >= off_line_count_max:
                     self.stop()
-                    raise LineFollowError("we lost the line")
+                    raise LineFollowErrorLostLine("we lost the line")
             else:
                 off_line_count = 0
 
