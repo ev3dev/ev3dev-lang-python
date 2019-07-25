@@ -46,34 +46,9 @@ You should modify the first line of your scripts to replace "python3" with "micr
 
 If you previously would have typed `python3 foo.py`, you should now type `micropython foo.py`.
 
-If you are running programs via an SSH shell, use the following command line to inform Brickman that your
-program needs control of the EV3:
+If you are running programs via an SSH shell to your EV3, use the following command line to
+prevent Brickman from interfering:
 
 ```shell
 brickrun -- ./program.py
-```
-
-### Displaying text on the EV3 LCD console
-
-The EV3 LCD console supports ANSI codes to position the cursor, clear the screen, show text with different fonts,
-and use reverse (white text on black background, versus the default black text on white background). See the file
-`utils/console_fonts.py` to see the fonts supported with sample calls to the `ev3dev2.Console()` class.
-
-### Building and installing the latest EV3DEV2 module on your EV3
-
-In an SSH Terminal window with an EV3 with Internet access, run the following commands:
-(recall that the `sudo` password is `maker`)
-
-```shell
-git clone https://github.com/ev3dev/ev3dev-lang-python.git
-cd ev3dev-lang-python
-sudo make micropython-install
-```
-
-To update the module, use the following commands:
-
-```shell
-cd ev3dev-lang-python
-git pull
-sudo make micropython-install
 ```

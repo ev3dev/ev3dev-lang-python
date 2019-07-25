@@ -1,3 +1,5 @@
+# Makefile to assist developers while modifying and testing changes before release
+# Note: to re-install a release of EV3DEV2, use `sudo apt-get --reinstall install python3-ev3dev2`
 OUT := build
 MPYCROSS := /usr/bin/mpy-cross
 MPYC_FLAGS := -v -v -mcache-lookup-bc

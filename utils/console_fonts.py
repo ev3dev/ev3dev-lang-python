@@ -32,7 +32,8 @@ def calc_fonts():
 
         # position cursor at 50, 50, and ask the console to report its actual cursor position
         console.text_at("\x1b[6n", 50, 50, False)
-        console.text_at(font + " ", 1, 1, False, True)
+        console.text_at(font, 1, 1, False, True)
+        console.clear_to_eol()
 
         # now, read the console response of the actual cursor position, in the form of esc[rr;ccR
         # requires pressing the center button on the EV3 for each read
@@ -45,7 +46,7 @@ def calc_fonts():
                 break
             dims += str(ch)
         (rows, cols) = dims.split(";")
-        print("(%s, %s, \"%s\")," % (rows, cols, font), file=stderr)
+        print("({}, {}, \"{}\"),".format(rows, cols, font), file=stderr)
         sleep(.5)
 
 
@@ -94,8 +95,9 @@ def show_fonts():
         console.set_font(font, True)
         for row in range(1, rows+1):
             for col in range(1, cols+1):
-                console.text_at("%d" % (col % 10), col, row, False, (row % 2 == 0))
-        console.text_at(font.split(".")[0] + " ", 1, 1, False, True)
+                console.text_at("{}".format(col % 10), col, row, False, (row % 2 == 0))
+        console.text_at(font.split(".")[0], 1, 1, False, True)
+        console.clear_to_eol()
         sleep(.5)
 
 
