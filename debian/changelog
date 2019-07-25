@@ -23,6 +23,8 @@ python-ev3dev2 (2.0.0~beta4) UNRELEASED; urgency=medium
     show the various system fonts
   * Added documentation for the Console() class
   * Updated the micropython documentation to reflect the Console() class
+  * Updated the CONTRIBUTING documentation with guidance using the makefile
+    to build and install the module while developing enancements
 
  -- Kaelin Laundry <wasabifan@outlook.com>  Sun, 24 Mar 2019 00:25:00 -0800
 
