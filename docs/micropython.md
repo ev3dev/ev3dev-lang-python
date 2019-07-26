@@ -14,7 +14,7 @@ Module                          Support status
 `ev3dev2.console`               ✔️️
 `ev3dev2.control` [1]_          ⚠️
 `ev3dev2.display` [2]_          ❌
-`ev3dev2.fonts` [3]_            ⚠️
+`ev3dev2.fonts` [3]_            ❌
 `ev3dev2.led`                   ✔️
 `ev3dev2.motor`                 ✔️
 `ev3dev2.port`                  ✔️
@@ -26,8 +26,8 @@ Module                          Support status
 ==============================  =================
 
 .. [1] Untested/low-priority, but some of it might work.
-.. [2] Display() isn't implemented. Use ``ev3dev2.console`` for text-only, using ANSI codes to the EV3 LCD console.
-.. [3] It might work, but isn't useful without ``ev3dev2.display``.
+.. [2] ``ev3dev2.display`` isn't implemented. Use ``ev3dev2.console`` for text-only, using ANSI codes to the EV3 LCD console.
+.. [3] ``ev3dev2.console`` supports the system fonts, but the fonts for ``ev3dev2.display`` do not work.
 ```
 
 ## Differences from standard Python (CPython)

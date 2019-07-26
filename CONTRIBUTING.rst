@@ -55,7 +55,7 @@ PR is merged.
 Building and testing changes on the EV3
 ---------------------------------------
 
-In an SSH Terminal window with an EV3 with Internet access,
+In an SSH terminal window with an EV3 with Internet access,
 run the following commands:
 (recall that the default `sudo` password is `maker`)
 

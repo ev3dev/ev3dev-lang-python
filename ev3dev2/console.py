@@ -70,7 +70,7 @@ class Console():
         - `row` (int): LCD row position to start the text (1 = top row)
         - `reset_console` (bool): ``True`` to reset the EV3 LCD console before showing
           the text; default is ``False``
-        - `inverse` (bool): ``True`` for white on blac, otherwise black on white;
+        - `inverse` (bool): ``True`` for white on black, otherwise black on white;
           default is ``False``
         - `alignment` (string): Align the `text` horizontally. Use `L` for left-alignment (default),
           `R` for right-alignment, or `C` for center-alignment

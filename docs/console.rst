@@ -24,7 +24,7 @@ Examples:
 
     #!/usr/bin/env micropython
     from time import sleep
-    from ev3dev2._platform.ev3 import INPUT_1, INPUT_2, INPUT_3
+    from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3
     from ev3dev2.console import Console
     from ev3dev2.sensor.lego import GyroSensor, ColorSensor
 
