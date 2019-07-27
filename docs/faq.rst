@@ -19,21 +19,6 @@ Q: Why does my Python program exit quickly or immediately throw an error?
     Most other editors have similar options; there may be an option for it in the
     status bar at the bottom of the window or in the menu bar at the top.
 
-Q: Where can I find demo code?
-    A: There are several demo programs that you can run to get acquainted with
-    this language binding. The programs are available
-    `at this GitHub site <https://github.com/ev3dev/ev3dev-lang-python-demo>`_.
-
-    You can also copy and run the programs in the `utils` directory to
-    understand some of the code constructs to use the EV3 motors, sensors,
-    LCD console, buttons, sound, and LEDs.
-
-    We also highly recommend `ev3python.com`_ where one of our community
-    members, @ndward, has put together a great website with detailed guides
-    on using this library which are targeted at beginners. If you are just
-    getting started with programming, we highly recommend that you check
-    it out at `ev3python.com`_!
-
 Q: Where can I learn more about the ev3dev operating system?
     A: `ev3dev.org`_ is a great resource for finding guides and tutorials on
     using ev3dev, straight from the maintainers.

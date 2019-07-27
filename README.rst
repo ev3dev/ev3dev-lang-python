@@ -178,6 +178,24 @@ Library Documentation
 ** `our Read the Docs page`_ **.** You can always go there to get
 information on how you can use this library's functionality.
 
+Demo Code
+---------
+
+There are several demo programs that you can run to get acquainted with
+this language binding. The programs are available
+`at this GitHub site <https://github.com/ev3dev/ev3dev-lang-python-demo>`_.
+
+You can also copy and run the programs in the `utils` directory to
+understand some of the code constructs to use the EV3 motors, sensors,
+LCD console, buttons, sound, and LEDs.
+
+We also highly recommend `ev3python.com`_ where one of our community
+members, @ndward, has put together a great website with detailed guides
+on using this library which are targeted at beginners. If you are just
+getting started with programming, we highly recommend that you check
+it out at `ev3python.com`_!
+
+
 Frequently-Asked Questions
 --------------------------
 
