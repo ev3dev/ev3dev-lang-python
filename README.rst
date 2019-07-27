@@ -165,21 +165,8 @@ If you want to make your robot speak, you can use the ``Sound.speak`` method:
   sound = Sound()
   sound.speak('Welcome to the E V 3 dev project!')
 
-Using Micropython
------------------
-
-Normal Python too slow? Review `Micropython`_ to see if it supports the
-features your project needs.
-
-Library Documentation
----------------------
-
-**Class documentation for this library can be found on
-** `our Read the Docs page`_ **.** You can always go there to get
-information on how you can use this library's functionality.
-
-Demo Code
----------
+More Demo Code
+~~~~~~~~~~~~~~
 
 There are several demo programs that you can run to get acquainted with
 this language binding. The programs are available
@@ -194,6 +181,19 @@ members, @ndward, has put together a great website with detailed guides
 on using this library which are targeted at beginners. If you are just
 getting started with programming, we highly recommend that you check
 it out at `ev3python.com`_!
+
+Using Micropython
+-----------------
+
+Normal Python too slow? Review `Micropython`_ to see if it supports the
+features your project needs.
+
+Library Documentation
+---------------------
+
+**Class documentation for this library can be found on
+** `our Read the Docs page`_ **.** You can always go there to get
+information on how you can use this library's functionality.
 
 
 Frequently-Asked Questions
