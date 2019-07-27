@@ -94,7 +94,8 @@ class Console():
         """
         Set the EV3 LCD console font and optionally reset the EV3 LCD console
         to clear it and turn off the cursor.
-        Parameter:
+
+        Parameters:
 
         - `font` (string): Font name, as found in `/usr/share/consolefonts/`
         - `reset_console` (bool): ``True`` to reset the EV3 LCD console
@@ -110,7 +111,7 @@ class Console():
 
     def show_cursor(self, on=False):
         """
-        Use ANSI codes to turn the EV3 LCD console cursor on or off
+        Use ANSI codes to turn the EV3 LCD console cursor on or off.
 
         Parameter:
 
@@ -119,12 +120,19 @@ class Console():
         """
         print("\x1b[?25{}".format('h' if on else 'l'), end='')
 
-    def clear_to_eol(self):
+    def clear_to_eol(self, column=None, row=None):
         """
-        Clear to the end of line from the current cursor position
-        on the EV3 LCD console
+        Clear to the end of line from the `column` and `row` position
+        on the EV3 LCD console. Default to current cursor position.
+
+        Parameters:
+
+        - `column` (int): LCD column position to move to before clearing
+        - `row` (int): LCD row position to move to before clearing
 
         """
+        if column is not None and row is not None:
+            print("\x1b[{};{}H".format(row, column), end='')
         print("\x1b[K", end='')
 
     def reset_console(self):
