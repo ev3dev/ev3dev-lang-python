@@ -52,7 +52,7 @@ class Console():
 
         Using the `inverse=True` parameter will display the `text` with more emphasis and contrast,
         as the background of the text will be black, and the foreground is white. Using inverse
-        can help in certain situations--such as to indicate when a color sensor senses
+        can help in certain situations, such as to indicate when a color sensor senses
         black, or the gyro sensor is pointing to zero.
 
         Use the `alignment` parameter to enable the function to align the `text` differently to the
@@ -81,9 +81,9 @@ class Console():
             self.reset_console()
 
         if alignment == "R":
-            col = col - len(text) + 1
+            column = column - len(text) + 1
         elif alignment == "C":
-            col -= len(text) // 2
+            column -= len(text) // 2
 
         if inverse:
             text = "\x1b[7m{}\x1b[m".format(text)
