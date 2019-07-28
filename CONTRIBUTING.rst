@@ -13,7 +13,7 @@ The ``ev3dev-stretch`` branch
 -----------------------------
 
 This is where the latest version of our library lives. It targets
-`ev3dev-stretch`, which is currently considered a beta. Nonetheless,
+``ev3dev-stretch``, which is currently considered a beta. Nonetheless,
 it is very stable and isn't expected to have significant breaking
 changes. We publish releases from this branch.
 
@@ -55,7 +55,7 @@ Building and testing changes on the EV3
 
 In an SSH terminal window with an EV3 with Internet access,
 run the following commands:
-(recall that the default `sudo` password is `maker`)
+(recall that the default ``sudo`` password is ``maker``)
 
 ```shell
 git clone https://github.com/ev3dev/ev3dev-lang-python.git
