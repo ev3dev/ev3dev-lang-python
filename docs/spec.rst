@@ -16,6 +16,7 @@ Device interfaces
     power-supply
     sound
     display
+    console
     ports
     port-names
     wheels
