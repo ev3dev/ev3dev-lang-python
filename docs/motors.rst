@@ -10,7 +10,10 @@ Motor classes
 Units
 -----
 
-Most methods which run motors will accept a ``speed`` argument. While this can be provided as an integer which will be interpreted as a percentage of max speed, you can also specify an instance of any of the following classes, each of which represents a different unit system:
+Most methods which run motors will accept a ``speed`` argument. While this can
+be provided as an integer which will be interpreted as a percentage of max
+speed, you can also specify an instance of any of the following classes, each
+of which represents a different unit system:
 
 .. autoclass:: SpeedValue
 .. autoclass:: SpeedPercent
@@ -25,7 +28,7 @@ Example:
 .. code:: python
 
     from ev3dev2.motor import SpeedRPM
-    
+
     # later...
 
     # rotates the motor at 200 RPM (rotations-per-minute) for five seconds.
@@ -41,6 +44,7 @@ Tacho Motor (``Motor``)
 
 .. autoclass:: Motor
     :members:
+    :show-inheritance:
 
 Large EV3 Motor
 ~~~~~~~~~~~~~~~
@@ -64,24 +68,28 @@ DC Motor
 
 .. autoclass:: DcMotor
     :members:
+    :show-inheritance:
 
 Servo Motor
 ~~~~~~~~~~~
 
 .. autoclass:: ServoMotor
     :members:
+    :show-inheritance:
 
 Actuonix L12 50 Linear Servo Motor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: ActuonixL1250Motor
     :members:
+    :show-inheritance:
 
 Actuonix L12 100 Linear Servo Motor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: ActuonixL12100Motor
     :members:
+    :show-inheritance:
 
 Multiple-motor groups
 ---------------------
@@ -97,15 +105,25 @@ Move Tank
 
 .. autoclass:: MoveTank
     :members:
+    :show-inheritance:
 
 Move Steering
 ~~~~~~~~~~~~~
 
 .. autoclass:: MoveSteering
     :members:
+    :show-inheritance:
 
 Move Joystick
 ~~~~~~~~~~~~~
 
 .. autoclass:: MoveJoystick
     :members:
+    :show-inheritance:
+
+Move MoveDifferential
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: MoveDifferential
+    :members:
+    :show-inheritance:

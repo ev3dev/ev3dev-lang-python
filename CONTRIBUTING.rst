@@ -50,8 +50,6 @@ note of the format ``Fixes #24`` in the PR so that the PR links back
 to its relevant issue and will automatically close the issue when the
 PR is merged.
 
-.. _ev3dev: http://ev3dev.org
-
 Building and testing changes on the EV3
 ---------------------------------------
 
@@ -95,3 +93,5 @@ following commands:
 sudo apt update
 sudo apt install --only-upgrade micropython-ev3dev2
 ```
+
+.. _ev3dev: http://ev3dev.org
