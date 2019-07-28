@@ -10,7 +10,7 @@ take a moment to read our suggestions for happy maintainers and
 even happier users.
 
 The ``ev3dev-stretch`` branch
----------------------
+-----------------------------
 
 This is where the latest version of our library lives. It targets
 `ev3dev-stretch`, which is currently considered a beta. Nonetheless,
@@ -39,13 +39,12 @@ notes.
 If your change addresses an Issue
 ---------------------------------
 
-Bug fixes are always welcome, especially if they are against known 
+Bug fixes are always welcome, especially if they are against known
 issues!
 
-When you send a pull request that addresses an issue, please add a 
+When you send a pull request that addresses an issue, please add a
 note of the format ``Fixes #24`` in the PR so that the PR links back
 to its relevant issue and will automatically close the issue when the
 PR is merged.
 
 .. _ev3dev: http://ev3dev.org
-

@@ -14,17 +14,19 @@ A Python3 library implementing an interface for ev3dev_ devices,
 letting you control motors, sensors, hardware buttons, LCD
 displays and more from Python code.
 
-If you haven't written code in Python before, you'll need to learn the language
-before you can use this library.
+If you haven't written code in Python before, you can certainly use this
+library to help you learn the language!
 
 Getting Started
 ---------------
 
 This library runs on ev3dev_. Before continuing, make sure that you have set up
-your EV3 or other ev3dev device as explained in the `ev3dev Getting Started guide`_.
-Make sure you have an ev3dev-stretch version greater than ``2.2.0``. You can check
-the kernel version by selecting "About" in Brickman and scrolling down to the
-"kernel version". If you don't have a compatible version, `upgrade the kernel before continuing`_.
+your EV3 or other ev3dev device as explained in the
+`ev3dev Getting Started guide`_. Make sure you have an ev3dev-stretch version
+greater than ``2.2.0``. You can check the kernel version by selecting
+"About" in Brickman and scrolling down to the "kernel version".
+If you don't have a compatible version,
+`upgrade the kernel before continuing`_.
 
 Usage
 -----
@@ -36,8 +38,8 @@ once you have that set up.
 
 Otherwise, you can can work with files `via an SSH connection`_ with an editor
 such as `nano`_, use the Python interactive REPL (type ``python3``), or roll
-your own solution. If you don't know how to do that, you are probably better off
-choosing the recommended option above.
+your own solution. If you don't know how to do that, you are probably
+better off choosing the recommended option above.
 
 The template for a Python script
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -64,16 +66,19 @@ or additional utilities.
 
 You should use the ``.py`` extension for your file, e.g. ``my-file.py``.
 
-If you encounter an error such as ``/usr/bin/env: 'python3\r': No such file or directory``,
-you must switch your editor's "line endings" setting for the file from "CRLF" to just "LF".
-This is usually in the status bar at the bottom. For help, see `our FAQ page`_.
+If you encounter an error such as
+``/usr/bin/env: 'python3\r': No such file or directory``,
+you must switch your editor's "line endings" setting for the file from
+"CRLF" to just "LF". This is usually in the status bar at the bottom.
+For help, see `our FAQ page`_.
 
 Important: Make your script executable (non-Visual Studio Code only)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To be able to run your Python file, **your program must be executable**. If
-you are using the `ev3dev Visual Studio Code extension`_, you can skip this step,
-as it will be automatically performed when you download your code to the brick.
+you are using the `ev3dev Visual Studio Code extension`_, you can skip this
+step, as it will be automatically performed when you download your code to the
+brick.
 
 **To mark a program as executable from the command line (often an SSH session),
 run** ``chmod +x my-file.py``.
@@ -85,8 +90,8 @@ Controlling the LEDs with a touch sensor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This code will turn the LEDs red whenever the touch sensor is pressed, and
-back to green when it's released. Plug a touch sensor into any sensor port before
-trying this out.
+back to green when it's released. Plug a touch sensor into any sensor port
+before trying this out.
 
 .. code-block:: python
 
@@ -120,8 +125,8 @@ This will run a LEGO Large Motor at 75% of maximum speed for 5 rotations.
   m.on_for_rotations(SpeedPercent(75), 5)
 
 You can also run a motor for a number of degrees, an amount of time, or simply
-start it and let it run until you tell it to stop. Additionally, other units are
-also available. See the following pages for more information:
+start it and let it run until you tell it to stop. Additionally, other units
+are also available. See the following pages for more information:
 
 - http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/motors.html#ev3dev.motor.Motor.on_for_degrees
 - http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/motors.html#units
@@ -138,12 +143,12 @@ The simplest drive control style is with the `MoveTank` class:
     # drive in a turn for 5 rotations of the outer motor
     # the first two parameters can be unit classes or percentages.
     tank_drive.on_for_rotations(SpeedPercent(50), SpeedPercent(75), 10)
-    
+
     # drive in a different turn for 3 seconds
     tank_drive.on_for_seconds(SpeedPercent(60), SpeedPercent(30), 3)
 
-There are also `MoveSteering` and `MoveJoystick` classes which provide different
-styles of control. See the following pages for more information:
+There are also `MoveSteering` and `MoveJoystick` classes which provide
+different styles of control. See the following pages for more information:
 
 - http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/motors.html#multiple-motor-groups
 - http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/motors.html#units
@@ -160,74 +165,43 @@ If you want to make your robot speak, you can use the ``Sound.speak`` method:
   sound = Sound()
   sound.speak('Welcome to the E V 3 dev project!')
 
-Make sure to check out the `User Resources`_ section for more detailed
-information on these features and many others.
+More Demo Code
+~~~~~~~~~~~~~~
+
+There are several demo programs that you can run to get acquainted with
+this language binding. The programs are available
+`at this GitHub site <https://github.com/ev3dev/ev3dev-lang-python-demo>`_.
+
+You can also copy and run the programs in the `utils` directory to
+understand some of the code constructs to use the EV3 motors, sensors,
+LCD console, buttons, sound, and LEDs.
+
+We also highly recommend `ev3python.com`_ where one of our community
+members, @ndward, has put together a great website with detailed guides
+on using this library which are targeted at beginners. If you are just
+getting started with programming, we highly recommend that you check
+it out at `ev3python.com`_!
 
 Using Micropython
 -----------------
 
-Normal Python too slow? Try `Micropython`_ if it supports the features your
-project needs.
-
-User Resources
---------------
+Normal Python too slow? Review `Micropython`_ to see if it supports the
+features your project needs.
 
 Library Documentation
-    **Class documentation for this library can be found on** `our Read the Docs page`_ **.**
-    You can always go there to get information on how you can use this
-    library's functionality.
+---------------------
 
-Demo Code
-    There are several demo programs that you can run to get acquainted with
-    this language binding. The programs are available at
-    https://github.com/ev3dev/ev3dev-lang-python-demo
+**Class documentation for this library can be found on
+** `our Read the Docs page`_ **.** You can always go there to get
+information on how you can use this library's functionality.
 
-ev3python.com
-    One of our community members, @ndward, has put together a great website
-    with detailed guides on using this library which are targeted at beginners.
-    If you are just getting started with programming, we highly recommend
-    that you check it out at `ev3python.com`_!
 
 Frequently-Asked Questions
-    Experiencing an odd error or unsure of how to do something that seems
-    simple? Check our our `FAQ`_ to see if there's an existing answer.
+--------------------------
 
-ev3dev.org
-    `ev3dev.org`_ is a great resource for finding guides and tutorials on
-    using ev3dev, straight from the maintainers.
+Experiencing an odd error or unsure of how to do something that seems
+simple? Check our our `FAQ`_ to see if there's an existing answer.
 
-Support
-    If you are having trouble using this library, please open an issue
-    at `our Issues tracker`_ so that we can help you. When opening an
-    issue, make sure to include as much information as possible about
-    what you are trying to do and what you have tried. The issue template
-    is in place to guide you through this process.
-
-Upgrading this Library
-----------------------
-
-You can upgrade this library from the command line as follows. Make sure
-to type the password (the default is ``maker``) when prompted.
-
-.. code-block:: bash
-
-   sudo apt-get update
-   sudo apt-get install --only-upgrade python3-ev3dev2
-
-
-Developer Resources
--------------------
-
-Python Package Index
-    The Python language has a `package repository`_ where you can find
-    libraries that others have written, including the `latest version of
-    this package`_.
-
-Python 2.x and Python 3.x Compatibility
----------------------------------------
-
-Some versions of the ev3dev_ distribution come with both `Python 2.x`_ and `Python 3.x`_ installed
-but this library is compatible only with Python 3.
 
 .. _ev3dev: http://ev3dev.org
 .. _ev3dev.org: ev3dev_
