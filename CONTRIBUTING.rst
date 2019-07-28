@@ -23,8 +23,8 @@ Before you issue a Pull Request
 Sometimes, it isn't easy for us to pull your suggested change and run
 rigorous testing on it. So please help us out by validating your changes
 and mentioning what kinds of testing you did when you open your PR.
-Please also consider adding relevant tests to `api_tests.py` and documentation
-changes within the `docs` directory.
+Please also consider adding relevant tests to ``api_tests.py`` and documentation
+changes within the ``docs`` directory.
 
 If your change breaks or changes an API
 ---------------------------------------
