@@ -38,7 +38,60 @@ class Console():
 
         """
         self._font = None
-        self.set_font(font, False)  # don't reset the screen during construction
+        self._columns = 0
+        self._rows = 0
+        self._echo = True
+        self._cursor = True
+        self.set_font(font, reset_console=False)  # don't reset the screen during construction
+
+    @property
+    def columns(self):
+        """
+        Return (int) number of columns on the EV3 LCD console supported by the current font.
+        """
+        return self._columns
+
+    @property
+    def rows(self):
+        """
+        Return (int) number of rows on the EV3 LCD console supported by the current font.
+        """
+        return self._rows
+
+    @property
+    def echo(self):
+        """
+        Return (bool) whether the console echo mode is enabled.
+        """
+        return self._echo
+
+    @rows.setter
+    def echo(self, value):
+        """
+        Enable/disable console echo (so that EV3 button presses do not show the escape characters on
+        the LCD console). Set to True to show the button codes, or False to hide them.
+        """
+        self._echo = value
+        if value:
+            os.system("stty echo")
+        else:
+            os.system("stty -echo")
+
+    @property
+    def cursor(self):
+        """
+        Return (bool) whether the console cursor is visible.
+        """
+        return self._cursor
+
+    @rows.setter
+    def cursor(self, value):
+        """
+        Enable/disable console cursor (to hide the cursor on the LCD).
+        Set to True to show the cursor, or False to hide it.
+        """
+        self._cursor = value
+        print("\x1b[?25{}".format('h' if value else 'l'), end='')
 
     def text_at(self, text, column=1, row=1, reset_console=False, inverse=False, alignment="L"):
         """
@@ -90,7 +143,7 @@ class Console():
 
         print("\x1b[{};{}H{}".format(row, column, text), end='')
 
-    def set_font(self, font, reset_console=True):
+    def set_font(self, font="Lat15-TerminusBold24x12", reset_console=True):
         """
         Set the EV3 LCD console font and optionally reset the EV3 LCD console
         to clear it and turn off the cursor.
@@ -105,20 +158,12 @@ class Console():
         if font is not None and font != self._font:
             self._font = font
             os.system("setfont {}".format(font))
+            rows, columns = os.popen('stty size').read().strip().split(" ")
+            self._rows = int(rows)
+            self._columns = int(columns)
 
         if reset_console:
             self.reset_console()
-
-    def show_cursor(self, on=False):
-        """
-        Use ANSI codes to turn the EV3 LCD console cursor on or off.
-
-        Parameter:
-
-        - `on` (bool): ``True`` to turn on the cursor; default is ``False``
-
-        """
-        print("\x1b[?25{}".format('h' if on else 'l'), end='')
 
     def clear_to_eol(self, column=None, row=None):
         """
@@ -137,7 +182,10 @@ class Console():
 
     def reset_console(self):
         """
-        Use ANSI codes to clear the EV3 LCD console, move the cursor to 1,1, then turn off the cursor.
+        Clear the EV3 LCD console using ANSI codes, move the cursor to 1,1, turn off the cursor,
+        and turn of console echo (so that button presses do not show the escape characters on
+        the LCD console).
         """
         print("\x1b[2J\x1b[H", end='')
-        self.show_cursor(False)
+        self.cursor = False
+        self.echo = False
