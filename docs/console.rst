@@ -145,5 +145,9 @@ Example:
     # change the console font and reset the console to clear it and turn off the cursor
     console.set_font('Lat15-TerminusBold16.psf.gz', True)
 
-    # display 'Hello World!' at column 1, row 5
-    console.text_at('Hello World!', column=1, row=5)
+    # compute the middle of the console
+    mid_col = console.columns // 2
+    mid_row = console.rows // 2
+
+    # display 'Hello World!' in the center of the LCD console
+    console.text_at('Hello World!', column=mid_col, row=mid_row, alignment="C")
