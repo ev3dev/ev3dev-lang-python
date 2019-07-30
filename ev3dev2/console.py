@@ -40,9 +40,11 @@ class Console():
         self._font = None
         self._columns = 0
         self._rows = 0
-        self._echo = True
-        self._cursor = True
+        self._echo = False
+        self._cursor = False
         self.set_font(font, reset_console=False)  # don't reset the screen during construction
+        self.cursor = False
+        self.echo = False
 
     @property
     def columns(self):
@@ -182,10 +184,6 @@ class Console():
 
     def reset_console(self):
         """
-        Clear the EV3 LCD console using ANSI codes, move the cursor to 1,1, turn off the cursor,
-        and turn of console echo (so that button presses do not show the escape characters on
-        the LCD console).
+        Clear the EV3 LCD console using ANSI codes, and move the cursor to 1,1
         """
         print("\x1b[2J\x1b[H", end='')
-        self.cursor = False
-        self.echo = False
