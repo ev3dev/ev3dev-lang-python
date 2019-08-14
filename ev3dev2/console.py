@@ -67,17 +67,14 @@ class Console():
         """
         return self._echo
 
-    @rows.setter
+    @echo.setter
     def echo(self, value):
         """
         Enable/disable console echo (so that EV3 button presses do not show the escape characters on
         the LCD console). Set to True to show the button codes, or False to hide them.
         """
         self._echo = value
-        if value:
-            os.system("stty echo")
-        else:
-            os.system("stty -echo")
+        os.system("stty {}".format("echo" if value else "-echo")
 
     @property
     def cursor(self):
@@ -86,7 +83,7 @@ class Console():
         """
         return self._cursor
 
-    @rows.setter
+    @cursor.setter
     def cursor(self, value):
         """
         Enable/disable console cursor (to hide the cursor on the LCD).
