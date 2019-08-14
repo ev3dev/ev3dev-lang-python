@@ -74,7 +74,7 @@ class Console():
         the LCD console). Set to True to show the button codes, or False to hide them.
         """
         self._echo = value
-        os.system("stty {}".format("echo" if value else "-echo")
+        os.system("stty {}".format("echo" if value else "-echo"))
 
     @property
     def cursor(self):
