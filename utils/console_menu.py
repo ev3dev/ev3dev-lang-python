@@ -23,7 +23,7 @@ def get_positions(console):
 
     Parameter:
 
-    - `console (Console): an instance of the EV3 Console() class
+    - `console` (Console): an instance of the EV3 Console() class
 
     returns a dictionary keyed by button names with column/row location
     """
@@ -46,7 +46,7 @@ def wait_for_button_press(button):
 
     Parameter:
 
-    - `button (Button): an instance of the EV3 Button() class
+    - `button` (Button): an instance of the EV3 Button() class
 
     return the Button name that was pressed.
     """
@@ -73,8 +73,8 @@ def menu(choices, before_run_function=None, after_run_function=None):
     - `choices` a dictionary of tuples "button-name": ("mission-name", function-to-call)
         Example:
             choices = {
-                # "button-name": ("mission abbreviation", function-to-call)
-                # or "button-name": ("mission abbreviation", lambda: call(x, y, z))
+                # "button-name": ("mission-name", function-to-call)
+                # or "button-name": ("mission-name", lambda: call(x, y, z))
                 "enter": ("CAL", lambda: auto_calibrate(robot, 1.0)),
                 "up": ("MI2", fmission2),
                 "right": ("MI3", fmission3),
@@ -188,13 +188,13 @@ if __name__ == "__main__":
     # Note the "backspace" button interrupts the program and returns to Brickman
     # Example:
     # CHOICES = {
-    #     # "button-name": ("mission abbreviation", function-to-call)
-    #     # or "button-name": ("mission abbreviation", lambda: call(x, y, z))
+    #     # "button-name": ("mission-name", function-to-call)
+    #     # or "button-name": ("mission-name", lambda: call(x, y, z))
     #     "up": ("MI1", mission1),
     #     "right": ("MI2", mission2),
     #     "left": ("MI3", mission3),
     #     "down": ("SHOW", lambda: show_sensors(5)),
-    #     "enter": ("CAL", calibrate
+    #     "enter": ("CAL", calibrate)
     # }
     # menu(CHOICES, before_run_function=before, after_run_function=after)
 
