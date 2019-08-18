@@ -1,3 +1,11 @@
+python-ev3dev2 (2.0.0~beta5) stretch; urgency=medium
+
+  [Brady Merkel]
+  * Add console and stopwatch to Debian rules file so they are
+    included in MicroPython package
+
+ -- Kaelin Laundry <wasabifan@outlook.com>  Sun, 18 Aug 2019 11:37:17 -0700
+
 python-ev3dev2 (2.0.0~beta4) stretch; urgency=medium
 
   [Daniel Walton]
