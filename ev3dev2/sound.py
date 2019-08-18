@@ -455,7 +455,7 @@ class Sound(object):
 
             Only 4/4 signature songs are supported with respect to note durations.
 
-        :param iterable[tuple(string, string)] song: the song
+        :param iterable[tuple(string,string)] song: the song
         :param int tempo: the song tempo, given in quarters per minute
         :param float delay: delay between notes (in seconds)
 

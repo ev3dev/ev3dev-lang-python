@@ -191,8 +191,8 @@ features your project needs.
 Library Documentation
 ---------------------
 
-**Class documentation for this library can be found on
-** `our Read the Docs page`_ **.** You can always go there to get
+Class documentation for this library can be found on
+`our Read the Docs page`_. You can always go there to get
 information on how you can use this library's functionality.
 
 

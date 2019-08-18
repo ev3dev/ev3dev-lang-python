@@ -121,8 +121,8 @@ Move Joystick
     :members:
     :show-inheritance:
 
-Move MoveDifferential
-~~~~~~~~~~~~~~~~~~~~~
+Move Differential
+~~~~~~~~~~~~~~~~~
 
 .. autoclass:: MoveDifferential
     :members:
