@@ -401,7 +401,8 @@ class Leds(object):
         def _animate_police_lights():
             self.all_off()
             even = True
-            duration_ms = duration * 1000
+            if duration != None:
+                duration_ms = duration * 1000
             stopwatch = StopWatch()
             stopwatch.start()
 
@@ -413,7 +414,7 @@ class Leds(object):
                     self.set_color(group1, color2)
                     self.set_color(group2, color1)
 
-                if self.animate_thread_stop or stopwatch.value_ms >= duration_ms:
+                if self.animate_thread_stop or (duration != None and stopwatch.value_ms >= duration_ms):
                     break
 
                 even = not even
