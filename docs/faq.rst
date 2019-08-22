@@ -38,7 +38,7 @@ Q: How can I upgrade the library on my EV3?
     .. code-block:: bash
 
         sudo apt-get update
-        sudo apt-get install --only-upgrade python3-ev3dev2
+        sudo apt-get install --only-upgrade python3-ev3dev2 micropython-ev3dev2
 
 Q: Are there other useful Python modules to use on the EV3?
     A: The Python language has a `package repository`_ where you can find
