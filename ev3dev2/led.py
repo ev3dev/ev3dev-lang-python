@@ -354,6 +354,8 @@ class Leds(object):
         if not self.leds:
             return
 
+        self.animate_stop()
+
         for led in self.leds.values():
             led.brightness = 0
 
