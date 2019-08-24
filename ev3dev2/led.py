@@ -403,8 +403,7 @@ class Leds(object):
         def _animate_police_lights():
             self.all_off()
             even = True
-            if duration is not None:
-                duration_ms = duration * 1000
+            duration_ms = duration * 1000 if duration is not None else None
             stopwatch = StopWatch()
             stopwatch.start()
 
