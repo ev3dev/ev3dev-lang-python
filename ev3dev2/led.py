@@ -415,7 +415,7 @@ class Leds(object):
                     self.set_color(group1, color2)
                     self.set_color(group2, color1)
 
-                if self.animate_thread_stop or (duration is not None and stopwatch.value_ms >= duration_ms):
+                if self.animate_thread_stop or (duration_ms is not None and stopwatch.value_ms >= duration_ms):
                     break
 
                 even = not even
