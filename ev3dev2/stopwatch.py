@@ -25,7 +25,7 @@ class StopWatch(object):
         Initializes the StopWatch but does not start it.
 
         desc:
-            A string description to pring when stringifying.
+            A string description to print when stringifying.
         """
         self.desc = desc
         self._value = 0
