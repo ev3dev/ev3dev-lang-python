@@ -31,6 +31,7 @@ if sys.version_info < (3, 4):
 from ev3dev2 import is_micropython
 import os
 import re
+from time import sleep
 
 if not is_micropython():
     import shlex
@@ -406,6 +407,7 @@ class Sound(object):
         and duration.
 
         It supports symbolic notes (e.g. ``A4``, ``D#3``, ``Gb5``) and durations (e.g. ``q``, ``h``).
+        You can also specify rests by using ``R`` instead of note pitch.
 
         For an exhaustive list of accepted note symbols and values, have a look at the ``_NOTE_FREQUENCIES``
         and ``_NOTE_VALUES`` private dictionaries in the source code.
@@ -471,39 +473,28 @@ class Sound(object):
         delay_ms = int(delay * 1000)
         meas_duration_ms = 60000 / tempo * 4       # we only support 4/4 bars, hence "* 4"
 
-        def beep_args(note, value):
-            """ Builds the arguments string for producing a beep matching
-            the requested note and value.
-
-            Args:
-                note (str): the note note and octave
-                value (str): the note value expression
-            Returns:
-                str: the arguments to be passed to the beep command
-            """
-            freq = self._NOTE_FREQUENCIES.get(note.upper(), self._NOTE_FREQUENCIES[note])
-
-            if '/' in value:
-                base, factor = value.split('/')
-                duration_ms = meas_duration_ms * self._NOTE_VALUES[base] / float(factor)
-            elif '*' in value:
-                base, factor = value.split('*')
-                duration_ms = meas_duration_ms * self._NOTE_VALUES[base] * float(factor)
-            elif value.endswith('.'):
-                base = value[:-1]
-                duration_ms = meas_duration_ms * self._NOTE_VALUES[base] * 1.5
-            elif value.endswith('3'):
-                base = value[:-1]
-                duration_ms = meas_duration_ms * self._NOTE_VALUES[base] * 2 / 3
-            else:
-                duration_ms = meas_duration_ms * self._NOTE_VALUES[value]
-
-            return '-f %d -l %d -D %d' % (freq, duration_ms, delay_ms)
-
         try:
-            return self.beep(' -n '.join(
-                [beep_args(note, value) for (note, value) in song]
-            ))
+            for (note, value) in song:
+                if '/' in value:
+                    base, factor = value.split('/')
+                    duration_ms = meas_duration_ms * self._NOTE_VALUES[base] / float(factor)
+                elif '*' in value:
+                    base, factor = value.split('*')
+                    duration_ms = meas_duration_ms * self._NOTE_VALUES[base] * float(factor)
+                elif value.endswith('.'):
+                    base = value[:-1]
+                    duration_ms = meas_duration_ms * self._NOTE_VALUES[base] * 1.5
+                elif value.endswith('3'):
+                    base = value[:-1]
+                    duration_ms = meas_duration_ms * self._NOTE_VALUES[base] * 2 / 3
+                else:
+                    duration_ms = meas_duration_ms * self._NOTE_VALUES[value]
+
+                if note == "R":
+                    sleep(duration_ms / 1000 + delay)
+                else:
+                    freq = self._NOTE_FREQUENCIES.get(note.upper(), self._NOTE_FREQUENCIES[note])
+                    self.beep('-f %d -l %d -D %d' % (freq, duration_ms, delay_ms))
         except KeyError as e:
             raise ValueError('invalid note (%s)' % e)
 
