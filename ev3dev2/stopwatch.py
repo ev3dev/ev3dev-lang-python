@@ -28,7 +28,6 @@ class StopWatch(object):
             A string description to print when stringifying.
         """
         self.desc = desc
-        self._value = 0
         self._start_time = None
         self._stopped_total_time = None
 
