@@ -44,7 +44,7 @@ def _make_scales(notes):
     for note, freq in notes:
         freq = round(freq)
         for n in note.split('/'):
-            res[n] = freq
+            res[n.upper()] = freq
     return res
 
 
@@ -475,6 +475,7 @@ class Sound(object):
 
         try:
             for (note, value) in song:
+                value = value.lower()
                 if '/' in value:
                     base, factor = value.split('/')
                     duration_ms = meas_duration_ms * self._NOTE_VALUES[base] / float(factor)
@@ -493,7 +494,7 @@ class Sound(object):
                 if note == "R":
                     sleep(duration_ms / 1000 + delay)
                 else:
-                    freq = self._NOTE_FREQUENCIES.get(note.upper(), self._NOTE_FREQUENCIES[note])
+                    freq = self._NOTE_FREQUENCIES[note.upper()]
                     self.beep('-f %d -l %d -D %d' % (freq, duration_ms, delay_ms))
         except KeyError as e:
             raise ValueError('invalid note (%s)' % e)
