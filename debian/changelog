@@ -1,3 +1,10 @@
+python-ev3dev2 (2.0.0) UNRELEASED; urgency=medium
+
+  [David Lechner]
+  * Fix gyro sensor reset
+
+ -- Kaelin Laundry <wasabifan@outlook.com>  UNRELEASED
+
 python-ev3dev2 (2.0.0~beta5) stretch; urgency=medium
 
   [Brady Merkel]
