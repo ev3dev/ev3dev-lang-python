@@ -2139,7 +2139,7 @@ class MoveTank(MotorSet):
 
         ``speed`` is the desired speed of the midpoint of the robot
 
-        ``target_angle`` is the angle we want drive
+        ``target_angle`` is the angle we want to maintain
 
         ``sleep_time`` is how many seconds we sleep on each pass through
             the loop.  This is to give the robot a chance to react
@@ -2147,7 +2147,7 @@ class MoveTank(MotorSet):
             as 0.01 (10ms).
 
         ``follow_for`` is called to determine if we should keep following the
-            line or stop.  This function will be passed ``self`` (the current
+            desired angle or stop.  This function will be passed ``self`` (the current
             ``MoveWithGyroTank`` object). Current supported options are:
             - ``follow_for_forever``
             - ``follow_for_ms``
@@ -2160,18 +2160,26 @@ class MoveTank(MotorSet):
 
             from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveTank, SpeedPercent, follow_for_ms
             from ev3dev2.sensor.lego import GyroSensor
+
+            # Instantiate the MoveTank object
             tank = MoveTank(OUTPUT_A, OUTPUT_B)
+
+            # Initialize the tank's gyro sensor
             tank.gyro = GyroSensor()
+
             try:
-                # Follow the line for 4500ms
+                # Calibrate the gyro to eliminate drift, and to initialize the current angle as 0
                 tank.calibrate_gyro()
+
+                # Follow the line for 4500ms
                 tank.follow_gyro_angle(
                     kp=11.3, ki=0.05, kd=3.2,
                     speed=SpeedPercent(30),
+                    target_angle=0
                     follow_for=follow_for_ms,
                     ms=4500
                 )
-            except Exception:
+            except FollowGyroAngleErrorTooFast:
                 tank.stop()
                 raise
         """
@@ -2225,7 +2233,7 @@ class MoveTank(MotorSet):
 
         ``speed`` is the desired speed of the midpoint of the robot
 
-        ``target_angle`` is the angle we want drive
+        ``target_angle`` is the target angle we want to pivot to
 
         ``sleep_time`` is how many seconds we sleep on each pass through
             the loop.  This is to give the robot a chance to react
@@ -2238,20 +2246,21 @@ class MoveTank(MotorSet):
         
             from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveTank, SpeedPercent
             from ev3dev2.sensor.lego import GyroSensor
-            tank = MoveTank(OUTPUT_A, OUTPUT_B)
-            tank.gyro = GyroSensor()
-            try:
-                # Reset gyro sensor to zero
-                tank.calibrate_gyro()
 
-                # Pivot 30 degrees
-                tank.pivot_gyro(
-                    speed=SpeedPercent(5),
-                    target_angle(30)
-                )
-            except Exception:
-                tank.stop()
-                raise
+            # Instantiate the MoveTank object
+            tank = MoveTank(OUTPUT_A, OUTPUT_B)
+
+            # Initialize the tank's gyro sensor
+            tank.gyro = GyroSensor()
+
+            # Calibrate the gyro to eliminate drift, and to initialize the current angle as 0
+            tank.calibrate_gyro()
+
+            # Pivot 30 degrees
+            tank.pivot_gyro(
+                speed=SpeedPercent(5),
+                target_angle(30)
+            )
         """
         assert self.gyro, "GyroSensor must be defined"
 
