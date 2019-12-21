@@ -130,7 +130,7 @@ class ButtonCommon(object):
         """
         if new_state is None:
             new_state = set(self.buttons_pressed)
-        old_state = self._state
+        old_state = self._state if hasattr(self, '_state') else set()
         self._state = new_state
 
         state_diff = new_state.symmetric_difference(old_state)
