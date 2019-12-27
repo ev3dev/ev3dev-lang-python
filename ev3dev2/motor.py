@@ -1863,11 +1863,23 @@ class MoveTank(MotorSet):
         self.right_motor = self.motors[right_motor_port]
         self.max_speed = self.left_motor.max_speed
 
-        # color sensor used by follow_line()
-        self.cs = None
+    # color sensor used by follow_line()
+    @property
+    def cs(self):
+        return self.__cs
+    
+    @cs.setter
+    def cs(self, cs):
+        self.__cs = cs
 
-        # gyro sensor used by follow_gyro_angle()
-        self.gyro = None
+    # gyro sensor used by follow_gyro_angle()
+    @property
+    def gyro(self):
+        return self.__gyro
+    
+    @gyro.setter
+    def gyro(self, gyro):
+        self.__gyro = gyro
 
     def _unpack_speeds_to_native_units(self, left_speed, right_speed):
         left_speed = self.left_motor._speed_native_units(left_speed, "left_speed")
@@ -2058,10 +2070,10 @@ class MoveTank(MotorSet):
                 tank.stop()
                 raise
         """
-        assert self.cs, "ColorSensor must be defined"
+        assert self.__cs, "ColorSensor must be defined"
 
         if target_light_intensity is None:
-            target_light_intensity = self.cs.reflected_light_intensity
+            target_light_intensity = self.__cs.reflected_light_intensity
 
         integral = 0.0
         last_error = 0.0
@@ -2071,7 +2083,7 @@ class MoveTank(MotorSet):
         MAX_SPEED = SpeedNativeUnits(self.max_speed)
 
         while follow_for(self, **kwargs):
-            reflected_light_intensity = self.cs.reflected_light_intensity
+            reflected_light_intensity = self.__cs.reflected_light_intensity
             error = target_light_intensity - reflected_light_intensity
             integral = integral + error
             derivative = error - last_error
@@ -2117,11 +2129,11 @@ class MoveTank(MotorSet):
 
         NOTE: This takes 1sec to run
         """
-        assert self.gyro, "GyroSensor must be defined"
+        assert self.__gyro, "GyroSensor must be defined"
 
         for x in range(2):
-            self.gyro.mode = 'GYRO-RATE'
-            self.gyro.mode = 'GYRO-ANG'
+            self.__gyro.mode = 'GYRO-RATE'
+            self.__gyro.mode = 'GYRO-ANG'
             time.sleep(0.5)
 
     def follow_gyro_angle(self,
@@ -2183,7 +2195,7 @@ class MoveTank(MotorSet):
                 tank.stop()
                 raise
         """
-        assert self.gyro, "GyroSensor must be defined"
+        assert self.__gyro, "GyroSensor must be defined"
 
         integral = 0.0
         last_error = 0.0
@@ -2192,7 +2204,7 @@ class MoveTank(MotorSet):
         MAX_SPEED = SpeedNativeUnits(self.max_speed)
 
         while follow_for(self, **kwargs):
-            current_angle = self.gyro.angle
+            current_angle = self.__gyro.angle
             error = current_angle - target_angle
             integral = integral + error
             derivative = error - last_error
@@ -2223,7 +2235,7 @@ class MoveTank(MotorSet):
 
         self.stop()
 
-    def pivot_gyro(self,
+    def turn_to_angle_gyro(self,
             speed,
             target_angle=0,
             sleep_time=0.01
@@ -2257,19 +2269,19 @@ class MoveTank(MotorSet):
             tank.calibrate_gyro()
 
             # Pivot 30 degrees
-            tank.pivot_gyro(
+            tank.turn_to_angle_gyro(
                 speed=SpeedPercent(5),
                 target_angle(30)
             )
         """
-        assert self.gyro, "GyroSensor must be defined"
+        assert self.__gyro, "GyroSensor must be defined"
 
         speed_native_units = speed.to_native_units(self.left_motor)
         target_reached = False
 
         while not target_reached:
-            current_angle = self.gyro.angle
-            if (current_angle >= target_angle-2 and current_angle <= target_angle+2):
+            current_angle = self.__gyro.angle
+            if (abs(current_angle - target_angle) <= 2):
                 target_reached = True
                 self.stop()
             elif (current_angle > target_angle):
