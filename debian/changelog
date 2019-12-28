@@ -1,10 +1,17 @@
-python-ev3dev2 (2.0.0) UNRELEASED; urgency=medium
+python-ev3dev2 (2.1.0) UNRELEASED; urgency=medium
 
   [Kaelin Laundry]
   * Add "value_secs" and "is_elapsed_*" methods to StopWatch
   * Rename "value_hms" to "hms_str". New "value_hms" returns original tuple.
 
  -- UNRELEASED
+
+python-ev3dev2 (2.0.0) stretch; urgency=medium
+
+  [David Lechner]
+  * Fix gyro sensor reset
+
+ -- Kaelin Laundry <wasabifan@outlook.com>  Sun, 24 Nov 2019 20:41:18 -0800
 
 python-ev3dev2 (2.0.0~beta5) stretch; urgency=medium
 
