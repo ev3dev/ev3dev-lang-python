@@ -30,6 +30,9 @@ from ev3dev2.unit import (
     DistanceStuds
 )
 
+import ev3dev2.stopwatch
+from ev3dev2.stopwatch import StopWatch, StopWatchAlreadyStartedException
+
 ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 
 _internal_set_attribute = ev3dev2.Device._set_attribute
@@ -55,6 +58,16 @@ def dummy_wait(self, cond, timeout=None):
 
 Motor.wait = dummy_wait
 
+# for StopWatch
+mock_ticks_ms = 0
+def _mock_get_ticks_ms():
+    return mock_ticks_ms
+ev3dev2.stopwatch.get_ticks_ms = _mock_get_ticks_ms
+
+def set_mock_ticks_ms(value):
+    global mock_ticks_ms
+    mock_ticks_ms = value
+
 class TestAPI(unittest.TestCase):
 
     def setUp(self):
@@ -63,6 +76,9 @@ class TestAPI(unittest.TestCase):
             print("\n\n{}\n{}".format(self._testMethodName, "=" * len(self._testMethodName,)))
         except AttributeError:
             pass
+
+        # ensure tests don't depend on order based on StopWatch tick state
+        set_mock_ticks_ms(0)
 
     def test_device(self):
         clean_arena()
@@ -359,6 +375,123 @@ class TestAPI(unittest.TestCase):
 
         self.assertEqual(DistanceStuds(42).mm, 336)
 
+    def test_stopwatch(self):
+        sw = StopWatch()
+        self.assertEqual(str(sw), "StopWatch: 00:00:00.000")
+        
+        sw = StopWatch(desc="test sw")
+        self.assertEqual(str(sw), "test sw: 00:00:00.000")
+        self.assertEqual(sw.is_started, False)
+
+        sw.start()
+        self.assertEqual(sw.is_started, True)
+        self.assertEqual(sw.value_ms, 0)
+        self.assertEqual(sw.value_secs, 0)
+        self.assertEqual(sw.value_hms, (0,0,0,0))
+        self.assertEqual(sw.hms_str, "00:00:00.000")
+        self.assertEqual(sw.is_elapsed_ms(None), False)
+        self.assertEqual(sw.is_elapsed_secs(None), False)
+        self.assertEqual(sw.is_elapsed_ms(3000), False)
+        self.assertEqual(sw.is_elapsed_secs(3), False)
+
+        set_mock_ticks_ms(1500)
+        self.assertEqual(sw.is_started, True)
+        self.assertEqual(sw.value_ms, 1500)
+        self.assertEqual(sw.value_secs, 1.5)
+        self.assertEqual(sw.value_hms, (0,0,1,500))
+        self.assertEqual(sw.hms_str, "00:00:01.500")
+        self.assertEqual(sw.is_elapsed_ms(None), False)
+        self.assertEqual(sw.is_elapsed_secs(None), False)
+        self.assertEqual(sw.is_elapsed_ms(3000), False)
+        self.assertEqual(sw.is_elapsed_secs(3), False)
+
+        set_mock_ticks_ms(3000)
+        self.assertEqual(sw.is_started, True)
+        self.assertEqual(sw.value_ms, 3000)
+        self.assertEqual(sw.value_secs, 3)
+        self.assertEqual(sw.value_hms, (0,0,3,0))
+        self.assertEqual(sw.hms_str, "00:00:03.000")
+        self.assertEqual(sw.is_elapsed_ms(None), False)
+        self.assertEqual(sw.is_elapsed_secs(None), False)
+        self.assertEqual(sw.is_elapsed_ms(3000), True)
+        self.assertEqual(sw.is_elapsed_secs(3), True)
+
+        set_mock_ticks_ms(1000 * 60 * 75.5) #75.5 minutes
+        self.assertEqual(sw.is_started, True)
+        self.assertEqual(sw.value_ms, 1000 * 60 * 75.5)
+        self.assertEqual(sw.value_secs, 60 * 75.5)
+        self.assertEqual(sw.value_hms, (1,15,30,0))
+        self.assertEqual(sw.hms_str, "01:15:30.000")
+        self.assertEqual(sw.is_elapsed_ms(None), False)
+        self.assertEqual(sw.is_elapsed_secs(None), False)
+        self.assertEqual(sw.is_elapsed_ms(3000), True)
+        self.assertEqual(sw.is_elapsed_secs(3), True)
+
+        try:
+            # StopWatch can't be started if already running
+            sw.start()
+            self.fail()
+        except StopWatchAlreadyStartedException:
+            pass
+
+        # test reset behavior
+        sw.restart()
+        self.assertEqual(sw.is_started, True)
+        self.assertEqual(sw.value_ms, 0)
+        self.assertEqual(sw.value_secs, 0)
+        self.assertEqual(sw.value_hms, (0,0,0,0))
+        self.assertEqual(sw.hms_str, "00:00:00.000")
+        self.assertEqual(sw.is_elapsed_ms(None), False)
+        self.assertEqual(sw.is_elapsed_secs(None), False)
+        self.assertEqual(sw.is_elapsed_ms(3000), False)
+        self.assertEqual(sw.is_elapsed_secs(3), False)
+
+        set_mock_ticks_ms(1000 * 60 * 75.5 + 3000)
+        self.assertEqual(sw.is_started, True)
+        self.assertEqual(sw.value_ms, 3000)
+        self.assertEqual(sw.value_secs, 3)
+        self.assertEqual(sw.value_hms, (0,0,3,0))
+        self.assertEqual(sw.hms_str, "00:00:03.000")
+        self.assertEqual(sw.is_elapsed_ms(None), False)
+        self.assertEqual(sw.is_elapsed_secs(None), False)
+        self.assertEqual(sw.is_elapsed_ms(3000), True)
+        self.assertEqual(sw.is_elapsed_secs(3), True)
+
+        # test stop
+        sw.stop()
+        set_mock_ticks_ms(1000 * 60 * 75.5 + 10000)
+        self.assertEqual(sw.is_started, False)
+        self.assertEqual(sw.value_ms, 3000)
+        self.assertEqual(sw.value_secs, 3)
+        self.assertEqual(sw.value_hms, (0,0,3,0))
+        self.assertEqual(sw.hms_str, "00:00:03.000")
+        self.assertEqual(sw.is_elapsed_ms(None), False)
+        self.assertEqual(sw.is_elapsed_secs(None), False)
+        self.assertEqual(sw.is_elapsed_ms(3000), True)
+        self.assertEqual(sw.is_elapsed_secs(3), True)
+
+        # test reset
+        sw.reset()
+        self.assertEqual(sw.is_started, False)
+        self.assertEqual(sw.value_ms, 0)
+        self.assertEqual(sw.value_secs, 0)
+        self.assertEqual(sw.value_hms, (0,0,0,0))
+        self.assertEqual(sw.hms_str, "00:00:00.000")
+        self.assertEqual(sw.is_elapsed_ms(None), False)
+        self.assertEqual(sw.is_elapsed_secs(None), False)
+        self.assertEqual(sw.is_elapsed_ms(3000), False)
+        self.assertEqual(sw.is_elapsed_secs(3), False)
+
+        set_mock_ticks_ms(1000 * 60 * 75.5 + 6000)
+        self.assertEqual(sw.is_started, False)
+        self.assertEqual(sw.value_ms, 0)
+        self.assertEqual(sw.value_secs, 0)
+        self.assertEqual(sw.value_hms, (0,0,0,0))
+        self.assertEqual(sw.hms_str, "00:00:00.000")
+        self.assertEqual(sw.is_elapsed_ms(None), False)
+        self.assertEqual(sw.is_elapsed_secs(None), False)
+        self.assertEqual(sw.is_elapsed_ms(3000), False)
+        self.assertEqual(sw.is_elapsed_secs(3), False)
 
 if __name__ == "__main__":
     unittest.main()
