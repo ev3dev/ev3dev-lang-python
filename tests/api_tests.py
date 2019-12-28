@@ -31,7 +31,7 @@ from ev3dev2.unit import (
 )
 
 import ev3dev2.stopwatch
-from ev3dev2.stopwatch import StopWatch
+from ev3dev2.stopwatch import StopWatch, StopWatchAlreadyStartedException
 
 ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 
@@ -427,8 +427,15 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_elapsed_ms(3000), True)
         self.assertEqual(sw.is_elapsed_secs(3), True)
 
-        # test start's reset behavior
-        sw.start()
+        try:
+            # StopWatch can't be started if already running
+            sw.start()
+            self.fail()
+        except StopWatchAlreadyStartedException:
+            pass
+
+        # test reset behavior
+        sw.restart()
         self.assertEqual(sw.is_started, True)
         self.assertEqual(sw.value_ms, 0)
         self.assertEqual(sw.value_secs, 0)
@@ -440,29 +447,6 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_elapsed_secs(3), False)
 
         set_mock_ticks_ms(1000 * 60 * 75.5 + 3000)
-        self.assertEqual(sw.is_started, True)
-        self.assertEqual(sw.value_ms, 3000)
-        self.assertEqual(sw.value_secs, 3)
-        self.assertEqual(sw.value_hms, (0,0,3,0))
-        self.assertEqual(sw.hms_str, "00:00:03.000")
-        self.assertEqual(sw.is_elapsed_ms(None), False)
-        self.assertEqual(sw.is_elapsed_secs(None), False)
-        self.assertEqual(sw.is_elapsed_ms(3000), True)
-        self.assertEqual(sw.is_elapsed_secs(3), True)
-
-        # test reset
-        sw.reset()
-        self.assertEqual(sw.is_started, True)
-        self.assertEqual(sw.value_ms, 0)
-        self.assertEqual(sw.value_secs, 0)
-        self.assertEqual(sw.value_hms, (0,0,0,0))
-        self.assertEqual(sw.hms_str, "00:00:00.000")
-        self.assertEqual(sw.is_elapsed_ms(None), False)
-        self.assertEqual(sw.is_elapsed_secs(None), False)
-        self.assertEqual(sw.is_elapsed_ms(3000), False)
-        self.assertEqual(sw.is_elapsed_secs(3), False)
-
-        set_mock_ticks_ms(1000 * 60 * 75.5 + 6000)
         self.assertEqual(sw.is_started, True)
         self.assertEqual(sw.value_ms, 3000)
         self.assertEqual(sw.value_secs, 3)
@@ -485,6 +469,29 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_elapsed_secs(None), False)
         self.assertEqual(sw.is_elapsed_ms(3000), True)
         self.assertEqual(sw.is_elapsed_secs(3), True)
+
+        # test reset
+        sw.reset()
+        self.assertEqual(sw.is_started, False)
+        self.assertEqual(sw.value_ms, 0)
+        self.assertEqual(sw.value_secs, 0)
+        self.assertEqual(sw.value_hms, (0,0,0,0))
+        self.assertEqual(sw.hms_str, "00:00:00.000")
+        self.assertEqual(sw.is_elapsed_ms(None), False)
+        self.assertEqual(sw.is_elapsed_secs(None), False)
+        self.assertEqual(sw.is_elapsed_ms(3000), False)
+        self.assertEqual(sw.is_elapsed_secs(3), False)
+
+        set_mock_ticks_ms(1000 * 60 * 75.5 + 6000)
+        self.assertEqual(sw.is_started, False)
+        self.assertEqual(sw.value_ms, 0)
+        self.assertEqual(sw.value_secs, 0)
+        self.assertEqual(sw.value_hms, (0,0,0,0))
+        self.assertEqual(sw.hms_str, "00:00:00.000")
+        self.assertEqual(sw.is_elapsed_ms(None), False)
+        self.assertEqual(sw.is_elapsed_secs(None), False)
+        self.assertEqual(sw.is_elapsed_ms(3000), False)
+        self.assertEqual(sw.is_elapsed_secs(3), False)
 
 if __name__ == "__main__":
     unittest.main()

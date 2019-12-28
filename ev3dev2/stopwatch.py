@@ -15,6 +15,13 @@ def get_ticks_ms():
     else:
         return int(dt.datetime.timestamp(dt.datetime.now()) * 1000)
 
+class StopWatchAlreadyStartedException(Exception):
+    """
+    Exception raised when start() is called on a StopWatch which was already start()ed and not yet
+    stopped.
+    """
+    pass
+
 class StopWatch(object):
     """
     A timer class which lets you start timing and then check the amount of time
@@ -38,7 +45,12 @@ class StopWatch(object):
     def start(self):
         """
         Starts the timer. If the timer is already running, resets it.
+
+        Raises a :py:class:`ev3dev2.stopwatch.StopWatchAlreadyStartedException` if already started.
         """
+        if self.is_started:
+            raise StopWatchAlreadyStartedException()
+
         self._stopped_total_time = None
         self._start_time = get_ticks_ms()
 
@@ -54,10 +66,16 @@ class StopWatch(object):
 
     def reset(self):
         """
-        Resets the timer, and starts it again.
+        Resets the timer and leaves it stopped.
         """
         self._start_time = None
         self._stopped_total_time = None
+    
+    def restart(self):
+        """
+        Resets and then starts the timer.
+        """
+        self.reset()
         self.start()
     
     @property
