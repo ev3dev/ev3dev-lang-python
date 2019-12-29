@@ -1790,6 +1790,15 @@ class MotorSet(object):
         self.wait_until_not_moving()
 
 
+# follow gyro angle classes
+class FollowGyroAngleErrorTooFast(Exception):
+    """
+    Raised when a gyro following robot has been asked to follow
+    an angle at an unrealistic speed
+    """
+    pass
+
+
 # line follower classes
 class LineFollowErrorLostLine(Exception):
     """
@@ -1854,8 +1863,23 @@ class MoveTank(MotorSet):
         self.right_motor = self.motors[right_motor_port]
         self.max_speed = self.left_motor.max_speed
 
-        # color sensor used by follow_line()
-        self.cs = None
+    # color sensor used by follow_line()
+    @property
+    def cs(self):
+        return self._cs
+    
+    @cs.setter
+    def cs(self, cs):
+        self._cs = cs
+
+    # gyro sensor used by follow_gyro_angle()
+    @property
+    def gyro(self):
+        return self._gyro
+    
+    @gyro.setter
+    def gyro(self, gyro):
+        self._gyro = gyro
 
     def _unpack_speeds_to_native_units(self, left_speed, right_speed):
         left_speed = self.left_motor._speed_native_units(left_speed, "left_speed")
@@ -2046,10 +2070,10 @@ class MoveTank(MotorSet):
                 tank.stop()
                 raise
         """
-        assert self.cs, "ColorSensor must be defined"
+        assert self._cs, "ColorSensor must be defined"
 
         if target_light_intensity is None:
-            target_light_intensity = self.cs.reflected_light_intensity
+            target_light_intensity = self._cs.reflected_light_intensity
 
         integral = 0.0
         last_error = 0.0
@@ -2059,7 +2083,7 @@ class MoveTank(MotorSet):
         MAX_SPEED = SpeedNativeUnits(self.max_speed)
 
         while follow_for(self, **kwargs):
-            reflected_light_intensity = self.cs.reflected_light_intensity
+            reflected_light_intensity = self._cs.reflected_light_intensity
             error = target_light_intensity - reflected_light_intensity
             integral = integral + error
             derivative = error - last_error
@@ -2099,6 +2123,183 @@ class MoveTank(MotorSet):
 
         self.stop()
 
+    def calibrate_gyro(self):
+        """
+        Calibrates the gyro sensor.
+
+        NOTE: This takes 1sec to run
+        """
+        assert self._gyro, "GyroSensor must be defined"
+
+        for x in range(2):
+            self._gyro.mode = 'GYRO-RATE'
+            self._gyro.mode = 'GYRO-ANG'
+            time.sleep(0.5)
+
+    def follow_gyro_angle(self,
+            kp, ki, kd,
+            speed,
+            target_angle=0,
+            sleep_time=0.01,
+            follow_for=follow_for_forever,
+            **kwargs
+        ):
+        """
+        PID gyro angle follower
+
+        ``kp``, ``ki``, and ``kd`` are the PID constants.
+
+        ``speed`` is the desired speed of the midpoint of the robot
+
+        ``target_angle`` is the angle we want to maintain
+
+        ``sleep_time`` is how many seconds we sleep on each pass through
+            the loop.  This is to give the robot a chance to react
+            to the new motor settings. This should be something small such
+            as 0.01 (10ms).
+
+        ``follow_for`` is called to determine if we should keep following the
+            desired angle or stop.  This function will be passed ``self`` (the current
+            ``MoveTank`` object). Current supported options are:
+            - ``follow_for_forever``
+            - ``follow_for_ms``
+
+        ``**kwargs`` will be passed to the ``follow_for`` function
+
+        Example:
+
+        .. code:: python
+
+            from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveTank, SpeedPercent, follow_for_ms
+            from ev3dev2.sensor.lego import GyroSensor
+
+            # Instantiate the MoveTank object
+            tank = MoveTank(OUTPUT_A, OUTPUT_B)
+
+            # Initialize the tank's gyro sensor
+            tank.gyro = GyroSensor()
+
+            try:
+                # Calibrate the gyro to eliminate drift, and to initialize the current angle as 0
+                tank.calibrate_gyro()
+
+                # Follow the line for 4500ms
+                tank.follow_gyro_angle(
+                    kp=11.3, ki=0.05, kd=3.2,
+                    speed=SpeedPercent(30),
+                    target_angle=0
+                    follow_for=follow_for_ms,
+                    ms=4500
+                )
+            except FollowGyroAngleErrorTooFast:
+                tank.stop()
+                raise
+        """
+        assert self._gyro, "GyroSensor must be defined"
+
+        integral = 0.0
+        last_error = 0.0
+        derivative = 0.0
+        speed_native_units = speed.to_native_units(self.left_motor)
+        MAX_SPEED = SpeedNativeUnits(self.max_speed)
+
+        assert speed_native_units <= MAX_SPEED, "Speed exceeds the max speed of the motors"
+
+        while follow_for(self, **kwargs):
+            current_angle = self._gyro.angle
+            error = current_angle - target_angle
+            integral = integral + error
+            derivative = error - last_error
+            last_error = error
+            turn_native_units = (kp * error) + (ki * integral) + (kd * derivative)
+
+            left_speed = SpeedNativeUnits(speed_native_units - turn_native_units)
+            right_speed = SpeedNativeUnits(speed_native_units + turn_native_units)
+
+            if abs(left_speed) > MAX_SPEED:
+                log.info("%s: left_speed %s is greater than MAX_SPEED %s" %
+                        (self, left_speed, MAX_SPEED))
+                self.stop()
+                raise FollowGyroAngleErrorTooFast(
+                    "The robot is moving too fast to follow the angle")
+
+            if abs(right_speed) > MAX_SPEED:
+                log.info("%s: right_speed %s is greater than MAX_SPEED %s" %
+                        (self, right_speed, MAX_SPEED))
+                self.stop()
+                raise FollowGyroAngleErrorTooFast(
+                    "The robot is moving too fast to follow the angle")
+
+            if sleep_time:
+                time.sleep(sleep_time)
+
+            self.on(left_speed, right_speed)
+
+        self.stop()
+
+    def turn_to_angle_gyro(self,
+            speed,
+            target_angle=0,
+            wiggle_room=2,
+            sleep_time=0.01
+        ):
+        """
+        Pivot Turn
+
+        ``speed`` is the desired speed of the midpoint of the robot
+
+        ``target_angle`` is the target angle we want to pivot to
+
+        ``wiggle_room`` is the +/- angle threshold to control how accurate the turn should be
+
+        ``sleep_time`` is how many seconds we sleep on each pass through
+            the loop.  This is to give the robot a chance to react
+            to the new motor settings. This should be something small such
+            as 0.01 (10ms).
+
+        Example:
+
+        .. code:: python
+        
+            from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveTank, SpeedPercent
+            from ev3dev2.sensor.lego import GyroSensor
+
+            # Instantiate the MoveTank object
+            tank = MoveTank(OUTPUT_A, OUTPUT_B)
+
+            # Initialize the tank's gyro sensor
+            tank.gyro = GyroSensor()
+
+            # Calibrate the gyro to eliminate drift, and to initialize the current angle as 0
+            tank.calibrate_gyro()
+
+            # Pivot 30 degrees
+            tank.turn_to_angle_gyro(
+                speed=SpeedPercent(5),
+                target_angle(30)
+            )
+        """
+        assert self._gyro, "GyroSensor must be defined"
+
+        speed_native_units = speed.to_native_units(self.left_motor)
+        target_reached = False
+
+        while not target_reached:
+            current_angle = self._gyro.angle
+            if abs(current_angle - target_angle) <= wiggle_room:
+                target_reached = True
+                self.stop()
+            elif (current_angle > target_angle):
+                left_speed = SpeedNativeUnits(-1 * speed_native_units)
+                right_speed = SpeedNativeUnits(speed_native_units)
+            else:
+                left_speed = SpeedNativeUnits(speed_native_units)
+                right_speed = SpeedNativeUnits(-1 * speed_native_units)
+
+            if sleep_time:
+                time.sleep(sleep_time)
+
+            self.on(left_speed, right_speed)
 
 class MoveSteering(MoveTank):
     """
