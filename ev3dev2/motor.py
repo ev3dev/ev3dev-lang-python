@@ -1866,20 +1866,20 @@ class MoveTank(MotorSet):
     # color sensor used by follow_line()
     @property
     def cs(self):
-        return self.__cs
+        return self._cs
     
     @cs.setter
     def cs(self, cs):
-        self.__cs = cs
+        self._cs = cs
 
     # gyro sensor used by follow_gyro_angle()
     @property
     def gyro(self):
-        return self.__gyro
+        return self._gyro
     
     @gyro.setter
     def gyro(self, gyro):
-        self.__gyro = gyro
+        self._gyro = gyro
 
     def _unpack_speeds_to_native_units(self, left_speed, right_speed):
         left_speed = self.left_motor._speed_native_units(left_speed, "left_speed")
@@ -2070,10 +2070,10 @@ class MoveTank(MotorSet):
                 tank.stop()
                 raise
         """
-        assert self.__cs, "ColorSensor must be defined"
+        assert self._cs, "ColorSensor must be defined"
 
         if target_light_intensity is None:
-            target_light_intensity = self.__cs.reflected_light_intensity
+            target_light_intensity = self._cs.reflected_light_intensity
 
         integral = 0.0
         last_error = 0.0
@@ -2083,7 +2083,7 @@ class MoveTank(MotorSet):
         MAX_SPEED = SpeedNativeUnits(self.max_speed)
 
         while follow_for(self, **kwargs):
-            reflected_light_intensity = self.__cs.reflected_light_intensity
+            reflected_light_intensity = self._cs.reflected_light_intensity
             error = target_light_intensity - reflected_light_intensity
             integral = integral + error
             derivative = error - last_error
@@ -2129,11 +2129,11 @@ class MoveTank(MotorSet):
 
         NOTE: This takes 1sec to run
         """
-        assert self.__gyro, "GyroSensor must be defined"
+        assert self._gyro, "GyroSensor must be defined"
 
         for x in range(2):
-            self.__gyro.mode = 'GYRO-RATE'
-            self.__gyro.mode = 'GYRO-ANG'
+            self._gyro.mode = 'GYRO-RATE'
+            self._gyro.mode = 'GYRO-ANG'
             time.sleep(0.5)
 
     def follow_gyro_angle(self,
@@ -2160,7 +2160,7 @@ class MoveTank(MotorSet):
 
         ``follow_for`` is called to determine if we should keep following the
             desired angle or stop.  This function will be passed ``self`` (the current
-            ``MoveWithGyroTank`` object). Current supported options are:
+            ``MoveTank`` object). Current supported options are:
             - ``follow_for_forever``
             - ``follow_for_ms``
 
@@ -2195,7 +2195,7 @@ class MoveTank(MotorSet):
                 tank.stop()
                 raise
         """
-        assert self.__gyro, "GyroSensor must be defined"
+        assert self._gyro, "GyroSensor must be defined"
 
         integral = 0.0
         last_error = 0.0
@@ -2203,8 +2203,10 @@ class MoveTank(MotorSet):
         speed_native_units = speed.to_native_units(self.left_motor)
         MAX_SPEED = SpeedNativeUnits(self.max_speed)
 
+        assert speed_native_units <= MAX_SPEED, "Speed exceeds the max speed of the motors"
+
         while follow_for(self, **kwargs):
-            current_angle = self.__gyro.angle
+            current_angle = self._gyro.angle
             error = current_angle - target_angle
             integral = integral + error
             derivative = error - last_error
@@ -2214,14 +2216,14 @@ class MoveTank(MotorSet):
             left_speed = SpeedNativeUnits(speed_native_units - turn_native_units)
             right_speed = SpeedNativeUnits(speed_native_units + turn_native_units)
 
-            if left_speed > MAX_SPEED:
+            if abs(left_speed) > MAX_SPEED:
                 log.info("%s: left_speed %s is greater than MAX_SPEED %s" %
                         (self, left_speed, MAX_SPEED))
                 self.stop()
                 raise FollowGyroAngleErrorTooFast(
                     "The robot is moving too fast to follow the angle")
 
-            if right_speed > MAX_SPEED:
+            if abs(right_speed) > MAX_SPEED:
                 log.info("%s: right_speed %s is greater than MAX_SPEED %s" %
                         (self, right_speed, MAX_SPEED))
                 self.stop()
@@ -2238,6 +2240,7 @@ class MoveTank(MotorSet):
     def turn_to_angle_gyro(self,
             speed,
             target_angle=0,
+            wiggle_room=2,
             sleep_time=0.01
         ):
         """
@@ -2246,6 +2249,8 @@ class MoveTank(MotorSet):
         ``speed`` is the desired speed of the midpoint of the robot
 
         ``target_angle`` is the target angle we want to pivot to
+
+        ``wiggle_room`` is the +/- angle threshold to control how accurate the turn should be
 
         ``sleep_time`` is how many seconds we sleep on each pass through
             the loop.  This is to give the robot a chance to react
@@ -2274,14 +2279,14 @@ class MoveTank(MotorSet):
                 target_angle(30)
             )
         """
-        assert self.__gyro, "GyroSensor must be defined"
+        assert self._gyro, "GyroSensor must be defined"
 
         speed_native_units = speed.to_native_units(self.left_motor)
         target_reached = False
 
         while not target_reached:
-            current_angle = self.__gyro.angle
-            if (abs(current_angle - target_angle) <= 2):
+            current_angle = self._gyro.angle
+            if abs(current_angle - target_angle) <= wiggle_room:
                 target_reached = True
                 self.stop()
             elif (current_angle > target_angle):
