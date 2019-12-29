@@ -10,6 +10,7 @@ processes and computers, so that remote objects can be manipulated as if they
 were local.
 
 For ev3dev, RPyC is most often used for:
+
 * robots that involve more than one EV3 (i.e. daisy chaining)
 * robots that perform some CPU intensive task (ex: Rubik's cube solver) where you
   wish to run the CPU intensive part on your desktop PC
