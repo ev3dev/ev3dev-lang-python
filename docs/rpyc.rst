@@ -1,87 +1,113 @@
-Working with ev3dev remotely using RPyC
-=======================================
+**************
+RPyC on ev3dev
+**************
 
-RPyC_ (pronounced as are-pie-see), or Remote Python Call, is a transparent
+`RPyC_ <https://rpyc.readthedocs.io/en/latest/>`_ (pronounced as are-pie-see), or Remote Python Call, is a transparent
 python library for symmetrical remote procedure calls, clustering and
 distributed-computing. RPyC makes use of object-proxying, a technique that
 employs python’s dynamic nature, to overcome the physical boundaries between
 processes and computers, so that remote objects can be manipulated as if they
-were local. Here are simple steps you need to follow in order to install and
-use RPyC with ev3dev:
+were local.
 
-1. Install RPyC both on the EV3 and on your desktop PC. For the EV3, enter the
-   following command at the command prompt (after you `connect with SSH`_):
+For ev3dev, RPyC is most often used for:
+* robots that involve more than one EV3 (i.e. daisy chaining)
+* robots that perform some CPU intensive task (ex: Rubik's cube solver) where you
+  wish to run the CPU intensive part on your desktop PC
 
-   .. code-block:: shell
+Networking
+==========
+You will need to setup networking on your ev3dev device(s). The
+`ev3dev networking documentation <https://www.ev3dev.org/docs/networking/>`_ should get
+you up and running in terms of networking connectivity.
 
-       sudo easy_install3 rpyc
 
-   On the desktop PC, it really depends on your operating system. In case it is
-   some flavor of linux, you should be able to do
+Install
+=======
 
-   .. code-block:: shell
-
-       sudo pip3 install rpyc
-
-   In case it is Windows, there is a win32 installer on the project's
-   `sourceforge page`_. Also, have a look at the `Download and Install`_ page
-   on their site.
-
-2. Create file ``rpyc_server.sh`` with the following contents on the EV3:
+1. RPyC is installed on ev3dev but we need to create a service that launches
+   ``rpyc_classic.py`` at bootup. Cut-n-paste the following commands on the
+   ev3dev device(s) that you wish to control via RPyC.
 
    .. code-block:: shell
 
-      #!/bin/bash
-      python3 `which rpyc_classic.py`
+      echo "[Unit]
+      Description=RPyC Classic Service
+      After=multi-user.target
 
-   and make the file executable:
+      [Service]
+      Type=simple
+      ExecStart=/usr/bin/rpyc_classic.py
+
+      [Install]
+      WantedBy=multi-user.target" > rpyc-classic.service
+
+      sudo cp rpyc-classic.service /lib/systemd/system/
+      sudo systemctl daemon-reload
+      sudo systemctl enable rpyc-classic.service
+      sudo systemctl start rpyc-classic.service
+
+
+2. If you will be using an ev3dev device to control another ev3dev device you
+   can skip this step.  If you will be using your desktop PC to control an ev3dev
+   device you must install RPyC on your desktop PC. How you install RPyC depends
+   on your operating system. For Linux you should be able to do:
 
    .. code-block:: shell
 
-      chmod +x rpyc_server.sh
+       sudo apt-get install python3-rpyc
 
-   Launch the created file either from SSH session (with
-   ``./rpyc_server.sh`` command), or from brickman. It should output something
-   like
+   For Windows there is a win32 installer on the project's `sourceforge page`_.
+   Also, have a look at the `Download and Install`_ page on their site.
 
-   .. code-block:: none
-
-      INFO:SLAVE/18812:server started on [0.0.0.0]:18812
-
-   and keep running.
-
-3. Now you are ready to connect to the RPyC server from your desktop PC. The
-   following python script should make a large motor connected to output port
-   ``A`` spin for a second.
+Example
+=======
+The following python script should make a large motor connected to ``OUTPUT_A``
+run while the touch sensor on ``INPUT_1`` is pressed.
 
    .. code-block:: py
 
        import rpyc
-       conn = rpyc.classic.connect('ev3dev') # host name or IP address of the EV3
-       ev3 = conn.modules['ev3dev2.ev3']      # import ev3dev2.ev3 remotely
-       m = ev3.LargeMotor('outA')
-       m.run_timed(time_sp=1000, speed_sp=600)
 
-You can run scripts like this from any interactive python environment, like
-ipython shell/notebook, spyder, pycharm, etc.
+       # Create a RPyC connection to the remote ev3dev device.
+       # Use the hostname or IP address of the ev3dev device.
+       # If this fails, verify your IP connectivty via ``ping X.X.X.X``
+       conn = rpyc.classic.connect('X.X.X.X')
 
-Some *advantages* of using RPyC with ev3dev are:
+       # import ev3dev2 on the remote ev3dev device
+       ev3dev2_motor = conn.modules['ev3dev2.motor']
+       ev3dev2_sensor = conn.modules['ev3dev2.sensor']
+       ev3dev2_sensor_lego = conn.modules['ev3dev2.sensor.lego']
 
-* It uses much less resources than running ipython notebook on EV3; RPyC server
-  is lightweight, and only requires an IP connection to the EV3 once set up (no
-  ssh required).
-* The scripts you are working with are actually stored and edited on your
-  desktop PC, with your favorite editor/IDE.
-* Some robots may need much more computational power than what EV3 can give
-  you. A notable example is the Rubics cube solver: there is an algorithm that
-  provides almost optimal solution (in terms of number of cube rotations), but
-  it takes more RAM than is available on EV3. With RPYC, you could run the
+       # Use the LargeMotor and TouchSensor on the remote ev3dev device
+       motor = ev3dev2_motor.LargeMotor(ev3dev2_motor.OUTPUT_A)
+       ts = ev3dev2_sensor_lego.TouchSensor(ev3dev2_sensor.INPUT_1)
+
+       # If the TouchSensor is pressed, run the motor
+       while True:
+           ts.wait_for_pressed()
+           motor.run_forever(speed_sp=200)
+
+           ts.wait_for_released()
+           motor.stop()
+
+
+Pros
+====
+* The RPyC server is lightweight and only requires an IP connection (no ssh required).
+* Some robots may need much more computational power than an EV3 can give
+  you. A notable example is the Rubik's cube solver. There is an algorithm that
+  provides an almost optimal solution (in terms of number of cube rotations), but
+  it takes more RAM than is available on EV3. With RPyC, you could run the
   heavy-duty computations on your desktop.
 
+Cons
+====
 The most obvious *disadvantage* is latency introduced by network connection.
 This may be a show stopper for robots where reaction speed is essential.
 
-.. _RPyC: http://rpyc.readthedocs.io/
-.. _sourceforge page: http://sourceforge.net/projects/rpyc/files/main
-.. _Download and Install: http://rpyc.readthedocs.io/en/latest/install.html
-.. _connect with SSH: http://www.ev3dev.org/docs/tutorials/connecting-to-ev3dev-with-ssh/
+References
+==========
+* `RPyC <http://rpyc.readthedocs.io/>`_
+* `sourceforge page <http://sourceforge.net/projects/rpyc/files/main>`_
+* `Download and Install <http://rpyc.readthedocs.io/en/latest/install.html>`_
+* `connect with SSH <http://www.ev3dev.org/docs/tutorials/connecting-to-ev3dev-with-ssh/>`_
