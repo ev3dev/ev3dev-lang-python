@@ -7,7 +7,7 @@ set -e
 source=$(dpkg-parsechangelog -S Source)
 version=$(dpkg-parsechangelog -S Version)
 distribution=$(dpkg-parsechangelog -S Distribution)
-codename=$(debian-distro-info --codename --${distribution})
+codename=$distribution # as of Aug 13 2019, the distribution is the codename
 
 OS=debian DIST=${codename} ARCH=amd64 pbuilder-ev3dev build
 OS=raspbian DIST=${codename} ARCH=armhf pbuilder-ev3dev build

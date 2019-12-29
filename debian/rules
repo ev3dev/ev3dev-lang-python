@@ -16,6 +16,7 @@ mpy_files = \
 	ev3dev2/_platform/pistorms.mpy \
 	ev3dev2/auto.mpy \
 	ev3dev2/button.mpy \
+	ev3dev2/console.mpy \
 	ev3dev2/control/__init__.mpy \
 	ev3dev2/control/GyroBalancer.mpy \
 	ev3dev2/control/rc_tank.mpy \
@@ -29,6 +30,7 @@ mpy_files = \
 	ev3dev2/sensor/__init__.mpy \
 	ev3dev2/sensor/lego.mpy \
 	ev3dev2/sound.mpy \
+	ev3dev2/stopwatch.mpy \
 	ev3dev2/unit.mpy \
 	ev3dev2/version.mpy \
 	ev3dev2/wheel.mpy
