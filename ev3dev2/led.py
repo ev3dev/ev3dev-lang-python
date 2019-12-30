@@ -354,6 +354,8 @@ class Leds(object):
         if not self.leds:
             return
 
+        self.animate_stop()
+
         for led in self.leds.values():
             led.brightness = 0
 
@@ -401,7 +403,7 @@ class Leds(object):
         def _animate_police_lights():
             self.all_off()
             even = True
-            duration_ms = duration * 1000
+            duration_ms = duration * 1000 if duration is not None else None
             stopwatch = StopWatch()
             stopwatch.start()
 
@@ -413,7 +415,7 @@ class Leds(object):
                     self.set_color(group1, color2)
                     self.set_color(group2, color1)
 
-                if self.animate_thread_stop or stopwatch.value_ms >= duration_ms:
+                if self.animate_thread_stop or stopwatch.is_elapsed_ms(duration_ms):
                     break
 
                 even = not even
@@ -446,7 +448,7 @@ class Leds(object):
 
         def _animate_flash():
             even = True
-            duration_ms = duration * 1000
+            duration_ms = duration * 1000 if duration is not None else None
             stopwatch = StopWatch()
             stopwatch.start()
 
@@ -457,7 +459,7 @@ class Leds(object):
                 else:
                     self.all_off()
 
-                if self.animate_thread_stop or stopwatch.value_ms >= duration_ms:
+                if self.animate_thread_stop or stopwatch.is_elapsed_ms(duration_ms):
                     break
 
                 even = not even
@@ -491,7 +493,7 @@ class Leds(object):
         def _animate_cycle():
             index = 0
             max_index = len(colors)
-            duration_ms = duration * 1000
+            duration_ms = duration * 1000 if duration is not None else None
             stopwatch = StopWatch()
             stopwatch.start()
 
@@ -504,7 +506,7 @@ class Leds(object):
                 if index == max_index:
                     index = 0
 
-                if self.animate_thread_stop or stopwatch.value_ms >= duration_ms:
+                if self.animate_thread_stop or stopwatch.is_elapsed_ms(duration_ms):
                     break
 
                 sleep(sleeptime)
@@ -545,7 +547,7 @@ class Leds(object):
             MIN_VALUE = 0
             MAX_VALUE = 1
             self.all_off()
-            duration_ms = duration * 1000
+            duration_ms = duration * 1000 if duration is not None else None
             stopwatch = StopWatch()
             stopwatch.start()
 
@@ -580,7 +582,7 @@ class Leds(object):
                 elif state == 3 and right_value == MIN_VALUE:
                     state = 0
 
-                if self.animate_thread_stop or stopwatch.value_ms >= duration_ms:
+                if self.animate_thread_stop or stopwatch.is_elapsed_ms(duration_ms):
                     break
 
                 sleep(sleeptime)
