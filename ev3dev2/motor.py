@@ -2702,64 +2702,14 @@ class MoveDifferential(MoveTank):
 
             while self.odometry_thread_run:
 
-                try:
-                    # sample the left and right encoder counts as close together
-                    # in time as possible
-                    left_current = self.left_motor.position
-                    right_current = self.right_motor.position
+                # sample the left and right encoder counts as close together
+                # in time as possible
+                left_current = self.left_motor.position
+                right_current = self.right_motor.position
 
-                    # determine how many ticks since our last sampling
-                    left_ticks = left_current - left_previous
-                    right_ticks = right_current - right_previous
-
-                    # Have we moved?
-                    if not left_ticks and not right_ticks:
-                        if sleep_time:
-                            time.sleep(sleep_time)
-                        continue
-
-                    # log.debug("%s: left_ticks %s (from %s to %s)" %
-                    #     (self, left_ticks, left_previous, left_current))
-                    # log.debug("%s: right_ticks %s (from %s to %s)" %
-                    #     (self, right_ticks, right_previous, right_current))
-
-                    # update _previous for next time
-                    left_previous = left_current
-                    right_previous = right_current
-
-                    # rotations = distance_mm/self.wheel.circumference_mm
-                    left_rotations = float(left_ticks / self.left_motor.count_per_rot)
-                    right_rotations = float(right_ticks / self.right_motor.count_per_rot)
-
-                    # convert longs to floats and ticks to mm
-                    left_mm = float(left_rotations * self.wheel.circumference_mm)
-                    right_mm = float(right_rotations * self.wheel.circumference_mm)
-
-                    # calculate distance we have traveled since last sampling
-                    mm = (left_mm + right_mm) / 2.0
-
-                    # accumulate total rotation around our center
-                    self.theta += (right_mm - left_mm) / self.wheel_distance_mm
-
-                    # and clip the rotation to plus or minus 360 degrees
-                    self.theta -= float(int(self.theta/TWO_PI) * TWO_PI)
-
-                    # now calculate and accumulate our position in mm
-                    if self.gyro:
-                        gyro_angle_radians = math.radians(self.gyro.angle + self.gyro_angle_offset)
-                        self.x_pos_mm += mm * math.cos(gyro_angle_radians)
-                        self.y_pos_mm += mm * math.sin(gyro_angle_radians)
-                    else:
-                        self.x_pos_mm += mm * math.cos(self.theta)
-                        self.y_pos_mm += mm * math.sin(self.theta)
-
-                    if sleep_time:
-                        time.sleep(sleep_time)
-
-                except Exception as e:
-                    log.info("_odometry_monitor caught an exception")
-                    log.exception(e)
-                    break
+                # determine how many ticks since our last sampling
+                left_ticks = left_current - left_previous
+                right_ticks = right_current - right_previous
 
                 # Have we moved?
                 if not left_ticks and not right_ticks:
@@ -2794,8 +2744,13 @@ class MoveDifferential(MoveTank):
                 self.theta -= float(int(self.theta/TWO_PI) * TWO_PI)
 
                 # now calculate and accumulate our position in mm
-                self.x_pos_mm += mm * math.cos(self.theta)
-                self.y_pos_mm += mm * math.sin(self.theta)
+                if self.gyro:
+                    gyro_angle_radians = math.radians(self.gyro.angle + self.gyro_angle_offset)
+                    self.x_pos_mm += mm * math.cos(gyro_angle_radians)
+                    self.y_pos_mm += mm * math.sin(gyro_angle_radians)
+                else:
+                    self.x_pos_mm += mm * math.cos(self.theta)
+                    self.y_pos_mm += mm * math.sin(self.theta)
 
                 if sleep_time:
                     time.sleep(sleep_time)
