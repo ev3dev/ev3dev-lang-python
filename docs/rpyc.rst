@@ -106,3 +106,10 @@ Cons
 ====
 * Latency will be introduced by the network connection.  This may be a show stopper for robots where reaction speed is essential.
 * RPyC is only supported by python, it is *NOT* supported by micropython
+
+References
+==========
+* `RPyC <http://rpyc.readthedocs.io/>`_
+* `sourceforge page <http://sourceforge.net/projects/rpyc/files/main>`_
+* `Download and Install <http://rpyc.readthedocs.io/en/latest/install.html>`_
+* `connect with SSH <http://www.ev3dev.org/docs/tutorials/connecting-to-ev3dev-with-ssh/>`_
