@@ -2,23 +2,27 @@
 RPyC on ev3dev
 **************
 
-`RPyC_ <https://rpyc.readthedocs.io/en/latest/>`_ (pronounced as are-pie-see), or Remote Python Call, is a transparent
-python library for symmetrical remote procedure calls, clustering and
-distributed-computing. RPyC makes use of object-proxying, a technique that
-employs python’s dynamic nature, to overcome the physical boundaries between
-processes and computers, so that remote objects can be manipulated as if they
-were local.
+`RPyC_ <https://rpyc.readthedocs.io/en/latest/>`_ (pronounced as are-pie-see) can be used to:
+* run a python program on an ev3dev device that controls another ev3dev device.
+This is more commonly known as daisy chaining.
+* run a python program on your laptop that controls an ev3dev device. This can be
+useful if your robot requires CPU intensive code that would be slow to run on the
+EV3. A good example of this is a Rubik's cube solver, calculating the solution to
+solve a Rubik's cube can be slow on an EV3.
 
-For ev3dev, RPyC is most often used for:
+For both of these scenarios you can use RPyC to control multiple remote ev3dev devices.
 
-* robots that involve more than one EV3 (i.e. daisy chaining)
-* robots that perform some CPU intensive task (ex: Rubik's cube solver) where you
-  wish to run the CPU intensive part on your desktop PC
 
 Networking
 ==========
-You will need to setup networking on your ev3dev device(s). The
-`ev3dev networking documentation <https://www.ev3dev.org/docs/networking/>`_ should get
+You will need IP connectivity between the device where your python code runs
+(laptop, an ev3dev device, etc) and the remote ev3dev devices. Some common scenarios
+might be:
+* Multiple EV3s on the same WiFi network
+* A laptop and an EV3 on the same WiFi network
+* A bluetooth connection between two EV3s
+
+The `ev3dev networking documentation <https://www.ev3dev.org/docs/networking/>`_ should get
 you up and running in terms of networking connectivity.
 
 
@@ -26,8 +30,8 @@ Install
 =======
 
 1. RPyC is installed on ev3dev but we need to create a service that launches
-   ``rpyc_classic.py`` at bootup. Cut-n-paste the following commands on the
-   ev3dev device(s) that you wish to control via RPyC.
+   ``rpyc_classic.py`` at bootup. `SSH <http://www.ev3dev.org/docs/tutorials/connecting-to-ev3dev-with-ssh/>`_ to your remote ev3dev devices and
+   cut-n-paste the following commands at the bash prompt.
 
    .. code-block:: shell
 
@@ -62,8 +66,9 @@ Install
 
 Example
 =======
-The following python script should make a large motor connected to ``OUTPUT_A``
-run while the touch sensor on ``INPUT_1`` is pressed.
+We will run code on our laptop to control the remote ev3dev device with IP
+address X.X.X.X. The goal is to have the LargeMotor connected to ``OUTPUT_A``
+run when the TouchSensor on ``INPUT_1`` is pressed.
 
    .. code-block:: py
 
@@ -91,24 +96,13 @@ run while the touch sensor on ``INPUT_1`` is pressed.
            ts.wait_for_released()
            motor.stop()
 
-
 Pros
 ====
-* The RPyC server is lightweight and only requires an IP connection (no ssh required).
+* RPyC is lightweight and only requires an IP connection (no ssh required).
 * Some robots may need much more computational power than an EV3 can give
-  you. A notable example is the Rubik's cube solver. There is an algorithm that
-  provides an almost optimal solution (in terms of number of cube rotations), but
-  it takes more RAM than is available on EV3. With RPyC, you could run the
-  heavy-duty computations on your desktop.
+  you. A notable example is the Rubik's cube solver.
 
 Cons
 ====
-The most obvious *disadvantage* is latency introduced by network connection.
-This may be a show stopper for robots where reaction speed is essential.
-
-References
-==========
-* `RPyC <http://rpyc.readthedocs.io/>`_
-* `sourceforge page <http://sourceforge.net/projects/rpyc/files/main>`_
-* `Download and Install <http://rpyc.readthedocs.io/en/latest/install.html>`_
-* `connect with SSH <http://www.ev3dev.org/docs/tutorials/connecting-to-ev3dev-with-ssh/>`_
+* Latency will be introduced by the network connection.  This may be a show stopper for robots where reaction speed is essential.
+* RPyC is only supported by python, it is *NOT* supported by micropython
