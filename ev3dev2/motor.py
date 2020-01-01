@@ -2469,7 +2469,6 @@ class MoveDifferential(MoveTank):
         self.x_pos_mm = 0.0  # robot X position in mm
         self.y_pos_mm = 0.0  # robot Y position in mm
         self.odometry_thread_run = False
-        self.odometry_thread_running = False
         self.theta = 0.0
 
     def on_for_distance(self, speed, distance_mm, brake=True, block=True):
@@ -2652,8 +2651,6 @@ class MoveDifferential(MoveTank):
             self.x_pos_mm = x_pos_start  # robot X position in mm
             self.y_pos_mm = y_pos_start  # robot Y position in mm
             TWO_PI = 2 * math.pi
-
-            log.info("_odometry_monitor running")
             self.odometry_thread_run = True
 
             while self.odometry_thread_run:
@@ -2696,7 +2693,7 @@ class MoveDifferential(MoveTank):
                 # accumulate total rotation around our center
                 self.theta += (right_mm - left_mm) / self.wheel_distance_mm
 
-                # clip the rotation to plus or minus 360 degrees
+                # and clip the rotation to plus or minus 360 degrees
                 self.theta -= float(int(self.theta/TWO_PI) * TWO_PI)
 
                 # now calculate and accumulate our position in mm
@@ -2706,12 +2703,7 @@ class MoveDifferential(MoveTank):
                 if sleep_time:
                     time.sleep(sleep_time)
 
-            self.odometry_thread_run = False
-            self.odometry_thread_running = False
-            log.info("_odometry_monitor stopped")
-
         _thread.start_new_thread(_odometry_monitor, ())
-        self.odometry_thread_running = True
 
         # Block until the thread has started doing work
         while not self.odometry_thread_run:
@@ -2719,20 +2711,17 @@ class MoveDifferential(MoveTank):
 
     def odometry_stop(self):
         """
-        Signal the odometry thread to exit and wait for it to exit
+        Signal the odometry thread to exit
         """
 
-        if self.odometry_thread_running:
+        if self.odometry_thread_run:
             self.odometry_thread_run = False
-
-            while self.odometry_thread_running:
-                pass
 
     def turn_to_angle(self, speed, angle_target_degrees, brake=True, block=True, wiggle_room=2):
         """
         Rotate in place to `angle_target_degrees` at `speed`
         """
-        assert self.odometry_thread_running, "odometry_start() must be called to track robot coordinates"
+        assert self.odometry_thread_run, "odometry_start() must be called to track robot coordinates"
 
         # Make both target and current angles positive numbers between 0 and 360
         while angle_target_degrees < 0:
@@ -2771,7 +2760,7 @@ class MoveDifferential(MoveTank):
         """
         Drive to (`x_target_mm`, `y_target_mm`) coordinates at `speed`
         """
-        assert self.odometry_thread_running, "odometry_start() must be called to track robot coordinates"
+        assert self.odometry_thread_run, "odometry_start() must be called to track robot coordinates"
 
         # stop moving
         self.off(brake='hold')
