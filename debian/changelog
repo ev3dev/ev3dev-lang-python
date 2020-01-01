@@ -1,5 +1,9 @@
 python-ev3dev2 (2.1.0) UNRELEASED; urgency=medium
 
+  [Matěj Volf]
+  * LED animation fix duration None
+  * Add rest notes to sound.Sound.play_song()
+
   [Kaelin Laundry]
   * Add "value_secs" and "is_elapsed_*" methods to StopWatch
   * Rename "value_hms" to "hms_str". New "value_hms" returns original tuple.
