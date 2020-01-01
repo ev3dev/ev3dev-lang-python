@@ -2224,19 +2224,21 @@ class MoveTank(MotorSet):
 
         self.stop()
 
-    def turn_degrees(
+    def _turn(
             self,
             speed,
-            target_degrees,
+            target_angle,
+            brake=True,
+            block=True,
             wiggle_room=2,
             sleep_time=0.01
         ):
         """
-        Use a GyroSensor to rotate in place for ``target_degrees``
+        Use a GyroSensor to rotate in place for ``target_angle``
 
         ``speed`` is the desired speed of the midpoint of the robot
 
-        ``target_degrees`` is the number of degrees we want to rotate
+        ``target_angle`` is the number of degrees we want to rotate
 
         ``wiggle_room`` is the +/- angle threshold to control how accurate the turn should be
 
@@ -2244,6 +2246,73 @@ class MoveTank(MotorSet):
             the loop.  This is to give the robot a chance to react
             to the new motor settings. This should be something small such
             as 0.01 (10ms).
+        """
+
+        # MoveTank does not have information on wheel size and distance (that is
+        # MoveDifferential) so we must have a GyroSensor to control how far we
+        # have rotated.
+        assert self._gyro, "GyroSensor must be defined"
+
+        if not target_angle:
+            return
+
+        speed_native_units = speed.to_native_units(self.left_motor)
+        init_angle = self._gyro.angle
+
+        while True:
+            current_angle = self._gyro.angle
+            delta = abs(current_angle - init_angle)
+
+            if delta <= wiggle_room:
+                self.stop(brake)
+                break
+
+            # our goal is to rotate target_angle clockwise
+            if target_angle > 0:
+
+                # we went too far, rotate counter-clockwise
+                if (delta > target_angle):
+                    left_speed = SpeedNativeUnits(-1 * speed_native_units)
+                    right_speed = SpeedNativeUnits(speed_native_units)
+
+                # we have not gone far enough, rotate clockwise
+                else:
+                    left_speed = SpeedNativeUnits(speed_native_units)
+                    right_speed = SpeedNativeUnits(-1 * speed_native_units)
+
+            # our goal is to rotate target_angle counter-clockwise
+            else:
+
+                # we went too far, rotate clockwise
+                if (delta > target_angle):
+                    left_speed = SpeedNativeUnits(speed_native_units)
+                    right_speed = SpeedNativeUnits(-1 * speed_native_units)
+
+                # we have not gone far enough, rotate counter-clockwise
+                else:
+                    left_speed = SpeedNativeUnits(-1 * speed_native_units)
+                    right_speed = SpeedNativeUnits(speed_native_units)
+
+            self.on(left_speed, right_speed)
+
+            if sleep_time:
+                time.sleep(sleep_time)
+
+    def turn_right(self, speed, degrees, brake=True, block=True, wiggle_room=2, sleep_time=0.01):
+        """
+        Rotate clockwise `degrees` in place
+        """
+        self._turn(speed, abs(degrees), brake, block, wiggle_room, sleep_time)
+
+    def turn_left(self, speed, degrees, brake=True, block=True, wiggle_room=2, sleep_time=0.01):
+        """
+        Rotate counter-clockwise `degrees` in place
+        """
+        self._turn(speed, abs(degrees) * -1, brake, block, wiggle_room, sleep_time)
+
+    def turn_degrees(self, speed, target_degrees, brake=True, block=True, wiggle_room=2, sleep_time=0.01):
+        """
+        Rotate in place for `target_degrees` at `speed`
 
         Example:
 
@@ -2264,48 +2333,13 @@ class MoveTank(MotorSet):
             # Pivot 30 degrees
             tank.turn_degrees(
                 speed=SpeedPercent(5),
-                target_degrees=30
+                target_angle=30
             )
         """
-        assert self._gyro, "GyroSensor must be defined"
-
-        if not target_degrees:
-            return
-
-        speed_native_units = speed.to_native_units(self.left_motor)
-        init_angle = self._gyro.angle
-
-        # dwalton
-        while True:
-            current_angle = self._gyro.angle
-            delta = abs(current_angle - init_angle)
-
-            if delta <= wiggle_room:
-                self.stop()
-                break
-
-            # goal is to rotate target_degrees clockwise
-            if target_degrees > 0:
-                if (delta > target_degrees):
-                    left_speed = SpeedNativeUnits(-1 * speed_native_units)
-                    right_speed = SpeedNativeUnits(speed_native_units)
-                else:
-                    left_speed = SpeedNativeUnits(speed_native_units)
-                    right_speed = SpeedNativeUnits(-1 * speed_native_units)
-
-            # goal is to rotate target_degrees counter-clockwise
-            else:
-                if (delta < target_degrees):
-                    left_speed = SpeedNativeUnits(-1 * speed_native_units)
-                    right_speed = SpeedNativeUnits(speed_native_units)
-                else:
-                    left_speed = SpeedNativeUnits(speed_native_units)
-                    right_speed = SpeedNativeUnits(-1 * speed_native_units)
-
-            self.on(left_speed, right_speed)
-
-            if sleep_time:
-                time.sleep(sleep_time)
+        if target_degrees > 0:
+            self.turn_right(speed, target_degrees, brake, block, wiggle_room, sleep_time)
+        elif target_degrees < 0:
+            self.turn_left(speed, abs(target_degrees), brake, block, wiggle_room, sleep_time)
 
 
 class MoveSteering(MoveTank):
@@ -2637,18 +2671,6 @@ class MoveDifferential(MoveTank):
             if abs(degrees_error) > wiggle_room:
                 self._turn(speed, degrees_error, brake, block)
 
-    def turn_right(self, speed, degrees, brake=True, block=True, wiggle_room=2):
-        """
-        Rotate clockwise `degrees` in place
-        """
-        self._turn(speed, abs(degrees), brake, block, wiggle_room)
-
-    def turn_left(self, speed, degrees, brake=True, block=True, wiggle_room=2):
-        """
-        Rotate counter-clockwise `degrees` in place
-        """
-        self._turn(speed, abs(degrees) * -1, brake, block, wiggle_room)
-
     def odometry_coordinates_log(self):
         log.debug("%s: odometry angle %s at (%d, %d)" %
             (self, math.degrees(self.theta), self.x_pos_mm, self.y_pos_mm))
@@ -2736,16 +2758,6 @@ class MoveDifferential(MoveTank):
 
         if self.odometry_thread_run:
             self.odometry_thread_run = False
-
-    # dwalton
-    def turn_degrees(self, speed, target_degrees, brake=True, block=True, wiggle_room=2):
-        """
-        Rotate in place for `target_degrees` at `speed`
-        """
-        if target_degrees > 0:
-            self.turn_right(speed, target_degrees, brake, block, wiggle_room)
-        elif target_degrees < 0:
-            self.turn_left(speed, abs(target_degrees), brake, block, wiggle_room)
 
     def turn_to_angle(self, speed, angle_target_degrees, brake=True, block=True, wiggle_room=2):
         """
