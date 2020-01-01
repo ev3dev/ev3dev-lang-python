@@ -4,7 +4,7 @@ python-ev3dev2 (2.1.0) UNRELEASED; urgency=medium
   * Add "value_secs" and "is_elapsed_*" methods to StopWatch
   * Rename "value_hms" to "hms_str". New "value_hms" returns original tuple.
   * Fix bug in Button.process() on Micropython
-  
+
   [Nithin Shenoy]
   * Add Gyro-based driving support to MoveTank
 

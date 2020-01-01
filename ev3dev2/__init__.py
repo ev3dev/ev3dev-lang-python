@@ -217,7 +217,7 @@ class Device(object):
             return "%s(%s)" % (self.__class__.__name__, self.kwargs.get('address'))
         else:
             return self.__class__.__name__
-    
+
     def __repr__(self):
         return self.__str__()
 

@@ -635,15 +635,8 @@ class GyroSensor(Sensor):
         time.sleep(2)
         self._ensure_mode(current_mode)
 
-    def reset(self, block=False):
-        """
-        Resets the angle to 0. If `block` is True the function will wait
-        until the angle is 0 before returning.
-
-        Caveats:
-            - This function only resets the angle to 0, it does not fix drift.
-            - This function only works on EV3, it does not work on BrickPi,
-              PiStorms, or with any sensor multiplexors.
+    def reset(self):
+        """Resets the angle to 0.
         """
         # 17 comes from inspecting the .vix file of the Gyro sensor block in EV3-G
         self._direct = self.set_attr_raw(self._direct, 'direct', b'\x11')

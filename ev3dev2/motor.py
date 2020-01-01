@@ -2706,9 +2706,9 @@ class MoveDifferential(MoveTank):
                 if sleep_time:
                     time.sleep(sleep_time)
 
-            log.info("_odometry_monitor stopped")
             self.odometry_thread_run = False
             self.odometry_thread_running = False
+            log.info("_odometry_monitor stopped")
 
         _thread.start_new_thread(_odometry_monitor, ())
         self.odometry_thread_running = True
