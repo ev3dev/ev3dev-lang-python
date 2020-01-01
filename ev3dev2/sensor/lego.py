@@ -647,27 +647,6 @@ class GyroSensor(Sensor):
         """
         # 17 comes from inspecting the .vix file of the Gyro sensor block in EV3-G
         self._direct = self.set_attr_raw(self._direct, 'direct', b'\x11')
-
-        # If block is True wait until the angle reads 0
-        if block:
-            MAX_ATTEMPTS = 20
-            SLEEP_AMOUNT = 0.1  # 100ms
-
-            for x in range(MAX_ATTEMPTS):
-                try:
-                    if self.angle:
-                        time.sleep(SLEEP_AMOUNT)
-                    else:
-                        break
-
-                # When we reset the gyro and then attempt to read the angle the
-                # read may fail if the gyro is in the middle of reseting.
-                except OSError:
-                    time.sleep(SLEEP_AMOUNT)
-
-            else:
-                raise Exception("%s did not reset, angle %s" % (self, self.angle))
-
         self._init_angle = self.angle
 
     def wait_until_angle_changed_by(self, delta, direction_sensitive=False):

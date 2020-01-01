@@ -2123,19 +2123,6 @@ class MoveTank(MotorSet):
 
         self.stop()
 
-    def calibrate_gyro(self):
-        """
-        Calibrates the gyro sensor.
-
-        NOTE: This takes 1sec to run
-        """
-        assert self._gyro, "GyroSensor must be defined"
-
-        for x in range(2):
-            self._gyro.mode = 'GYRO-RATE'
-            self._gyro.mode = 'GYRO-ANG'
-            time.sleep(0.5)
-
     def follow_gyro_angle(self,
             kp, ki, kd,
             speed,
@@ -2181,7 +2168,7 @@ class MoveTank(MotorSet):
 
             try:
                 # Calibrate the gyro to eliminate drift, and to initialize the current angle as 0
-                tank.calibrate_gyro()
+                tank.gyro.calibrate()
 
                 # Follow the line for 4500ms
                 tank.follow_gyro_angle(
@@ -2271,7 +2258,7 @@ class MoveTank(MotorSet):
             tank.gyro = GyroSensor()
 
             # Calibrate the gyro to eliminate drift, and to initialize the current angle as 0
-            tank.calibrate_gyro()
+            tank.gyro.calibrate()
 
             # Pivot 30 degrees
             tank.turn_to_angle_gyro(
@@ -2586,9 +2573,9 @@ class MoveDifferential(MoveTank):
         use_gyro = bool(block and brake and self._gyro)
 
         if use_gyro:
-            angle_init_degrees = math.degrees(self.theta)
-        else:
             angle_init_degrees = self._gyro.circle_angle()
+        else:
+            angle_init_degrees = math.degrees(self.theta)
 
         angle_target_degrees = final_angle(angle_init_degrees, degrees)
 
@@ -2645,8 +2632,7 @@ class MoveDifferential(MoveTank):
 
     def odometry_coordinates_log(self):
         log.debug("%s: odometry angle %s at (%d, %d)" %
-            (self, math.degrees(self.theta),
-            self.x_pos_mm, self.y_pos_mm))
+            (self, math.degrees(self.theta), self.x_pos_mm, self.y_pos_mm))
 
     def odometry_start(self, theta_degrees_start=90.0,
             x_pos_start=0.0, y_pos_start=0.0,
@@ -2667,8 +2653,7 @@ class MoveDifferential(MoveTank):
             self.y_pos_mm = y_pos_start  # robot Y position in mm
             TWO_PI = 2 * math.pi
 
-            log.info("_odometry_monitor running, gyro angle %s" % (self._gyro.angle))
-            self.odometry_coordinates_log()
+            log.info("_odometry_monitor running")
             self.odometry_thread_run = True
 
             while self.odometry_thread_run:
@@ -2721,7 +2706,6 @@ class MoveDifferential(MoveTank):
                 if sleep_time:
                     time.sleep(sleep_time)
 
-            self.odometry_coordinates_log()
             log.info("_odometry_monitor stopped")
             self.odometry_thread_run = False
             self.odometry_thread_running = False
