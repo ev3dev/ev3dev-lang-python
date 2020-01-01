@@ -1,5 +1,8 @@
 python-ev3dev2 (2.1.0) UNRELEASED; urgency=medium
 
+  [Daniel Walton]
+  * MoveDifferential._turn() use gyro for better accuracy
+
   [Matěj Volf]
   * LED animation fix duration None
   * Add rest notes to sound.Sound.play_song()
