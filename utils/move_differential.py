@@ -4,12 +4,10 @@
 Used to experiment with the MoveDifferential class
 """
 
-from ev3dev2.sensor.lego import GyroSensor
 from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveDifferential, SpeedRPM
 from ev3dev2.wheel import EV3Tire
 from ev3dev2.unit import DistanceFeet
 from math import pi
-from time import sleep
 import logging
 import sys
 
@@ -34,7 +32,6 @@ ONE_FOOT_CICLE_CIRCUMFERENCE_MM = 2 * pi * ONE_FOOT_CICLE_RADIUS_MM
 # wheel seperation.
 # https://sites.google.com/site/ev3basic/ev3-basic-programming/going-further/writerbot-v1/drawing-arcs
 mdiff = MoveDifferential(OUTPUT_A, OUTPUT_B, EV3Tire, 16.3 * STUD_MM)
-mdiff.gyro = GyroSensor()
 
 # This goes crazy on brickpi3, does it do the same on ev3?
 #mdiff.on_for_distance(SpeedRPM(-40), 720, brake=False)
@@ -42,20 +39,17 @@ mdiff.gyro = GyroSensor()
 
 # Test arc left/right turns
 #mdiff.on_arc_right(SpeedRPM(80), ONE_FOOT_CICLE_RADIUS_MM, ONE_FOOT_CICLE_CIRCUMFERENCE_MM / 4)
-#mdiff.on_arc_left(SpeedRPM(80), ONE_FOOT_CICLE_RADIUS_MM, ONE_FOOT_CICLE_CIRCUMFERENCE_MM)
+mdiff.on_arc_left(SpeedRPM(80), ONE_FOOT_CICLE_RADIUS_MM, ONE_FOOT_CICLE_CIRCUMFERENCE_MM)
 
 # Test turning in place
 #mdiff.turn_right(SpeedRPM(40), 180)
 #mdiff.turn_left(SpeedRPM(40), 180)
 
 # Test odometry
-mdiff.odometry_start()
-mdiff.turn_to_angle(SpeedRPM(40), 0)
-print("\n\n\n\n")
-mdiff.turn_to_angle(SpeedRPM(40), 90)
-print("\n\n\n\n")
-sys.exit(0)
+#mdiff.odometry_start()
+#mdiff.odometry_coordinates_log()
 
+#mdiff.turn_to_angle(SpeedRPM(40), 0)
 #mdiff.on_for_distance(SpeedRPM(40), DistanceFeet(2).mm)
 #mdiff.turn_right(SpeedRPM(40), 180)
 #mdiff.turn_left(SpeedRPM(30), 90)
@@ -87,16 +81,6 @@ sys.exit(0)
 #mdiff.on_to_coordinates(SpeedRPM(40), 0, 0)
 #mdiff.turn_to_angle(SpeedRPM(40), 90)
 
-prev_gyro_angle = None
-log.info("FOO")
 
-while True:
-    gyro_angle = mdiff.gyro.angle
-
-    log.info(gyro_angle)
-    if prev_gyro_angle is not None and gyro_angle == prev_gyro_angle:
-        break
-    sleep(1)
-    prev_gyro_angle = gyro_angle
-
-mdiff.odometry_stop()
+#mdiff.odometry_coordinates_log()
+#mdiff.odometry_stop()
