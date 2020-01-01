@@ -28,9 +28,12 @@ import sys
 if sys.version_info < (3,4):
     raise SystemError('Must be using Python 3.4 or higher')
 
+import logging
 import time
 from ev3dev2.button import ButtonBase
 from ev3dev2.sensor import Sensor
+
+log = logging.getLogger(__name__)
 
 
 class TouchSensor(Sensor):
@@ -586,6 +589,7 @@ class GyroSensor(Sensor):
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(GyroSensor, self).__init__(address, name_pattern, name_exact, driver_name='lego-ev3-gyro', **kwargs)
         self._direct = None
+        self._init_angle = self.angle
 
     @property
     def angle(self):
@@ -664,6 +668,8 @@ class GyroSensor(Sensor):
             else:
                 raise Exception("%s did not reset, angle %s" % (self, self.angle))
 
+        self._init_angle = self.angle
+
     def wait_until_angle_changed_by(self, delta, direction_sensitive=False):
         """
         Wait until angle has changed by specified amount.
@@ -690,6 +696,61 @@ class GyroSensor(Sensor):
         else:
             while abs(start_angle - self.value(0)) < delta:
                 time.sleep(0.01)
+
+    def circle_angle(self):
+        """
+        As the gryo rotates clockwise the angle increases, it will increase
+        by 360 for each full rotation. As the gyro rotates counter-clockwise
+        the gyro angle will decrease.
+
+        The angles on a circle have the opposite behavior though, they start
+        at 0 and increase as you move counter-clockwise around the circle.
+
+        Convert the gyro angle to the angle on a circle. We consider the initial
+        position of the gyro to be at 90 degrees on the cirlce.
+        """
+        current_angle = self.angle
+        delta = abs(current_angle - self._init_angle) % 360
+
+        if delta == 0:
+            result = 90
+
+        # the gyro has turned clockwise relative to where we started
+        elif current_angle > self._init_angle:
+
+            if delta <= 90:
+                result = 90 - delta
+
+            elif delta <= 180:
+                result = 360 - (delta - 90)
+
+            elif delta <= 270:
+                result = 270 - (delta - 180)
+
+            else:
+                result = 180 - (delta - 270)
+
+            # This can be chatty (but helpful) so save it for a rainy day
+            # log.info("%s moved clockwise %s degrees to %s" % (self, delta, result))
+
+        # the gyro has turned counter-clockwise relative to where we started
+        else:
+            if delta <= 90:
+                result = 90 + delta
+
+            elif delta <= 180:
+                result = 180 + (delta - 90)
+
+            elif delta <= 270:
+                result = 270 + (delta - 180)
+
+            else:
+                result = delta - 270
+
+            # This can be chatty (but helpful) so save it for a rainy day
+            # log.info("%s moved counter-clockwise %s degrees to %s" % (self, delta, result))
+
+        return result
 
 
 class InfraredSensor(Sensor, ButtonBase):
