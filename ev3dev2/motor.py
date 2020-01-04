@@ -2249,8 +2249,7 @@ class MoveTank(MotorSet):
         """
 
         # MoveTank does not have information on wheel size and distance (that is
-        # MoveDifferential) so we must have a GyroSensor to control how far we
-        # have rotated.
+        # MoveDifferential) so we must use a GyroSensor to control how far we rotate.
         assert self._gyro, "GyroSensor must be defined"
 
         if not target_angle:
