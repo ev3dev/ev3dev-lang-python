@@ -50,7 +50,6 @@ import fnmatch
 import re
 import stat
 import errno
-import _thread
 from os.path import abspath
 
 def get_current_platform():
@@ -153,7 +152,6 @@ class Device(object):
         '_path',
         '_device_index',
         '_attr_cache',
-        '_file_lock',
         'kwargs',
     ]
 
@@ -189,7 +187,6 @@ class Device(object):
         classpath = abspath(Device.DEVICE_ROOT_PATH + '/' + class_name)
         self.kwargs = kwargs
         self._attr_cache = {}
-        self._file_lock = _thread.allocate_lock()
 
         def get_index(file):
             match = Device._DEVICE_INDEX.match(file)
@@ -242,25 +239,20 @@ class Device(object):
 
     def _get_attribute(self, attribute, name):
         """Device attribute getter"""
-        self._file_lock.acquire()
         try:
             if attribute is None:
-                attribute = self._attribute_file_open(name)
+                attribute = self._attribute_file_open( name )
             else:
                 attribute.seek(0)
-            result = attribute.read().strip().decode()
-            self._file_lock.release()
-            return attribute, result
+            return attribute, attribute.read().strip().decode()
         except Exception as ex:
-            self._file_lock.release()
             self._raise_friendly_access_error(ex, name, None)
 
     def _set_attribute(self, attribute, name, value):
         """Device attribute setter"""
-        self._file_lock.acquire()
         try:
             if attribute is None:
-                attribute = self._attribute_file_open(name)
+                attribute = self._attribute_file_open( name )
             else:
                 attribute.seek(0)
 
@@ -268,12 +260,9 @@ class Device(object):
                 value = value.encode()
             attribute.write(value)
             attribute.flush()
-            self._file_lock.release()
-            return attribute
-
         except Exception as ex:
-            self._file_lock.release()
             self._raise_friendly_access_error(ex, name, value)
+        return attribute
 
     def _raise_friendly_access_error(self, driver_error, attribute, value):
         if not isinstance(driver_error, OSError):
