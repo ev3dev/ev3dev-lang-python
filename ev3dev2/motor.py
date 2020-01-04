@@ -2229,7 +2229,6 @@ class MoveTank(MotorSet):
             speed,
             target_angle,
             brake=True,
-            block=True,
             wiggle_room=2,
             sleep_time=0.01
         ):
@@ -2239,6 +2238,8 @@ class MoveTank(MotorSet):
         ``speed`` is the desired speed of the midpoint of the robot
 
         ``target_angle`` is the number of degrees we want to rotate
+
+        ``brake`` hit the brakes once we reach ``target_angle``
 
         ``wiggle_room`` is the +/- angle threshold to control how accurate the turn should be
 
@@ -2257,59 +2258,62 @@ class MoveTank(MotorSet):
 
         speed_native_units = speed.to_native_units(self.left_motor)
         init_angle = self._gyro.angle
+        first = True
 
         while True:
             current_angle = self._gyro.angle
-            delta = abs(current_angle - init_angle)
+            degrees_moved = abs(current_angle - init_angle)
+            delta = abs(abs(target_angle) - degrees_moved)
 
             if delta <= wiggle_room:
-                self.stop(brake)
+                self.stop(brake=brake)
                 break
 
             # our goal is to rotate target_angle clockwise
             if target_angle > 0:
 
-                # we went too far, rotate counter-clockwise
-                if (delta > target_angle):
-                    left_speed = SpeedNativeUnits(-1 * speed_native_units)
-                    right_speed = SpeedNativeUnits(speed_native_units)
-
                 # we have not gone far enough, rotate clockwise
-                else:
+                if first or degrees_moved < target_angle:
                     left_speed = SpeedNativeUnits(speed_native_units)
                     right_speed = SpeedNativeUnits(-1 * speed_native_units)
+
+                # we went too far, rotate counter-clockwise
+                else:
+                    left_speed = SpeedNativeUnits(-1 * speed_native_units)
+                    right_speed = SpeedNativeUnits(speed_native_units)
 
             # our goal is to rotate target_angle counter-clockwise
             else:
 
-                # we went too far, rotate clockwise
-                if (delta > target_angle):
-                    left_speed = SpeedNativeUnits(speed_native_units)
-                    right_speed = SpeedNativeUnits(-1 * speed_native_units)
-
                 # we have not gone far enough, rotate counter-clockwise
-                else:
+                if first or degrees_moved < abs(target_angle):
                     left_speed = SpeedNativeUnits(-1 * speed_native_units)
                     right_speed = SpeedNativeUnits(speed_native_units)
 
+                # we went too far, rotate clockwise
+                else:
+                    left_speed = SpeedNativeUnits(speed_native_units)
+                    right_speed = SpeedNativeUnits(-1 * speed_native_units)
+
+            first = False
             self.on(left_speed, right_speed)
 
             if sleep_time:
                 time.sleep(sleep_time)
 
-    def turn_right(self, speed, degrees, brake=True, block=True, wiggle_room=2, sleep_time=0.01):
+    def turn_right(self, speed, degrees, brake=True, wiggle_room=2, sleep_time=0.01):
         """
         Rotate clockwise `degrees` in place
         """
-        self._turn(speed, abs(degrees), brake, block, wiggle_room, sleep_time)
+        self._turn(speed, abs(degrees), brake, wiggle_room, sleep_time)
 
-    def turn_left(self, speed, degrees, brake=True, block=True, wiggle_room=2, sleep_time=0.01):
+    def turn_left(self, speed, degrees, brake=True, wiggle_room=2, sleep_time=0.01):
         """
         Rotate counter-clockwise `degrees` in place
         """
-        self._turn(speed, abs(degrees) * -1, brake, block, wiggle_room, sleep_time)
+        self._turn(speed, abs(degrees) * -1, brake, wiggle_room, sleep_time)
 
-    def turn_degrees(self, speed, target_degrees, brake=True, block=True, wiggle_room=2, sleep_time=0.01):
+    def turn_degrees(self, speed, target_degrees, brake=True, wiggle_room=2, sleep_time=0.01):
         """
         Rotate in place for `target_degrees` at `speed`
 
@@ -2336,9 +2340,9 @@ class MoveTank(MotorSet):
             )
         """
         if target_degrees > 0:
-            self.turn_right(speed, target_degrees, brake, block, wiggle_room, sleep_time)
+            self.turn_right(speed, target_degrees, brake, wiggle_room, sleep_time)
         elif target_degrees < 0:
-            self.turn_left(speed, abs(target_degrees), brake, block, wiggle_room, sleep_time)
+            self.turn_left(speed, abs(target_degrees), brake, wiggle_room, sleep_time)
 
 
 class MoveSteering(MoveTank):
@@ -2670,6 +2674,66 @@ class MoveDifferential(MoveTank):
             if abs(degrees_error) > wiggle_room:
                 self._turn(speed, degrees_error, brake, block)
 
+    def turn_right(self, speed, degrees, brake=True, block=True, wiggle_room=2):
+        """
+        Rotate clockwise `degrees` in place
+        """
+        self._turn(speed, abs(degrees), brake, block, wiggle_room)
+
+    def turn_left(self, speed, degrees, brake=True, block=True, wiggle_room=2):
+        """
+        Rotate counter-clockwise `degrees` in place
+        """
+        self._turn(speed, abs(degrees) * -1, brake, block, wiggle_room)
+
+    def turn_degrees(self, speed, degrees, brake=True, block=True, wiggle_room=2):
+        """
+        Rotate `degrees` in place
+        """
+        if degrees > 0:
+            self.turn_right(speed, degrees, brake, block, wiggle_room)
+        elif degrees < 0:
+            self.turn_left(speed, abs(degrees), brake, block, wiggle_room)
+
+    def turn_to_angle(self, speed, angle_target_degrees, brake=True, block=True, wiggle_room=2):
+        """
+        Rotate in place to `angle_target_degrees` at `speed`
+        """
+        assert self.odometry_thread_run, "odometry_start() must be called to track robot coordinates"
+
+        # Make both target and current angles positive numbers between 0 and 360
+        while angle_target_degrees < 0:
+            angle_target_degrees += 360
+
+        angle_current_degrees = math.degrees(self.theta)
+
+        while angle_current_degrees < 0:
+            angle_current_degrees += 360
+
+        # Is it shorter to rotate to the right or left
+        # to reach angle_target_degrees?
+        if angle_current_degrees > angle_target_degrees:
+            turn_right = True
+            angle_delta = angle_current_degrees - angle_target_degrees
+        else:
+            turn_right = False
+            angle_delta = angle_target_degrees - angle_current_degrees
+
+        if angle_delta > 180:
+            angle_delta = 360 - angle_delta
+            turn_right = not turn_right
+
+        log.debug("%s: turn_to_angle %s, current angle %s, delta %s, turn_right %s" %
+            (self, angle_target_degrees, angle_current_degrees, angle_delta, turn_right))
+        self.odometry_coordinates_log()
+
+        if turn_right:
+            self.turn_right(speed, angle_delta, brake, block, wiggle_room)
+        else:
+            self.turn_left(speed, angle_delta, brake, block, wiggle_room)
+
+        self.odometry_coordinates_log()
+
     def odometry_coordinates_log(self):
         log.debug("%s: odometry angle %s at (%d, %d)" %
             (self, math.degrees(self.theta), self.x_pos_mm, self.y_pos_mm))
@@ -2757,45 +2821,6 @@ class MoveDifferential(MoveTank):
 
         if self.odometry_thread_run:
             self.odometry_thread_run = False
-
-    def turn_to_angle(self, speed, angle_target_degrees, brake=True, block=True, wiggle_room=2):
-        """
-        Rotate in place to `angle_target_degrees` at `speed`
-        """
-        assert self.odometry_thread_run, "odometry_start() must be called to track robot coordinates"
-
-        # Make both target and current angles positive numbers between 0 and 360
-        while angle_target_degrees < 0:
-            angle_target_degrees += 360
-
-        angle_current_degrees = math.degrees(self.theta)
-
-        while angle_current_degrees < 0:
-            angle_current_degrees += 360
-
-        # Is it shorter to rotate to the right or left
-        # to reach angle_target_degrees?
-        if angle_current_degrees > angle_target_degrees:
-            turn_right = True
-            angle_delta = angle_current_degrees - angle_target_degrees
-        else:
-            turn_right = False
-            angle_delta = angle_target_degrees - angle_current_degrees
-
-        if angle_delta > 180:
-            angle_delta = 360 - angle_delta
-            turn_right = not turn_right
-
-        log.debug("%s: turn_to_angle %s, current angle %s, delta %s, turn_right %s" %
-            (self, angle_target_degrees, angle_current_degrees, angle_delta, turn_right))
-        self.odometry_coordinates_log()
-
-        if turn_right:
-            self.turn_right(speed, angle_delta, brake, block, wiggle_room)
-        else:
-            self.turn_left(speed, angle_delta, brake, block, wiggle_room)
-
-        self.odometry_coordinates_log()
 
     def on_to_coordinates(self, speed, x_target_mm, y_target_mm, brake=True, block=True):
         """
