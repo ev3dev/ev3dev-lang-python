@@ -159,42 +159,42 @@ class EV3ButtonCommon(object):
     @property
     def up(self):
         """
-        Check if 'up' button is pressed.
+        Check if ``up`` button is pressed.
         """
         return 'up' in self.buttons_pressed
 
     @property
     def down(self):
         """
-        Check if 'down' button is pressed.
+        Check if ``down`` button is pressed.
         """
         return 'down' in self.buttons_pressed
 
     @property
     def left(self):
         """
-        Check if 'left' button is pressed.
+        Check if ``left`` button is pressed.
         """
         return 'left' in self.buttons_pressed
 
     @property
     def right(self):
         """
-        Check if 'right' button is pressed.
+        Check if ``right`` button is pressed.
         """
         return 'right' in self.buttons_pressed
 
     @property
     def enter(self):
         """
-        Check if 'enter' button is pressed.
+        Check if ``enter`` button is pressed.
         """
         return 'enter' in self.buttons_pressed
 
     @property
     def backspace(self):
         """
-        Check if 'backspace' button is pressed.
+        Check if ``backspace`` button is pressed.
         """
         return 'backspace' in self.buttons_pressed
 
