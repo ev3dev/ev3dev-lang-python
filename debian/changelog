@@ -2,6 +2,7 @@ python-ev3dev2 (2.1.0) UNRELEASED; urgency=medium
 
   [Daniel Walton]
   * RPyC update docs and make it easier to use
+  * replace asserts with ValueError or TypeError
 
   [Matěj Volf]
   * LED animation fix duration None
