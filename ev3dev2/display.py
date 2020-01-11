@@ -396,7 +396,8 @@ class Display(FbMem):
 
         if font is not None:
             if isinstance(font, str):
-                assert font in fonts.available(), "%s is an invalid font" % font
+                if font not in fonts.available():
+                    raise ValueError("%s is an invalid font" % font)
                 font = fonts.load(font)
             return self.draw.text((x, y), text, fill=text_color, font=font)
         else:
@@ -424,13 +425,13 @@ class Display(FbMem):
 
         """
 
-        assert 0 <= x < Display.GRID_COLUMNS,\
-            "grid columns must be between 0 and %d, %d was requested" %\
-            ((Display.GRID_COLUMNS - 1, x))
+        if not 0 <= x < Display.GRID_COLUMNS:
+            raise ValueError("grid columns must be between 0 and %d, %d was requested" %\
+                (Display.GRID_COLUMNS - 1, x))
 
-        assert 0 <= y < Display.GRID_ROWS,\
-            "grid rows must be between 0 and %d, %d was requested" %\
-            ((Display.GRID_ROWS - 1), y)
+        if not 0 <= y < Display.GRID_ROWS:
+            raise ValueError("grid rows must be between 0 and %d, %d was requested" %\
+                (Display.GRID_ROWS - 1, y))
 
         return self.text_pixels(text, clear_screen,
                                 x * Display.GRID_COLUMN_PIXELS,

@@ -39,7 +39,7 @@ except ImportError:
 
 from logging import getLogger
 from os.path import abspath
-from ev3dev2 import get_current_platform, Device, list_device_names
+from ev3dev2 import get_current_platform, Device, list_device_names, ThreadNotRunning
 from ev3dev2.stopwatch import StopWatch
 
 log = getLogger(__name__)
@@ -112,8 +112,8 @@ class SpeedPercent(SpeedValue):
     """
 
     def __init__(self, percent):
-        assert -100 <= percent <= 100,\
-            "{} is an invalid percentage, must be between -100 and 100 (inclusive)".format(percent)
+        if not -100 <= percent <= 100:
+            raise ValueError("{} is an invalid percentage, must be between -100 and 100 (inclusive)".format(percent))
 
         self.percent = percent
 
@@ -121,7 +121,8 @@ class SpeedPercent(SpeedValue):
         return str(self.percent) + "%"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        if not isinstance(other, (float, int)):
+            raise TypeError("{} can only be multiplied by an int or float, not {}".format(self, type(other)))
         return SpeedPercent(self.percent * other)
 
     def to_native_units(self, motor):
@@ -143,7 +144,8 @@ class SpeedNativeUnits(SpeedValue):
         return "{:.2f}".format(self.native_counts) + " counts/sec"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        if not isinstance(other, (float, int)):
+            raise TypeError("{} can only be multiplied by an int or float, not {}".format(self, type(other)))
         return SpeedNativeUnits(self.native_counts * other)
 
     def to_native_units(self, motor=None):
@@ -165,16 +167,17 @@ class SpeedRPS(SpeedValue):
         return str(self.rotations_per_second) + " rot/sec"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        if not isinstance(other, (float, int)):
+            raise TypeError("{} can only be multiplied by an int or float, not {}".format(self, type(other)))
         return SpeedRPS(self.rotations_per_second * other)
 
     def to_native_units(self, motor):
         """
         Return the native speed measurement required to achieve desired rotations-per-second
         """
-        assert abs(self.rotations_per_second) <= motor.max_rps,\
-            "invalid rotations-per-second: {} max RPS is {}, {} was requested".format(
-            motor, motor.max_rps, self.rotations_per_second)
+        if abs(self.rotations_per_second) > motor.max_rps:
+            raise ValueError("invalid rotations-per-second: {} max RPS is {}, {} was requested".format(
+                motor, motor.max_rps, self.rotations_per_second))
         return self.rotations_per_second/motor.max_rps * motor.max_speed
 
 
@@ -190,16 +193,17 @@ class SpeedRPM(SpeedValue):
         return str(self.rotations_per_minute) + " rot/min"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        if not isinstance(other, (float, int)):
+            raise TypeError("{} can only be multiplied by an int or float, not {}".format(self, type(other)))
         return SpeedRPM(self.rotations_per_minute * other)
 
     def to_native_units(self, motor):
         """
         Return the native speed measurement required to achieve desired rotations-per-minute
         """
-        assert abs(self.rotations_per_minute) <= motor.max_rpm,\
-            "invalid rotations-per-minute: {} max RPM is {}, {} was requested".format(
-            motor, motor.max_rpm, self.rotations_per_minute)
+        if abs(self.rotations_per_minute) > motor.max_rpm:
+            raise ValueError("invalid rotations-per-minute: {} max RPM is {}, {} was requested".format(
+                motor, motor.max_rpm, self.rotations_per_minute))
         return self.rotations_per_minute/motor.max_rpm * motor.max_speed
 
 
@@ -215,16 +219,17 @@ class SpeedDPS(SpeedValue):
         return str(self.degrees_per_second) + " deg/sec"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        if not isinstance(other, (float, int)):
+            raise TypeError("{} can only be multiplied by an int or float, not {}".format(self, type(other)))
         return SpeedDPS(self.degrees_per_second * other)
 
     def to_native_units(self, motor):
         """
         Return the native speed measurement required to achieve desired degrees-per-second
         """
-        assert abs(self.degrees_per_second) <= motor.max_dps,\
-            "invalid degrees-per-second: {} max DPS is {}, {} was requested".format(
-            motor, motor.max_dps, self.degrees_per_second)
+        if abs(self.degrees_per_second) > motor.max_dps:
+            raise ValueError("invalid degrees-per-second: {} max DPS is {}, {} was requested".format(
+                motor, motor.max_dps, self.degrees_per_second))
         return self.degrees_per_second/motor.max_dps * motor.max_speed
 
 
@@ -240,16 +245,17 @@ class SpeedDPM(SpeedValue):
         return str(self.degrees_per_minute) + " deg/min"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        if not isinstance(other, (float, int)):
+            raise TypeError("{} can only be multiplied by an int or float, not {}".format(self, type(other)))
         return SpeedDPM(self.degrees_per_minute * other)
 
     def to_native_units(self, motor):
         """
         Return the native speed measurement required to achieve desired degrees-per-minute
         """
-        assert abs(self.degrees_per_minute) <= motor.max_dpm,\
-            "invalid degrees-per-minute: {} max DPM is {}, {} was requested".format(
-            motor, motor.max_dpm, self.degrees_per_minute)
+        if abs(self.degrees_per_minute) > motor.max_dpm:
+            raise ValueError("invalid degrees-per-minute: {} max DPM is {}, {} was requested".format(
+                motor, motor.max_dpm, self.degrees_per_minute))
         return self.degrees_per_minute/motor.max_dpm * motor.max_speed
 
 
@@ -949,8 +955,9 @@ class Motor(Device):
 
         # If speed is not a SpeedValue object we treat it as a percentage
         if not isinstance(speed, SpeedValue):
-            assert -100 <= speed <= 100,\
-                "{}{} is an invalid speed percentage, must be between -100 and 100 (inclusive)".format("" if label is None else (label + ": ") , speed)
+            if not -100 <= speed <= 100:
+                raise ValueError("{}{} is an invalid speed percentage, must be between -100 and 100 (inclusive)".format(
+                    "" if label is None else (label + ": ") , speed))
             speed = SpeedPercent(speed)
 
         return speed.to_native_units(self)
@@ -1666,8 +1673,8 @@ class MotorSet(object):
     def set_polarity(self, polarity, motors=None):
         valid_choices = (LargeMotor.POLARITY_NORMAL, LargeMotor.POLARITY_INVERSED)
 
-        assert polarity in valid_choices,\
-            "%s is an invalid polarity choice, must be %s" % (polarity, ', '.join(valid_choices))
+        if polarity not in valid_choices:
+            raise ValueError("%s is an invalid polarity choice, must be %s" % (polarity, ', '.join(valid_choices)))
         motors = motors if motors is not None else self.motors.values()
 
         for motor in motors:
@@ -2203,7 +2210,8 @@ class MoveTank(MotorSet):
         speed_native_units = speed.to_native_units(self.left_motor)
         MAX_SPEED = SpeedNativeUnits(self.max_speed)
 
-        assert speed_native_units <= MAX_SPEED, "Speed exceeds the max speed of the motors"
+        if speed_native_units > MAX_SPEED:
+            raise ValueError("Speed exceeds the max speed of the motors")
 
         while follow_for(self, **kwargs):
             current_angle = self._gyro.angle
@@ -2371,8 +2379,8 @@ class MoveSteering(MoveTank):
             automatically.
         """
 
-        assert steering >= -100 and steering <= 100,\
-            "{} is an invalid steering, must be between -100 and 100 (inclusive)".format(steering)
+        if steering < -100 or steering > 100:
+            raise ValueError("{} is an invalid steering, must be between -100 and 100 (inclusive)".format(steering))
 
         # We don't have a good way to make this generic for the pair... so we
         # assume that the left motor's speed stats are the same as the right
@@ -2690,7 +2698,8 @@ class MoveDifferential(MoveTank):
         """
         Rotate in place to `angle_target_degrees` at `speed`
         """
-        assert self.odometry_thread_id, "odometry_start() must be called to track robot coordinates"
+        if not self.odometry_thread_id:
+            raise ThreadNotRunning("odometry_start() must be called to track robot coordinates")
 
         # Make both target and current angles positive numbers between 0 and 360
         if angle_target_degrees < 0:
@@ -2729,7 +2738,8 @@ class MoveDifferential(MoveTank):
         """
         Drive to (`x_target_mm`, `y_target_mm`) coordinates at `speed`
         """
-        assert self.odometry_thread_id, "odometry_start() must be called to track robot coordinates"
+        if not self.odometry_thread_id:
+            raise ThreadNotRunning("odometry_start() must be called to track robot coordinates")
 
         # stop moving
         self.off(brake='hold')

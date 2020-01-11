@@ -116,8 +116,8 @@ class Sound(object):
     )
 
     def _validate_play_type(self, play_type):
-        assert play_type in self.PLAY_TYPES, \
-            "Invalid play_type %s, must be one of %s" % (play_type, ','.join(str(t) for t in self.PLAY_TYPES))
+        if play_type not in self.PLAY_TYPES:
+            raise ValueError("Invalid play_type %s, must be one of %s" % (play_type, ','.join(str(t) for t in self.PLAY_TYPES)))
 
     def _audio_command(self, command, play_type):
         if is_micropython():

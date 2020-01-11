@@ -643,9 +643,8 @@ class GyroSensor(Sensor):
         If ``direction_sensitive`` is False (default) we will wait until angle has changed
         by ``delta`` in either direction.
         """
-        assert self.mode in (self.MODE_GYRO_G_A, self.MODE_GYRO_ANG,
-                             self.MODE_TILT_ANG),\
-            'Gyro mode should be MODE_GYRO_ANG, MODE_GYRO_G_A or MODE_TILT_ANG'
+        if self.mode not in (self.MODE_GYRO_G_A, self.MODE_GYRO_ANG, self.MODE_TILT_ANG):
+            raise ValueError("{} mode is {}, it should be MODE_GYRO_ANG, MODE_GYRO_G_A or MODE_TILT_ANG".format(self, self.mode))
         start_angle = self.value(0)
 
         if direction_sensitive:
@@ -775,7 +774,8 @@ class InfraredSensor(Sensor, ButtonBase):
         super(InfraredSensor, self).__init__(address, name_pattern, name_exact, driver_name='lego-ev3-ir', **kwargs)
 
     def _normalize_channel(self, channel):
-        assert channel >= 1 and channel <= 4, "channel is %s, it must be 1, 2, 3, or 4" % channel
+        if channel < 1 or channel > 4:
+            raise ValueError("channel is %s, it must be 1, 2, 3, or 4" % channel)
         channel = max(1, min(4, channel)) - 1
         return channel
 

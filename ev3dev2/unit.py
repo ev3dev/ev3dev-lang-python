@@ -62,7 +62,8 @@ class DistanceMillimeters(DistanceValue):
         return str(self.millimeters) + "mm"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        if not isinstance(other, (float, int)):
+            raise TypeError("{} can only be multiplied by an int or float, not {}".format(self, type(other)))
         return DistanceMillimeters(self.millimeters * other)
 
     @property
@@ -82,7 +83,8 @@ class DistanceCentimeters(DistanceValue):
         return str(self.centimeters) + "cm"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        if not isinstance(other, (float, int)):
+            raise TypeError("{} can only be multiplied by an int or float, not {}".format(self, type(other)))
         return DistanceCentimeters(self.centimeters * other)
 
     @property
@@ -102,7 +104,8 @@ class DistanceDecimeters(DistanceValue):
         return str(self.decimeters) + "dm"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        if not isinstance(other, (float, int)):
+            raise TypeError("{} can only be multiplied by an int or float, not {}".format(self, type(other)))
         return DistanceDecimeters(self.decimeters * other)
 
     @property
@@ -122,7 +125,8 @@ class DistanceMeters(DistanceValue):
         return str(self.meters) + "m"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        if not isinstance(other, (float, int)):
+            raise TypeError("{} can only be multiplied by an int or float, not {}".format(self, type(other)))
         return DistanceMeters(self.meters * other)
 
     @property
@@ -142,7 +146,8 @@ class DistanceInches(DistanceValue):
         return str(self.inches) + "in"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        if not isinstance(other, (float, int)):
+            raise TypeError("{} can only be multiplied by an int or float, not {}".format(self, type(other)))
         return DistanceInches(self.inches * other)
 
     @property
@@ -162,7 +167,8 @@ class DistanceFeet(DistanceValue):
         return str(self.feet) + "ft"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        if not isinstance(other, (float, int)):
+            raise TypeError("{} can only be multiplied by an int or float, not {}".format(self, type(other)))
         return DistanceFeet(self.feet * other)
 
     @property
@@ -182,7 +188,8 @@ class DistanceYards(DistanceValue):
         return str(self.yards) + "yd"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        if not isinstance(other, (float, int)):
+            raise TypeError("{} can only be multiplied by an int or float, not {}".format(self, type(other)))
         return DistanceYards(self.yards * other)
 
     @property
@@ -202,7 +209,8 @@ class DistanceStuds(DistanceValue):
         return str(self.studs) + "stud"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        if not isinstance(other, (float, int)):
+            raise TypeError("{} can only be multiplied by an int or float, not {}".format(self, type(other)))
         return DistanceStuds(self.studs * other)
 
     @property
