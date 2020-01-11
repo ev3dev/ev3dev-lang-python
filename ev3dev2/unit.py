@@ -38,8 +38,8 @@ STUD_MM = 8
 class DistanceValue(object):
     """
     A base class for other unit types. Don't use this directly; instead, see
-    :class:`DistanceMillimeters`, :class:`DistanceCentimeters`, :class:`DistanceDecimeters`, :class:`DistanceMeters`,
-    :class:`DistanceInches`, :class:`DistanceFeet`, :class:`DistanceYards` and :class:`DistanceStuds`.
+    :class:``DistanceMillimeters``, :class:``DistanceCentimeters``, :class:``DistanceDecimeters``, :class:``DistanceMeters``,
+    :class:``DistanceInches``, :class:``DistanceFeet``, :class:``DistanceYards`` and :class:``DistanceStuds``.
     """
 
     # This allows us to sort lists of DistanceValue objects

@@ -46,7 +46,7 @@ class StopWatch(object):
         """
         Starts the timer. If the timer is already running, resets it.
 
-        Raises a :py:class:`ev3dev2.stopwatch.StopWatchAlreadyStartedException` if already started.
+        Raises a :py:class:``ev3dev2.stopwatch.StopWatchAlreadyStartedException`` if already started.
         """
         if self.is_started:
             raise StopWatchAlreadyStartedException()

@@ -32,7 +32,7 @@ if sys.version_info < (3,4):
 
 class LegoPort(Device):
     """
-    The `lego-port` class provides an interface for working with input and
+    The ``lego-port`` class provides an interface for working with input and
     output ports that are compatible with LEGO MINDSTORMS RCX/NXT/EV3, LEGO
     WeDo and LEGO Power Functions sensors and motors. Supported devices include
     the LEGO MINDSTORMS EV3 Intelligent Brick, the LEGO WeDo USB hub and
@@ -45,17 +45,17 @@ class LegoPort(Device):
 
     In most cases, ports are able to automatically detect what type of sensor
     or motor is connected. In some cases though, this must be manually specified
-    using the `mode` and `set_device` attributes. The `mode` attribute affects
+    using the ``mode`` and ``set_device`` attributes. The ``mode`` attribute affects
     how the port communicates with the connected device. For example the input
     ports on the EV3 brick can communicate using UART, I2C or analog voltages,
     but not all at the same time, so the mode must be set to the one that is
-    appropriate for the connected sensor. The `set_device` attribute is used to
+    appropriate for the connected sensor. The ``set_device`` attribute is used to
     specify the exact type of sensor that is connected. Note: the mode must be
     correctly set before setting the sensor type.
 
-    Ports can be found at `/sys/class/lego-port/port<N>` where `<N>` is
+    Ports can be found at ``/sys/class/lego-port/port<N>`` where ``<N>`` is
     incremented each time a new port is registered. Note: The number is not
-    related to the actual port at all - use the `address` attribute to find
+    related to the actual port at all - use the ``address`` attribute to find
     a specific port.
     """
 
@@ -142,9 +142,9 @@ class LegoPort(Device):
     @property
     def status(self):
         """
-        In most cases, reading status will return the same value as `mode`. In
-        cases where there is an `auto` mode additional values may be returned,
-        such as `no-device` or `error`. See individual port driver documentation
+        In most cases, reading status will return the same value as ``mode``. In
+        cases where there is an ``auto`` mode additional values may be returned,
+        such as ``no-device`` or ``error``. See individual port driver documentation
         for the full list of possible values.
         """
         self._status, value = self.get_attr_string(self._status, 'status')

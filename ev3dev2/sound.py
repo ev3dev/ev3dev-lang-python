@@ -162,17 +162,17 @@ class Sound(object):
     def beep(self, args='', play_type=PLAY_WAIT_FOR_COMPLETE):
         """
         Call beep command with the provided arguments (if any).
-        See `beep man page`_ and google `linux beep music`_ for inspiration.
+        See ``beep man page``_ and google ``linux beep music``_ for inspiration.
 
-        :param string args: Any additional arguments to be passed to ``beep`` (see the `beep man page`_ for details)
+        :param string args: Any additional arguments to be passed to ``beep`` (see the ``beep man page``_ for details)
 
         :param play_type: The behavior of ``beep`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE`` or  ``Sound.PLAY_NO_WAIT_FOR_COMPLETE``
 
         :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
 
-        .. _`beep man page`: https://linux.die.net/man/1/beep
-        .. _`linux beep music`: https://www.google.com/search?q=linux+beep+music
+        .. _``beep man page``: https://linux.die.net/man/1/beep
+        .. _``linux beep music``: https://www.google.com/search?q=linux+beep+music
         """
         return self._audio_command("/usr/bin/beep %s" % args, play_type)
 
@@ -206,7 +206,7 @@ class Sound(object):
                 (392.00, 300, 150), (311.13, 250, 100), (466.16, 25, 100), (392, 700)
                 ])
 
-        Have also a look at :py:meth:`play_song` for a more musician-friendly way of doing, which uses
+        Have also a look at :py:meth:``play_song`` for a more musician-friendly way of doing, which uses
         the conventional notation for notes and durations.
 
         :param list[tuple(float,float,float)] tone_sequence: The sequence of tones to play. The first number of each tuple is frequency in Hz, the second is duration in milliseconds, and the third is delay in milliseconds between this and the next tone in the sequence.
@@ -403,7 +403,7 @@ class Sound(object):
         if m:
             return int(m.group(1))
         else:
-            raise Exception('Failed to parse output of `amixer get {}`'.format(channel))
+            raise Exception('Failed to parse output of ``amixer get {}``'.format(channel))
 
     def play_song(self, song, tempo=120, delay=0.05):
         """ Plays a song provided as a list of tuples containing the note name and its
@@ -424,7 +424,7 @@ class Sound(object):
 
         Shortcuts exist for common modifiers:
 
-        - ``3`` produces a triplet member note. For instance `e3` gives a triplet of eight notes,
+        - ``3`` produces a triplet member note. For instance ``e3`` gives a triplet of eight notes,
           i.e. 3 eight notes in the duration of a single quarter. You must ensure that 3 triplets
           notes are defined in sequence to match the count, otherwise the result will not be the
           expected one.
@@ -649,7 +649,7 @@ class Sound(object):
     #: Triplets can be obtained by dividing the corresponding reference by 3.
     #: For instance, the note value of a eight triplet will be ``NOTE_VALUE['e'] / 3``.
     #: It is simpler however to user the ``3`` modifier of notes, as supported by the
-    #: :py:meth:`Sound.play_song` method.
+    #: :py:meth:``Sound.play_song`` method.
     _NOTE_VALUES = {
         'w': 1.,
         'h': 1./2,

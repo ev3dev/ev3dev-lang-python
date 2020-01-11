@@ -71,8 +71,8 @@ class ButtonCommon(object):
     @staticmethod
     def on_change(changed_buttons):
         """
-        This handler is called by `process()` whenever state of any button has
-        changed since last `process()` call. `changed_buttons` is a list of
+        This handler is called by ``process()`` whenever state of any button has
+        changed since last ``process()`` call. ``changed_buttons`` is a list of
         tuples of changed button names and their states.
         """
         pass
@@ -89,7 +89,7 @@ class ButtonCommon(object):
 
     def check_buttons(self, buttons=[]):
         """
-        Check if currently pressed buttons exactly match the given list.
+        Check if currently pressed buttons exactly match the given list ``buttons``.
         """
         return set(self.buttons_pressed) == set(buttons)
 
@@ -98,20 +98,20 @@ class ButtonCommon(object):
 
     def wait_for_pressed(self, buttons, timeout_ms=None):
         """
-        Wait for the button to be pressed down.
+        Wait for ``buttons`` to be pressed down.
         """
         return self._wait(buttons, [], timeout_ms)
 
     def wait_for_released(self, buttons, timeout_ms=None):
         """
-        Wait for the button to be released.
+        Wait for ``buttons`` to be released.
         """
         return self._wait([], buttons, timeout_ms)
 
     def wait_for_bump(self, buttons, timeout_ms=None):
         """
-        Wait for the button to be pressed down and then released.
-        Both actions must happen within timeout_ms.
+        Wait for ``buttons`` to be pressed down and then released.
+        Both actions must happen within ``timeout_ms``.
         """
         stopwatch = StopWatch()
         stopwatch.start()
@@ -125,7 +125,7 @@ class ButtonCommon(object):
 
     def process(self, new_state=None):
         """
-        Check for currenly pressed buttons. If the new state differs from the
+        Check for currenly pressed buttons. If the ``new_state`` differs from the
         old state, call the appropriate button event handlers (on_up, on_down, etc).
         """
         if new_state is None:
@@ -146,9 +146,9 @@ class ButtonCommon(object):
 
 class EV3ButtonCommon(object):
 
-    # These handlers are called by `ButtonCommon.process()` whenever the
+    # These handlers are called by ButtonCommon.process() whenever the
     # state of 'up', 'down', etc buttons have changed since last
-    # `ButtonCommon.process()` call
+    # ButtonCommon.process() call
     on_up = None
     on_down = None
     on_left = None

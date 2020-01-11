@@ -1,7 +1,7 @@
 
 """
 This program is used to find the kp, ki, kd PID values for
-`MoveTank.follow_line()`. These values vary from robot to robot, the best way
+``MoveTank.follow_line()``. These values vary from robot to robot, the best way
 to find them for your robot is to have it follow a line, tweak the values a
 little, repeat.
 
@@ -37,8 +37,8 @@ def frange(start, end, increment):
 
 def find_kp_ki_kd(tank, start, end, increment, speed, kx_to_tweak, kp, ki, kd):
     """
-    Return the optimal `kx_to_tweak` value where `kx_to_tweak` must be "kp", "ki" or "kd"
-    This will test values from `start` to `end` in steps of `increment`. The value
+    Return the optimal ``kx_to_tweak`` value where ``kx_to_tweak`` must be "kp", "ki" or "kd"
+    This will test values from ``start`` to ``end`` in steps of ``increment``. The value
     that results in the robot moving the least total distance is the optimal value
     that is returned by this function.
     """
