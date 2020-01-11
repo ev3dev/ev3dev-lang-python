@@ -2226,6 +2226,8 @@ class MoveTank(MotorSet):
 
         ``target_angle`` is the number of degrees we want to rotate
 
+        ``brake`` hit the brakes once we reach ``target_angle``
+
         ``error_margin`` is the +/- angle threshold to control how accurate the turn should be
 
         ``sleep_time`` is how many seconds we sleep on each pass through
@@ -2268,57 +2270,60 @@ class MoveTank(MotorSet):
 
         speed_native_units = speed.to_native_units(self.left_motor)
         init_angle = self._gyro.angle
+        first = True
 
         while True:
             current_angle = self._gyro.angle
-            delta = abs(current_angle - init_angle)
+            degrees_moved = abs(current_angle - init_angle)
+            delta = abs(abs(target_angle) - degrees_moved)
 
             if delta <= error_margin:
-                self.stop(brake)
+                self.stop(brake=brake)
                 break
 
             # our goal is to rotate target_angle clockwise
             if target_angle > 0:
 
-                # we went too far, rotate counter-clockwise
-                if (delta > target_angle):
-                    left_speed = SpeedNativeUnits(-1 * speed_native_units)
-                    right_speed = SpeedNativeUnits(speed_native_units)
-
                 # we have not gone far enough, rotate clockwise
-                else:
+                if first or degrees_moved < target_angle:
                     left_speed = SpeedNativeUnits(speed_native_units)
                     right_speed = SpeedNativeUnits(-1 * speed_native_units)
+
+                # we went too far, rotate counter-clockwise
+                else:
+                    left_speed = SpeedNativeUnits(-1 * speed_native_units)
+                    right_speed = SpeedNativeUnits(speed_native_units)
 
             # our goal is to rotate target_angle counter-clockwise
             else:
 
-                # we went too far, rotate clockwise
-                if (delta > target_angle):
-                    left_speed = SpeedNativeUnits(speed_native_units)
-                    right_speed = SpeedNativeUnits(-1 * speed_native_units)
-
                 # we have not gone far enough, rotate counter-clockwise
-                else:
+                if first or degrees_moved < abs(target_angle):
                     left_speed = SpeedNativeUnits(-1 * speed_native_units)
                     right_speed = SpeedNativeUnits(speed_native_units)
 
+                # we went too far, rotate clockwise
+                else:
+                    left_speed = SpeedNativeUnits(speed_native_units)
+                    right_speed = SpeedNativeUnits(-1 * speed_native_units)
+
+            first = False
             self.on(left_speed, right_speed)
 
             if sleep_time:
                 time.sleep(sleep_time)
 
-    def turn_right(self, speed, degrees, brake=True, block=True, error_margin=2, sleep_time=0.01):
+    def turn_right(self, speed, degrees, brake=True, error_margin=2, sleep_time=0.01):
         """
         Rotate clockwise `degrees` in place
         """
-        self.turn_degrees(speed, abs(degrees), brake, block, error_margin, sleep_time)
+        self._turn(speed, abs(degrees), brake, error_margin, sleep_time)
 
-    def turn_left(self, speed, degrees, brake=True, block=True, error_margin=2, sleep_time=0.01):
+    def turn_left(self, speed, degrees, brake=True, error_margin=2, sleep_time=0.01):
         """
         Rotate counter-clockwise `degrees` in place
         """
-        self.turn_degrees(speed, abs(degrees) * -1, brake, block, error_margin, sleep_time)
+        self._turn(speed, abs(degrees) * -1, brake, error_margin, sleep_time)
 
 
 class MoveSteering(MoveTank):
