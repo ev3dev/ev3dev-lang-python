@@ -1,7 +1,8 @@
 python-ev3dev2 (2.1.0) UNRELEASED; urgency=medium
 
   [Daniel Walton]
-  * MoveDifferential._turn() use gyro for better accuracy
+  * MoveDifferential use gyro for better accuracy. Make MoveTank and
+    MoveDifferential "turn" APIs more consistent.
 
   [Matěj Volf]
   * LED animation fix duration None

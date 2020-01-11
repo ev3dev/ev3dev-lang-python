@@ -142,6 +142,12 @@ def library_load_warning_message(library_name, dependent_class):
 class DeviceNotFound(Exception):
     pass
 
+class DeviceNotDefined(Exception):
+    pass
+
+class ThreadNotRunning(Exception):
+    pass
+
 # -----------------------------------------------------------------------------
 # Define the base class from which all other ev3dev classes are defined.
 
