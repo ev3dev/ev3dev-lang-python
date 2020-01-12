@@ -162,17 +162,17 @@ class Sound(object):
     def beep(self, args='', play_type=PLAY_WAIT_FOR_COMPLETE):
         """
         Call beep command with the provided arguments (if any).
-        See ``beep man page``_ and google ``linux beep music``_ for inspiration.
+        See `beep man page`_ and google `linux beep music`_ for inspiration.
 
-        :param string args: Any additional arguments to be passed to ``beep`` (see the ``beep man page``_ for details)
+        :param string args: Any additional arguments to be passed to ``beep`` (see the `beep man page`_ for details)
 
         :param play_type: The behavior of ``beep`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE`` or  ``Sound.PLAY_NO_WAIT_FOR_COMPLETE``
 
         :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
 
-        .. _``beep man page``: https://linux.die.net/man/1/beep
-        .. _``linux beep music``: https://www.google.com/search?q=linux+beep+music
+        .. _`beep man page`: https://linux.die.net/man/1/beep
+        .. _`linux beep music`: https://www.google.com/search?q=linux+beep+music
         """
         return self._audio_command("/usr/bin/beep %s" % args, play_type)
 
