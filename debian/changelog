@@ -1,9 +1,9 @@
 python-ev3dev2 (2.1.0) UNRELEASED; urgency=medium
 
   [Daniel Walton]
+  * RPyC update docs and make it easier to use
   * MoveDifferential use gyro for better accuracy. Make MoveTank and
     MoveDifferential "turn" APIs more consistent.
-  * RPyC update docs and make it easier to use
 
   [Matěj Volf]
   * LED animation fix duration None

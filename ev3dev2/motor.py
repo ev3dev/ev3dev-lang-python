@@ -2215,7 +2215,6 @@ class MoveTank(MotorSet):
             speed,
             target_angle,
             brake=True,
-            block=True,
             error_margin=2,
             sleep_time=0.01
         ):
@@ -2235,7 +2234,7 @@ class MoveTank(MotorSet):
             to the new motor settings. This should be something small such
             as 0.01 (10ms).
 
-        Rotate in place for `target_degrees` at `speed`
+        Rotate in place for ``target_degrees`` at ``speed``
 
         Example:
 
@@ -2265,49 +2264,27 @@ class MoveTank(MotorSet):
         if not self._gyro:
             raise DeviceNotDefined("The 'gyro' variable must be defined with a GyroSensor. Example: tank.gyro = GyroSensor()")
 
-        if not target_angle:
-            return
-
         speed_native_units = speed.to_native_units(self.left_motor)
-        init_angle = self._gyro.angle
-        first = True
+        target_angle = self._gyro.angle + target_angle
 
         while True:
             current_angle = self._gyro.angle
-            degrees_moved = abs(current_angle - init_angle)
-            delta = abs(abs(target_angle) - degrees_moved)
+            delta = abs(target_angle - current_angle)
 
             if delta <= error_margin:
                 self.stop(brake=brake)
                 break
 
-            # our goal is to rotate target_angle clockwise
-            if target_angle > 0:
+            # we are left of our target, rotate clockwise
+            if current_angle < target_angle:
+                left_speed = SpeedNativeUnits(speed_native_units)
+                right_speed = SpeedNativeUnits(-1 * speed_native_units)
 
-                # we have not gone far enough, rotate clockwise
-                if first or degrees_moved < target_angle:
-                    left_speed = SpeedNativeUnits(speed_native_units)
-                    right_speed = SpeedNativeUnits(-1 * speed_native_units)
-
-                # we went too far, rotate counter-clockwise
-                else:
-                    left_speed = SpeedNativeUnits(-1 * speed_native_units)
-                    right_speed = SpeedNativeUnits(speed_native_units)
-
-            # our goal is to rotate target_angle counter-clockwise
+            # we are right of our target, rotate counter-clockwise
             else:
+                left_speed = SpeedNativeUnits(-1 * speed_native_units)
+                right_speed = SpeedNativeUnits(speed_native_units)
 
-                # we have not gone far enough, rotate counter-clockwise
-                if first or degrees_moved < abs(target_angle):
-                    left_speed = SpeedNativeUnits(-1 * speed_native_units)
-                    right_speed = SpeedNativeUnits(speed_native_units)
-
-                # we went too far, rotate clockwise
-                else:
-                    left_speed = SpeedNativeUnits(speed_native_units)
-                    right_speed = SpeedNativeUnits(-1 * speed_native_units)
-
-            first = False
             self.on(left_speed, right_speed)
 
             if sleep_time:
@@ -2317,13 +2294,13 @@ class MoveTank(MotorSet):
         """
         Rotate clockwise `degrees` in place
         """
-        self._turn(speed, abs(degrees), brake, error_margin, sleep_time)
+        self.turn_degrees(speed, abs(degrees), brake, error_margin, sleep_time)
 
     def turn_left(self, speed, degrees, brake=True, error_margin=2, sleep_time=0.01):
         """
         Rotate counter-clockwise `degrees` in place
         """
-        self._turn(speed, abs(degrees) * -1, brake, error_margin, sleep_time)
+        self.turn_degrees(speed, abs(degrees) * -1, brake, error_margin, sleep_time)
 
 
 class MoveSteering(MoveTank):
@@ -2619,7 +2596,7 @@ class MoveDifferential(MoveTank):
 
         angle_target_degrees = final_angle(angle_init_degrees, degrees)
 
-        log.info("%s: _turn() %d degrees from %s to %s" %
+        log.info("%s: turn_degrees() %d degrees from %s to %s" %
             (self, degrees, angle_init_degrees, angle_target_degrees))
 
         # The distance each wheel needs to travel
@@ -2644,6 +2621,11 @@ class MoveDifferential(MoveTank):
             if 90 >= angle_target_degrees >= 0 and 270 <= angle_current_degrees <= 360:
                 degrees_error = (angle_target_degrees + (360 - angle_current_degrees)) * -1
 
+            # This can happen if we are aiming for 358 degrees and overrotate to 2 degrees
+            # We need to rotate clockwise
+            elif 360 >= angle_target_degrees >= 270 and 0 <= angle_current_degrees <= 90:
+                degrees_error = angle_current_degrees + (360 - angle_target_degrees)
+
             # We need to rotate clockwise
             elif angle_current_degrees > angle_target_degrees:
                 degrees_error = angle_current_degrees - angle_target_degrees
@@ -2652,11 +2634,11 @@ class MoveDifferential(MoveTank):
             else:
                 degrees_error = (angle_target_degrees - angle_current_degrees) * -1
 
-            log.info("%s: _turn() ended up at %s, error %s, error_margin %s" %
+            log.info("%s: turn_degrees() ended up at %s, error %s, error_margin %s" %
                (self, angle_current_degrees, degrees_error, error_margin))
 
             if abs(degrees_error) > error_margin:
-                self._turn(speed, degrees_error, brake, block)
+                self.turn_degrees(speed, degrees_error, brake, block, error_margin, use_gyro)
 
     def turn_right(self, speed, degrees, brake=True, block=True, error_margin=2, use_gyro=False):
         """
