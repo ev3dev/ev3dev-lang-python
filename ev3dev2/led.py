@@ -110,7 +110,7 @@ class Led(Device):
     @property
     def brightness(self):
         """
-        Sets the brightness level. Possible values are from 0 to `max_brightness`.
+        Sets the brightness level. Possible values are from 0 to ``max_brightness``.
         """
         self._brightness, value = self.get_attr_int(self._brightness, 'brightness')
         return value
@@ -133,17 +133,17 @@ class Led(Device):
         Sets the LED trigger. A trigger is a kernel based source of LED events.
         Triggers can either be simple or complex. A simple trigger isn't
         configurable and is designed to slot into existing subsystems with
-        minimal additional code. Examples are the `ide-disk` and `nand-disk`
+        minimal additional code. Examples are the ``ide-disk`` and ``nand-disk``
         triggers.
 
         Complex triggers whilst available to all LEDs have LED specific
-        parameters and work on a per LED basis. The `timer` trigger is an example.
-        The `timer` trigger will periodically change the LED brightness between
-        0 and the current brightness setting. The `on` and `off` time can
-        be specified via `delay_{on,off}` attributes in milliseconds.
+        parameters and work on a per LED basis. The ``timer`` trigger is an example.
+        The ``timer`` trigger will periodically change the LED brightness between
+        0 and the current brightness setting. The ``on`` and ``off`` time can
+        be specified via ``delay_{on,off}`` attributes in milliseconds.
         You can change the brightness value of a LED independently of the timer
         trigger. However, if you set the brightness value to 0 it will
-        also disable the `timer` trigger.
+        also disable the ``timer`` trigger.
         """
         self._trigger, value = self.get_attr_from_set(self._trigger, 'trigger')
         return value
@@ -179,9 +179,9 @@ class Led(Device):
     @property
     def delay_on(self):
         """
-        The `timer` trigger will periodically change the LED brightness between
-        0 and the current brightness setting. The `on` time can
-        be specified via `delay_on` attribute in milliseconds.
+        The ``timer`` trigger will periodically change the LED brightness between
+        0 and the current brightness setting. The ``on`` time can
+        be specified via ``delay_on`` attribute in milliseconds.
         """
 
         # Workaround for ev3dev/ev3dev#225.
@@ -219,9 +219,9 @@ class Led(Device):
     @property
     def delay_off(self):
         """
-        The `timer` trigger will periodically change the LED brightness between
-        0 and the current brightness setting. The `off` time can
-        be specified via `delay_off` attribute in milliseconds.
+        The ``timer`` trigger will periodically change the LED brightness between
+        0 and the current brightness setting. The ``off`` time can
+        be specified via ``delay_off`` attribute in milliseconds.
         """
 
         # Workaround for ev3dev/ev3dev#225.
@@ -241,11 +241,13 @@ class Led(Device):
 
     @delay_off.setter
     def delay_off(self, value):
-        # Workaround for ev3dev/ev3dev#225.
-        # 'delay_on' and 'delay_off' attributes are created when trigger is set
-        # to 'timer', and destroyed when it is set to anything else.
-        # This means the file cache may become outdated, and we may have to
-        # reopen the file.
+        """
+        Workaround for ev3dev/ev3dev#225.
+        ``delay_on`` and ``delay_off`` attributes are created when trigger is set
+        to ``timer``, and destroyed when it is set to anything else.
+        This means the file cache may become outdated, and we may have to
+        reopen the file.
+        """
         for retry in (True, False):
             try:
                 self._delay_off = self.set_attr_int(self._delay_off, 'delay_off', value)

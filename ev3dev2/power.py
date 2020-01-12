@@ -79,29 +79,21 @@ class PowerSupply(Device):
 
     @property
     def max_voltage(self):
-        """
-        """
         self._max_voltage, value = self.get_attr_int(self._max_voltage, 'voltage_max_design')
         return value
 
     @property
     def min_voltage(self):
-        """
-        """
         self._min_voltage, value = self.get_attr_int(self._min_voltage, 'voltage_min_design')
         return value
 
     @property
     def technology(self):
-        """
-        """
         self._technology, value = self.get_attr_string(self._technology, 'technology')
         return value
 
     @property
     def type(self):
-        """
-        """
         self._type, value = self.get_attr_string(self._type, 'type')
         return value
 
