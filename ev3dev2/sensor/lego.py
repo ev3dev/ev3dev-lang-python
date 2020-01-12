@@ -455,7 +455,7 @@ class UltrasonicSensor(Sensor):
         The sensor will continue to take measurements so
         they are available for future reads.
 
-        Prefer using the equivalent :meth:``UltrasonicSensor.distance_centimeters`` property.
+        Prefer using the equivalent :meth:`UltrasonicSensor.distance_centimeters` property.
         """
         self._ensure_mode(self.MODE_US_DIST_CM)
         return self.value(0) * self._scale('US_DIST_CM')
@@ -486,7 +486,7 @@ class UltrasonicSensor(Sensor):
         Measurement of the distance detected by the sensor,
         in centimeters.
 
-        Equivalent to :meth:``UltrasonicSensor.distance_centimeters_continuous``.
+        Equivalent to :meth:`UltrasonicSensor.distance_centimeters_continuous`.
         """
         return self.distance_centimeters_continuous
 
@@ -499,7 +499,7 @@ class UltrasonicSensor(Sensor):
         The sensor will continue to take measurements so
         they are available for future reads.
 
-        Prefer using the equivalent :meth:``UltrasonicSensor.distance_inches`` property.
+        Prefer using the equivalent :meth:`UltrasonicSensor.distance_inches` property.
         """
         self._ensure_mode(self.MODE_US_DIST_IN)
         return self.value(0) * self._scale('US_DIST_IN')
@@ -530,7 +530,7 @@ class UltrasonicSensor(Sensor):
         Measurement of the distance detected by the sensor,
         in inches.
 
-        Equivalent to :meth:``UltrasonicSensor.distance_inches_continuous``.
+        Equivalent to :meth:`UltrasonicSensor.distance_inches_continuous`.
         """
         return self.distance_inches_continuous
 
@@ -727,48 +727,48 @@ class InfraredSensor(Sensor, ButtonBase):
     TOP_LEFT_BOTTOM_LEFT = 10
     TOP_RIGHT_BOTTOM_RIGHT = 11
 
-    #: Handler for top-left button events on channel 1. See :meth:``InfraredSensor.process``.
+    #: Handler for top-left button events on channel 1. See :meth:`InfraredSensor.process`.
     on_channel1_top_left = None
-    #: Handler for bottom-left button events on channel 1. See :meth:``InfraredSensor.process``.
+    #: Handler for bottom-left button events on channel 1. See :meth:`InfraredSensor.process`.
     on_channel1_bottom_left = None
-    #: Handler for top-right button events on channel 1. See :meth:``InfraredSensor.process``.
+    #: Handler for top-right button events on channel 1. See :meth:`InfraredSensor.process`.
     on_channel1_top_right = None
-    #: Handler for bottom-right button events on channel 1. See :meth:``InfraredSensor.process``.
+    #: Handler for bottom-right button events on channel 1. See :meth:`InfraredSensor.process`.
     on_channel1_bottom_right = None
-    #: Handler for beacon button events on channel 1. See :meth:``InfraredSensor.process``.
+    #: Handler for beacon button events on channel 1. See :meth:`InfraredSensor.process`.
     on_channel1_beacon = None
 
-    #: Handler for top-left button events on channel 2. See :meth:``InfraredSensor.process``.
+    #: Handler for top-left button events on channel 2. See :meth:`InfraredSensor.process`.
     on_channel2_top_left = None
-    #: Handler for bottom-left button events on channel 2. See :meth:``InfraredSensor.process``.
+    #: Handler for bottom-left button events on channel 2. See :meth:`InfraredSensor.process`.
     on_channel2_bottom_left = None
-    #: Handler for top-right button events on channel 2. See :meth:``InfraredSensor.process``.
+    #: Handler for top-right button events on channel 2. See :meth:`InfraredSensor.process`.
     on_channel2_top_right = None
-    #: Handler for bottom-right button events on channel 2. See :meth:``InfraredSensor.process``.
+    #: Handler for bottom-right button events on channel 2. See :meth:`InfraredSensor.process`.
     on_channel2_bottom_right = None
-    #: Handler for beacon button events on channel 2. See :meth:``InfraredSensor.process``.
+    #: Handler for beacon button events on channel 2. See :meth:`InfraredSensor.process`.
     on_channel2_beacon = None
 
-    #: Handler for top-left button events on channel 3. See :meth:``InfraredSensor.process``.
+    #: Handler for top-left button events on channel 3. See :meth:`InfraredSensor.process`.
     on_channel3_top_left = None
-    #: Handler for bottom-left button events on channel 3. See :meth:``InfraredSensor.process``.
+    #: Handler for bottom-left button events on channel 3. See :meth:`InfraredSensor.process`.
     on_channel3_bottom_left = None
-    #: Handler for top-right button events on channel 3. See :meth:``InfraredSensor.process``.
+    #: Handler for top-right button events on channel 3. See :meth:`InfraredSensor.process`.
     on_channel3_top_right = None
-    #: Handler for bottom-right button events on channel 3. See :meth:``InfraredSensor.process``.
+    #: Handler for bottom-right button events on channel 3. See :meth:`InfraredSensor.process`.
     on_channel3_bottom_right = None
-    #: Handler for beacon button events on channel 3. See :meth:``InfraredSensor.process``.
+    #: Handler for beacon button events on channel 3. See :meth:`InfraredSensor.process`.
     on_channel3_beacon = None
 
-    #: Handler for top-left button events on channel 4. See :meth:``InfraredSensor.process``.
+    #: Handler for top-left button events on channel 4. See :meth:`InfraredSensor.process`.
     on_channel4_top_left = None
-    #: Handler for bottom-left button events on channel 4. See :meth:``InfraredSensor.process``.
+    #: Handler for bottom-left button events on channel 4. See :meth:`InfraredSensor.process`.
     on_channel4_bottom_left = None
-    #: Handler for top-right button events on channel 4. See :meth:``InfraredSensor.process``.
+    #: Handler for top-right button events on channel 4. See :meth:`InfraredSensor.process`.
     on_channel4_top_right = None
-    #: Handler for bottom-right button events on channel 4. See :meth:``InfraredSensor.process``.
+    #: Handler for bottom-right button events on channel 4. See :meth:`InfraredSensor.process`.
     on_channel4_bottom_right = None
-    #: Handler for beacon button events on channel 4. See :meth:``InfraredSensor.process``.
+    #: Handler for beacon button events on channel 4. See :meth:`InfraredSensor.process`.
     on_channel4_beacon = None
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):

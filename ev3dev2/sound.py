@@ -206,7 +206,7 @@ class Sound(object):
                 (392.00, 300, 150), (311.13, 250, 100), (466.16, 25, 100), (392, 700)
                 ])
 
-        Have also a look at :py:meth:``play_song`` for a more musician-friendly way of doing, which uses
+        Have also a look at :py:meth:`play_song` for a more musician-friendly way of doing, which uses
         the conventional notation for notes and durations.
 
         :param list[tuple(float,float,float)] tone_sequence: The sequence of tones to play. The first number of each tuple is frequency in Hz, the second is duration in milliseconds, and the third is delay in milliseconds between this and the next tone in the sequence.
@@ -649,7 +649,7 @@ class Sound(object):
     #: Triplets can be obtained by dividing the corresponding reference by 3.
     #: For instance, the note value of a eight triplet will be ``NOTE_VALUE['e'] / 3``.
     #: It is simpler however to user the ``3`` modifier of notes, as supported by the
-    #: :py:meth:``Sound.play_song`` method.
+    #: :py:meth:`Sound.play_song` method.
     _NOTE_VALUES = {
         'w': 1.,
         'h': 1./2,

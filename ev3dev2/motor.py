@@ -80,8 +80,8 @@ else:
 class SpeedValue(object):
     """
     A base class for other unit types. Don't use this directly; instead, see
-    :class:``SpeedPercent``, :class:``SpeedRPS``, :class:``SpeedRPM``,
-    :class:``SpeedDPS``, and :class:``SpeedDPM``.
+    :class:`SpeedPercent`, :class:`SpeedRPS`, :class:`SpeedRPM`,
+    :class:`SpeedDPS`, and :class:`SpeedDPM`.
     """
 
     def __eq__(self, other):
@@ -975,7 +975,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed`` for ``rotations``
 
-        ``speed`` can be a percentage or a :class:``ev3dev2.motor.SpeedValue``
+        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
         speed_sp = self._speed_native_units(speed)
@@ -991,7 +991,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed`` for ``degrees``
 
-        ``speed`` can be a percentage or a :class:``ev3dev2.motor.SpeedValue``
+        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
         speed_sp = self._speed_native_units(speed)
@@ -1007,7 +1007,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed`` to ``position``
 
-        ``speed`` can be a percentage or a :class:``ev3dev2.motor.SpeedValue``
+        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
         speed = self._speed_native_units(speed)
@@ -1024,7 +1024,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed`` for ``seconds``
 
-        ``speed`` can be a percentage or a :class:``ev3dev2.motor.SpeedValue``
+        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
         """
 
@@ -1045,7 +1045,7 @@ class Motor(Device):
         """
         Rotate the motor at ``speed`` for forever
 
-        ``speed`` can be a percentage or a :class:``ev3dev2.motor.SpeedValue``
+        ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
 
         Note that ``block`` is False by default, this is different from the
@@ -1097,7 +1097,7 @@ class LargeMotor(Motor):
     """
     EV3/NXT large servo motor.
 
-    Same as :class:``Motor``, except it will only successfully initialize if it finds a "large" motor.
+    Same as :class:`Motor`, except it will only successfully initialize if it finds a "large" motor.
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
@@ -1114,7 +1114,7 @@ class MediumMotor(Motor):
     """
     EV3 medium servo motor.
 
-    Same as :class:``Motor``, except it will only successfully initialize if it finds a "medium" motor.
+    Same as :class:`Motor`, except it will only successfully initialize if it finds a "medium" motor.
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
@@ -1131,7 +1131,7 @@ class ActuonixL1250Motor(Motor):
     """
     Actuonix L12 50 linear servo motor.
 
-    Same as :class:``Motor``, except it will only successfully initialize if it finds an Actuonix L12 50 linear servo motor
+    Same as :class:`Motor`, except it will only successfully initialize if it finds an Actuonix L12 50 linear servo motor
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
@@ -1148,7 +1148,7 @@ class ActuonixL12100Motor(Motor):
     """
     Actuonix L12 100 linear servo motor.
 
-    Same as :class:``Motor``, except it will only successfully initialize if it finds an Actuonix L12 100 linear servo motor
+    Same as :class:`Motor`, except it will only successfully initialize if it finds an Actuonix L12 100 linear servo motor
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
@@ -2324,7 +2324,7 @@ class MoveSteering(MoveTank):
         """
         Rotate the motors according to the provided ``steering``.
 
-        The distance each motor will travel follows the rules of :meth:``MoveTank.on_for_rotations``.
+        The distance each motor will travel follows the rules of :meth:`MoveTank.on_for_rotations`.
         """
         (left_speed, right_speed) = self.get_speed_steering(steering, speed)
         MoveTank.on_for_rotations(self, SpeedNativeUnits(left_speed), SpeedNativeUnits(right_speed), rotations, brake, block)
@@ -2333,7 +2333,7 @@ class MoveSteering(MoveTank):
         """
         Rotate the motors according to the provided ``steering``.
 
-        The distance each motor will travel follows the rules of :meth:``MoveTank.on_for_degrees``.
+        The distance each motor will travel follows the rules of :meth:`MoveTank.on_for_degrees`.
         """
         (left_speed, right_speed) = self.get_speed_steering(steering, speed)
         MoveTank.on_for_degrees(self, SpeedNativeUnits(left_speed), SpeedNativeUnits(right_speed), degrees, brake, block)
@@ -2407,7 +2407,7 @@ class MoveDifferential(MoveTank):
 
     New arguments:
 
-    wheel_class - Typically a child class of :class:``ev3dev2.wheel.Wheel``. This is used to
+    wheel_class - Typically a child class of :class:`ev3dev2.wheel.Wheel`. This is used to
     get the circumference of the wheels of the robot. The circumference is
     needed for several calculations in this class.
 

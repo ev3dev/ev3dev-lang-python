@@ -385,7 +385,7 @@ class Display(FbMem):
             http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/ev3dev-stretch/display.html#bitmap-fonts
 
         - If font is a string, it is the name of a font to be loaded.
-        - If font is a Font object, returned from :meth:``ev3dev2.fonts.load``, then it is
+        - If font is a Font object, returned from :meth:`ev3dev2.fonts.load`, then it is
           used directly.  This is desirable for faster display times.
 
         """
@@ -418,7 +418,7 @@ class Display(FbMem):
             http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/ev3dev-stretch/display.html#bitmap-fonts
 
         - If font is a string, it is the name of a font to be loaded.
-        - If font is a Font object, returned from :meth:``ev3dev2.fonts.load``, then it is
+        - If font is a Font object, returned from :meth:`ev3dev2.fonts.load`, then it is
           used directly.  This is desirable for faster display times.
 
         """
