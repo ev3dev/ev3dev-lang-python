@@ -12,8 +12,8 @@ import parameterizedtestcase as ptc
 
 from motor_info import motor_info
 
-class TestMotorMotion(ptc.ParameterizedTestCase):
 
+class TestMotorMotion(ptc.ParameterizedTestCase):
     @classmethod
     def setUpClass(cls):
         pass
@@ -23,117 +23,127 @@ class TestMotorMotion(ptc.ParameterizedTestCase):
         pass
 
     def initialize_motor(self):
-        self._param['motor'].command = 'reset'
+        self._param["motor"].command = "reset"
 
-    def run_to_positions(self,stop_action,command,speed_sp,positions,tolerance):
-        self._param['motor'].stop_action = stop_action
-        self._param['motor'].speed_sp = speed_sp
+    def run_to_positions(self, stop_action, command, speed_sp, positions, tolerance):
+        self._param["motor"].stop_action = stop_action
+        self._param["motor"].speed_sp = speed_sp
 
-        target = self._param['motor'].position
+        target = self._param["motor"].position
 
         for i in positions:
-            self._param['motor'].position_sp = i
-            if 'run-to-rel-pos' == command:
+            self._param["motor"].position_sp = i
+            if "run-to-rel-pos" == command:
                 target += i
             else:
                 target = i
-            print( "PRE position = {0} i = {1} target = {2}".format(self._param['motor'].position, i, target))
-            self._param['motor'].command = command
-            while 'running' in self._param['motor'].state:
+            print("PRE position = {0} i = {1} target = {2}".format(self._param["motor"].position, i, target))
+            self._param["motor"].command = command
+            while "running" in self._param["motor"].state:
                 pass
-            print( "POS position = {0} i = {1} target = {2}".format(self._param['motor'].position, i, target))
-            self.assertGreaterEqual(tolerance, abs(self._param['motor'].position - target))
+            print("POS position = {0} i = {1} target = {2}".format(self._param["motor"].position, i, target))
+            self.assertGreaterEqual(tolerance, abs(self._param["motor"].position - target))
             time.sleep(0.2)
 
-        self._param['motor'].command = 'stop'
+        self._param["motor"].command = "stop"
 
     def test_stop_brake_no_ramp_med_speed_relative(self):
-        if not self._param['has_brake']:
-            self.skipTest('brake not supported by this motor controller')
+        if not self._param["has_brake"]:
+            self.skipTest("brake not supported by this motor controller")
         self.initialize_motor()
-        self.run_to_positions('brake','run-to-rel-pos',400,[0,90,180,360,720,-720,-360,-180,-90,0],20)
+        self.run_to_positions("brake", "run-to-rel-pos", 400, [0, 90, 180, 360, 720, -720, -360, -180, -90, 0], 20)
 
     def test_stop_hold_no_ramp_med_speed_relative(self):
         self.initialize_motor()
-        self.run_to_positions('hold','run-to-rel-pos',400,[0,90,180,360,720,-720,-360,-180,-90,0],5)
+        self.run_to_positions("hold", "run-to-rel-pos", 400, [0, 90, 180, 360, 720, -720, -360, -180, -90, 0], 5)
 
     def test_stop_brake_no_ramp_low_speed_relative(self):
-        if not self._param['has_brake']:
-            self.skipTest('brake not supported by this motor controller')
+        if not self._param["has_brake"]:
+            self.skipTest("brake not supported by this motor controller")
         self.initialize_motor()
-        self.run_to_positions('brake','run-to-rel-pos',100,[0,90,180,360,720,-720,-360,-180,-90,0],20)
+        self.run_to_positions("brake", "run-to-rel-pos", 100, [0, 90, 180, 360, 720, -720, -360, -180, -90, 0], 20)
 
     def test_stop_hold_no_ramp_low_speed_relative(self):
         self.initialize_motor()
-        self.run_to_positions('hold','run-to-rel-pos',100,[0,90,180,360,720,-720,-360,-180,-90,0],5)
+        self.run_to_positions("hold", "run-to-rel-pos", 100, [0, 90, 180, 360, 720, -720, -360, -180, -90, 0], 5)
 
     def test_stop_brake_no_ramp_high_speed_relative(self):
-        if not self._param['has_brake']:
-            self.skipTest('brake not supported by this motor controller')
+        if not self._param["has_brake"]:
+            self.skipTest("brake not supported by this motor controller")
         self.initialize_motor()
-        self.run_to_positions('brake','run-to-rel-pos',900,[0,90,180,360,720,-720,-360,-180,-90,0],50)
+        self.run_to_positions("brake", "run-to-rel-pos", 900, [0, 90, 180, 360, 720, -720, -360, -180, -90, 0], 50)
 
     def test_stop_hold_no_ramp_high_speed_relative(self):
         self.initialize_motor()
-        self.run_to_positions('hold','run-to-rel-pos',100,[0,90,180,360,720,-720,-360,-180,-90,0],5)
+        self.run_to_positions("hold", "run-to-rel-pos", 100, [0, 90, 180, 360, 720, -720, -360, -180, -90, 0], 5)
 
     def test_stop_brake_no_ramp_med_speed_absolute(self):
-        if not self._param['has_brake']:
-            self.skipTest('brake not supported by this motor controller')
+        if not self._param["has_brake"]:
+            self.skipTest("brake not supported by this motor controller")
         self.initialize_motor()
-        self.run_to_positions('brake','run-to-abs-pos',400,[0,90,180,360,180,90,0,-90,-180,-360,-180,-90,0],20)
+        self.run_to_positions(
+            "brake", "run-to-abs-pos", 400, [0, 90, 180, 360, 180, 90, 0, -90, -180, -360, -180, -90, 0], 20
+        )
 
     def test_stop_hold_no_ramp_med_speed_absolute(self):
         self.initialize_motor()
-        self.run_to_positions('hold','run-to-abs-pos',400,[0,90,180,360,180,90,0,-90,-180,-360,-180,-90,0],5)
+        self.run_to_positions(
+            "hold", "run-to-abs-pos", 400, [0, 90, 180, 360, 180, 90, 0, -90, -180, -360, -180, -90, 0], 5
+        )
 
     def test_stop_brake_no_ramp_low_speed_absolute(self):
-        if not self._param['has_brake']:
-            self.skipTest('brake not supported by this motor controller')
+        if not self._param["has_brake"]:
+            self.skipTest("brake not supported by this motor controller")
         self.initialize_motor()
-        self.run_to_positions('brake','run-to-abs-pos',100,[0,90,180,360,180,90,0,-90,-180,-360,-180,-90,0],20)
+        self.run_to_positions(
+            "brake", "run-to-abs-pos", 100, [0, 90, 180, 360, 180, 90, 0, -90, -180, -360, -180, -90, 0], 20
+        )
 
     def test_stop_hold_no_ramp_low_speed_absolute(self):
         self.initialize_motor()
-        self.run_to_positions('hold','run-to-abs-pos',100,[0,90,180,360,180,90,0,-90,-180,-360,-180,-90,0],5)
+        self.run_to_positions(
+            "hold", "run-to-abs-pos", 100, [0, 90, 180, 360, 180, 90, 0, -90, -180, -360, -180, -90, 0], 5
+        )
 
     def test_stop_brake_no_ramp_high_speed_absolute(self):
-        if not self._param['has_brake']:
-            self.skipTest('brake not supported by this motor controller')
+        if not self._param["has_brake"]:
+            self.skipTest("brake not supported by this motor controller")
         self.initialize_motor()
-        self.run_to_positions('brake','run-to-abs-pos',900,[0,90,180,360,180,90,0,-90,-180,-360,-180,-90,0],50)
+        self.run_to_positions(
+            "brake", "run-to-abs-pos", 900, [0, 90, 180, 360, 180, 90, 0, -90, -180, -360, -180, -90, 0], 50
+        )
 
     def test_stop_hold_no_ramp_high_speed_absolute(self):
         self.initialize_motor()
-        self.run_to_positions('hold','run-to-abs-pos',100,[0,90,180,360,180,90,0,-90,-180,-360,-180,-90,0],5)
+        self.run_to_positions(
+            "hold", "run-to-abs-pos", 100, [0, 90, 180, 360, 180, 90, 0, -90, -180, -360, -180, -90, 0], 5
+        )
+
 
 # Add all the tests to the suite - some tests apply only to certain drivers!
+
 
 def AddTachoMotorMotionTestsToSuite(suite, params):
     suite.addTest(ptc.ParameterizedTestCase.parameterize(TestMotorMotion, param=params))
 
-if __name__ == '__main__':
-    ev3_params = {
-        'motor': ev3.Motor('outA'),
-        'port': 'outA',
-        'driver_name': 'lego-ev3-l-motor',
-        'has_brake': True,
-    }
+
+if __name__ == "__main__":
+    ev3_params = {"motor": ev3.Motor("outA"), "port": "outA", "driver_name": "lego-ev3-l-motor", "has_brake": True}
     brickpi_params = {
-        'motor': ev3.Motor('ttyAMA0:MA'),
-        'port': 'ttyAMA0:MA',
-        'driver_name': 'lego-nxt-motor',
-        'has_brake': False,
+        "motor": ev3.Motor("ttyAMA0:MA"),
+        "port": "ttyAMA0:MA",
+        "driver_name": "lego-nxt-motor",
+        "has_brake": False,
     }
     pistorms_params = {
-        'motor': ev3.Motor('pistorms:BAM1'),
-        'port': 'pistorms:BAM1',
-        'driver_name': 'lego-nxt-motor',
-        'has_brake': True,
+        "motor": ev3.Motor("pistorms:BAM1"),
+        "port": "pistorms:BAM1",
+        "driver_name": "lego-nxt-motor",
+        "has_brake": True,
     }
 
     suite = unittest.TestSuite()
 
     AddTachoMotorMotionTestsToSuite(suite, ev3_params)
 
-    unittest.TextTestRunner(verbosity=1,buffer=True ).run(suite)
+    unittest.TextTestRunner(verbosity=1, buffer=True).run(suite)

@@ -1,4 +1,3 @@
-
 """
 This program is used to find the kp, ki, kd PID values for
 ``MoveTank.follow_line()``. These values vary from robot to robot, the best way
@@ -52,28 +51,13 @@ def find_kp_ki_kd(tank, start, end, increment, speed, kx_to_tweak, kp, ki, kd):
 
         try:
             if kx_to_tweak == "kp":
-                tank.follow_line(
-                    kp=kx, ki=ki, kd=kd,
-                    speed=speed,
-                    follow_for=follow_for_ms,
-                    ms=10000,
-                )
+                tank.follow_line(kp=kx, ki=ki, kd=kd, speed=speed, follow_for=follow_for_ms, ms=10000)
 
             elif kx_to_tweak == "ki":
-                tank.follow_line(
-                    kp=kp, ki=kx, kd=kd,
-                    speed=speed,
-                    follow_for=follow_for_ms,
-                    ms=10000,
-                )
+                tank.follow_line(kp=kp, ki=kx, kd=kd, speed=speed, follow_for=follow_for_ms, ms=10000)
 
             elif kx_to_tweak == "kd":
-                tank.follow_line(
-                    kp=kp, ki=ki, kd=kx,
-                    speed=speed,
-                    follow_for=follow_for_ms,
-                    ms=10000,
-                )
+                tank.follow_line(kp=kp, ki=ki, kd=kx, speed=speed, follow_for=follow_for_ms, ms=10000)
 
             else:
                 raise Exception("Invalid kx_to_tweak %s" % kx_to_tweak)
@@ -102,8 +86,7 @@ def find_kp_ki_kd(tank, start, end, increment, speed, kx_to_tweak, kp, ki, kd):
 if __name__ == "__main__":
 
     # logging
-    logging.basicConfig(level=logging.DEBUG,
-                        format="%(asctime)s %(levelname)5s: %(message)s")
+    logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)5s: %(message)s")
     log = logging.getLogger(__name__)
 
     tank = MoveTank(OUTPUT_A, OUTPUT_B)
@@ -113,18 +96,18 @@ if __name__ == "__main__":
 
     # Find the best integer for kp (in increments of 1) then fine tune by
     # finding the best float (in increments of 0.1)
-    kp = find_kp_ki_kd(tank, 1, 20, 1, speed, 'kp', 0, 0, 0)
-    kp = find_kp_ki_kd(tank, kp - 1, kp + 1, 0.1, speed, 'kp', kp, 0, 0)
+    kp = find_kp_ki_kd(tank, 1, 20, 1, speed, "kp", 0, 0, 0)
+    kp = find_kp_ki_kd(tank, kp - 1, kp + 1, 0.1, speed, "kp", kp, 0, 0)
     print("\n\n\n%s\nkp %s\n%s\n\n\n" % ("" * 10, kp, "*" * 10))
 
     # Find the best float ki (in increments of 0.1)
-    ki = find_kp_ki_kd(tank, 0, 1, 0.1, speed, 'ki', kp, 0, 0)
+    ki = find_kp_ki_kd(tank, 0, 1, 0.1, speed, "ki", kp, 0, 0)
     print("\n\n\n%s\nki %s\n%s\n\n\n" % ("" * 10, ki, "*" * 10))
 
     # Find the best integer for kd (in increments of 1) then fine tune by
     # finding the best float (in increments of 0.1)
-    kd = find_kp_ki_kd(tank, 0, 10, 1, speed, 'kd', kp, ki, 0)
-    kd = find_kp_ki_kd(tank, kd - 1, kd + 1, 0.1, speed, 'kd', kp, ki, 0)
+    kd = find_kp_ki_kd(tank, 0, 10, 1, speed, "kd", kp, ki, 0)
+    kd = find_kp_ki_kd(tank, kd - 1, kd + 1, 0.1, speed, "kd", kp, ki, 0)
     print("\n\n\n%s\nkd %s\n%s\n\n\n" % ("" * 10, kd, "*" * 10))
 
     print("Final results: kp %s, ki %s, kd %s" % (kp, ki, kd))

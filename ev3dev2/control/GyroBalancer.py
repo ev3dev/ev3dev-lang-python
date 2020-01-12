@@ -82,28 +82,29 @@ class GyroBalancer(object):
     Robot will keep its balance.
     """
 
-    def __init__(self,
-                 gain_gyro_angle=1700,
-                 gain_gyro_rate=120,
-                 gain_motor_angle=7,
-                 gain_motor_angular_speed=9,
-                 gain_motor_angle_error_accumulated=3,
-                 power_voltage_nominal=8.0,
-                 pwr_friction_offset_nom=3,
-                 timing_loop_msec=30,
-                 motor_angle_history_length=5,
-                 gyro_drift_compensation_factor=0.05,
-                 left_motor_port=OUTPUT_D,
-                 right_motor_port=OUTPUT_A,
-                 debug=False):
+    def __init__(
+        self,
+        gain_gyro_angle=1700,
+        gain_gyro_rate=120,
+        gain_motor_angle=7,
+        gain_motor_angular_speed=9,
+        gain_motor_angle_error_accumulated=3,
+        power_voltage_nominal=8.0,
+        pwr_friction_offset_nom=3,
+        timing_loop_msec=30,
+        motor_angle_history_length=5,
+        gyro_drift_compensation_factor=0.05,
+        left_motor_port=OUTPUT_D,
+        right_motor_port=OUTPUT_A,
+        debug=False,
+    ):
         """Create GyroBalancer."""
         # Gain parameters
         self.gain_gyro_angle = gain_gyro_angle
         self.gain_gyro_rate = gain_gyro_rate
         self.gain_motor_angle = gain_motor_angle
         self.gain_motor_angular_speed = gain_motor_angular_speed
-        self.gain_motor_angle_error_accumulated =\
-            gain_motor_angle_error_accumulated
+        self.gain_motor_angle_error_accumulated = gain_motor_angle_error_accumulated
 
         # Power parameters
         self.power_voltage_nominal = power_voltage_nominal
@@ -138,13 +139,10 @@ class GyroBalancer(object):
         # Open sensor and motor files
         self.gyro_file = open(self.gyro._path + "/value0", "rb")
         self.touch_file = open(self.touch._path + "/value0", "rb")
-        self.encoder_left_file = open(self.motor_left._path + "/position",
-                                      "rb")
-        self.encoder_right_file = open(self.motor_right._path + "/position",
-                                       "rb")
+        self.encoder_left_file = open(self.motor_left._path + "/position", "rb")
+        self.encoder_right_file = open(self.motor_right._path + "/position", "rb")
         self.dc_left_file = open(self.motor_left._path + "/duty_cycle_sp", "w")
-        self.dc_right_file = open(self.motor_right._path + "/duty_cycle_sp",
-                                  "w")
+        self.dc_right_file = open(self.motor_right._path + "/duty_cycle_sp", "w")
 
         # Drive queue
         self.drive_queue = queue.Queue()
@@ -174,7 +172,7 @@ class GyroBalancer(object):
     def _fast_read(self, infile):
         """Function for fast reading from sensor files."""
         infile.seek(0)
-        return(int(infile.read().decode().strip()))
+        return int(infile.read().decode().strip())
 
     def _fast_write(self, outfile, value):
         """Function for fast writing to motor files."""
@@ -182,11 +180,10 @@ class GyroBalancer(object):
         outfile.write(str(int(value)))
         outfile.flush()
 
-    def _set_duty(self, motor_duty_file, duty, friction_offset,
-                  voltage_comp):
+    def _set_duty(self, motor_duty_file, duty, friction_offset, voltage_comp):
         """Function to set the duty cycle of the motors."""
         # Compensate for nominal voltage and round the input
-        duty_int = int(round(duty*voltage_comp))
+        duty_int = int(round(duty * voltage_comp))
 
         # Add or subtract offset and clamp the value between -100 and 100
         if duty_int > 0:
@@ -298,8 +295,7 @@ class GyroBalancer(object):
             voltage_comp = self.power_voltage_nominal / voltage_idle
 
             # Offset to limit friction deadlock
-            friction_offset = int(round(self.pwr_friction_offset_nom *
-                                        voltage_comp))
+            friction_offset = int(round(self.pwr_friction_offset_nom * voltage_comp))
 
             # Timing settings for the program
             # Time of each loop, measured in seconds.
@@ -309,14 +305,13 @@ class GyroBalancer(object):
             # A deque (a fifo array) which we'll use to keep track of
             # previous motor positions, which we can use to calculate the
             # rate of change (speed)
-            motor_angle_hist =\
-                deque([0], self.motor_angle_history_length)
+            motor_angle_hist = deque([0], self.motor_angle_history_length)
 
             # The rate at which we'll update the gyro offset (precise
             # definition given in docs)
-            gyro_drift_comp_rate =\
-                self.gyro_drift_compensation_factor *\
-                loop_time_target * RAD_PER_SEC_PER_RAW_GYRO_UNIT
+            gyro_drift_comp_rate = (
+                self.gyro_drift_compensation_factor * loop_time_target * RAD_PER_SEC_PER_RAW_GYRO_UNIT
+            )
 
             # Calibrate Gyro
             log.info("-----------------------------------")
@@ -346,9 +341,9 @@ class GyroBalancer(object):
                 # Data logging
                 data = OrderedDict()
                 loop_times = OrderedDict()
-                data['loop_times'] = loop_times
+                data["loop_times"] = loop_times
                 gyro_readings = OrderedDict()
-                data['gyro_readings'] = gyro_readings
+                data["gyro_readings"] = gyro_readings
 
             # Initial fast read touch sensor value
             touch_pressed = False
@@ -375,9 +370,9 @@ class GyroBalancer(object):
                 touch_pressed = self._fast_read(self.touch_file)
 
                 # Read the Motor Position
-                motor_angle_raw = ((self._fast_read(self.encoder_left_file) +
-                                   self._fast_read(self.encoder_right_file)) /
-                                   2.0)
+                motor_angle_raw = (
+                    self._fast_read(self.encoder_left_file) + self._fast_read(self.encoder_right_file)
+                ) / 2.0
                 motor_angle = motor_angle_raw * RAD_PER_RAW_MOTOR_UNIT
 
                 # Read the Gyro
@@ -385,7 +380,7 @@ class GyroBalancer(object):
 
                 # Busy wait for the loop to reach target time length
                 loop_time = 0
-                while(loop_time < loop_time_target):
+                while loop_time < loop_time_target:
                     loop_time = time.time() - loop_start_time
                     time.sleep(0.001)
 
@@ -402,48 +397,39 @@ class GyroBalancer(object):
                     loop_times[time_of_sample] = loop_time * 1000.0
 
                 # Calculate gyro rate
-                gyro_rate = (gyro_rate_raw - gyro_offset) *\
-                    RAD_PER_SEC_PER_RAW_GYRO_UNIT
+                gyro_rate = (gyro_rate_raw - gyro_offset) * RAD_PER_SEC_PER_RAW_GYRO_UNIT
 
                 # Calculate Motor Parameters
-                motor_angular_speed_ref =\
-                    speed * RAD_PER_SEC_PER_PERCENT_SPEED
-                motor_angle_ref = motor_angle_ref +\
-                    motor_angular_speed_ref * loop_time_target
+                motor_angular_speed_ref = speed * RAD_PER_SEC_PER_PERCENT_SPEED
+                motor_angle_ref = motor_angle_ref + motor_angular_speed_ref * loop_time_target
                 motor_angle_error = motor_angle - motor_angle_ref
 
                 # Compute Motor Speed
-                motor_angular_speed =\
-                    ((motor_angle - motor_angle_hist[0]) /
-                     (self.motor_angle_history_length * loop_time_target))
+                motor_angular_speed = (motor_angle - motor_angle_hist[0]) / (
+                    self.motor_angle_history_length * loop_time_target
+                )
                 motor_angular_speed_error = motor_angular_speed
                 motor_angle_hist.append(motor_angle)
 
                 # Compute the motor duty cycle value
-                motor_duty_cycle =\
-                    (self.gain_gyro_angle * gyro_est_angle +
-                     self.gain_gyro_rate * gyro_rate +
-                     self.gain_motor_angle * motor_angle_error +
-                     self.gain_motor_angular_speed *
-                     motor_angular_speed_error +
-                     self.gain_motor_angle_error_accumulated *
-                     motor_angle_error_acc)
+                motor_duty_cycle = (
+                    self.gain_gyro_angle * gyro_est_angle
+                    + self.gain_gyro_rate * gyro_rate
+                    + self.gain_motor_angle * motor_angle_error
+                    + self.gain_motor_angular_speed * motor_angular_speed_error
+                    + self.gain_motor_angle_error_accumulated * motor_angle_error_acc
+                )
 
                 # Apply the signal to the motor, and add steering
-                self._set_duty(self.dc_right_file, motor_duty_cycle + steering,
-                               friction_offset, voltage_comp)
-                self._set_duty(self.dc_left_file, motor_duty_cycle - steering,
-                               friction_offset, voltage_comp)
+                self._set_duty(self.dc_right_file, motor_duty_cycle + steering, friction_offset, voltage_comp)
+                self._set_duty(self.dc_left_file, motor_duty_cycle - steering, friction_offset, voltage_comp)
 
                 # Update angle estimate and gyro offset estimate
-                gyro_est_angle = gyro_est_angle + gyro_rate *\
-                    loop_time_target
-                gyro_offset = (1 - gyro_drift_comp_rate) *\
-                    gyro_offset + gyro_drift_comp_rate * gyro_rate_raw
+                gyro_est_angle = gyro_est_angle + gyro_rate * loop_time_target
+                gyro_offset = (1 - gyro_drift_comp_rate) * gyro_offset + gyro_drift_comp_rate * gyro_rate_raw
 
                 # Update Accumulated Motor Error
-                motor_angle_error_acc = motor_angle_error_acc +\
-                    motor_angle_error * loop_time_target
+                motor_angle_error_acc = motor_angle_error_acc + motor_angle_error * loop_time_target
 
             # Closing down & Cleaning up
 
@@ -469,7 +455,7 @@ class GyroBalancer(object):
 
             if self.debug:
                 # Dump logged data to file
-                with open("data.txt", 'w') as data_file:
+                with open("data.txt", "w") as data_file:
                     json.dump(data, data_file)
 
     def _move(self, speed=0, steering=0, seconds=None):

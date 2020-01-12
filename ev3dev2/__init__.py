@@ -25,17 +25,20 @@
 
 import sys
 
-if sys.version_info < (3,4):
-    raise SystemError('Must be using Python 3.4 or higher')
+if sys.version_info < (3, 4):
+    raise SystemError("Must be using Python 3.4 or higher")
+
 
 def is_micropython():
     return sys.implementation.name == "micropython"
+
 
 def chain_exception(exception, cause):
     if is_micropython():
         raise exception
     else:
         raise exception from cause
+
 
 try:
     # if we are in a released build, there will be an auto-generated "version"
@@ -52,46 +55,47 @@ import stat
 import errno
 from os.path import abspath
 
+
 def get_current_platform():
     """
     Look in /sys/class/board-info/ to determine the platform type.
 
     This can return 'ev3', 'evb', 'pistorms', 'brickpi', 'brickpi3' or 'fake'.
     """
-    board_info_dir = '/sys/class/board-info/'
+    board_info_dir = "/sys/class/board-info/"
 
     if not os.path.exists(board_info_dir) or os.environ.get("FAKE_SYS"):
-        return 'fake'
+        return "fake"
 
     for board in os.listdir(board_info_dir):
-        uevent_filename = os.path.join(board_info_dir, board, 'uevent')
+        uevent_filename = os.path.join(board_info_dir, board, "uevent")
 
         if os.path.exists(uevent_filename):
-            with open(uevent_filename, 'r') as fh:
+            with open(uevent_filename, "r") as fh:
                 for line in fh.readlines():
-                    (key, value) = line.strip().split('=')
+                    (key, value) = line.strip().split("=")
 
-                    if key == 'BOARD_INFO_MODEL':
+                    if key == "BOARD_INFO_MODEL":
 
-                        if value == 'LEGO MINDSTORMS EV3':
-                            return 'ev3'
+                        if value == "LEGO MINDSTORMS EV3":
+                            return "ev3"
 
-                        elif value in ('FatcatLab EVB', 'QuestCape'):
-                            return 'evb'
+                        elif value in ("FatcatLab EVB", "QuestCape"):
+                            return "evb"
 
-                        elif value == 'PiStorms':
-                            return 'pistorms'
+                        elif value == "PiStorms":
+                            return "pistorms"
 
                         # This is the same for both BrickPi and BrickPi+.
                         # There is not a way to tell the difference.
-                        elif value == 'Dexter Industries BrickPi':
-                            return 'brickpi'
+                        elif value == "Dexter Industries BrickPi":
+                            return "brickpi"
 
-                        elif value == 'Dexter Industries BrickPi3':
-                            return 'brickpi3'
+                        elif value == "Dexter Industries BrickPi3":
+                            return "brickpi3"
 
-                        elif value == 'FAKE-SYS':
-                            return 'fake'
+                        elif value == "FAKE-SYS":
+                            return "fake"
 
     return None
 
@@ -131,35 +135,33 @@ def list_device_names(class_path, name_pattern, **kwargs):
 
     for f in os.listdir(class_path):
         if fnmatch.fnmatch(f, name_pattern):
-            path = class_path + '/' + f
-            if all([matches(path + '/' + k, kwargs[k]) for k in kwargs]):
+            path = class_path + "/" + f
+            if all([matches(path + "/" + k, kwargs[k]) for k in kwargs]):
                 yield f
 
 
 def library_load_warning_message(library_name, dependent_class):
     return 'Import warning: Failed to import "{}". {} will be unusable!'.format(library_name, dependent_class)
 
+
 class DeviceNotFound(Exception):
     pass
+
 
 # -----------------------------------------------------------------------------
 # Define the base class from which all other ev3dev classes are defined.
 
+
 class Device(object):
     """The ev3dev device base class"""
 
-    __slots__ = [
-        '_path',
-        '_device_index',
-        '_attr_cache',
-        'kwargs',
-    ]
+    __slots__ = ["_path", "_device_index", "_attr_cache", "kwargs"]
 
-    DEVICE_ROOT_PATH = '/sys/class'
+    DEVICE_ROOT_PATH = "/sys/class"
 
-    _DEVICE_INDEX = re.compile(r'^.*(\d+)$')
+    _DEVICE_INDEX = re.compile(r"^.*(\d+)$")
 
-    def __init__(self, class_name, name_pattern='*', name_exact=False, **kwargs):
+    def __init__(self, class_name, name_pattern="*", name_exact=False, **kwargs):
         """Spin through the Linux sysfs class for the device type and find
         a device that matches the provided name pattern and attributes (if any).
 
@@ -184,7 +186,7 @@ class Device(object):
         If there was no valid connected device, an error is thrown.
         """
 
-        classpath = abspath(Device.DEVICE_ROOT_PATH + '/' + class_name)
+        classpath = abspath(Device.DEVICE_ROOT_PATH + "/" + class_name)
         self.kwargs = kwargs
         self._attr_cache = {}
 
@@ -196,12 +198,12 @@ class Device(object):
                 return None
 
         if name_exact:
-            self._path = classpath + '/' + name_pattern
+            self._path = classpath + "/" + name_pattern
             self._device_index = get_index(name_pattern)
         else:
             try:
                 name = next(list_device_names(classpath, name_pattern, **kwargs))
-                self._path = classpath + '/' + name
+                self._path = classpath + "/" + name
                 self._device_index = get_index(name)
             except StopIteration:
                 self._path = None
@@ -210,11 +212,11 @@ class Device(object):
                 chain_exception(DeviceNotFound("%s is not connected." % self), None)
 
     def __str__(self):
-        if 'address' in self.kwargs:
-            return "%s(%s)" % (self.__class__.__name__, self.kwargs.get('address'))
+        if "address" in self.kwargs:
+            return "%s(%s)" % (self.__class__.__name__, self.kwargs.get("address"))
         else:
             return self.__class__.__name__
-    
+
     def __repr__(self):
         return self.__str__()
 
@@ -229,11 +231,11 @@ class Device(object):
         w_ok = mode & stat.S_IWGRP
 
         if r_ok and w_ok:
-            mode_str = 'r+'
+            mode_str = "r+"
         elif w_ok:
-            mode_str = 'w'
+            mode_str = "w"
         else:
-            mode_str = 'r'
+            mode_str = "r"
 
         return io.FileIO(path, mode_str)
 
@@ -241,7 +243,7 @@ class Device(object):
         """Device attribute getter"""
         try:
             if attribute is None:
-                attribute = self._attribute_file_open( name )
+                attribute = self._attribute_file_open(name)
             else:
                 attribute.seek(0)
             return attribute, attribute.read().strip().decode()
@@ -252,7 +254,7 @@ class Device(object):
         """Device attribute setter"""
         try:
             if attribute is None:
-                attribute = self._attribute_file_open( name )
+                attribute = self._attribute_file_open(name)
             else:
                 attribute.seek(0)
 
@@ -275,11 +277,17 @@ class Device(object):
                 try:
                     max_speed = self.max_speed
                 except (AttributeError, Exception):
-                    chain_exception(ValueError("The given speed value {} was out of range".format(value)),
-                        driver_error)
+                    chain_exception(ValueError("The given speed value {} was out of range".format(value)), driver_error)
                 else:
-                    chain_exception(ValueError("The given speed value {} was out of range. Max speed: +/-{}".format(value, max_speed)), driver_error)
-            chain_exception(ValueError("One or more arguments were out of range or invalid, value {}".format(value)), driver_error)
+                    chain_exception(
+                        ValueError(
+                            "The given speed value {} was out of range. Max speed: +/-{}".format(value, max_speed)
+                        ),
+                        driver_error,
+                    )
+            chain_exception(
+                ValueError("One or more arguments were out of range or invalid, value {}".format(value)), driver_error
+            )
         elif driver_errorno == errno.ENODEV or driver_errorno == errno.ENOENT:
             # We will assume that a file-not-found error is the result of a disconnected device
             # rather than a library error. If that isn't the case, at a minimum the underlying
@@ -326,7 +334,7 @@ class Device(object):
 
     def get_attr_set(self, attribute, name):
         attribute, value = self.get_attr_line(attribute, name)
-        return attribute, [v.strip('[]') for v in value.split()]
+        return attribute, [v.strip("[]") for v in value.split()]
 
     def get_cached_attr_set(self, filehandle, keyword):
         value = self._attr_cache.get(keyword)
@@ -340,7 +348,7 @@ class Device(object):
     def get_attr_from_set(self, attribute, name):
         attribute, value = self.get_attr_line(attribute, name)
         for a in value.split():
-            v = a.strip('[]')
+            v = a.strip("[]")
             if v != a:
                 return v
         return ""
@@ -367,7 +375,6 @@ def list_devices(class_name, name_pattern, **kwargs):
             is a list, then a match against any entry of the list is
             enough.
     """
-    classpath = abspath(Device.DEVICE_ROOT_PATH + '/' + class_name)
+    classpath = abspath(Device.DEVICE_ROOT_PATH + "/" + class_name)
 
-    return (Device(class_name, name, name_exact=True)
-            for name in list_device_names(classpath, name_pattern, **kwargs))
+    return (Device(class_name, name, name_exact=True) for name in list_device_names(classpath, name_pattern, **kwargs))

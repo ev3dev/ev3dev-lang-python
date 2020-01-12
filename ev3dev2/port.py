@@ -26,8 +26,8 @@
 import sys
 from . import Device
 
-if sys.version_info < (3,4):
-    raise SystemError('Must be using Python 3.4 or higher')
+if sys.version_info < (3, 4):
+    raise SystemError("Must be using Python 3.4 or higher")
 
 
 class LegoPort(Device):
@@ -59,21 +59,14 @@ class LegoPort(Device):
     a specific port.
     """
 
-    SYSTEM_CLASS_NAME = 'lego-port'
-    SYSTEM_DEVICE_NAME_CONVENTION = '*'
-    __slots__ = [
-    '_address',
-    '_driver_name',
-    '_modes',
-    '_mode',
-    '_set_device',
-    '_status',
-    ]
+    SYSTEM_CLASS_NAME = "lego-port"
+    SYSTEM_DEVICE_NAME_CONVENTION = "*"
+    __slots__ = ["_address", "_driver_name", "_modes", "_mode", "_set_device", "_status"]
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
         if address is not None:
-            kwargs['address'] = address
+            kwargs["address"] = address
         super(LegoPort, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
         self._address = None
@@ -89,7 +82,7 @@ class LegoPort(Device):
         Returns the name of the port. See individual driver documentation for
         the name that will be returned.
         """
-        self._address, value = self.get_attr_string(self._address, 'address')
+        self._address, value = self.get_attr_string(self._address, "address")
         return value
 
     @property
@@ -98,7 +91,7 @@ class LegoPort(Device):
         Returns the name of the driver that loaded this device. You can find the
         complete list of drivers in the [list of port drivers].
         """
-        (self._driver_name, value) = self.get_cached_attr_string(self._driver_name, 'driver_name')
+        (self._driver_name, value) = self.get_cached_attr_string(self._driver_name, "driver_name")
         return value
 
     @property
@@ -106,7 +99,7 @@ class LegoPort(Device):
         """
         Returns a list of the available modes of the port.
         """
-        (self._modes, value) = self.get_cached_attr_set(self._modes, 'modes')
+        (self._modes, value) = self.get_cached_attr_set(self._modes, "modes")
         return value
 
     @property
@@ -117,12 +110,12 @@ class LegoPort(Device):
         associated with the port will be removed new ones loaded, however this
         this will depend on the individual driver implementing this class.
         """
-        self._mode, value = self.get_attr_string(self._mode, 'mode')
+        self._mode, value = self.get_attr_string(self._mode, "mode")
         return value
 
     @mode.setter
     def mode(self, value):
-        self._mode = self.set_attr_string(self._mode, 'mode', value)
+        self._mode = self.set_attr_string(self._mode, "mode", value)
 
     @property
     def set_device(self):
@@ -137,7 +130,7 @@ class LegoPort(Device):
 
     @set_device.setter
     def set_device(self, value):
-        self._set_device = self.set_attr_string(self._set_device, 'set_device', value)
+        self._set_device = self.set_attr_string(self._set_device, "set_device", value)
 
     @property
     def status(self):
@@ -147,5 +140,5 @@ class LegoPort(Device):
         such as ``no-device`` or ``error``. See individual port driver documentation
         for the full list of possible values.
         """
-        self._status, value = self.get_attr_string(self._status, 'status')
+        self._status, value = self.get_attr_string(self._status, "status")
         return value

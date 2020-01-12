@@ -18,8 +18,7 @@ parser.add_argument("-s", "--speed", type=int, default=50)
 args = parser.parse_args()
 
 # logging
-logging.basicConfig(level=logging.INFO,
-                    format="%(asctime)s %(levelname)5s: %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)5s: %(message)s")
 log = logging.getLogger(__name__)
 
 if args.motor == "A":
@@ -34,8 +33,8 @@ else:
     raise Exception("%s is invalid, options are A, B, C, D")
 
 if args.degrees:
-    log.info("Motor %s, current position %d, move to position %d, max speed %d" %
-             (args.motor, motor.position, args.degrees, motor.max_speed))
-    motor.run_to_rel_pos(speed_sp=args.speed,
-                         position_sp=args.degrees,
-                         stop_action='hold')
+    log.info(
+        "Motor %s, current position %d, move to position %d, max speed %d"
+        % (args.motor, motor.position, args.degrees, motor.max_speed)
+    )
+    motor.run_to_rel_pos(speed_sp=args.speed, position_sp=args.degrees, stop_action="hold")

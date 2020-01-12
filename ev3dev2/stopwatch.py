@@ -9,24 +9,29 @@ if is_micropython():
 else:
     import datetime as dt
 
+
 def get_ticks_ms():
     if is_micropython():
         return utime.ticks_ms()
     else:
         return int(dt.datetime.timestamp(dt.datetime.now()) * 1000)
 
+
 class StopWatchAlreadyStartedException(Exception):
     """
     Exception raised when start() is called on a StopWatch which was already start()ed and not yet
     stopped.
     """
+
     pass
+
 
 class StopWatch(object):
     """
     A timer class which lets you start timing and then check the amount of time
     elapsed.
     """
+
     def __init__(self, desc=None):
         """
         Initializes the StopWatch but does not start it.
@@ -70,14 +75,14 @@ class StopWatch(object):
         """
         self._start_time = None
         self._stopped_total_time = None
-    
+
     def restart(self):
         """
         Resets and then starts the timer.
         """
         self.reset()
         self.start()
-    
+
     @property
     def is_started(self):
         """
@@ -118,7 +123,7 @@ class StopWatch(object):
         """
         Returns the stringified value of the stopwatch in HH:MM:SS.msec format
         """
-        return '%02d:%02d:%02d.%03d' % self.value_hms
+        return "%02d:%02d:%02d.%03d" % self.value_hms
 
     def is_elapsed_ms(self, duration_ms):
         """
@@ -136,4 +141,3 @@ class StopWatch(object):
         """
 
         return duration_secs is not None and self.value_secs >= duration_secs
-

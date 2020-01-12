@@ -23,8 +23,8 @@
 
 import sys
 
-if sys.version_info < (3,4):
-    raise SystemError('Must be using Python 3.4 or higher')
+if sys.version_info < (3, 4):
+    raise SystemError("Must be using Python 3.4 or higher")
 
 CENTIMETER_MM = 10
 DECIMETER_MM = 100

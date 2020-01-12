@@ -21,7 +21,7 @@
 import os
 
 
-class Console():
+class Console:
     """
     A class that represents the EV3 LCD console, which implements ANSI codes
     for cursor positioning, text color, and resetting the screen. Supports changing
@@ -90,7 +90,7 @@ class Console():
         Set to True to show the cursor, or False to hide it.
         """
         self._cursor = value
-        print("\x1b[?25{}".format('h' if value else 'l'), end='')
+        print("\x1b[?25{}".format("h" if value else "l"), end="")
 
     def text_at(self, text, column=1, row=1, reset_console=False, inverse=False, alignment="L"):
         """
@@ -140,7 +140,7 @@ class Console():
         if inverse:
             text = "\x1b[7m{}\x1b[m".format(text)
 
-        print("\x1b[{};{}H{}".format(row, column, text), end='')
+        print("\x1b[{};{}H{}".format(row, column, text), end="")
 
     def set_font(self, font="Lat15-TerminusBold24x12", reset_console=True):
         """
@@ -157,7 +157,7 @@ class Console():
         if font is not None and font != self._font:
             self._font = font
             os.system("setfont {}".format(font))
-            rows, columns = os.popen('stty size').read().strip().split(" ")
+            rows, columns = os.popen("stty size").read().strip().split(" ")
             self._rows = int(rows)
             self._columns = int(columns)
 
@@ -176,11 +176,11 @@ class Console():
 
         """
         if column is not None and row is not None:
-            print("\x1b[{};{}H".format(row, column), end='')
-        print("\x1b[K", end='')
+            print("\x1b[{};{}H".format(row, column), end="")
+        print("\x1b[K", end="")
 
     def reset_console(self):
         """
         Clear the EV3 LCD console using ANSI codes, and move the cursor to 1,1
         """
-        print("\x1b[2J\x1b[H", end='')
+        print("\x1b[2J\x1b[H", end="")

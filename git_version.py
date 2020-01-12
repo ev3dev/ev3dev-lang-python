@@ -3,7 +3,7 @@ import os, sys
 
 pyver = sys.version_info
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Get version string from git
 #
 # Author: Douglas Creager <dcreager@dcreager.net>
@@ -11,14 +11,13 @@ pyver = sys.version_info
 #
 # PEP 386 adaptation from
 # https://gist.github.com/ilogue/2567778/f6661ea2c12c070851b2dfb4da8840a6641914bc
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 def call_git_describe(abbrev=4):
     try:
-        p = Popen(['git', 'describe', '--exclude', 'ev3dev-*', '--abbrev=%d' % abbrev],
-                  stdout=PIPE, stderr=PIPE)
+        p = Popen(["git", "describe", "--exclude", "ev3dev-*", "--abbrev=%d" % abbrev], stdout=PIPE, stderr=PIPE)
         p.stderr.close()
         line = p.stdout.readlines()[0]
-        return line.strip().decode('utf8')
+        return line.strip().decode("utf8")
 
     except:
         return None
@@ -26,7 +25,7 @@ def call_git_describe(abbrev=4):
 
 def read_release_version():
     try:
-        with open('{}/RELEASE-VERSION'.format(os.path.dirname(__file__)), 'r') as f:
+        with open("{}/RELEASE-VERSION".format(os.path.dirname(__file__)), "r") as f:
             version = f.readlines()[0]
             return version.strip()
     except:
@@ -34,16 +33,16 @@ def read_release_version():
 
 
 def write_release_version(version):
-    with open('{}/RELEASE-VERSION'.format(os.path.dirname(__file__)), 'w') as f:
+    with open("{}/RELEASE-VERSION".format(os.path.dirname(__file__)), "w") as f:
         f.write("%s\n" % version)
 
 
 def pep386adapt(version):
     # adapt git-describe version to be in line with PEP 386
-    parts = version.split('-')
+    parts = version.split("-")
     if len(parts) > 1:
-        parts[-2] = 'post'+parts[-2]
-        version = '.'.join(parts[:-1])
+        parts[-2] = "post" + parts[-2]
+        version = ".".join(parts[:-1])
     return version
 
 
@@ -59,7 +58,7 @@ def git_version(abbrev=4):
     if version is None:
         version = release_version
     else:
-        #adapt to PEP 386 compatible versioning scheme
+        # adapt to PEP 386 compatible versioning scheme
         version = pep386adapt(version)
 
     # If we still don't have anything, that's an error.
@@ -72,9 +71,8 @@ def git_version(abbrev=4):
         write_release_version(version)
 
     # Update the ev3dev2/version.py
-    with open('{}/ev3dev2/version.py'.format(os.path.dirname(__file__)), 'w') as f:
+    with open("{}/ev3dev2/version.py".format(os.path.dirname(__file__)), "w") as f:
         f.write("__version__ = '{}'".format(version))
 
     # Finally, return the current version.
     return version
-

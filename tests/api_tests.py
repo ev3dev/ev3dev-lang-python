@@ -2,22 +2,33 @@
 import unittest, sys, os.path
 import os
 
-FAKE_SYS = os.path.join(os.path.dirname(__file__), 'fake-sys')
+FAKE_SYS = os.path.join(os.path.dirname(__file__), "fake-sys")
 os.environ["FAKE_SYS"] = "1"
 
 sys.path.append(FAKE_SYS)
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from populate_arena import populate_arena
-from clean_arena    import clean_arena
+from clean_arena import clean_arena
 
 import ev3dev2
 from ev3dev2.sensor.lego import InfraredSensor
-from ev3dev2.motor import \
-    OUTPUT_A, OUTPUT_B, \
-    Motor, MediumMotor, LargeMotor, \
-    MoveTank, MoveSteering, MoveJoystick, \
-    SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits
+from ev3dev2.motor import (
+    OUTPUT_A,
+    OUTPUT_B,
+    Motor,
+    MediumMotor,
+    LargeMotor,
+    MoveTank,
+    MoveSteering,
+    MoveJoystick,
+    SpeedPercent,
+    SpeedDPM,
+    SpeedDPS,
+    SpeedRPM,
+    SpeedRPS,
+    SpeedNativeUnits,
+)
 
 from ev3dev2.unit import (
     DistanceMillimeters,
@@ -27,53 +38,68 @@ from ev3dev2.unit import (
     DistanceInches,
     DistanceFeet,
     DistanceYards,
-    DistanceStuds
+    DistanceStuds,
 )
 
 import ev3dev2.stopwatch
 from ev3dev2.stopwatch import StopWatch, StopWatchAlreadyStartedException
 
-ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
+ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, "arena")
 
 _internal_set_attribute = ev3dev2.Device._set_attribute
+
+
 def _set_attribute(self, attribute, name, value):
     # Follow the text with a newline to separate new content from stuff that
     # already existed in the buffer. On the real device we're writing to sysfs
     # attributes where there isn't any persistent buffer, but in the test
     # environment they're normal files on disk which retain previous data.
     attribute = _internal_set_attribute(self, attribute, name, value)
-    attribute.write(b'\n')
+    attribute.write(b"\n")
     return attribute
+
+
 ev3dev2.Device._set_attribute = _set_attribute
 
 _internal_get_attribute = ev3dev2.Device._get_attribute
+
+
 def _get_attribute(self, attribute, name):
     # Split on newline delimiter; see _set_attribute above
     attribute, value = _internal_get_attribute(self, attribute, name)
-    return attribute, value.split('\n', 1)[0]
+    return attribute, value.split("\n", 1)[0]
+
+
 ev3dev2.Device._get_attribute = _get_attribute
+
 
 def dummy_wait(self, cond, timeout=None):
     pass
+
 
 Motor.wait = dummy_wait
 
 # for StopWatch
 mock_ticks_ms = 0
+
+
 def _mock_get_ticks_ms():
     return mock_ticks_ms
+
+
 ev3dev2.stopwatch.get_ticks_ms = _mock_get_ticks_ms
+
 
 def set_mock_ticks_ms(value):
     global mock_ticks_ms
     mock_ticks_ms = value
 
-class TestAPI(unittest.TestCase):
 
+class TestAPI(unittest.TestCase):
     def setUp(self):
         # micropython does not have _testMethodName
         try:
-            print("\n\n{}\n{}".format(self._testMethodName, "=" * len(self._testMethodName,)))
+            print("\n\n{}\n{}".format(self._testMethodName, "=" * len(self._testMethodName)))
         except AttributeError:
             pass
 
@@ -82,33 +108,33 @@ class TestAPI(unittest.TestCase):
 
     def test_device(self):
         clean_arena()
-        populate_arena([('medium_motor', 0, 'outA'), ('infrared_sensor', 0, 'in1')])
+        populate_arena([("medium_motor", 0, "outA"), ("infrared_sensor", 0, "in1")])
 
-        d = ev3dev2.Device('tacho-motor', 'motor*')
+        d = ev3dev2.Device("tacho-motor", "motor*")
 
-        d = ev3dev2.Device('tacho-motor', 'motor0')
+        d = ev3dev2.Device("tacho-motor", "motor0")
 
-        d = ev3dev2.Device('tacho-motor', 'motor*', driver_name='lego-ev3-m-motor')
+        d = ev3dev2.Device("tacho-motor", "motor*", driver_name="lego-ev3-m-motor")
 
-        d = ev3dev2.Device('tacho-motor', 'motor*', address='outA')
-
-        with self.assertRaises(ev3dev2.DeviceNotFound):
-            d = ev3dev2.Device('tacho-motor', 'motor*', address='outA', driver_name='not-valid')
+        d = ev3dev2.Device("tacho-motor", "motor*", address="outA")
 
         with self.assertRaises(ev3dev2.DeviceNotFound):
-            d = ev3dev2.Device('tacho-motor', 'motor*', address='this-does-not-exist')
-
-        d = ev3dev2.Device('lego-sensor', 'sensor*')
+            d = ev3dev2.Device("tacho-motor", "motor*", address="outA", driver_name="not-valid")
 
         with self.assertRaises(ev3dev2.DeviceNotFound):
-            d = ev3dev2.Device('this-does-not-exist')
+            d = ev3dev2.Device("tacho-motor", "motor*", address="this-does-not-exist")
+
+        d = ev3dev2.Device("lego-sensor", "sensor*")
+
+        with self.assertRaises(ev3dev2.DeviceNotFound):
+            d = ev3dev2.Device("this-does-not-exist")
 
     def test_medium_motor(self):
         def dummy(self):
             pass
 
         clean_arena()
-        populate_arena([('medium_motor', 0, 'outA')])
+        populate_arena([("medium_motor", 0, "outA")])
 
         # Do not write motor.command on exit (so that fake tree stays intact)
         MediumMotor.__del__ = dummy
@@ -118,56 +144,58 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(m.device_index, 0)
 
         # Check that reading twice works:
-        self.assertEqual(m.driver_name, 'lego-ev3-m-motor')
-        self.assertEqual(m.driver_name, 'lego-ev3-m-motor')
+        self.assertEqual(m.driver_name, "lego-ev3-m-motor")
+        self.assertEqual(m.driver_name, "lego-ev3-m-motor")
 
-        self.assertEqual(m.count_per_rot,            360)
-        self.assertEqual(m.commands,                 ['run-forever', 'run-to-abs-pos', 'run-to-rel-pos', 'run-timed', 'run-direct', 'stop', 'reset'])
-        self.assertEqual(m.duty_cycle,               0)
-        self.assertEqual(m.duty_cycle_sp,            42)
-        self.assertEqual(m.polarity,                 'normal')
-        self.assertEqual(m.address,                  'outA')
-        self.assertEqual(m.position,                 42)
-        self.assertEqual(m.position_sp,              42)
-        self.assertEqual(m.ramp_down_sp,             0)
-        self.assertEqual(m.ramp_up_sp,               0)
-        self.assertEqual(m.speed,                    0)
-        self.assertEqual(m.speed_sp,                 0)
-        self.assertEqual(m.state,                    ['running'])
-        self.assertEqual(m.stop_action,              'coast')
-        self.assertEqual(m.time_sp,                  1000)
+        self.assertEqual(m.count_per_rot, 360)
+        self.assertEqual(
+            m.commands, ["run-forever", "run-to-abs-pos", "run-to-rel-pos", "run-timed", "run-direct", "stop", "reset"]
+        )
+        self.assertEqual(m.duty_cycle, 0)
+        self.assertEqual(m.duty_cycle_sp, 42)
+        self.assertEqual(m.polarity, "normal")
+        self.assertEqual(m.address, "outA")
+        self.assertEqual(m.position, 42)
+        self.assertEqual(m.position_sp, 42)
+        self.assertEqual(m.ramp_down_sp, 0)
+        self.assertEqual(m.ramp_up_sp, 0)
+        self.assertEqual(m.speed, 0)
+        self.assertEqual(m.speed_sp, 0)
+        self.assertEqual(m.state, ["running"])
+        self.assertEqual(m.stop_action, "coast")
+        self.assertEqual(m.time_sp, 1000)
 
         with self.assertRaises(Exception):
             c = m.command
 
     def test_infrared_sensor(self):
         clean_arena()
-        populate_arena([('infrared_sensor', 0, 'in1')])
+        populate_arena([("infrared_sensor", 0, "in1")])
 
         s = InfraredSensor()
 
-        self.assertEqual(s.device_index,    0)
-        self.assertEqual(s.bin_data_format, 's8')
-        self.assertEqual(s.bin_data('<b'),  (16,))
-        self.assertEqual(s.num_values,      1)
-        self.assertEqual(s.address,         'in1')
-        self.assertEqual(s.value(0),        16)
-        self.assertEqual(s.mode,            "IR-PROX")
+        self.assertEqual(s.device_index, 0)
+        self.assertEqual(s.bin_data_format, "s8")
+        self.assertEqual(s.bin_data("<b"), (16,))
+        self.assertEqual(s.num_values, 1)
+        self.assertEqual(s.address, "in1")
+        self.assertEqual(s.value(0), 16)
+        self.assertEqual(s.mode, "IR-PROX")
 
         s.mode = "IR-REMOTE"
-        self.assertEqual(s.mode,            "IR-REMOTE")
+        self.assertEqual(s.mode, "IR-REMOTE")
 
         val = s.proximity
         self.assertEqual(s.mode, "IR-PROX")
-        self.assertEqual(val,               16)
+        self.assertEqual(val, 16)
 
         val = s.buttons_pressed()
         self.assertEqual(s.mode, "IR-REMOTE")
-        self.assertEqual(val,               [])
+        self.assertEqual(val, [])
 
     def test_medium_motor_write(self):
         clean_arena()
-        populate_arena([('medium_motor', 0, 'outA')])
+        populate_arena([("medium_motor", 0, "outA")])
 
         m = MediumMotor()
 
@@ -177,7 +205,7 @@ class TestAPI(unittest.TestCase):
 
     def test_motor_on_for_degrees(self):
         clean_arena()
-        populate_arena([('large_motor', 0, 'outA')])
+        populate_arena([("large_motor", 0, "outA")])
 
         m = LargeMotor()
 
@@ -216,7 +244,7 @@ class TestAPI(unittest.TestCase):
 
     def test_motor_on_for_rotations(self):
         clean_arena()
-        populate_arena([('large_motor', 0, 'outA')])
+        populate_arena([("large_motor", 0, "outA")])
 
         m = LargeMotor()
 
@@ -227,7 +255,7 @@ class TestAPI(unittest.TestCase):
 
     def test_move_tank_relative_distance(self):
         clean_arena()
-        populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
+        populate_arena([("large_motor", 0, "outA"), ("large_motor", 1, "outB")])
 
         drive = MoveTank(OUTPUT_A, OUTPUT_B)
 
@@ -289,7 +317,7 @@ class TestAPI(unittest.TestCase):
 
     def test_tank_units(self):
         clean_arena()
-        populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
+        populate_arena([("large_motor", 0, "outA"), ("large_motor", 1, "outB")])
 
         drive = MoveTank(OUTPUT_A, OUTPUT_B)
         drive.on_for_rotations(SpeedDPS(400), SpeedDPM(10000), 10)
@@ -304,7 +332,7 @@ class TestAPI(unittest.TestCase):
 
     def test_steering_units(self):
         clean_arena()
-        populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
+        populate_arena([("large_motor", 0, "outA"), ("large_motor", 1, "outB")])
 
         drive = MoveSteering(OUTPUT_A, OUTPUT_B)
         drive.on_for_rotations(25, SpeedDPS(400), 10)
@@ -319,7 +347,7 @@ class TestAPI(unittest.TestCase):
 
     def test_steering_large_value(self):
         clean_arena()
-        populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
+        populate_arena([("large_motor", 0, "outA"), ("large_motor", 1, "outB")])
 
         drive = MoveSteering(OUTPUT_A, OUTPUT_B)
         drive.on_for_rotations(-100, SpeedDPS(400), 10)
@@ -334,7 +362,7 @@ class TestAPI(unittest.TestCase):
 
     def test_joystick(self):
         clean_arena()
-        populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
+        populate_arena([("large_motor", 0, "outA"), ("large_motor", 1, "outB")])
 
         drive = MoveJoystick(OUTPUT_A, OUTPUT_B)
 
@@ -343,17 +371,17 @@ class TestAPI(unittest.TestCase):
         drive.on(0, 50)
         self.assertEqual(drive.left_motor.speed_sp, 1050 / 2)
         self.assertEqual(drive.right_motor.speed_sp, 1050 / 2)
-        self.assertEqual(drive.left_motor._get_attribute(None, 'command')[1], 'run-forever')
-        self.assertEqual(drive.right_motor._get_attribute(None, 'command')[1], 'run-forever')
+        self.assertEqual(drive.left_motor._get_attribute(None, "command")[1], "run-forever")
+        self.assertEqual(drive.right_motor._get_attribute(None, "command")[1], "run-forever")
 
         # With the joystick centered, motors should both be stopped
         drive.on(0, 0)
-        self.assertEqual(drive.left_motor._get_attribute(None, 'command')[1], 'stop')
-        self.assertEqual(drive.right_motor._get_attribute(None, 'command')[1], 'stop')
+        self.assertEqual(drive.left_motor._get_attribute(None, "command")[1], "stop")
+        self.assertEqual(drive.right_motor._get_attribute(None, "command")[1], "stop")
 
     def test_units(self):
         clean_arena()
-        populate_arena([('large_motor', 0, 'outA'), ('large_motor', 1, 'outB')])
+        populate_arena([("large_motor", 0, "outA"), ("large_motor", 1, "outB")])
 
         m = Motor()
 
@@ -378,7 +406,7 @@ class TestAPI(unittest.TestCase):
     def test_stopwatch(self):
         sw = StopWatch()
         self.assertEqual(str(sw), "StopWatch: 00:00:00.000")
-        
+
         sw = StopWatch(desc="test sw")
         self.assertEqual(str(sw), "test sw: 00:00:00.000")
         self.assertEqual(sw.is_started, False)
@@ -387,7 +415,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, True)
         self.assertEqual(sw.value_ms, 0)
         self.assertEqual(sw.value_secs, 0)
-        self.assertEqual(sw.value_hms, (0,0,0,0))
+        self.assertEqual(sw.value_hms, (0, 0, 0, 0))
         self.assertEqual(sw.hms_str, "00:00:00.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
@@ -398,7 +426,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, True)
         self.assertEqual(sw.value_ms, 1500)
         self.assertEqual(sw.value_secs, 1.5)
-        self.assertEqual(sw.value_hms, (0,0,1,500))
+        self.assertEqual(sw.value_hms, (0, 0, 1, 500))
         self.assertEqual(sw.hms_str, "00:00:01.500")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
@@ -409,18 +437,18 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, True)
         self.assertEqual(sw.value_ms, 3000)
         self.assertEqual(sw.value_secs, 3)
-        self.assertEqual(sw.value_hms, (0,0,3,0))
+        self.assertEqual(sw.value_hms, (0, 0, 3, 0))
         self.assertEqual(sw.hms_str, "00:00:03.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
         self.assertEqual(sw.is_elapsed_ms(3000), True)
         self.assertEqual(sw.is_elapsed_secs(3), True)
 
-        set_mock_ticks_ms(1000 * 60 * 75.5) #75.5 minutes
+        set_mock_ticks_ms(1000 * 60 * 75.5)  # 75.5 minutes
         self.assertEqual(sw.is_started, True)
         self.assertEqual(sw.value_ms, 1000 * 60 * 75.5)
         self.assertEqual(sw.value_secs, 60 * 75.5)
-        self.assertEqual(sw.value_hms, (1,15,30,0))
+        self.assertEqual(sw.value_hms, (1, 15, 30, 0))
         self.assertEqual(sw.hms_str, "01:15:30.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
@@ -439,7 +467,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, True)
         self.assertEqual(sw.value_ms, 0)
         self.assertEqual(sw.value_secs, 0)
-        self.assertEqual(sw.value_hms, (0,0,0,0))
+        self.assertEqual(sw.value_hms, (0, 0, 0, 0))
         self.assertEqual(sw.hms_str, "00:00:00.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
@@ -450,7 +478,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, True)
         self.assertEqual(sw.value_ms, 3000)
         self.assertEqual(sw.value_secs, 3)
-        self.assertEqual(sw.value_hms, (0,0,3,0))
+        self.assertEqual(sw.value_hms, (0, 0, 3, 0))
         self.assertEqual(sw.hms_str, "00:00:03.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
@@ -463,7 +491,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, False)
         self.assertEqual(sw.value_ms, 3000)
         self.assertEqual(sw.value_secs, 3)
-        self.assertEqual(sw.value_hms, (0,0,3,0))
+        self.assertEqual(sw.value_hms, (0, 0, 3, 0))
         self.assertEqual(sw.hms_str, "00:00:03.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
@@ -475,7 +503,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, False)
         self.assertEqual(sw.value_ms, 0)
         self.assertEqual(sw.value_secs, 0)
-        self.assertEqual(sw.value_hms, (0,0,0,0))
+        self.assertEqual(sw.value_hms, (0, 0, 0, 0))
         self.assertEqual(sw.hms_str, "00:00:00.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
@@ -486,12 +514,13 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, False)
         self.assertEqual(sw.value_ms, 0)
         self.assertEqual(sw.value_secs, 0)
-        self.assertEqual(sw.value_hms, (0,0,0,0))
+        self.assertEqual(sw.value_hms, (0, 0, 0, 0))
         self.assertEqual(sw.hms_str, "00:00:00.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
         self.assertEqual(sw.is_elapsed_ms(3000), False)
         self.assertEqual(sw.is_elapsed_secs(3), False)
+
 
 if __name__ == "__main__":
     unittest.main()

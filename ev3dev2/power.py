@@ -25,8 +25,8 @@
 
 import sys
 
-if sys.version_info < (3,4):
-    raise SystemError('Must be using Python 3.4 or higher')
+if sys.version_info < (3, 4):
+    raise SystemError("Must be using Python 3.4 or higher")
 
 from ev3dev2 import Device
 
@@ -37,21 +37,14 @@ class PowerSupply(Device):
     Uses the built-in legoev3-battery if none is specified.
     """
 
-    SYSTEM_CLASS_NAME = 'power_supply'
-    SYSTEM_DEVICE_NAME_CONVENTION = '*'
-    __slots__ = [
-    '_measured_current',
-    '_measured_voltage',
-    '_max_voltage',
-    '_min_voltage',
-    '_technology',
-    '_type',
-    ]
+    SYSTEM_CLASS_NAME = "power_supply"
+    SYSTEM_DEVICE_NAME_CONVENTION = "*"
+    __slots__ = ["_measured_current", "_measured_voltage", "_max_voltage", "_min_voltage", "_technology", "_type"]
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
         if address is not None:
-            kwargs['address'] = address
+            kwargs["address"] = address
         super(PowerSupply, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
         self._measured_current = None
@@ -66,7 +59,7 @@ class PowerSupply(Device):
         """
         The measured current that the battery is supplying (in microamps)
         """
-        self._measured_current, value = self.get_attr_int(self._measured_current, 'current_now')
+        self._measured_current, value = self.get_attr_int(self._measured_current, "current_now")
         return value
 
     @property
@@ -74,27 +67,27 @@ class PowerSupply(Device):
         """
         The measured voltage that the battery is supplying (in microvolts)
         """
-        self._measured_voltage, value = self.get_attr_int(self._measured_voltage, 'voltage_now')
+        self._measured_voltage, value = self.get_attr_int(self._measured_voltage, "voltage_now")
         return value
 
     @property
     def max_voltage(self):
-        self._max_voltage, value = self.get_attr_int(self._max_voltage, 'voltage_max_design')
+        self._max_voltage, value = self.get_attr_int(self._max_voltage, "voltage_max_design")
         return value
 
     @property
     def min_voltage(self):
-        self._min_voltage, value = self.get_attr_int(self._min_voltage, 'voltage_min_design')
+        self._min_voltage, value = self.get_attr_int(self._min_voltage, "voltage_min_design")
         return value
 
     @property
     def technology(self):
-        self._technology, value = self.get_attr_string(self._technology, 'technology')
+        self._technology, value = self.get_attr_string(self._technology, "technology")
         return value
 
     @property
     def type(self):
-        self._type, value = self.get_attr_string(self._type, 'type')
+        self._type, value = self.get_attr_string(self._type, "type")
         return value
 
     @property

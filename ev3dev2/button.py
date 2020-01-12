@@ -25,8 +25,8 @@
 
 import sys
 
-if sys.version_info < (3,4):
-    raise SystemError('Must be using Python 3.4 or higher')
+if sys.version_info < (3, 4):
+    raise SystemError("Must be using Python 3.4 or higher")
 
 from ev3dev2.stopwatch import StopWatch
 from ev3dev2 import get_current_platform, is_micropython, library_load_warning_message
@@ -37,22 +37,22 @@ log = getLogger(__name__)
 # Import the button filenames, this is platform specific
 platform = get_current_platform()
 
-if platform == 'ev3':
+if platform == "ev3":
     from ._platform.ev3 import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
 
-elif platform == 'evb':
+elif platform == "evb":
     from ._platform.evb import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
 
-elif platform == 'pistorms':
+elif platform == "pistorms":
     from ._platform.pistorms import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
 
-elif platform == 'brickpi':
+elif platform == "brickpi":
     from ._platform.brickpi import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
 
-elif platform == 'brickpi3':
+elif platform == "brickpi3":
     from ._platform.brickpi3 import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
 
-elif platform == 'fake':
+elif platform == "fake":
     from ._platform.fake import BUTTONS_FILENAME, EVDEV_DEVICE_NAME
 
 else:
@@ -64,7 +64,6 @@ class MissingButton(Exception):
 
 
 class ButtonCommon(object):
-
     def __str__(self):
         return self.__class__.__name__
 
@@ -130,12 +129,12 @@ class ButtonCommon(object):
         """
         if new_state is None:
             new_state = set(self.buttons_pressed)
-        old_state = self._state if hasattr(self, '_state') else set()
+        old_state = self._state if hasattr(self, "_state") else set()
         self._state = new_state
 
         state_diff = new_state.symmetric_difference(old_state)
         for button in state_diff:
-            handler = getattr(self, 'on_' + button)
+            handler = getattr(self, "on_" + button)
 
             if handler is not None:
                 handler(button in new_state)
@@ -161,42 +160,42 @@ class EV3ButtonCommon(object):
         """
         Check if ``up`` button is pressed.
         """
-        return 'up' in self.buttons_pressed
+        return "up" in self.buttons_pressed
 
     @property
     def down(self):
         """
         Check if ``down`` button is pressed.
         """
-        return 'down' in self.buttons_pressed
+        return "down" in self.buttons_pressed
 
     @property
     def left(self):
         """
         Check if ``left`` button is pressed.
         """
-        return 'left' in self.buttons_pressed
+        return "left" in self.buttons_pressed
 
     @property
     def right(self):
         """
         Check if ``right`` button is pressed.
         """
-        return 'right' in self.buttons_pressed
+        return "right" in self.buttons_pressed
 
     @property
     def enter(self):
         """
         Check if ``enter`` button is pressed.
         """
-        return 'enter' in self.buttons_pressed
+        return "enter" in self.buttons_pressed
 
     @property
     def backspace(self):
         """
         Check if ``backspace`` button is pressed.
         """
-        return 'backspace' in self.buttons_pressed
+        return "backspace" in self.buttons_pressed
 
 
 # micropython implementation
@@ -213,12 +212,10 @@ if is_micropython():
     if platform not in ("ev3", "fake"):
         raise Exception("micropython button support has not been implemented for '%s'" % platform)
 
-
     def _test_bit(buf, index):
         byte = buf[int(index >> 3)]
         bit = byte & (1 << (index % 8))
         return bool(bit)
-
 
     class ButtonBase(ButtonCommon):
         pass
@@ -238,25 +235,18 @@ if is_micropython():
 
         # Note, this order is intentional and comes from the EV3-G software
         _BUTTONS = (UP, DOWN, LEFT, RIGHT, ENTER, BACK)
-        _BUTTON_DEV = '/dev/input/by-path/platform-gpio_keys-event'
+        _BUTTON_DEV = "/dev/input/by-path/platform-gpio_keys-event"
 
-        _BUTTON_TO_STRING = {
-            UP : "up",
-            DOWN : "down",
-            LEFT : "left",
-            RIGHT : "right",
-            ENTER : "enter",
-            BACK : "backspace",
-        }
+        _BUTTON_TO_STRING = {UP: "up", DOWN: "down", LEFT: "left", RIGHT: "right", ENTER: "enter", BACK: "backspace"}
 
         # stuff from linux/input.h and linux/input-event-codes.h
         _KEY_MAX = 0x2FF
         _KEY_BUF_LEN = (_KEY_MAX + 7) // 8
-        _EVIOCGKEY = 2 << (14 + 8 + 8) | _KEY_BUF_LEN << (8 + 8) | ord('E') << 8 | 0x18
+        _EVIOCGKEY = 2 << (14 + 8 + 8) | _KEY_BUF_LEN << (8 + 8) | ord("E") << 8 | 0x18
 
         def __init__(self):
             super(Button, self).__init__()
-            self._devnode = open(Button._BUTTON_DEV, 'b')
+            self._devnode = open(Button._BUTTON_DEV, "b")
             self._fd = self._devnode.fileno()
             self._buffer = bytearray(Button._KEY_BUF_LEN)
 
@@ -285,10 +275,10 @@ if is_micropython():
             # with the name of a single button.  If it is a string of a single
             # button convert that to a list.
             if isinstance(wait_for_button_press, str):
-                wait_for_button_press = [wait_for_button_press, ]
+                wait_for_button_press = [wait_for_button_press]
 
             if isinstance(wait_for_button_release, str):
-                wait_for_button_release = [wait_for_button_release, ]
+                wait_for_button_release = [wait_for_button_release]
 
             while True:
                 all_pressed = True
@@ -311,6 +301,7 @@ if is_micropython():
                 if timeout_ms is not None and stopwatch.value_ms >= timeout_ms:
                     return False
 
+
 # python3 implementation
 else:
     import array
@@ -331,11 +322,11 @@ else:
     except ImportError:
         log.warning(library_load_warning_message("evdev", "Button"))
 
-
     class ButtonBase(ButtonCommon):
         """
         Abstract button interface.
         """
+
         _state = set([])
 
         @property
@@ -356,7 +347,6 @@ else:
                 if event.type == evdev.ecodes.EV_KEY:
                     self.process()
 
-
     class ButtonEVIO(ButtonBase):
         """
         Provides a generic button reading mechanism that works with event interface
@@ -369,7 +359,7 @@ else:
 
         KEY_MAX = 0x2FF
         KEY_BUF_LEN = int((KEY_MAX + 7) / 8)
-        EVIOCGKEY = (2 << (14 + 8 + 8) | KEY_BUF_LEN << (8 + 8) | ord('E') << 8 | 0x18)
+        EVIOCGKEY = 2 << (14 + 8 + 8) | KEY_BUF_LEN << (8 + 8) | ord("E") << 8 | 0x18
 
         _buttons = {}
 
@@ -379,14 +369,14 @@ else:
             self._buffer_cache = {}
 
             for b in self._buttons:
-                name = self._buttons[b]['name']
+                name = self._buttons[b]["name"]
 
                 if name is None:
                     raise MissingButton("Button '%s' is not available on this platform" % b)
 
                 if name not in self._file_cache:
-                    self._file_cache[name] = open(name, 'rb', 0)
-                    self._buffer_cache[name] = array.array('B', [0] * self.KEY_BUF_LEN)
+                    self._file_cache[name] = open(name, "rb", 0)
+                    self._buffer_cache[name] = array.array("B", [0] * self.KEY_BUF_LEN)
 
         def _button_file(self, name):
             return self._file_cache[name]
@@ -404,8 +394,8 @@ else:
 
             pressed = []
             for k, v in self._buttons.items():
-                buf = self._buffer_cache[v['name']]
-                bit = v['value']
+                buf = self._buffer_cache[v["name"]]
+                bit = v["value"]
 
                 if bool(buf[int(bit / 8)] & 1 << bit % 8):
                     pressed.append(k)
@@ -420,10 +410,10 @@ else:
             # with the name of a single button.  If it is a string of a single
             # button convert that to a list.
             if isinstance(wait_for_button_press, str):
-                wait_for_button_press = [wait_for_button_press, ]
+                wait_for_button_press = [wait_for_button_press]
 
             if isinstance(wait_for_button_release, str):
-                wait_for_button_release = [wait_for_button_release, ]
+                wait_for_button_release = [wait_for_button_release]
 
             for event in self.evdev_device.read_loop():
                 if event.type == evdev.ecodes.EV_KEY:
@@ -447,18 +437,17 @@ else:
                     if timeout_ms is not None and stopwatch.value_ms >= timeout_ms:
                         return False
 
-
     class Button(ButtonEVIO, EV3ButtonCommon):
         """
         EV3 Buttons
         """
 
         _buttons = {
-            'up': {'name': BUTTONS_FILENAME, 'value': 103},
-            'down': {'name': BUTTONS_FILENAME, 'value': 108},
-            'left': {'name': BUTTONS_FILENAME, 'value': 105},
-            'right': {'name': BUTTONS_FILENAME, 'value': 106},
-            'enter': {'name': BUTTONS_FILENAME, 'value': 28},
-            'backspace': {'name': BUTTONS_FILENAME, 'value': 14},
+            "up": {"name": BUTTONS_FILENAME, "value": 103},
+            "down": {"name": BUTTONS_FILENAME, "value": 108},
+            "left": {"name": BUTTONS_FILENAME, "value": 105},
+            "right": {"name": BUTTONS_FILENAME, "value": 106},
+            "enter": {"name": BUTTONS_FILENAME, "value": 28},
+            "backspace": {"name": BUTTONS_FILENAME, "value": 14},
         }
         evdev_device_name = EVDEV_DEVICE_NAME

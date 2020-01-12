@@ -26,7 +26,7 @@
 import sys
 
 if sys.version_info < (3, 4):
-    raise SystemError('Must be using Python 3.4 or higher')
+    raise SystemError("Must be using Python 3.4 or higher")
 
 from ev3dev2 import is_micropython
 import os
@@ -43,10 +43,9 @@ def _make_scales(notes):
     res = dict()
     for note, freq in notes:
         freq = round(freq)
-        for n in note.split('/'):
+        for n in note.split("/"):
             res[n.upper()] = freq
     return res
-
 
 
 def get_command_processes(command):
@@ -105,19 +104,17 @@ class Sound(object):
     channel = None
 
     # play_types
-    PLAY_WAIT_FOR_COMPLETE = 0 #: Play the sound and block until it is complete
-    PLAY_NO_WAIT_FOR_COMPLETE = 1 #: Start playing the sound but return immediately
-    PLAY_LOOP = 2 #: Never return; start the sound immediately after it completes, until the program is killed
+    PLAY_WAIT_FOR_COMPLETE = 0  #: Play the sound and block until it is complete
+    PLAY_NO_WAIT_FOR_COMPLETE = 1  #: Start playing the sound but return immediately
+    PLAY_LOOP = 2  #: Never return; start the sound immediately after it completes, until the program is killed
 
-    PLAY_TYPES = (
-        PLAY_WAIT_FOR_COMPLETE,
-        PLAY_NO_WAIT_FOR_COMPLETE,
-        PLAY_LOOP
-    )
+    PLAY_TYPES = (PLAY_WAIT_FOR_COMPLETE, PLAY_NO_WAIT_FOR_COMPLETE, PLAY_LOOP)
 
     def _validate_play_type(self, play_type):
-        assert play_type in self.PLAY_TYPES, \
-            "Invalid play_type %s, must be one of %s" % (play_type, ','.join(str(t) for t in self.PLAY_TYPES))
+        assert play_type in self.PLAY_TYPES, "Invalid play_type %s, must be one of %s" % (
+            play_type,
+            ",".join(str(t) for t in self.PLAY_TYPES),
+        )
 
     def _audio_command(self, command, play_type):
         if is_micropython():
@@ -126,7 +123,7 @@ class Sound(object):
                 os.system(command)
 
             elif play_type == Sound.PLAY_NO_WAIT_FOR_COMPLETE:
-                os.system('{} &'.format(command))
+                os.system("{} &".format(command))
 
             elif play_type == Sound.PLAY_LOOP:
                 while True:
@@ -138,7 +135,7 @@ class Sound(object):
             return None
 
         else:
-            with open(os.devnull, 'w') as n:
+            with open(os.devnull, "w") as n:
 
                 if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
                     processes = get_command_processes(command)
@@ -159,7 +156,7 @@ class Sound(object):
                 else:
                     raise Exception("invalid play_type " % play_type)
 
-    def beep(self, args='', play_type=PLAY_WAIT_FOR_COMPLETE):
+    def beep(self, args="", play_type=PLAY_WAIT_FOR_COMPLETE):
         """
         Call beep command with the provided arguments (if any).
         See `beep man page`_ and google `linux beep music`_ for inspiration.
@@ -228,19 +225,20 @@ class Sound(object):
 
         :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
+
         def play_tone_sequence(tone_sequence):
             def beep_args(frequency=None, duration=None, delay=None):
-                args = ''
+                args = ""
                 if frequency is not None:
-                    args += '-f %s ' % frequency
-                if duration  is not None:
-                    args += '-l %s ' % duration
-                if delay     is not None:
-                    args += '-D %s ' % delay
+                    args += "-f %s " % frequency
+                if duration is not None:
+                    args += "-l %s " % duration
+                if delay is not None:
+                    args += "-D %s " % delay
 
                 return args
 
-            return self.beep(' -n '.join([beep_args(*t) for t in tone_sequence]), play_type=play_type)
+            return self.beep(" -n ".join([beep_args(*t) for t in tone_sequence]), play_type=play_type)
 
         if len(args) == 1:
             return play_tone_sequence(args[0])
@@ -249,8 +247,7 @@ class Sound(object):
         else:
             raise Exception("Unsupported number of parameters in Sound.tone(): expected 1 or 2, got " + str(len(args)))
 
-    def play_tone(self, frequency, duration, delay=0.0, volume=100,
-                  play_type=PLAY_WAIT_FOR_COMPLETE):
+    def play_tone(self, frequency, duration, delay=0.0, volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
         """ Play a single tone, specified by its frequency, duration, volume and final delay.
 
         :param int frequency: the tone frequency, in Hertz
@@ -268,11 +265,11 @@ class Sound(object):
         self._validate_play_type(play_type)
 
         if duration <= 0:
-            raise ValueError('invalid duration (%s)' % duration)
+            raise ValueError("invalid duration (%s)" % duration)
         if delay < 0:
-            raise ValueError('invalid delay (%s)' % delay)
+            raise ValueError("invalid delay (%s)" % delay)
         if not 0 < volume <= 100:
-            raise ValueError('invalid volume (%s)' % volume)
+            raise ValueError("invalid volume (%s)" % volume)
 
         self.set_volume(volume)
 
@@ -299,12 +296,12 @@ class Sound(object):
         try:
             freq = self._NOTE_FREQUENCIES.get(note.upper(), self._NOTE_FREQUENCIES[note])
         except KeyError:
-            raise ValueError('invalid note (%s)' % note)
+            raise ValueError("invalid note (%s)" % note)
 
         if duration <= 0:
-            raise ValueError('invalid duration (%s)' % duration)
+            raise ValueError("invalid duration (%s)" % duration)
         if not 0 < volume <= 100:
-            raise ValueError('invalid volume (%s)' % volume)
+            raise ValueError("invalid volume (%s)" % volume)
 
         return self.play_tone(freq, duration=duration, volume=volume, play_type=play_type)
 
@@ -320,10 +317,10 @@ class Sound(object):
         :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
         if not 0 < volume <= 100:
-            raise ValueError('invalid volume (%s)' % volume)
+            raise ValueError("invalid volume (%s)" % volume)
 
         if not wav_file.endswith(".wav"):
-            raise ValueError('invalid sound file (%s), only .wav files are supported' % wav_file)
+            raise ValueError("invalid sound file (%s), only .wav files are supported" % wav_file)
 
         if not os.path.exists(wav_file):
             raise ValueError("%s does not exist" % wav_file)
@@ -332,7 +329,7 @@ class Sound(object):
         self.set_volume(volume)
         return self._audio_command('/usr/bin/aplay -q "%s"' % wav_file, play_type)
 
-    def speak(self, text, espeak_opts='-a 200 -s 130', volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
+    def speak(self, text, espeak_opts="-a 200 -s 130", volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
         """ Speak the given text aloud.
 
         Uses the ``espeak`` external command.
@@ -363,12 +360,12 @@ class Sound(object):
             #
             #     Simple mixer control 'Master',0
             #     Simple mixer control 'Capture',0
-            out = os.popen('/usr/bin/amixer scontrols').read()
+            out = os.popen("/usr/bin/amixer scontrols").read()
             m = re.search(r"'([^']+)'", out)
             if m:
                 self.channel = m.group(1)
             else:
-                self.channel = 'Playback'
+                self.channel = "Playback"
 
         return self.channel
 
@@ -384,7 +381,7 @@ class Sound(object):
         if channel is None:
             channel = self._get_channel()
 
-        os.system('/usr/bin/amixer -q set {0} {1:d}%'.format(channel, pct))
+        os.system("/usr/bin/amixer -q set {0} {1:d}%".format(channel, pct))
 
     def get_volume(self, channel=None):
         """
@@ -398,12 +395,12 @@ class Sound(object):
         if channel is None:
             channel = self._get_channel()
 
-        out = os.popen(['/usr/bin/amixer', 'get', channel]).read()
-        m = re.search(r'\[(\d+)%\]', out)
+        out = os.popen(["/usr/bin/amixer", "get", channel]).read()
+        m = re.search(r"\[(\d+)%\]", out)
         if m:
             return int(m.group(1))
         else:
-            raise Exception('Failed to parse output of ``amixer get {}``'.format(channel))
+            raise Exception("Failed to parse output of ``amixer get {}``".format(channel))
 
     def play_song(self, song, tempo=120, delay=0.05):
         """ Plays a song provided as a list of tuples containing the note name and its
@@ -472,31 +469,31 @@ class Sound(object):
         :raises ValueError: if invalid note in song or invalid play parameters
         """
         if tempo <= 0:
-            raise ValueError('invalid tempo (%s)' % tempo)
+            raise ValueError("invalid tempo (%s)" % tempo)
         if delay < 0:
-            raise ValueError('invalid delay (%s)' % delay)
+            raise ValueError("invalid delay (%s)" % delay)
 
         delay_ms = int(delay * 1000)
-        meas_duration_ms = 60000 / tempo * 4       # we only support 4/4 bars, hence "* 4"
+        meas_duration_ms = 60000 / tempo * 4  # we only support 4/4 bars, hence "* 4"
 
         for (note, value) in song:
             value = value.lower()
 
-            if '/' in value:
-                base, factor = value.split('/')
+            if "/" in value:
+                base, factor = value.split("/")
                 factor = float(factor)
 
-            elif '*' in value:
-                base, factor = value.split('*')
+            elif "*" in value:
+                base, factor = value.split("*")
                 factor = float(factor)
 
-            elif value.endswith('.'):
+            elif value.endswith("."):
                 base = value[:-1]
                 factor = 1.5
 
-            elif value.endswith('3'):
+            elif value.endswith("3"):
                 base = value[:-1]
-                factor = float(2/3)
+                factor = float(2 / 3)
 
             else:
                 base = value
@@ -505,13 +502,13 @@ class Sound(object):
             try:
                 duration_ms = meas_duration_ms * self._NOTE_VALUES[base] * factor
             except KeyError:
-                raise ValueError('invalid note (%s)' % base)
+                raise ValueError("invalid note (%s)" % base)
 
             if note == "R":
                 sleep(duration_ms / 1000 + delay)
             else:
                 freq = self._NOTE_FREQUENCIES[note.upper()]
-                self.beep('-f %d -l %d -D %d' % (freq, duration_ms, delay_ms))
+                self.beep("-f %d -l %d -D %d" % (freq, duration_ms, delay_ms))
 
     #: Note frequencies.
     #:
@@ -519,116 +516,118 @@ class Sound(object):
     #: standard US abbreviation and its octave number (e.g. ``C3``).
     #: Alterations use the ``#`` and ``b`` symbols, respectively for
     #: *sharp* and *flat*, between the note code and the octave number (e.g. ``D#4``, ``Gb5``).
-    _NOTE_FREQUENCIES = _make_scales((
-        ('C0', 16.35),
-        ('C#0/Db0', 17.32),
-        ('D0', 18.35),
-        ('D#0/Eb0', 19.45),     # expanded in one entry per symbol by _make_scales
-        ('E0', 20.60),
-        ('F0', 21.83),
-        ('F#0/Gb0', 23.12),
-        ('G0', 24.50),
-        ('G#0/Ab0', 25.96),
-        ('A0', 27.50),
-        ('A#0/Bb0', 29.14),
-        ('B0', 30.87),
-        ('C1', 32.70),
-        ('C#1/Db1', 34.65),
-        ('D1', 36.71),
-        ('D#1/Eb1', 38.89),
-        ('E1', 41.20),
-        ('F1', 43.65),
-        ('F#1/Gb1', 46.25),
-        ('G1', 49.00),
-        ('G#1/Ab1', 51.91),
-        ('A1', 55.00),
-        ('A#1/Bb1', 58.27),
-        ('B1', 61.74),
-        ('C2', 65.41),
-        ('C#2/Db2', 69.30),
-        ('D2', 73.42),
-        ('D#2/Eb2', 77.78),
-        ('E2', 82.41),
-        ('F2', 87.31),
-        ('F#2/Gb2', 92.50),
-        ('G2', 98.00),
-        ('G#2/Ab2', 103.83),
-        ('A2', 110.00),
-        ('A#2/Bb2', 116.54),
-        ('B2', 123.47),
-        ('C3', 130.81),
-        ('C#3/Db3', 138.59),
-        ('D3', 146.83),
-        ('D#3/Eb3', 155.56),
-        ('E3', 164.81),
-        ('F3', 174.61),
-        ('F#3/Gb3', 185.00),
-        ('G3', 196.00),
-        ('G#3/Ab3', 207.65),
-        ('A3', 220.00),
-        ('A#3/Bb3', 233.08),
-        ('B3', 246.94),
-        ('C4', 261.63),
-        ('C#4/Db4', 277.18),
-        ('D4', 293.66),
-        ('D#4/Eb4', 311.13),
-        ('E4', 329.63),
-        ('F4', 349.23),
-        ('F#4/Gb4', 369.99),
-        ('G4', 392.00),
-        ('G#4/Ab4', 415.30),
-        ('A4', 440.00),
-        ('A#4/Bb4', 466.16),
-        ('B4', 493.88),
-        ('C5', 523.25),
-        ('C#5/Db5', 554.37),
-        ('D5', 587.33),
-        ('D#5/Eb5', 622.25),
-        ('E5', 659.25),
-        ('F5', 698.46),
-        ('F#5/Gb5', 739.99),
-        ('G5', 783.99),
-        ('G#5/Ab5', 830.61),
-        ('A5', 880.00),
-        ('A#5/Bb5', 932.33),
-        ('B5', 987.77),
-        ('C6', 1046.50),
-        ('C#6/Db6', 1108.73),
-        ('D6', 1174.66),
-        ('D#6/Eb6', 1244.51),
-        ('E6', 1318.51),
-        ('F6', 1396.91),
-        ('F#6/Gb6', 1479.98),
-        ('G6', 1567.98),
-        ('G#6/Ab6', 1661.22),
-        ('A6', 1760.00),
-        ('A#6/Bb6', 1864.66),
-        ('B6', 1975.53),
-        ('C7', 2093.00),
-        ('C#7/Db7', 2217.46),
-        ('D7', 2349.32),
-        ('D#7/Eb7', 2489.02),
-        ('E7', 2637.02),
-        ('F7', 2793.83),
-        ('F#7/Gb7', 2959.96),
-        ('G7', 3135.96),
-        ('G#7/Ab7', 3322.44),
-        ('A7', 3520.00),
-        ('A#7/Bb7', 3729.31),
-        ('B7', 3951.07),
-        ('C8', 4186.01),
-        ('C#8/Db8', 4434.92),
-        ('D8', 4698.63),
-        ('D#8/Eb8', 4978.03),
-        ('E8', 5274.04),
-        ('F8', 5587.65),
-        ('F#8/Gb8', 5919.91),
-        ('G8', 6271.93),
-        ('G#8/Ab8', 6644.88),
-        ('A8', 7040.00),
-        ('A#8/Bb8', 7458.62),
-        ('B8', 7902.13)
-    ))
+    _NOTE_FREQUENCIES = _make_scales(
+        (
+            ("C0", 16.35),
+            ("C#0/Db0", 17.32),
+            ("D0", 18.35),
+            ("D#0/Eb0", 19.45),  # expanded in one entry per symbol by _make_scales
+            ("E0", 20.60),
+            ("F0", 21.83),
+            ("F#0/Gb0", 23.12),
+            ("G0", 24.50),
+            ("G#0/Ab0", 25.96),
+            ("A0", 27.50),
+            ("A#0/Bb0", 29.14),
+            ("B0", 30.87),
+            ("C1", 32.70),
+            ("C#1/Db1", 34.65),
+            ("D1", 36.71),
+            ("D#1/Eb1", 38.89),
+            ("E1", 41.20),
+            ("F1", 43.65),
+            ("F#1/Gb1", 46.25),
+            ("G1", 49.00),
+            ("G#1/Ab1", 51.91),
+            ("A1", 55.00),
+            ("A#1/Bb1", 58.27),
+            ("B1", 61.74),
+            ("C2", 65.41),
+            ("C#2/Db2", 69.30),
+            ("D2", 73.42),
+            ("D#2/Eb2", 77.78),
+            ("E2", 82.41),
+            ("F2", 87.31),
+            ("F#2/Gb2", 92.50),
+            ("G2", 98.00),
+            ("G#2/Ab2", 103.83),
+            ("A2", 110.00),
+            ("A#2/Bb2", 116.54),
+            ("B2", 123.47),
+            ("C3", 130.81),
+            ("C#3/Db3", 138.59),
+            ("D3", 146.83),
+            ("D#3/Eb3", 155.56),
+            ("E3", 164.81),
+            ("F3", 174.61),
+            ("F#3/Gb3", 185.00),
+            ("G3", 196.00),
+            ("G#3/Ab3", 207.65),
+            ("A3", 220.00),
+            ("A#3/Bb3", 233.08),
+            ("B3", 246.94),
+            ("C4", 261.63),
+            ("C#4/Db4", 277.18),
+            ("D4", 293.66),
+            ("D#4/Eb4", 311.13),
+            ("E4", 329.63),
+            ("F4", 349.23),
+            ("F#4/Gb4", 369.99),
+            ("G4", 392.00),
+            ("G#4/Ab4", 415.30),
+            ("A4", 440.00),
+            ("A#4/Bb4", 466.16),
+            ("B4", 493.88),
+            ("C5", 523.25),
+            ("C#5/Db5", 554.37),
+            ("D5", 587.33),
+            ("D#5/Eb5", 622.25),
+            ("E5", 659.25),
+            ("F5", 698.46),
+            ("F#5/Gb5", 739.99),
+            ("G5", 783.99),
+            ("G#5/Ab5", 830.61),
+            ("A5", 880.00),
+            ("A#5/Bb5", 932.33),
+            ("B5", 987.77),
+            ("C6", 1046.50),
+            ("C#6/Db6", 1108.73),
+            ("D6", 1174.66),
+            ("D#6/Eb6", 1244.51),
+            ("E6", 1318.51),
+            ("F6", 1396.91),
+            ("F#6/Gb6", 1479.98),
+            ("G6", 1567.98),
+            ("G#6/Ab6", 1661.22),
+            ("A6", 1760.00),
+            ("A#6/Bb6", 1864.66),
+            ("B6", 1975.53),
+            ("C7", 2093.00),
+            ("C#7/Db7", 2217.46),
+            ("D7", 2349.32),
+            ("D#7/Eb7", 2489.02),
+            ("E7", 2637.02),
+            ("F7", 2793.83),
+            ("F#7/Gb7", 2959.96),
+            ("G7", 3135.96),
+            ("G#7/Ab7", 3322.44),
+            ("A7", 3520.00),
+            ("A#7/Bb7", 3729.31),
+            ("B7", 3951.07),
+            ("C8", 4186.01),
+            ("C#8/Db8", 4434.92),
+            ("D8", 4698.63),
+            ("D#8/Eb8", 4978.03),
+            ("E8", 5274.04),
+            ("F8", 5587.65),
+            ("F#8/Gb8", 5919.91),
+            ("G8", 6271.93),
+            ("G#8/Ab8", 6644.88),
+            ("A8", 7040.00),
+            ("A#8/Bb8", 7458.62),
+            ("B8", 7902.13),
+        )
+    )
 
     #: Common note values.
     #:
@@ -650,10 +649,4 @@ class Sound(object):
     #: For instance, the note value of a eight triplet will be ``NOTE_VALUE['e'] / 3``.
     #: It is simpler however to user the ``3`` modifier of notes, as supported by the
     #: :py:meth:`Sound.play_song` method.
-    _NOTE_VALUES = {
-        'w': 1.,
-        'h': 1./2,
-        'q': 1./4,
-        'e': 1./8,
-        's': 1./16,
-    }
+    _NOTE_VALUES = {"w": 1.0, "h": 1.0 / 2, "q": 1.0 / 4, "e": 1.0 / 8, "s": 1.0 / 16}

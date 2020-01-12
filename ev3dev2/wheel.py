@@ -44,6 +44,7 @@ class EV3Rim(Wheel):
     part number 56145
     comes in set 31313
     """
+
     def __init__(self):
         Wheel.__init__(self, 30, 20)
 

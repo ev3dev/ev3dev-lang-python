@@ -25,8 +25,8 @@
 
 import sys
 
-if sys.version_info < (3,4):
-    raise SystemError('Must be using Python 3.4 or higher')
+if sys.version_info < (3, 4):
+    raise SystemError("Must be using Python 3.4 or higher")
 
 import os
 import stat
@@ -40,22 +40,22 @@ from time import sleep
 # Import the LED settings, this is platform specific
 platform = get_current_platform()
 
-if platform == 'ev3':
+if platform == "ev3":
     from ev3dev2._platform.ev3 import LEDS, LED_GROUPS, LED_COLORS, LED_DEFAULT_COLOR
 
-elif platform == 'evb':
+elif platform == "evb":
     from ev3dev2._platform.evb import LEDS, LED_GROUPS, LED_COLORS, LED_DEFAULT_COLOR
 
-elif platform == 'pistorms':
+elif platform == "pistorms":
     from ev3dev2._platform.pistorms import LEDS, LED_GROUPS, LED_COLORS, LED_DEFAULT_COLOR
 
-elif platform == 'brickpi':
+elif platform == "brickpi":
     from ev3dev2._platform.brickpi import LEDS, LED_GROUPS, LED_COLORS, LED_DEFAULT_COLOR
 
-elif platform == 'brickpi3':
+elif platform == "brickpi3":
     from ev3dev2._platform.brickpi3 import LEDS, LED_GROUPS, LED_COLORS, LED_DEFAULT_COLOR
 
-elif platform == 'fake':
+elif platform == "fake":
     from ev3dev2._platform.fake import LEDS, LED_GROUPS, LED_COLORS, LED_DEFAULT_COLOR
 
 else:
@@ -69,21 +69,11 @@ class Led(Device):
     for more details.
     """
 
-    SYSTEM_CLASS_NAME = 'leds'
-    SYSTEM_DEVICE_NAME_CONVENTION = '*'
-    __slots__ = [
-    '_max_brightness',
-    '_brightness',
-    '_triggers',
-    '_trigger',
-    '_delay_on',
-    '_delay_off',
-    'desc',
-    ]
+    SYSTEM_CLASS_NAME = "leds"
+    SYSTEM_DEVICE_NAME_CONVENTION = "*"
+    __slots__ = ["_max_brightness", "_brightness", "_triggers", "_trigger", "_delay_on", "_delay_off", "desc"]
 
-    def __init__(self,
-                 name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False,
-                 desc=None, **kwargs):
+    def __init__(self, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, desc=None, **kwargs):
         self.desc = desc
         super(Led, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
         self._max_brightness = None
@@ -104,7 +94,7 @@ class Led(Device):
         """
         Returns the maximum allowable brightness value.
         """
-        self._max_brightness, value = self.get_cached_attr_int(self._max_brightness, 'max_brightness')
+        self._max_brightness, value = self.get_cached_attr_int(self._max_brightness, "max_brightness")
         return value
 
     @property
@@ -112,19 +102,19 @@ class Led(Device):
         """
         Sets the brightness level. Possible values are from 0 to ``max_brightness``.
         """
-        self._brightness, value = self.get_attr_int(self._brightness, 'brightness')
+        self._brightness, value = self.get_attr_int(self._brightness, "brightness")
         return value
 
     @brightness.setter
     def brightness(self, value):
-        self._brightness = self.set_attr_int(self._brightness, 'brightness', value)
+        self._brightness = self.set_attr_int(self._brightness, "brightness", value)
 
     @property
     def triggers(self):
         """
         Returns a list of available triggers.
         """
-        self._triggers, value = self.get_attr_set(self._triggers, 'trigger')
+        self._triggers, value = self.get_attr_set(self._triggers, "trigger")
         return value
 
     @property
@@ -145,19 +135,19 @@ class Led(Device):
         trigger. However, if you set the brightness value to 0 it will
         also disable the ``timer`` trigger.
         """
-        self._trigger, value = self.get_attr_from_set(self._trigger, 'trigger')
+        self._trigger, value = self.get_attr_from_set(self._trigger, "trigger")
         return value
 
     @trigger.setter
     def trigger(self, value):
-        self._trigger = self.set_attr_string(self._trigger, 'trigger', value)
+        self._trigger = self.set_attr_string(self._trigger, "trigger", value)
 
         # Workaround for ev3dev/ev3dev#225.
         # When trigger is set to 'timer', we need to wait for 'delay_on' and
         # 'delay_off' attributes to appear with correct permissions.
-        if value == 'timer':
-            for attr in ('delay_on', 'delay_off'):
-                path = self._path + '/' + attr
+        if value == "timer":
+            for attr in ("delay_on", "delay_off"):
+                path = self._path + "/" + attr
 
                 # Make sure the file has been created:
                 for _ in range(5):
@@ -191,7 +181,7 @@ class Led(Device):
         # reopen the file.
         for retry in (True, False):
             try:
-                self._delay_on, value = self.get_attr_int(self._delay_on, 'delay_on')
+                self._delay_on, value = self.get_attr_int(self._delay_on, "delay_on")
                 return value
             except OSError:
                 if retry:
@@ -208,7 +198,7 @@ class Led(Device):
         # reopen the file.
         for retry in (True, False):
             try:
-                self._delay_on = self.set_attr_int(self._delay_on, 'delay_on', value)
+                self._delay_on = self.set_attr_int(self._delay_on, "delay_on", value)
                 return
             except OSError:
                 if retry:
@@ -231,7 +221,7 @@ class Led(Device):
         # reopen the file.
         for retry in (True, False):
             try:
-                self._delay_off, value = self.get_attr_int(self._delay_off, 'delay_off')
+                self._delay_off, value = self.get_attr_int(self._delay_off, "delay_off")
                 return value
             except OSError:
                 if retry:
@@ -250,7 +240,7 @@ class Led(Device):
         """
         for retry in (True, False):
             try:
-                self._delay_off = self.set_attr_int(self._delay_off, 'delay_off', value)
+                self._delay_off = self.set_attr_int(self._delay_off, "delay_off", value)
                 return
             except OSError:
                 if retry:
@@ -271,7 +261,6 @@ class Led(Device):
 
 
 class Leds(object):
-
     def __init__(self):
         self.leds = OrderedDict()
         self.led_groups = OrderedDict()
@@ -313,14 +302,16 @@ class Leds(object):
 
         color_tuple = color
         if isinstance(color, str):
-            assert color in self.led_colors, \
-                "%s is an invalid LED color, valid choices are %s" % \
-                (color, ', '.join(self.led_colors.keys()))
+            assert color in self.led_colors, "%s is an invalid LED color, valid choices are %s" % (
+                color,
+                ", ".join(self.led_colors.keys()),
+            )
             color_tuple = self.led_colors[color]
 
-        assert group in self.led_groups, \
-            "%s is an invalid LED group, valid choices are %s" % \
-            (group, ', '.join(self.led_groups.keys()))
+        assert group in self.led_groups, "%s is an invalid LED group, valid choices are %s" % (
+            group,
+            ", ".join(self.led_groups.keys()),
+        )
 
         for led, value in zip(self.led_groups[group], color_tuple):
             led.brightness_pct = value * pct
@@ -339,9 +330,10 @@ class Leds(object):
         if not self.leds:
             return
 
-        assert group in self.led_groups, \
-            "%s is an invalid LED group, valid choices are %s" % \
-            (group, ', '.join(self.led_groups.keys()))
+        assert group in self.led_groups, "%s is an invalid LED group, valid choices are %s" % (
+            group,
+            ", ".join(self.led_groups.keys()),
+        )
 
         for led in self.led_groups[group]:
             for k in kwargs:
@@ -385,7 +377,9 @@ class Leds(object):
             while self.animate_thread_id:
                 pass
 
-    def animate_police_lights(self, color1, color2, group1='LEFT', group2='RIGHT', sleeptime=0.5, duration=5, block=True):
+    def animate_police_lights(
+        self, color1, color2, group1="LEFT", group2="RIGHT", sleeptime=0.5, duration=5, block=True
+    ):
         """
         Cycle the ``group1`` and ``group2`` LEDs between ``color1`` and ``color2``
         to give the effect of police lights.  Alternate the ``group1`` and ``group2``
@@ -433,7 +427,7 @@ class Leds(object):
         else:
             self.animate_thread_id = _thread.start_new_thread(_animate_police_lights, ())
 
-    def animate_flash(self, color, groups=('LEFT', 'RIGHT'), sleeptime=0.5, duration=5, block=True):
+    def animate_flash(self, color, groups=("LEFT", "RIGHT"), sleeptime=0.5, duration=5, block=True):
         """
         Turn all LEDs in ``groups`` off/on to ``color`` every ``sleeptime`` seconds
 
@@ -477,7 +471,7 @@ class Leds(object):
         else:
             self.animate_thread_id = _thread.start_new_thread(_animate_flash, ())
 
-    def animate_cycle(self, colors, groups=('LEFT', 'RIGHT'), sleeptime=0.5, duration=5, block=True):
+    def animate_cycle(self, colors, groups=("LEFT", "RIGHT"), sleeptime=0.5, duration=5, block=True):
         """
         Cycle ``groups`` LEDs through ``colors``. Do this in a loop where
         we display each color for ``sleeptime`` seconds.
@@ -492,6 +486,7 @@ class Leds(object):
             leds = Leds()
             leds.animate_cyle(('RED', 'GREEN', 'AMBER'))
         """
+
         def _animate_cycle():
             index = 0
             max_index = len(colors)
@@ -523,7 +518,7 @@ class Leds(object):
         else:
             self.animate_thread_id = _thread.start_new_thread(_animate_cycle, ())
 
-    def animate_rainbow(self, group1='LEFT', group2='RIGHT', increment_by=0.1, sleeptime=0.1, duration=5, block=True):
+    def animate_rainbow(self, group1="LEFT", group2="RIGHT", increment_by=0.1, sleeptime=0.1, duration=5, block=True):
         """
         Gradually fade from one color to the next
 

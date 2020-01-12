@@ -28,35 +28,35 @@ An assortment of classes modeling specific features of the EV3 brick.
 
 from collections import OrderedDict
 
-OUTPUT_A = 'ev3-ports:outA'
-OUTPUT_B = 'ev3-ports:outB'
-OUTPUT_C = 'ev3-ports:outC'
-OUTPUT_D = 'ev3-ports:outD'
+OUTPUT_A = "ev3-ports:outA"
+OUTPUT_B = "ev3-ports:outB"
+OUTPUT_C = "ev3-ports:outC"
+OUTPUT_D = "ev3-ports:outD"
 
-INPUT_1 = 'ev3-ports:in1'
-INPUT_2 = 'ev3-ports:in2'
-INPUT_3 = 'ev3-ports:in3'
-INPUT_4 = 'ev3-ports:in4'
+INPUT_1 = "ev3-ports:in1"
+INPUT_2 = "ev3-ports:in2"
+INPUT_3 = "ev3-ports:in3"
+INPUT_4 = "ev3-ports:in4"
 
-BUTTONS_FILENAME = '/dev/input/by-path/platform-gpio_keys-event'
-EVDEV_DEVICE_NAME = 'EV3 Brick Buttons'
+BUTTONS_FILENAME = "/dev/input/by-path/platform-gpio_keys-event"
+EVDEV_DEVICE_NAME = "EV3 Brick Buttons"
 
 LEDS = OrderedDict()
-LEDS['red_left'] = 'led0:red:brick-status'
-LEDS['red_right'] = 'led1:red:brick-status'
-LEDS['green_left'] = 'led0:green:brick-status'
-LEDS['green_right'] = 'led1:green:brick-status'
+LEDS["red_left"] = "led0:red:brick-status"
+LEDS["red_right"] = "led1:red:brick-status"
+LEDS["green_left"] = "led0:green:brick-status"
+LEDS["green_right"] = "led1:green:brick-status"
 
 LED_GROUPS = OrderedDict()
-LED_GROUPS['LEFT'] = ('red_left', 'green_left')
-LED_GROUPS['RIGHT'] = ('red_right', 'green_right')
+LED_GROUPS["LEFT"] = ("red_left", "green_left")
+LED_GROUPS["RIGHT"] = ("red_right", "green_right")
 
 LED_COLORS = OrderedDict()
-LED_COLORS['BLACK'] = (0, 0)
-LED_COLORS['RED'] = (1, 0)
-LED_COLORS['GREEN'] = (0, 1)
-LED_COLORS['AMBER'] = (1, 1)
-LED_COLORS['ORANGE'] = (1, 0.5)
-LED_COLORS['YELLOW'] = (0.1, 1)
+LED_COLORS["BLACK"] = (0, 0)
+LED_COLORS["RED"] = (1, 0)
+LED_COLORS["GREEN"] = (0, 1)
+LED_COLORS["AMBER"] = (1, 1)
+LED_COLORS["ORANGE"] = (1, 0.5)
+LED_COLORS["YELLOW"] = (0.1, 1)
 
-LED_DEFAULT_COLOR = 'GREEN'
+LED_DEFAULT_COLOR = "GREEN"

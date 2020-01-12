@@ -25,8 +25,8 @@
 
 import sys
 
-if sys.version_info < (3,4):
-    raise SystemError('Must be using Python 3.4 or higher')
+if sys.version_info < (3, 4):
+    raise SystemError("Must be using Python 3.4 or higher")
 
 import numbers
 from os.path import abspath
@@ -37,25 +37,39 @@ from ev3dev2 import get_current_platform, Device, list_device_names
 # INPUT ports have platform specific values that we must import
 platform = get_current_platform()
 
-if platform == 'ev3':
+if platform == "ev3":
     from ev3dev2._platform.ev3 import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 
-elif platform == 'evb':
+elif platform == "evb":
     from ev3dev2._platform.evb import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 
-elif platform == 'pistorms':
+elif platform == "pistorms":
     from ev3dev2._platform.pistorms import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 
-elif platform == 'brickpi':
+elif platform == "brickpi":
     from ev3dev2._platform.brickpi import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 
-elif platform == 'brickpi3':
-    from ev3dev2._platform.brickpi3 import INPUT_1, INPUT_2, INPUT_3, INPUT_4, \
-                                           INPUT_5, INPUT_6, INPUT_7, INPUT_8, \
-                                           INPUT_9, INPUT_10, INPUT_11, INPUT_12, \
-                                           INPUT_13, INPUT_14, INPUT_15, INPUT_16
+elif platform == "brickpi3":
+    from ev3dev2._platform.brickpi3 import (
+        INPUT_1,
+        INPUT_2,
+        INPUT_3,
+        INPUT_4,
+        INPUT_5,
+        INPUT_6,
+        INPUT_7,
+        INPUT_8,
+        INPUT_9,
+        INPUT_10,
+        INPUT_11,
+        INPUT_12,
+        INPUT_13,
+        INPUT_14,
+        INPUT_15,
+        INPUT_16,
+    )
 
-elif platform == 'fake':
+elif platform == "fake":
     from ev3dev2._platform.fake import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 
 else:
@@ -68,29 +82,29 @@ class Sensor(Device):
     sensors available for the EV3.
     """
 
-    SYSTEM_CLASS_NAME = 'lego-sensor'
-    SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
+    SYSTEM_CLASS_NAME = "lego-sensor"
+    SYSTEM_DEVICE_NAME_CONVENTION = "sensor*"
     __slots__ = [
-    '_address',
-    '_command',
-    '_commands',
-    '_decimals',
-    '_driver_name',
-    '_mode',
-    '_modes',
-    '_num_values',
-    '_units',
-    '_value',
-    '_bin_data_format',
-    '_bin_data_size',
-    '_bin_data',
-    '_mode_scale'
+        "_address",
+        "_command",
+        "_commands",
+        "_decimals",
+        "_driver_name",
+        "_mode",
+        "_modes",
+        "_num_values",
+        "_units",
+        "_value",
+        "_bin_data_format",
+        "_bin_data_size",
+        "_bin_data",
+        "_mode_scale",
     ]
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
         if address is not None:
-            kwargs['address'] = address
+            kwargs["address"] = address
         super(Sensor, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
         self._address = None
@@ -102,7 +116,7 @@ class Sensor(Device):
         self._modes = None
         self._num_values = None
         self._units = None
-        self._value = [None,None,None,None,None,None,None,None]
+        self._value = [None, None, None, None, None, None, None, None]
 
         self._bin_data_format = None
         self._bin_data_size = None
@@ -116,7 +130,7 @@ class Sensor(Device):
         if mode in self._mode_scale:
             scale = self._mode_scale[mode]
         else:
-            scale = 10**(-self.decimals)
+            scale = 10 ** (-self.decimals)
             self._mode_scale[mode] = scale
 
         return scale
@@ -127,7 +141,7 @@ class Sensor(Device):
         Returns the name of the port that the sensor is connected to, e.g. ``ev3:in1``.
         I2C sensors also include the I2C address (decimal), e.g. ``ev3:in1:i2c8``.
         """
-        self._address, value = self.get_attr_string(self._address, 'address')
+        self._address, value = self.get_attr_string(self._address, "address")
         return value
 
     @property
@@ -139,7 +153,7 @@ class Sensor(Device):
 
     @command.setter
     def command(self, value):
-        self._command = self.set_attr_string(self._command, 'command', value)
+        self._command = self.set_attr_string(self._command, "command", value)
 
     @property
     def commands(self):
@@ -147,7 +161,7 @@ class Sensor(Device):
         Returns a list of the valid commands for the sensor.
         Returns -EOPNOTSUPP if no commands are supported.
         """
-        (self._commands, value) = self.get_cached_attr_set(self._commands, 'commands')
+        (self._commands, value) = self.get_cached_attr_set(self._commands, "commands")
         return value
 
     @property
@@ -156,7 +170,7 @@ class Sensor(Device):
         Returns the number of decimal places for the values in the ``value<N>``
         attributes of the current mode.
         """
-        self._decimals, value = self.get_attr_int(self._decimals, 'decimals')
+        self._decimals, value = self.get_attr_int(self._decimals, "decimals")
         return value
 
     @property
@@ -165,7 +179,7 @@ class Sensor(Device):
         Returns the name of the sensor device/driver. See the list of [supported
         sensors] for a complete list of drivers.
         """
-        (self._driver_name, value) = self.get_cached_attr_string(self._driver_name, 'driver_name')
+        (self._driver_name, value) = self.get_cached_attr_string(self._driver_name, "driver_name")
         return value
 
     @property
@@ -174,19 +188,19 @@ class Sensor(Device):
         Returns the current mode. Writing one of the values returned by ``modes``
         sets the sensor to that mode.
         """
-        self._mode, value = self.get_attr_string(self._mode, 'mode')
+        self._mode, value = self.get_attr_string(self._mode, "mode")
         return value
 
     @mode.setter
     def mode(self, value):
-        self._mode = self.set_attr_string(self._mode, 'mode', value)
+        self._mode = self.set_attr_string(self._mode, "mode", value)
 
     @property
     def modes(self):
         """
         Returns a list of the valid modes for the sensor.
         """
-        (self._modes, value) = self.get_cached_attr_set(self._modes, 'modes')
+        (self._modes, value) = self.get_cached_attr_set(self._modes, "modes")
         return value
 
     @property
@@ -195,7 +209,7 @@ class Sensor(Device):
         Returns the number of ``value<N>`` attributes that will return a valid value
         for the current mode.
         """
-        self._num_values, value = self.get_attr_int(self._num_values, 'num_values')
+        self._num_values, value = self.get_attr_int(self._num_values, "num_values")
         return value
 
     @property
@@ -204,7 +218,7 @@ class Sensor(Device):
         Returns the units of the measured value for the current mode. May return
         empty string
         """
-        self._units, value = self.get_attr_string(self._units, 'units')
+        self._units, value = self.get_attr_string(self._units, "units")
         return value
 
     def value(self, n=0):
@@ -216,7 +230,7 @@ class Sensor(Device):
         """
         n = int(n)
 
-        self._value[n], value = self.get_attr_int(self._value[n], 'value'+str(n))
+        self._value[n], value = self.get_attr_int(self._value[n], "value" + str(n))
         return value
 
     @property
@@ -233,7 +247,7 @@ class Sensor(Device):
         - ``s32``: Signed 32-bit integer (int)
         - ``float``: IEEE 754 32-bit floating point (float)
         """
-        self._bin_data_format, value = self.get_attr_string(self._bin_data_format, 'bin_data_format')
+        self._bin_data_format, value = self.get_attr_string(self._bin_data_format, "bin_data_format")
         return value
 
     def bin_data(self, fmt=None):
@@ -255,29 +269,25 @@ class Sensor(Device):
         """
 
         if self._bin_data_size == None:
-            self._bin_data_size = {
-                    "u8":     1,
-                    "s8":     1,
-                    "u16":    2,
-                    "s16":    2,
-                    "s16_be": 2,
-                    "s32":    4,
-                    "float":  4
-                }.get(self.bin_data_format, 1) * self.num_values
+            self._bin_data_size = {"u8": 1, "s8": 1, "u16": 2, "s16": 2, "s16_be": 2, "s32": 4, "float": 4}.get(
+                self.bin_data_format, 1
+            ) * self.num_values
 
         if None == self._bin_data:
-            self._bin_data = self._attribute_file_open( 'bin_data' )
+            self._bin_data = self._attribute_file_open("bin_data")
 
         self._bin_data.seek(0)
         raw = bytearray(self._bin_data.read(self._bin_data_size))
 
-        if fmt is None: return raw
+        if fmt is None:
+            return raw
 
         return unpack(fmt, raw)
-    
+
     def _ensure_mode(self, mode):
         if self.mode != mode:
             self.mode = mode
+
 
 def list_sensors(name_pattern=Sensor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     """
@@ -292,9 +302,10 @@ def list_sensors(name_pattern=Sensor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
             address=['in1', 'in3']. When argument value is a list,
             then a match against any entry of the list is enough.
     """
-    class_path = abspath(Device.DEVICE_ROOT_PATH + '/' + Sensor.SYSTEM_CLASS_NAME)
-    return (Sensor(name_pattern=name, name_exact=True)
-            for name in list_device_names(class_path, name_pattern, **kwargs))
+    class_path = abspath(Device.DEVICE_ROOT_PATH + "/" + Sensor.SYSTEM_CLASS_NAME)
+    return (
+        Sensor(name_pattern=name, name_exact=True) for name in list_device_names(class_path, name_pattern, **kwargs)
+    )
 
 
 class I2cSensor(Sensor):
@@ -303,10 +314,10 @@ class I2cSensor(Sensor):
     """
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
-    SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
+    SYSTEM_DEVICE_NAME_CONVENTION = "sensor*"
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(I2cSensor, self).__init__(address, name_pattern, name_exact, driver_name=['nxt-i2c-sensor'], **kwargs)
+        super(I2cSensor, self).__init__(address, name_pattern, name_exact, driver_name=["nxt-i2c-sensor"], **kwargs)
         self._fw_version = None
         self._poll_ms = None
 
@@ -316,7 +327,7 @@ class I2cSensor(Sensor):
         Returns the firmware version of the sensor if available. Currently only
         I2C/NXT sensors support this.
         """
-        (self._fw_version, value) = self.get_cached_attr_string(self._fw_version, 'fw_version')
+        (self._fw_version, value) = self.get_cached_attr_string(self._fw_version, "fw_version")
         return value
 
     @property
@@ -327,9 +338,9 @@ class I2cSensor(Sensor):
         coded as 50 msec. Returns -EOPNOTSUPP if changing polling is not supported.
         Currently only I2C/NXT sensors support changing the polling period.
         """
-        self._poll_ms, value = self.get_attr_int(self._poll_ms, 'poll_ms')
+        self._poll_ms, value = self.get_attr_int(self._poll_ms, "poll_ms")
         return value
 
     @poll_ms.setter
     def poll_ms(self, value):
-        self._poll_ms = self.set_attr_int(self._poll_ms, 'poll_ms', value)
+        self._poll_ms = self.set_attr_int(self._poll_ms, "poll_ms", value)

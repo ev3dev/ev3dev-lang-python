@@ -24,13 +24,13 @@ class RobotWebHandler(BaseHTTPRequestHandler):
 
     # File extension to mimetype
     mimetype = {
-        'css'  : 'text/css',
-        'gif'  : 'image/gif',
-        'html' : 'text/html',
-        'ico'  : 'image/x-icon',
-        'jpg'  : 'image/jpg',
-        'js'   : 'application/javascript',
-        'png'  : 'image/png'
+        "css": "text/css",
+        "gif": "image/gif",
+        "html": "text/html",
+        "ico": "image/x-icon",
+        "jpg": "image/jpg",
+        "js": "application/javascript",
+        "png": "image/png",
     }
 
     def do_GET(self):
@@ -42,8 +42,8 @@ class RobotWebHandler(BaseHTTPRequestHandler):
             self.path = "/index.html"
 
         # Serve a file (image, css, html, etc)
-        if '.' in self.path:
-            extension = self.path.split('.')[-1]
+        if "." in self.path:
+            extension = self.path.split(".")[-1]
             mt = self.mimetype.get(extension)
 
             if mt:
@@ -52,20 +52,20 @@ class RobotWebHandler(BaseHTTPRequestHandler):
                 # Open the static file requested and send it
                 if os.path.exists(filename):
                     self.send_response(200)
-                    self.send_header('Content-type', mt)
+                    self.send_header("Content-type", mt)
                     self.end_headers()
 
-                    if extension in ('gif', 'ico', 'jpg', 'png'):
+                    if extension in ("gif", "ico", "jpg", "png"):
                         # Open in binary mode, do not encode
-                        with open(filename, mode='rb') as fh:
+                        with open(filename, mode="rb") as fh:
                             self.wfile.write(fh.read())
                     else:
                         # Open as plain text and encode
-                        with open(filename, mode='r') as fh:
+                        with open(filename, mode="r") as fh:
                             self.wfile.write(fh.read().encode())
                 else:
                     log.error("404: %s not found" % self.path)
-                    self.send_error(404, 'File Not Found: %s' % self.path)
+                    self.send_error(404, "File Not Found: %s" % self.path)
                 return True
 
         return False
@@ -83,8 +83,8 @@ motor_max_speed = None
 medium_motor_max_speed = None
 joystick_engaged = False
 
-class TankWebHandler(RobotWebHandler):
 
+class TankWebHandler(RobotWebHandler):
     def __str__(self):
         return "%s-TankWebHandler" % self.robot
 
@@ -104,12 +104,12 @@ class TankWebHandler(RobotWebHandler):
         if medium_motor_max_speed is None:
             motor_max_speed = self.robot.left_motor.max_speed
 
-            if hasattr(self.robot, 'medium_motor'):
+            if hasattr(self.robot, "medium_motor"):
                 medium_motor_max_speed = self.robot.medium_motor.max_speed
             else:
                 medium_motor_max_speed = 0
 
-        '''
+        """
         Sometimes we get AJAX requests out of order like this:
         2016-09-06 02:29:35,846 DEBUG: seq 65: (x, y): 0, 44 -> speed 462 462
         2016-09-06 02:29:35,910 DEBUG: seq 66: (x, y): 0, 45 -> speed 473 473
@@ -134,68 +134,70 @@ class TankWebHandler(RobotWebHandler):
 
         We can also ignore any move-xy requests that show up late by tracking the
         max seq for any move-xy we service.
-        '''
-        path = self.path.split('/')
+        """
+        path = self.path.split("/")
         seq = int(path[1])
         action = path[2]
 
         # desktop interface
-        if action == 'move-start':
+        if action == "move-start":
             direction = path[3]
             speed_percentage = path[4]
             log.debug("seq %d: move %s" % (seq, direction))
 
-            left_speed = int(int(speed_percentage) * motor_max_speed)/100.0
-            right_speed = int(int(speed_percentage) * motor_max_speed)/100.0
+            left_speed = int(int(speed_percentage) * motor_max_speed) / 100.0
+            right_speed = int(int(speed_percentage) * motor_max_speed) / 100.0
 
-            if direction == 'forward':
+            if direction == "forward":
                 self.robot.left_motor.run_forever(speed_sp=left_speed)
                 self.robot.right_motor.run_forever(speed_sp=right_speed)
 
-            elif direction == 'backward':
+            elif direction == "backward":
                 self.robot.left_motor.run_forever(speed_sp=left_speed * -1)
                 self.robot.right_motor.run_forever(speed_sp=right_speed * -1)
 
-            elif direction == 'left':
+            elif direction == "left":
                 self.robot.left_motor.run_forever(speed_sp=left_speed * -1)
                 self.robot.right_motor.run_forever(speed_sp=right_speed)
 
-            elif direction == 'right':
+            elif direction == "right":
                 self.robot.left_motor.run_forever(speed_sp=left_speed)
                 self.robot.right_motor.run_forever(speed_sp=right_speed * -1)
 
         # desktop & mobile interface
-        elif action == 'move-stop':
+        elif action == "move-stop":
             log.debug("seq %d: move stop" % seq)
             self.robot.left_motor.stop()
             self.robot.right_motor.stop()
             joystick_engaged = False
 
         # medium motor
-        elif action == 'motor-stop':
+        elif action == "motor-stop":
             motor = path[3]
             log.debug("seq %d: motor-stop %s" % (seq, motor))
 
-            if motor == 'medium':
-                if hasattr(self.robot, 'medium_motor'):
+            if motor == "medium":
+                if hasattr(self.robot, "medium_motor"):
                     self.robot.medium_motor.stop()
             else:
                 raise Exception("motor %s not supported yet" % motor)
 
-        elif action == 'motor-start':
+        elif action == "motor-start":
             motor = path[3]
             direction = path[4]
             speed_percentage = path[5]
-            log.debug("seq %d: start motor %s, direction %s, speed_percentage %s" % (seq, motor, direction, speed_percentage))
+            log.debug(
+                "seq %d: start motor %s, direction %s, speed_percentage %s" % (seq, motor, direction, speed_percentage)
+            )
 
-            if motor == 'medium':
-                if hasattr(self.robot, 'medium_motor'):
-                    if direction == 'clockwise':
-                        medium_speed = int(int(speed_percentage) * medium_motor_max_speed)/100.0
+            if motor == "medium":
+                if hasattr(self.robot, "medium_motor"):
+                    if direction == "clockwise":
+                        medium_speed = int(int(speed_percentage) * medium_motor_max_speed) / 100.0
                         self.robot.medium_motor.run_forever(speed_sp=medium_speed)
 
-                    elif direction == 'counter-clockwise':
-                        medium_speed = int(int(speed_percentage) * medium_motor_max_speed)/100.0
+                    elif direction == "counter-clockwise":
+                        medium_speed = int(int(speed_percentage) * medium_motor_max_speed) / 100.0
                         self.robot.medium_motor.run_forever(speed_sp=medium_speed * -1)
                 else:
                     log.info("we do not have a medium_motor")
@@ -203,7 +205,7 @@ class TankWebHandler(RobotWebHandler):
                 raise Exception("motor %s not supported yet" % motor)
 
         # mobile interface
-        elif action == 'move-xy':
+        elif action == "move-xy":
             x = int(path[3])
             y = int(path[4])
 
@@ -213,18 +215,16 @@ class TankWebHandler(RobotWebHandler):
                     max_move_xy_seq = seq
                     log.debug("seq %d: (x, y) (%4d, %4d)" % (seq, x, y))
                 else:
-                    log.debug("seq %d: (x, y) %4d, %4d (ignore, max seq %d)" %
-                              (seq, x, y, max_move_xy_seq))
+                    log.debug("seq %d: (x, y) %4d, %4d (ignore, max seq %d)" % (seq, x, y, max_move_xy_seq))
             else:
-                log.debug("seq %d: (x, y) %4d, %4d (ignore, joystick idle)" %
-                          (seq, x, y))
+                log.debug("seq %d: (x, y) %4d, %4d (ignore, joystick idle)" % (seq, x, y))
 
-        elif action == 'joystick-engaged':
+        elif action == "joystick-engaged":
             joystick_engaged = True
 
-        elif action == 'log':
-            msg = ''.join(path[3:])
-            re_msg = re.search('^(.*)\?', msg)
+        elif action == "log":
+            msg = "".join(path[3:])
+            re_msg = re.search("^(.*)\?", msg)
 
             if re_msg:
                 msg = re_msg.group(1)
@@ -237,7 +237,7 @@ class TankWebHandler(RobotWebHandler):
         # It is good practice to send this but if we are getting move-xy we
         # tend to get a lot of them and we need to be as fast as possible so
         # be bad and don't send a reply. This takes ~20ms.
-        if action != 'move-xy':
+        if action != "move-xy":
             self.send_response(204)
 
         return True
@@ -258,7 +258,7 @@ class RobotWebServer(object):
 
         try:
             log.info("Started HTTP server (content) on port %d" % self.port_number)
-            self.content_server = HTTPServer(('', self.port_number), self.handler_class)
+            self.content_server = HTTPServer(("", self.port_number), self.handler_class)
             self.content_server.serve_forever()
 
         # Exit cleanly, stop both web servers and all motors

@@ -28,29 +28,29 @@ An assortment of classes modeling specific features of the BrickPi.
 
 from collections import OrderedDict
 
-OUTPUT_A = 'serial0-0:MA'
-OUTPUT_B = 'serial0-0:MB'
-OUTPUT_C = 'serial0-0:MC'
-OUTPUT_D = 'serial0-0:MD'
+OUTPUT_A = "serial0-0:MA"
+OUTPUT_B = "serial0-0:MB"
+OUTPUT_C = "serial0-0:MC"
+OUTPUT_D = "serial0-0:MD"
 
-INPUT_1 = 'serial0-0:S1'
-INPUT_2 = 'serial0-0:S2'
-INPUT_3 = 'serial0-0:S3'
-INPUT_4 = 'serial0-0:S4'
+INPUT_1 = "serial0-0:S1"
+INPUT_2 = "serial0-0:S2"
+INPUT_3 = "serial0-0:S3"
+INPUT_4 = "serial0-0:S4"
 
 BUTTONS_FILENAME = None
 EVDEV_DEVICE_NAME = None
 
 LEDS = OrderedDict()
-LEDS['blue_led1'] = 'led1:blue:brick-status'
-LEDS['blue_led2'] = 'led2:blue:brick-status'
+LEDS["blue_led1"] = "led1:blue:brick-status"
+LEDS["blue_led2"] = "led2:blue:brick-status"
 
 LED_GROUPS = OrderedDict()
-LED_GROUPS['LED1'] = ('blue_led1',)
-LED_GROUPS['LED2'] = ('blue_led2',)
+LED_GROUPS["LED1"] = ("blue_led1",)
+LED_GROUPS["LED2"] = ("blue_led2",)
 
 LED_COLORS = OrderedDict()
-LED_COLORS['BLACK'] = (0,)
-LED_COLORS['BLUE'] = (1,)
+LED_COLORS["BLACK"] = (0,)
+LED_COLORS["BLUE"] = (1,)
 
-LED_DEFAULT_COLOR = 'BLUE'
+LED_DEFAULT_COLOR = "BLUE"

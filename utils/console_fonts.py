@@ -31,9 +31,10 @@ def show_fonts():
         console.set_font(font, True)
         console.text_at(font, 1, 1, False, True)
         console.clear_to_eol()
-        console.text_at("{}, {}".format(console.columns, console.rows),
-                              column=2, row=4, reset_console=False, inverse=False)
-        print("{}, {}, \"{}\"".format(console.columns, console.rows, font), file=stderr)
+        console.text_at(
+            "{}, {}".format(console.columns, console.rows), column=2, row=4, reset_console=False, inverse=False
+        )
+        print('{}, {}, "{}"'.format(console.columns, console.rows, font), file=stderr)
         fonts.append((console.columns, console.rows, font))
 
     fonts.sort(key=lambda f: (f[0], f[1], f[2]))
@@ -42,11 +43,12 @@ def show_fonts():
     for cols, rows, font in fonts:
         print(cols, rows, font, file=stderr)
         console.set_font(font, True)
-        for row in range(1, rows+1):
-            for col in range(1, cols+1):
+        for row in range(1, rows + 1):
+            for col in range(1, cols + 1):
                 console.text_at("{}".format(col % 10), col, row, False, (row % 2 == 0))
         console.text_at(font.split(".")[0], 1, 1, False, True)
         console.clear_to_eol()
+
 
 # Show the fonts; you may want to adjust the ``startswith`` filter to show other codesets.
 show_fonts()

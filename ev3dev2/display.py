@@ -25,8 +25,8 @@
 
 import sys
 
-if sys.version_info < (3,4):
-    raise SystemError('Must be using Python 3.4 or higher')
+if sys.version_info < (3, 4):
+    raise SystemError("Must be using Python 3.4 or higher")
 
 import os
 import mmap
@@ -74,7 +74,7 @@ class FbMem(object):
     # http://sam.zoy.org/wtfpl/COPYING for more details.
     # ------------------------------------------------------------------
 
-    __slots__ = ('fid', 'fix_info', 'var_info', 'mmap')
+    __slots__ = ("fid", "fix_info", "var_info", "mmap")
 
     FBIOGET_VSCREENINFO = 0x4600
     FBIOGET_FSCREENINFO = 0x4602
@@ -87,61 +87,67 @@ class FbMem(object):
         """The fb_fix_screeninfo from fb.h."""
 
         _fields_ = [
-            ('id_name', ctypes.c_char * 16),
-            ('smem_start', ctypes.c_ulong),
-            ('smem_len', ctypes.c_uint32),
-            ('type', ctypes.c_uint32),
-            ('type_aux', ctypes.c_uint32),
-            ('visual', ctypes.c_uint32),
-            ('xpanstep', ctypes.c_uint16),
-            ('ypanstep', ctypes.c_uint16),
-            ('ywrapstep', ctypes.c_uint16),
-            ('line_length', ctypes.c_uint32),
-            ('mmio_start', ctypes.c_ulong),
-            ('mmio_len', ctypes.c_uint32),
-            ('accel', ctypes.c_uint32),
-            ('reserved', ctypes.c_uint16 * 3),
+            ("id_name", ctypes.c_char * 16),
+            ("smem_start", ctypes.c_ulong),
+            ("smem_len", ctypes.c_uint32),
+            ("type", ctypes.c_uint32),
+            ("type_aux", ctypes.c_uint32),
+            ("visual", ctypes.c_uint32),
+            ("xpanstep", ctypes.c_uint16),
+            ("ypanstep", ctypes.c_uint16),
+            ("ywrapstep", ctypes.c_uint16),
+            ("line_length", ctypes.c_uint32),
+            ("mmio_start", ctypes.c_ulong),
+            ("mmio_len", ctypes.c_uint32),
+            ("accel", ctypes.c_uint32),
+            ("reserved", ctypes.c_uint16 * 3),
         ]
 
     class VarScreenInfo(ctypes.Structure):
-
         class FbBitField(ctypes.Structure):
 
             """The fb_bitfield struct from fb.h."""
 
-            _fields_ = [
-                ('offset', ctypes.c_uint32),
-                ('length', ctypes.c_uint32),
-                ('msb_right', ctypes.c_uint32),
-            ]
+            _fields_ = [("offset", ctypes.c_uint32), ("length", ctypes.c_uint32), ("msb_right", ctypes.c_uint32)]
 
             def __str__(self):
-                return "%s (offset %s, length %s, msg_right %s)" %\
-                    (self.__class__.__name__, self.offset, self.length, self.msb_right)
+                return "%s (offset %s, length %s, msg_right %s)" % (
+                    self.__class__.__name__,
+                    self.offset,
+                    self.length,
+                    self.msb_right,
+                )
 
         """The fb_var_screeninfo struct from fb.h."""
 
         _fields_ = [
-            ('xres', ctypes.c_uint32),
-            ('yres', ctypes.c_uint32),
-            ('xres_virtual', ctypes.c_uint32),
-            ('yres_virtual', ctypes.c_uint32),
-            ('xoffset', ctypes.c_uint32),
-            ('yoffset', ctypes.c_uint32),
-
-            ('bits_per_pixel', ctypes.c_uint32),
-            ('grayscale', ctypes.c_uint32),
-
-            ('red', FbBitField),
-            ('green', FbBitField),
-            ('blue', FbBitField),
-            ('transp', FbBitField),
+            ("xres", ctypes.c_uint32),
+            ("yres", ctypes.c_uint32),
+            ("xres_virtual", ctypes.c_uint32),
+            ("yres_virtual", ctypes.c_uint32),
+            ("xoffset", ctypes.c_uint32),
+            ("yoffset", ctypes.c_uint32),
+            ("bits_per_pixel", ctypes.c_uint32),
+            ("grayscale", ctypes.c_uint32),
+            ("red", FbBitField),
+            ("green", FbBitField),
+            ("blue", FbBitField),
+            ("transp", FbBitField),
         ]
 
         def __str__(self):
-            return ("%sx%s at (%s,%s), bpp %s, grayscale %s, red %s, green %s, blue %s, transp %s" %
-                (self.xres, self.yres, self.xoffset, self.yoffset, self.bits_per_pixel, self.grayscale,
-                self.red, self.green, self.blue, self.transp))
+            return "%sx%s at (%s,%s), bpp %s, grayscale %s, red %s, green %s, blue %s, transp %s" % (
+                self.xres,
+                self.yres,
+                self.xoffset,
+                self.yoffset,
+                self.bits_per_pixel,
+                self.grayscale,
+                self.red,
+                self.green,
+                self.blue,
+                self.transp,
+            )
 
     def __init__(self, fbdev=None):
         """Create the FbMem framebuffer memory object."""
@@ -160,7 +166,7 @@ class FbMem(object):
         Try to use the FRAMEBUFFER environment variable if fbdev is
         not given. Use '/dev/fb0' by default.
         """
-        dev = fbdev or os.getenv('FRAMEBUFFER', '/dev/fb0')
+        dev = fbdev or os.getenv("FRAMEBUFFER", "/dev/fb0")
         fbfid = os.open(dev, os.O_RDWR)
         return fbfid
 
@@ -181,13 +187,7 @@ class FbMem(object):
     @staticmethod
     def _map_fb_memory(fbfid, fix_info):
         """Map the framebuffer memory."""
-        return mmap.mmap(
-            fbfid,
-            fix_info.smem_len,
-            mmap.MAP_SHARED,
-            mmap.PROT_READ | mmap.PROT_WRITE,
-            offset=0
-        )
+        return mmap.mmap(fbfid, fix_info.smem_len, mmap.MAP_SHARED, mmap.PROT_READ | mmap.PROT_WRITE, offset=0)
 
 
 class Display(FbMem):
@@ -201,7 +201,7 @@ class Display(FbMem):
     GRID_ROWS = 12
     GRID_ROW_PIXELS = 10
 
-    def __init__(self, desc='Display'):
+    def __init__(self, desc="Display"):
         FbMem.__init__(self)
 
         self.platform = get_current_platform()
@@ -216,13 +216,13 @@ class Display(FbMem):
             im_type = "RGB"
 
         else:
-            raise Exception("Not supported - platform %s with bits_per_pixel %s" %
-                (self.platform, self.var_info.bits_per_pixel))
+            raise Exception(
+                "Not supported - platform %s with bits_per_pixel %s" % (self.platform, self.var_info.bits_per_pixel)
+            )
 
         self._img = Image.new(
-                im_type,
-                (self.fix_info.line_length * 8 // self.var_info.bits_per_pixel, self.yres),
-                "white")
+            im_type, (self.fix_info.line_length * 8 // self.var_info.bits_per_pixel, self.yres), "white"
+        )
 
         self._draw = ImageDraw.Draw(self._img)
         self.desc = desc
@@ -284,11 +284,11 @@ class Display(FbMem):
         """Convert red, green, blue components to a 16-bit 565 RGB value. Components
         should be values 0 to 255.
         """
-        return (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3))
+        return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
 
     def _img_to_rgb565_bytes(self):
         pixels = [self._color565(r, g, b) for (r, g, b) in self._img.getdata()]
-        return pack('H' * len(pixels), *pixels)
+        return pack("H" * len(pixels), *pixels)
 
     def update(self):
         """
@@ -297,7 +297,7 @@ class Display(FbMem):
         """
         if self.var_info.bits_per_pixel == 1:
             b = self._img.tobytes("raw", "1;R")
-            self.mmap[:len(b)] = b
+            self.mmap[: len(b)] = b
 
         elif self.var_info.bits_per_pixel == 16:
             self.mmap[:] = self._img_to_rgb565_bytes()
@@ -306,8 +306,9 @@ class Display(FbMem):
             self.mmap[:] = self._img.convert("RGB").tobytes("raw", "XRGB")
 
         else:
-            raise Exception("Not supported - platform %s with bits_per_pixel %s" %
-                (self.platform, self.var_info.bits_per_pixel))
+            raise Exception(
+                "Not supported - platform %s with bits_per_pixel %s" % (self.platform, self.var_info.bits_per_pixel)
+            )
 
     def image_filename(self, filename, clear_screen=True, x1=0, y1=0, x2=None, y2=None):
 
@@ -321,7 +322,7 @@ class Display(FbMem):
         else:
             return self._img.paste(filename_im, (x1, y1))
 
-    def line(self, clear_screen=True, x1=10, y1=10, x2=50, y2=50, line_color='black', width=1):
+    def line(self, clear_screen=True, x1=10, y1=10, x2=50, y2=50, line_color="black", width=1):
         """
         Draw a line from (x1, y1) to (x2, y2)
         """
@@ -331,7 +332,7 @@ class Display(FbMem):
 
         return self.draw.line((x1, y1, x2, y2), fill=line_color, width=width)
 
-    def circle(self, clear_screen=True, x=50, y=50, radius=40, fill_color='black', outline_color='black'):
+    def circle(self, clear_screen=True, x=50, y=50, radius=40, fill_color="black", outline_color="black"):
         """
         Draw a circle of 'radius' centered at (x, y)
         """
@@ -346,7 +347,7 @@ class Display(FbMem):
 
         return self.draw.ellipse((x1, y1, x2, y2), fill=fill_color, outline=outline_color)
 
-    def rectangle(self, clear_screen=True, x1=10, y1=10, x2=80, y2=40, fill_color='black', outline_color='black'):
+    def rectangle(self, clear_screen=True, x1=10, y1=10, x2=80, y2=40, fill_color="black", outline_color="black"):
         """
         Draw a rectangle where the top left corner is at (x1, y1) and the
         bottom right corner is at (x2, y2)
@@ -357,7 +358,7 @@ class Display(FbMem):
 
         return self.draw.rectangle((x1, y1, x2, y2), fill=fill_color, outline=outline_color)
 
-    def point(self, clear_screen=True, x=10, y=10, point_color='black'):
+    def point(self, clear_screen=True, x=10, y=10, point_color="black"):
         """
         Draw a single pixel at (x, y)
         """
@@ -367,7 +368,7 @@ class Display(FbMem):
 
         return self.draw.point((x, y), fill=point_color)
 
-    def text_pixels(self, text, clear_screen=True, x=0, y=0, text_color='black', font=None):
+    def text_pixels(self, text, clear_screen=True, x=0, y=0, text_color="black", font=None):
         """
         Display ``text`` starting at pixel (x, y).
 
@@ -401,7 +402,7 @@ class Display(FbMem):
         else:
             return self.draw.text((x, y), text, fill=text_color)
 
-    def text_grid(self, text, clear_screen=True, x=0, y=0, text_color='black', font=None):
+    def text_grid(self, text, clear_screen=True, x=0, y=0, text_color="black", font=None):
         """
         Display ``text`` starting at grid (x, y)
 
@@ -423,18 +424,18 @@ class Display(FbMem):
 
         """
 
-        assert 0 <= x < Display.GRID_COLUMNS,\
-            "grid columns must be between 0 and %d, %d was requested" %\
-            ((Display.GRID_COLUMNS - 1, x))
+        assert 0 <= x < Display.GRID_COLUMNS, "grid columns must be between 0 and %d, %d was requested" % (
+            (Display.GRID_COLUMNS - 1, x)
+        )
 
-        assert 0 <= y < Display.GRID_ROWS,\
-            "grid rows must be between 0 and %d, %d was requested" %\
-            ((Display.GRID_ROWS - 1), y)
+        assert 0 <= y < Display.GRID_ROWS, "grid rows must be between 0 and %d, %d was requested" % (
+            (Display.GRID_ROWS - 1),
+            y,
+        )
 
-        return self.text_pixels(text, clear_screen,
-                                x * Display.GRID_COLUMN_PIXELS,
-                                y * Display.GRID_ROW_PIXELS,
-                                text_color, font)
+        return self.text_pixels(
+            text, clear_screen, x * Display.GRID_COLUMN_PIXELS, y * Display.GRID_ROW_PIXELS, text_color, font
+        )
 
     def reset_screen(self):
         self.clear()
