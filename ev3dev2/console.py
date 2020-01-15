@@ -34,7 +34,7 @@ class Console():
 
         Parameter:
 
-        - `font` (string): Font name, as found in `/usr/share/consolefonts/`
+        - ``font`` (string): Font name, as found in ``/usr/share/consolefonts/``
 
         """
         self._font = None
@@ -94,7 +94,7 @@ class Console():
 
     def text_at(self, text, column=1, row=1, reset_console=False, inverse=False, alignment="L"):
         """
-        Display `text` (string) at grid position (`column`, `row`).
+        Display ``text`` (string) at grid position (``column``, ``row``).
         Note that the grid locations are 1-based (not 0-based).
 
         Depending on the font, the number of columns and rows supported by the EV3 LCD console
@@ -102,30 +102,30 @@ class Console():
         44 columns and 21 rows. The default font for the Console() class results in a grid that
         is 14 columns and 5 rows.
 
-        Using the `inverse=True` parameter will display the `text` with more emphasis and contrast,
+        Using the ``inverse=True`` parameter will display the ``text`` with more emphasis and contrast,
         as the background of the text will be black, and the foreground is white. Using inverse
         can help in certain situations, such as to indicate when a color sensor senses
         black, or the gyro sensor is pointing to zero.
 
-        Use the `alignment` parameter to enable the function to align the `text` differently to the
-        column/row values passed-in. Use `L` for left-alignment (default), where the first character
-        in the `text` will show at the column/row position. Use `R` for right-alignment, where the
-        last character will show at the column/row position. Use `C` for center-alignment, where the
+        Use the ``alignment`` parameter to enable the function to align the ``text`` differently to the
+        column/row values passed-in. Use ``L`` for left-alignment (default), where the first character
+        in the ``text`` will show at the column/row position. Use ``R`` for right-alignment, where the
+        last character will show at the column/row position. Use ``C`` for center-alignment, where the
         text string will centered at the column/row position (as close as possible using integer
         division--odd-length text string will center better than even-length).
 
         Parameters:
 
-        - `text` (string): Text to display
-        - `column` (int): LCD column position to start the text (1 = left column);
+        - ``text`` (string): Text to display
+        - ``column`` (int): LCD column position to start the text (1 = left column);
           text will wrap when it reaches the right edge
-        - `row` (int): LCD row position to start the text (1 = top row)
-        - `reset_console` (bool): ``True`` to reset the EV3 LCD console before showing
+        - ``row`` (int): LCD row position to start the text (1 = top row)
+        - ``reset_console`` (bool): ``True`` to reset the EV3 LCD console before showing
           the text; default is ``False``
-        - `inverse` (bool): ``True`` for white on black, otherwise black on white;
+        - ``inverse`` (bool): ``True`` for white on black, otherwise black on white;
           default is ``False``
-        - `alignment` (string): Align the `text` horizontally. Use `L` for left-alignment (default),
-          `R` for right-alignment, or `C` for center-alignment
+        - ``alignment`` (string): Align the ``text`` horizontally. Use ``L`` for left-alignment (default),
+          ``R`` for right-alignment, or ``C`` for center-alignment
 
         """
 
@@ -149,8 +149,8 @@ class Console():
 
         Parameters:
 
-        - `font` (string): Font name, as found in `/usr/share/consolefonts/`
-        - `reset_console` (bool): ``True`` to reset the EV3 LCD console
+        - ``font`` (string): Font name, as found in ``/usr/share/consolefonts/``
+        - ``reset_console`` (bool): ``True`` to reset the EV3 LCD console
           after the font change; default is ``True``
 
         """
@@ -166,13 +166,13 @@ class Console():
 
     def clear_to_eol(self, column=None, row=None):
         """
-        Clear to the end of line from the `column` and `row` position
+        Clear to the end of line from the ``column`` and ``row`` position
         on the EV3 LCD console. Default to current cursor position.
 
         Parameters:
 
-        - `column` (int): LCD column position to move to before clearing
-        - `row` (int): LCD row position to move to before clearing
+        - ``column`` (int): LCD column position to move to before clearing
+        - ``row`` (int): LCD row position to move to before clearing
 
         """
         if column is not None and row is not None:

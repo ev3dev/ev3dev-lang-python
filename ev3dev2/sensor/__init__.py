@@ -124,8 +124,8 @@ class Sensor(Device):
     @property
     def address(self):
         """
-        Returns the name of the port that the sensor is connected to, e.g. `ev3:in1`.
-        I2C sensors also include the I2C address (decimal), e.g. `ev3:in1:i2c8`.
+        Returns the name of the port that the sensor is connected to, e.g. ``ev3:in1``.
+        I2C sensors also include the I2C address (decimal), e.g. ``ev3:in1:i2c8``.
         """
         self._address, value = self.get_attr_string(self._address, 'address')
         return value
@@ -153,7 +153,7 @@ class Sensor(Device):
     @property
     def decimals(self):
         """
-        Returns the number of decimal places for the values in the `value<N>`
+        Returns the number of decimal places for the values in the ``value<N>``
         attributes of the current mode.
         """
         self._decimals, value = self.get_attr_int(self._decimals, 'decimals')
@@ -171,7 +171,7 @@ class Sensor(Device):
     @property
     def mode(self):
         """
-        Returns the current mode. Writing one of the values returned by `modes`
+        Returns the current mode. Writing one of the values returned by ``modes``
         sets the sensor to that mode.
         """
         self._mode, value = self.get_attr_string(self._mode, 'mode')
@@ -192,7 +192,7 @@ class Sensor(Device):
     @property
     def num_values(self):
         """
-        Returns the number of `value<N>` attributes that will return a valid value
+        Returns the number of ``value<N>`` attributes that will return a valid value
         for the current mode.
         """
         self._num_values, value = self.get_attr_int(self._num_values, 'num_values')
@@ -222,27 +222,27 @@ class Sensor(Device):
     @property
     def bin_data_format(self):
         """
-        Returns the format of the values in `bin_data` for the current mode.
+        Returns the format of the values in ``bin_data`` for the current mode.
         Possible values are:
 
-        - `u8`: Unsigned 8-bit integer (byte)
-        - `s8`: Signed 8-bit integer (sbyte)
-        - `u16`: Unsigned 16-bit integer (ushort)
-        - `s16`: Signed 16-bit integer (short)
-        - `s16_be`: Signed 16-bit integer, big endian
-        - `s32`: Signed 32-bit integer (int)
-        - `float`: IEEE 754 32-bit floating point (float)
+        - ``u8``: Unsigned 8-bit integer (byte)
+        - ``s8``: Signed 8-bit integer (sbyte)
+        - ``u16``: Unsigned 16-bit integer (ushort)
+        - ``s16``: Signed 16-bit integer (short)
+        - ``s16_be``: Signed 16-bit integer, big endian
+        - ``s32``: Signed 32-bit integer (int)
+        - ``float``: IEEE 754 32-bit floating point (float)
         """
         self._bin_data_format, value = self.get_attr_string(self._bin_data_format, 'bin_data_format')
         return value
 
     def bin_data(self, fmt=None):
         """
-        Returns the unscaled raw values in the `value<N>` attributes as raw byte
-        array. Use `bin_data_format`, `num_values` and the individual sensor
+        Returns the unscaled raw values in the ``value<N>`` attributes as raw byte
+        array. Use ``bin_data_format``, ``num_values`` and the individual sensor
         documentation to determine how to interpret the data.
 
-        Use `fmt` to unpack the raw bytes into a struct.
+        Use ``fmt`` to unpack the raw bytes into a struct.
 
         Example::
 
