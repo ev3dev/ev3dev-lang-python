@@ -1,4 +1,3 @@
-
 """
 This program is used to find the kp, ki, kd PID values for
 ``MoveTank.follow_line()``. These values vary from robot to robot, the best way
@@ -53,7 +52,9 @@ def find_kp_ki_kd(tank, start, end, increment, speed, kx_to_tweak, kp, ki, kd):
         try:
             if kx_to_tweak == "kp":
                 tank.follow_line(
-                    kp=kx, ki=ki, kd=kd,
+                    kp=kx,
+                    ki=ki,
+                    kd=kd,
                     speed=speed,
                     follow_for=follow_for_ms,
                     ms=10000,
@@ -61,7 +62,9 @@ def find_kp_ki_kd(tank, start, end, increment, speed, kx_to_tweak, kp, ki, kd):
 
             elif kx_to_tweak == "ki":
                 tank.follow_line(
-                    kp=kp, ki=kx, kd=kd,
+                    kp=kp,
+                    ki=kx,
+                    kd=kd,
                     speed=speed,
                     follow_for=follow_for_ms,
                     ms=10000,
@@ -69,7 +72,9 @@ def find_kp_ki_kd(tank, start, end, increment, speed, kx_to_tweak, kp, ki, kd):
 
             elif kx_to_tweak == "kd":
                 tank.follow_line(
-                    kp=kp, ki=ki, kd=kx,
+                    kp=kp,
+                    ki=ki,
+                    kd=kx,
                     speed=speed,
                     follow_for=follow_for_ms,
                     ms=10000,
@@ -102,8 +107,7 @@ def find_kp_ki_kd(tank, start, end, increment, speed, kx_to_tweak, kp, ki, kd):
 if __name__ == "__main__":
 
     # logging
-    logging.basicConfig(level=logging.DEBUG,
-                        format="%(asctime)s %(levelname)5s: %(message)s")
+    logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)5s: %(message)s")
     log = logging.getLogger(__name__)
 
     tank = MoveTank(OUTPUT_A, OUTPUT_B)

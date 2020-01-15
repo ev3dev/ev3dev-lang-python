@@ -21,7 +21,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # -----------------------------------------------------------------------------
-
 """
 An assortment of classes modeling specific features of the BrickPi.
 """
@@ -46,11 +45,11 @@ LEDS['blue_led1'] = 'led1:blue:brick-status'
 LEDS['blue_led2'] = 'led2:blue:brick-status'
 
 LED_GROUPS = OrderedDict()
-LED_GROUPS['LED1'] = ('blue_led1',)
-LED_GROUPS['LED2'] = ('blue_led2',)
+LED_GROUPS['LED1'] = ('blue_led1', )
+LED_GROUPS['LED2'] = ('blue_led2', )
 
 LED_COLORS = OrderedDict()
-LED_COLORS['BLACK'] = (0,)
-LED_COLORS['BLUE'] = (1,)
+LED_COLORS['BLACK'] = (0, )
+LED_COLORS['BLUE'] = (1, )
 
 LED_DEFAULT_COLOR = 'BLUE'

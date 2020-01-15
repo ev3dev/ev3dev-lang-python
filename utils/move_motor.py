@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """
 Used to adjust the position of a motor in an already assembled robot
 where you can"t move the motor by hand.
@@ -18,8 +17,7 @@ parser.add_argument("-s", "--speed", type=int, default=50)
 args = parser.parse_args()
 
 # logging
-logging.basicConfig(level=logging.INFO,
-                    format="%(asctime)s %(levelname)5s: %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)5s: %(message)s")
 log = logging.getLogger(__name__)
 
 if args.motor == "A":
@@ -36,6 +34,4 @@ else:
 if args.degrees:
     log.info("Motor %s, current position %d, move to position %d, max speed %d" %
              (args.motor, motor.position, args.degrees, motor.max_speed))
-    motor.run_to_rel_pos(speed_sp=args.speed,
-                         position_sp=args.degrees,
-                         stop_action='hold')
+    motor.run_to_rel_pos(speed_sp=args.speed, position_sp=args.degrees, stop_action='hold')

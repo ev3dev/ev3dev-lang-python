@@ -3,6 +3,7 @@ import os, sys
 
 pyver = sys.version_info
 
+
 #----------------------------------------------------------------------------
 # Get version string from git
 #
@@ -14,8 +15,7 @@ pyver = sys.version_info
 #----------------------------------------------------------------------------
 def call_git_describe(abbrev=4):
     try:
-        p = Popen(['git', 'describe', '--exclude', 'ev3dev-*', '--abbrev=%d' % abbrev],
-                  stdout=PIPE, stderr=PIPE)
+        p = Popen(['git', 'describe', '--exclude', 'ev3dev-*', '--abbrev=%d' % abbrev], stdout=PIPE, stderr=PIPE)
         p.stderr.close()
         line = p.stdout.readlines()[0]
         return line.strip().decode('utf8')
@@ -42,7 +42,7 @@ def pep386adapt(version):
     # adapt git-describe version to be in line with PEP 386
     parts = version.split('-')
     if len(parts) > 1:
-        parts[-2] = 'post'+parts[-2]
+        parts[-2] = 'post' + parts[-2]
         version = '.'.join(parts[:-1])
     return version
 
@@ -77,4 +77,3 @@ def git_version(abbrev=4):
 
     # Finally, return the current version.
     return version
-

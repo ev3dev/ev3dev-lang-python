@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """
 Wheel and Rim classes
 
@@ -28,7 +27,6 @@ class Wheel(object):
         # calculate the number of rotations needed to travel forward 500 mm
         rotations_for_500mm = 500 / tire.circumference_mm
     """
-
     def __init__(self, diameter_mm, width_mm):
         self.diameter_mm = float(diameter_mm)
         self.width_mm = float(width_mm)
@@ -53,7 +51,6 @@ class EV3Tire(Wheel):
     part number 44309
     comes in set 31313
     """
-
     def __init__(self):
         Wheel.__init__(self, 43.2, 21)
 
@@ -63,7 +60,6 @@ class EV3EducationSetRim(Wheel):
     part number 56908
     comes in set 45544
     """
-
     def __init__(self):
         Wheel.__init__(self, 43, 26)
 
@@ -73,6 +69,5 @@ class EV3EducationSetTire(Wheel):
     part number 41897
     comes in set 45544
     """
-
     def __init__(self):
         Wheel.__init__(self, 56, 28)

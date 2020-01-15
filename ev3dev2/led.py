@@ -25,7 +25,7 @@
 
 import sys
 
-if sys.version_info < (3,4):
+if sys.version_info < (3, 4):
     raise SystemError('Must be using Python 3.4 or higher')
 
 import os
@@ -72,18 +72,16 @@ class Led(Device):
     SYSTEM_CLASS_NAME = 'leds'
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
     __slots__ = [
-    '_max_brightness',
-    '_brightness',
-    '_triggers',
-    '_trigger',
-    '_delay_on',
-    '_delay_off',
-    'desc',
+        '_max_brightness',
+        '_brightness',
+        '_triggers',
+        '_trigger',
+        '_delay_on',
+        '_delay_off',
+        'desc',
     ]
 
-    def __init__(self,
-                 name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False,
-                 desc=None, **kwargs):
+    def __init__(self, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, desc=None, **kwargs):
         self.desc = desc
         super(Led, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
         self._max_brightness = None
@@ -271,7 +269,6 @@ class Led(Device):
 
 
 class Leds(object):
-
     def __init__(self):
         self.leds = OrderedDict()
         self.led_groups = OrderedDict()
@@ -385,7 +382,14 @@ class Leds(object):
             while self.animate_thread_id:
                 pass
 
-    def animate_police_lights(self, color1, color2, group1='LEFT', group2='RIGHT', sleeptime=0.5, duration=5, block=True):
+    def animate_police_lights(self,
+                              color1,
+                              color2,
+                              group1='LEFT',
+                              group2='RIGHT',
+                              sleeptime=0.5,
+                              duration=5,
+                              block=True):
         """
         Cycle the ``group1`` and ``group2`` LEDs between ``color1`` and ``color2``
         to give the effect of police lights.  Alternate the ``group1`` and ``group2``
@@ -401,7 +405,6 @@ class Leds(object):
             leds = Leds()
             leds.animate_police_lights('RED', 'GREEN', sleeptime=0.75, duration=10)
         """
-
         def _animate_police_lights():
             self.all_off()
             even = True
@@ -447,7 +450,6 @@ class Leds(object):
             leds = Leds()
             leds.animate_flash('AMBER', sleeptime=0.75, duration=10)
         """
-
         def _animate_flash():
             even = True
             duration_ms = duration * 1000 if duration is not None else None
@@ -537,7 +539,6 @@ class Leds(object):
             leds = Leds()
             leds.animate_rainbow()
         """
-
         def _animate_rainbow():
             # state 0: (LEFT,RIGHT) from (0,0) to (1,0)...RED
             # state 1: (LEFT,RIGHT) from (1,0) to (1,1)...AMBER

@@ -25,7 +25,7 @@
 
 import sys
 
-if sys.version_info < (3,4):
+if sys.version_info < (3, 4):
     raise SystemError('Must be using Python 3.4 or higher')
 
 from ev3dev2.stopwatch import StopWatch
@@ -64,7 +64,6 @@ class MissingButton(Exception):
 
 
 class ButtonCommon(object):
-
     def __str__(self):
         return self.__class__.__name__
 
@@ -213,12 +212,10 @@ if is_micropython():
     if platform not in ("ev3", "fake"):
         raise Exception("micropython button support has not been implemented for '%s'" % platform)
 
-
     def _test_bit(buf, index):
         byte = buf[int(index >> 3)]
         bit = byte & (1 << (index % 8))
         return bool(bit)
-
 
     class ButtonBase(ButtonCommon):
         pass
@@ -241,12 +238,12 @@ if is_micropython():
         _BUTTON_DEV = '/dev/input/by-path/platform-gpio_keys-event'
 
         _BUTTON_TO_STRING = {
-            UP : "up",
-            DOWN : "down",
-            LEFT : "left",
-            RIGHT : "right",
-            ENTER : "enter",
-            BACK : "backspace",
+            UP: "up",
+            DOWN: "down",
+            LEFT: "left",
+            RIGHT: "right",
+            ENTER: "enter",
+            BACK: "backspace",
         }
 
         # stuff from linux/input.h and linux/input-event-codes.h
@@ -285,10 +282,14 @@ if is_micropython():
             # with the name of a single button.  If it is a string of a single
             # button convert that to a list.
             if isinstance(wait_for_button_press, str):
-                wait_for_button_press = [wait_for_button_press, ]
+                wait_for_button_press = [
+                    wait_for_button_press,
+                ]
 
             if isinstance(wait_for_button_release, str):
-                wait_for_button_release = [wait_for_button_release, ]
+                wait_for_button_release = [
+                    wait_for_button_release,
+                ]
 
             while True:
                 all_pressed = True
@@ -311,6 +312,7 @@ if is_micropython():
                 if timeout_ms is not None and stopwatch.value_ms >= timeout_ms:
                     return False
 
+
 # python3 implementation
 else:
     import array
@@ -330,7 +332,6 @@ else:
         import evdev
     except ImportError:
         log.warning(library_load_warning_message("evdev", "Button"))
-
 
     class ButtonBase(ButtonCommon):
         """
@@ -355,7 +356,6 @@ else:
             for event in self.evdev_device.read_loop():
                 if event.type == evdev.ecodes.EV_KEY:
                     self.process()
-
 
     class ButtonEVIO(ButtonBase):
         """
@@ -420,10 +420,14 @@ else:
             # with the name of a single button.  If it is a string of a single
             # button convert that to a list.
             if isinstance(wait_for_button_press, str):
-                wait_for_button_press = [wait_for_button_press, ]
+                wait_for_button_press = [
+                    wait_for_button_press,
+                ]
 
             if isinstance(wait_for_button_release, str):
-                wait_for_button_release = [wait_for_button_release, ]
+                wait_for_button_release = [
+                    wait_for_button_release,
+                ]
 
             for event in self.evdev_device.read_loop():
                 if event.type == evdev.ecodes.EV_KEY:
@@ -447,18 +451,35 @@ else:
                     if timeout_ms is not None and stopwatch.value_ms >= timeout_ms:
                         return False
 
-
     class Button(ButtonEVIO, EV3ButtonCommon):
         """
         EV3 Buttons
         """
 
         _buttons = {
-            'up': {'name': BUTTONS_FILENAME, 'value': 103},
-            'down': {'name': BUTTONS_FILENAME, 'value': 108},
-            'left': {'name': BUTTONS_FILENAME, 'value': 105},
-            'right': {'name': BUTTONS_FILENAME, 'value': 106},
-            'enter': {'name': BUTTONS_FILENAME, 'value': 28},
-            'backspace': {'name': BUTTONS_FILENAME, 'value': 14},
+            'up': {
+                'name': BUTTONS_FILENAME,
+                'value': 103
+            },
+            'down': {
+                'name': BUTTONS_FILENAME,
+                'value': 108
+            },
+            'left': {
+                'name': BUTTONS_FILENAME,
+                'value': 105
+            },
+            'right': {
+                'name': BUTTONS_FILENAME,
+                'value': 106
+            },
+            'enter': {
+                'name': BUTTONS_FILENAME,
+                'value': 28
+            },
+            'backspace': {
+                'name': BUTTONS_FILENAME,
+                'value': 14
+            },
         }
         evdev_device_name = EVDEV_DEVICE_NAME
