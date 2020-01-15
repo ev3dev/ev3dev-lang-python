@@ -70,14 +70,14 @@ class StopWatch(object):
         """
         self._start_time = None
         self._stopped_total_time = None
-    
+
     def restart(self):
         """
         Resets and then starts the timer.
         """
         self.reset()
         self.start()
-    
+
     @property
     def is_started(self):
         """
