@@ -2292,13 +2292,13 @@ class MoveTank(MotorSet):
 
     def turn_right(self, speed, degrees, brake=True, error_margin=2, sleep_time=0.01):
         """
-        Rotate clockwise `degrees` in place
+        Rotate clockwise ``degrees`` in place
         """
         self.turn_degrees(speed, abs(degrees), brake, error_margin, sleep_time)
 
     def turn_left(self, speed, degrees, brake=True, error_margin=2, sleep_time=0.01):
         """
-        Rotate counter-clockwise `degrees` in place
+        Rotate counter-clockwise ``degrees`` in place
         """
         self.turn_degrees(speed, abs(degrees) * -1, brake, error_margin, sleep_time)
 
@@ -2642,19 +2642,19 @@ class MoveDifferential(MoveTank):
 
     def turn_right(self, speed, degrees, brake=True, block=True, error_margin=2, use_gyro=False):
         """
-        Rotate clockwise `degrees` in place
+        Rotate clockwise ``degrees`` in place
         """
         self.turn_degrees(speed, abs(degrees), brake, block, error_margin, use_gyro)
 
     def turn_left(self, speed, degrees, brake=True, block=True, error_margin=2, use_gyro=False):
         """
-        Rotate counter-clockwise `degrees` in place
+        Rotate counter-clockwise ``degrees`` in place
         """
         self.turn_degrees(speed, abs(degrees) * -1, brake, block, error_margin, use_gyro)
 
     def turn_to_angle(self, speed, angle_target_degrees, brake=True, block=True, error_margin=2, use_gyro=False):
         """
-        Rotate in place to `angle_target_degrees` at `speed`
+        Rotate in place to ``angle_target_degrees`` at ``speed``
         """
         if not self.odometry_thread_run:
             raise ThreadNotRunning("odometry_start() must be called to track robot coordinates")
@@ -2804,7 +2804,7 @@ class MoveJoystick(MoveTank):
 
     def on(self, x, y, radius=100.0):
         """
-        Convert x,y joystick coordinates to left/right motor speed percentages
+        Convert ``x``,``y`` joystick coordinates to left/right motor speed percentages
         and move the motors.
 
         This will use a classic "arcade drive" algorithm: a full-forward joystick
@@ -2813,11 +2813,11 @@ class MoveJoystick(MoveTank):
         Positions in the middle will control how fast the vehicle moves and how
         sharply it turns.
 
-        "x", "y":
+        ``x``, ``y``:
             The X and Y coordinates of the joystick's position, with
             (0,0) representing the center position. X is horizontal and Y is vertical.
 
-        radius (default 100):
+        ``radius`` (default 100):
             The radius of the joystick, controlling the range of the input (x, y) values.
             e.g. if "x" and "y" can be between -1 and 1, radius should be set to "1".
         """
