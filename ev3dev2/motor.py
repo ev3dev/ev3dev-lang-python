@@ -265,7 +265,7 @@ class Motor(Device):
     The motor class provides a uniform interface for using motors with
     positional and directional feedback such as the EV3 and NXT motors.
     This feedback allows for precise control of the motors. This is the
-    most common type of motor, so we just call it `motor`.
+    most common type of motor, so we just call it ``motor``.
     """
 
     SYSTEM_CLASS_NAME = 'tacho-motor'
@@ -309,27 +309,27 @@ class Motor(Device):
     #: Run the motor until another command is sent.
     COMMAND_RUN_FOREVER = 'run-forever'
 
-    #: Run to an absolute position specified by `position_sp` and then
-    #: stop using the action specified in `stop_action`.
+    #: Run to an absolute position specified by ``position_sp`` and then
+    #: stop using the action specified in ``stop_action``.
     COMMAND_RUN_TO_ABS_POS = 'run-to-abs-pos'
 
-    #: Run to a position relative to the current `position` value.
-    #: The new position will be current `position` + `position_sp`.
+    #: Run to a position relative to the current ``position`` value.
+    #: The new position will be current ``position`` + ``position_sp``.
     #: When the new position is reached, the motor will stop using
-    #: the action specified by `stop_action`.
+    #: the action specified by ``stop_action``.
     COMMAND_RUN_TO_REL_POS = 'run-to-rel-pos'
 
-    #: Run the motor for the amount of time specified in `time_sp`
-    #: and then stop the motor using the action specified by `stop_action`.
+    #: Run the motor for the amount of time specified in ``time_sp``
+    #: and then stop the motor using the action specified by ``stop_action``.
     COMMAND_RUN_TIMED = 'run-timed'
 
-    #: Run the motor at the duty cycle specified by `duty_cycle_sp`.
-    #: Unlike other run commands, changing `duty_cycle_sp` while running *will*
+    #: Run the motor at the duty cycle specified by ``duty_cycle_sp``.
+    #: Unlike other run commands, changing ``duty_cycle_sp`` while running *will*
     #: take effect immediately.
     COMMAND_RUN_DIRECT = 'run-direct'
 
     #: Stop any of the run commands before they are complete using the
-    #: action specified by `stop_action`.
+    #: action specified by ``stop_action``.
     COMMAND_STOP = 'stop'
 
     #: Reset all of the motor parameter attributes to their default value.
@@ -342,11 +342,11 @@ class Motor(Device):
     #: Sets the inversed polarity of the rotary encoder.
     ENCODER_POLARITY_INVERSED = 'inversed'
 
-    #: With `normal` polarity, a positive duty cycle will
+    #: With ``normal`` polarity, a positive duty cycle will
     #: cause the motor to rotate clockwise.
     POLARITY_NORMAL = 'normal'
 
-    #: With `inversed` polarity, a positive duty cycle will
+    #: With ``inversed`` polarity, a positive duty cycle will
     #: cause the motor to rotate counter-clockwise.
     POLARITY_INVERSED = 'inversed'
 
@@ -359,7 +359,7 @@ class Motor(Device):
     #: The motor is not turning, but rather attempting to hold a fixed position.
     STATE_HOLDING = 'holding'
 
-    #: The motor is turning, but cannot reach its `speed_sp`.
+    #: The motor is turning, but cannot reach its ``speed_sp``.
     STATE_OVERLOADED = 'overloaded'
 
     #: The motor is not turning when it should be.
@@ -376,7 +376,7 @@ class Motor(Device):
 
     #: Does not remove power from the motor. Instead it actively try to hold the motor
     #: at the current position. If an external force tries to turn the motor, the motor
-    #: will `push back` to maintain its position.
+    #: will ``push back`` to maintain its position.
     STOP_ACTION_HOLD = 'hold'
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
@@ -432,7 +432,7 @@ class Motor(Device):
     @property
     def command(self):
         """
-        Sends a command to the motor controller. See `commands` for a list of
+        Sends a command to the motor controller. See ``commands`` for a list of
         possible values.
         """
         raise Exception("command is a write-only property!")
@@ -445,23 +445,23 @@ class Motor(Device):
     def commands(self):
         """
         Returns a list of commands that are supported by the motor
-        controller. Possible values are `run-forever`, `run-to-abs-pos`, `run-to-rel-pos`,
-        `run-timed`, `run-direct`, `stop` and `reset`. Not all commands may be supported.
+        controller. Possible values are ``run-forever``, ``run-to-abs-pos``, ``run-to-rel-pos``,
+        ``run-timed``, ``run-direct``, ``stop`` and ``reset``. Not all commands may be supported.
 
-        - `run-forever` will cause the motor to run until another command is sent.
-        - `run-to-abs-pos` will run to an absolute position specified by `position_sp`
-          and then stop using the action specified in `stop_action`.
-        - `run-to-rel-pos` will run to a position relative to the current `position` value.
-          The new position will be current `position` + `position_sp`. When the new
-          position is reached, the motor will stop using the action specified by `stop_action`.
-        - `run-timed` will run the motor for the amount of time specified in `time_sp`
-          and then stop the motor using the action specified by `stop_action`.
-        - `run-direct` will run the motor at the duty cycle specified by `duty_cycle_sp`.
-          Unlike other run commands, changing `duty_cycle_sp` while running *will*
+        - ``run-forever`` will cause the motor to run until another command is sent.
+        - ``run-to-abs-pos`` will run to an absolute position specified by ``position_sp``
+          and then stop using the action specified in ``stop_action``.
+        - ``run-to-rel-pos`` will run to a position relative to the current ``position`` value.
+          The new position will be current ``position`` + ``position_sp``. When the new
+          position is reached, the motor will stop using the action specified by ``stop_action``.
+        - ``run-timed`` will run the motor for the amount of time specified in ``time_sp``
+          and then stop the motor using the action specified by ``stop_action``.
+        - ``run-direct`` will run the motor at the duty cycle specified by ``duty_cycle_sp``.
+          Unlike other run commands, changing ``duty_cycle_sp`` while running *will*
           take effect immediately.
-        - `stop` will stop any of the run commands before they are complete using the
-          action specified by `stop_action`.
-        - `reset` will reset all of the motor parameter attributes to their default value.
+        - ``stop`` will stop any of the run commands before they are complete using the
+          action specified by ``stop_action``.
+        - ``reset`` will reset all of the motor parameter attributes to their default value.
           This will also have the effect of stopping the motor.
         """
         (self._commands, value) = self.get_cached_attr_set(self._commands, 'commands')
@@ -522,7 +522,7 @@ class Motor(Device):
     def full_travel_count(self):
         """
         Returns the number of tacho counts in the full travel of the motor. When
-        combined with the `count_per_m` atribute, you can use this value to
+        combined with the ``count_per_m`` atribute, you can use this value to
         calculate the maximum travel distance of the motor. (linear motors only)
         """
         (self._full_travel_count, value) = self.get_cached_attr_int(self._full_travel_count, 'full_travel_count')
@@ -531,10 +531,10 @@ class Motor(Device):
     @property
     def polarity(self):
         """
-        Sets the polarity of the motor. With `normal` polarity, a positive duty
-        cycle will cause the motor to rotate clockwise. With `inversed` polarity,
+        Sets the polarity of the motor. With ``normal`` polarity, a positive duty
+        cycle will cause the motor to rotate clockwise. With ``inversed`` polarity,
         a positive duty cycle will cause the motor to rotate counter-clockwise.
-        Valid values are `normal` and `inversed`.
+        Valid values are ``normal`` and ``inversed``.
         """
         self._polarity, value = self.get_attr_string(self._polarity, 'polarity')
         return value
@@ -597,9 +597,9 @@ class Motor(Device):
     @property
     def position_sp(self):
         """
-        Writing specifies the target position for the `run-to-abs-pos` and `run-to-rel-pos`
+        Writing specifies the target position for the ``run-to-abs-pos`` and ``run-to-rel-pos``
         commands. Reading returns the current value. Units are in tacho counts. You
-        can use the value returned by `count_per_rot` to convert tacho counts to/from
+        can use the value returned by ``count_per_rot`` to convert tacho counts to/from
         rotations or degrees.
         """
         self._position_sp, value = self.get_attr_int(self._position_sp, 'position_sp')
@@ -612,7 +612,7 @@ class Motor(Device):
     @property
     def max_speed(self):
         """
-        Returns the maximum value that is accepted by the `speed_sp` attribute. This
+        Returns the maximum value that is accepted by the ``speed_sp`` attribute. This
         may be slightly different than the maximum speed that a particular motor can
         reach - it's the maximum theoretical speed.
         """
@@ -623,7 +623,7 @@ class Motor(Device):
     def speed(self):
         """
         Returns the current motor speed in tacho counts per second. Note, this is
-        not necessarily degrees (although it is for LEGO motors). Use the `count_per_rot`
+        not necessarily degrees (although it is for LEGO motors). Use the ``count_per_rot``
         attribute to convert this value to RPM or deg/sec.
         """
         self._speed, value = self.get_attr_int(self._speed, 'speed')
@@ -632,11 +632,11 @@ class Motor(Device):
     @property
     def speed_sp(self):
         """
-        Writing sets the target speed in tacho counts per second used for all `run-*`
-        commands except `run-direct`. Reading returns the current value. A negative
-        value causes the motor to rotate in reverse with the exception of `run-to-*-pos`
-        commands where the sign is ignored. Use the `count_per_rot` attribute to convert
-        RPM or deg/sec to tacho counts per second. Use the `count_per_m` attribute to
+        Writing sets the target speed in tacho counts per second used for all ``run-*``
+        commands except ``run-direct``. Reading returns the current value. A negative
+        value causes the motor to rotate in reverse with the exception of ``run-to-*-pos``
+        commands where the sign is ignored. Use the ``count_per_rot`` attribute to convert
+        RPM or deg/sec to tacho counts per second. Use the ``count_per_m`` attribute to
         convert m/s to tacho counts per second.
         """
         self._speed_sp, value = self.get_attr_int(self._speed_sp, 'speed_sp')
@@ -651,9 +651,9 @@ class Motor(Device):
         """
         Writing sets the ramp up setpoint. Reading returns the current value. Units
         are in milliseconds and must be positive. When set to a non-zero value, the
-        motor speed will increase from 0 to 100% of `max_speed` over the span of this
+        motor speed will increase from 0 to 100% of ``max_speed`` over the span of this
         setpoint. The actual ramp time is the ratio of the difference between the
-        `speed_sp` and the current `speed` and max_speed multiplied by `ramp_up_sp`.
+        ``speed_sp`` and the current ``speed`` and max_speed multiplied by ``ramp_up_sp``.
         """
         self._ramp_up_sp, value = self.get_attr_int(self._ramp_up_sp, 'ramp_up_sp')
         return value
@@ -667,9 +667,9 @@ class Motor(Device):
         """
         Writing sets the ramp down setpoint. Reading returns the current value. Units
         are in milliseconds and must be positive. When set to a non-zero value, the
-        motor speed will decrease from 0 to 100% of `max_speed` over the span of this
+        motor speed will decrease from 0 to 100% of ``max_speed`` over the span of this
         setpoint. The actual ramp time is the ratio of the difference between the
-        `speed_sp` and the current `speed` and max_speed multiplied by `ramp_down_sp`.
+        ``speed_sp`` and the current ``speed`` and max_speed multiplied by ``ramp_down_sp``.
         """
         self._ramp_down_sp, value = self.get_attr_int(self._ramp_down_sp, 'ramp_down_sp')
         return value
@@ -718,7 +718,7 @@ class Motor(Device):
     def state(self):
         """
         Reading returns a list of state flags. Possible flags are
-        `running`, `ramping`, `holding`, `overloaded` and `stalled`.
+        ``running``, ``ramping``, ``holding``, ``overloaded`` and ``stalled``.
         """
         self._state, value = self.get_attr_set(self._state, 'state')
         return value
@@ -727,9 +727,9 @@ class Motor(Device):
     def stop_action(self):
         """
         Reading returns the current stop action. Writing sets the stop action.
-        The value determines the motors behavior when `command` is set to `stop`.
+        The value determines the motors behavior when ``command`` is set to ``stop``.
         Also, it determines the motors behavior when a run command completes. See
-        `stop_actions` for a list of possible values.
+        ``stop_actions`` for a list of possible values.
         """
         self._stop_action, value = self.get_attr_string(self._stop_action, 'stop_action')
         return value
@@ -742,12 +742,12 @@ class Motor(Device):
     def stop_actions(self):
         """
         Returns a list of stop actions supported by the motor controller.
-        Possible values are `coast`, `brake` and `hold`. `coast` means that power will
-        be removed from the motor and it will freely coast to a stop. `brake` means
+        Possible values are ``coast``, ``brake`` and ``hold``. ``coast`` means that power will
+        be removed from the motor and it will freely coast to a stop. ``brake`` means
         that power will be removed from the motor and a passive electrical load will
         be placed on the motor. This is usually done by shorting the motor terminals
         together. This load will absorb the energy from the rotation of the motors and
-        cause the motor to stop more quickly than coasting. `hold` does not remove
+        cause the motor to stop more quickly than coasting. ``hold`` does not remove
         power from the motor. Instead it actively tries to hold the motor at the current
         position. If an external force tries to turn the motor, the motor will 'push
         back' to maintain its position.
@@ -759,7 +759,7 @@ class Motor(Device):
     def time_sp(self):
         """
         Writing specifies the amount of time the motor will run when using the
-        `run-timed` command. Reading returns the current value. Units are in
+        ``run-timed`` command. Reading returns the current value. Units are in
         milliseconds.
         """
         self._time_sp, value = self.get_attr_int(self._time_sp, 'time_sp')
@@ -779,8 +779,8 @@ class Motor(Device):
 
     def run_to_abs_pos(self, **kwargs):
         """
-        Run to an absolute position specified by `position_sp` and then
-        stop using the action specified in `stop_action`.
+        Run to an absolute position specified by ``position_sp`` and then
+        stop using the action specified in ``stop_action``.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -788,10 +788,10 @@ class Motor(Device):
 
     def run_to_rel_pos(self, **kwargs):
         """
-        Run to a position relative to the current `position` value.
-        The new position will be current `position` + `position_sp`.
+        Run to a position relative to the current ``position`` value.
+        The new position will be current ``position`` + ``position_sp``.
         When the new position is reached, the motor will stop using
-        the action specified by `stop_action`.
+        the action specified by ``stop_action``.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -799,8 +799,8 @@ class Motor(Device):
 
     def run_timed(self, **kwargs):
         """
-        Run the motor for the amount of time specified in `time_sp`
-        and then stop the motor using the action specified by `stop_action`.
+        Run the motor for the amount of time specified in ``time_sp``
+        and then stop the motor using the action specified by ``stop_action``.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -808,8 +808,8 @@ class Motor(Device):
 
     def run_direct(self, **kwargs):
         """
-        Run the motor at the duty cycle specified by `duty_cycle_sp`.
-        Unlike other run commands, changing `duty_cycle_sp` while running *will*
+        Run the motor at the duty cycle specified by ``duty_cycle_sp``.
+        Unlike other run commands, changing ``duty_cycle_sp`` while running *will*
         take effect immediately.
         """
         for key in kwargs:
@@ -819,7 +819,7 @@ class Motor(Device):
     def stop(self, **kwargs):
         """
         Stop any of the run commands before they are complete using the
-        action specified by `stop_action`.
+        action specified by ``stop_action``.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -858,7 +858,7 @@ class Motor(Device):
     @property
     def is_overloaded(self):
         """
-        The motor is turning, but cannot reach its `speed_sp`.
+        The motor is turning, but cannot reach its ``speed_sp``.
         """
         return self.STATE_OVERLOADED in self.state
 
@@ -1055,8 +1055,8 @@ class Motor(Device):
         ``speed`` can be a percentage or a :class:`ev3dev2.motor.SpeedValue`
         object, enabling use of other units.
 
-        Note that `block` is False by default, this is different from the
-        other `on_for_XYZ` methods.
+        Note that ``block`` is False by default, this is different from the
+        other ``on_for_XYZ`` methods.
         """
         speed = self._speed_native_units(speed)
         self.speed_sp = int(round(speed))
@@ -1224,9 +1224,9 @@ class DcMotor(Device):
     @property
     def command(self):
         """
-        Sets the command for the motor. Possible values are `run-forever`, `run-timed` and
-        `stop`. Not all commands may be supported, so be sure to check the contents
-        of the `commands` attribute.
+        Sets the command for the motor. Possible values are ``run-forever``, ``run-timed`` and
+        ``stop``. Not all commands may be supported, so be sure to check the contents
+        of the ``commands`` attribute.
         """
         raise Exception("command is a write-only property!")
 
@@ -1278,7 +1278,7 @@ class DcMotor(Device):
     @property
     def polarity(self):
         """
-        Sets the polarity of the motor. Valid values are `normal` and `inversed`.
+        Sets the polarity of the motor. Valid values are ``normal`` and ``inversed``.
         """
         self._polarity, value = self.get_attr_string(self._polarity, 'polarity')
         return value
@@ -1317,9 +1317,9 @@ class DcMotor(Device):
     def state(self):
         """
         Gets a list of flags indicating the motor status. Possible
-        flags are `running` and `ramping`. `running` indicates that the motor is
-        powered. `ramping` indicates that the motor has not yet reached the
-        `duty_cycle_sp`.
+        flags are ``running`` and ``ramping``. ``running`` indicates that the motor is
+        powered. ``ramping`` indicates that the motor has not yet reached the
+        ``duty_cycle_sp``.
         """
         self._state, value = self.get_attr_set(self._state, 'state')
         return value
@@ -1328,7 +1328,7 @@ class DcMotor(Device):
     def stop_action(self):
         """
         Sets the stop action that will be used when the motor stops. Read
-        `stop_actions` to get the list of valid values.
+        ``stop_actions`` to get the list of valid values.
         """
         raise Exception("stop_action is a write-only property!")
 
@@ -1339,8 +1339,8 @@ class DcMotor(Device):
     @property
     def stop_actions(self):
         """
-        Gets a list of stop actions. Valid values are `coast`
-        and `brake`.
+        Gets a list of stop actions. Valid values are ``coast``
+        and ``brake``.
         """
         self._stop_actions, value = self.get_attr_set(self._stop_actions, 'stop_actions')
         return value
@@ -1349,7 +1349,7 @@ class DcMotor(Device):
     def time_sp(self):
         """
         Writing specifies the amount of time the motor will run when using the
-        `run-timed` command. Reading returns the current value. Units are in
+        ``run-timed`` command. Reading returns the current value. Units are in
         milliseconds.
         """
         self._time_sp, value = self.get_attr_int(self._time_sp, 'time_sp')
@@ -1362,24 +1362,24 @@ class DcMotor(Device):
     #: Run the motor until another command is sent.
     COMMAND_RUN_FOREVER = 'run-forever'
 
-    #: Run the motor for the amount of time specified in `time_sp`
-    #: and then stop the motor using the action specified by `stop_action`.
+    #: Run the motor for the amount of time specified in ``time_sp``
+    #: and then stop the motor using the action specified by ``stop_action``.
     COMMAND_RUN_TIMED = 'run-timed'
 
-    #: Run the motor at the duty cycle specified by `duty_cycle_sp`.
-    #: Unlike other run commands, changing `duty_cycle_sp` while running *will*
+    #: Run the motor at the duty cycle specified by ``duty_cycle_sp``.
+    #: Unlike other run commands, changing ``duty_cycle_sp`` while running *will*
     #: take effect immediately.
     COMMAND_RUN_DIRECT = 'run-direct'
 
     #: Stop any of the run commands before they are complete using the
-    #: action specified by `stop_action`.
+    #: action specified by ``stop_action``.
     COMMAND_STOP = 'stop'
 
-    #: With `normal` polarity, a positive duty cycle will
+    #: With ``normal`` polarity, a positive duty cycle will
     #: cause the motor to rotate clockwise.
     POLARITY_NORMAL = 'normal'
 
-    #: With `inversed` polarity, a positive duty cycle will
+    #: With ``inversed`` polarity, a positive duty cycle will
     #: cause the motor to rotate counter-clockwise.
     POLARITY_INVERSED = 'inversed'
 
@@ -1402,8 +1402,8 @@ class DcMotor(Device):
 
     def run_timed(self, **kwargs):
         """
-        Run the motor for the amount of time specified in `time_sp`
-        and then stop the motor using the action specified by `stop_action`.
+        Run the motor for the amount of time specified in ``time_sp``
+        and then stop the motor using the action specified by ``stop_action``.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -1411,8 +1411,8 @@ class DcMotor(Device):
 
     def run_direct(self, **kwargs):
         """
-        Run the motor at the duty cycle specified by `duty_cycle_sp`.
-        Unlike other run commands, changing `duty_cycle_sp` while running *will*
+        Run the motor at the duty cycle specified by ``duty_cycle_sp``.
+        Unlike other run commands, changing ``duty_cycle_sp`` while running *will*
         take effect immediately.
         """
         for key in kwargs:
@@ -1422,7 +1422,7 @@ class DcMotor(Device):
     def stop(self, **kwargs):
         """
         Stop any of the run commands before they are complete using the
-        action specified by `stop_action`.
+        action specified by ``stop_action``.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -1479,9 +1479,9 @@ class ServoMotor(Device):
     @property
     def command(self):
         """
-        Sets the command for the servo. Valid values are `run` and `float`. Setting
-        to `run` will cause the servo to be driven to the position_sp set in the
-        `position_sp` attribute. Setting to `float` will remove power from the motor.
+        Sets the command for the servo. Valid values are ``run`` and ``float``. Setting
+        to ``run`` will cause the servo to be driven to the position_sp set in the
+        ``position_sp`` attribute. Setting to ``float`` will remove power from the motor.
         """
         raise Exception("command is a write-only property!")
 
@@ -1548,10 +1548,10 @@ class ServoMotor(Device):
     @property
     def polarity(self):
         """
-        Sets the polarity of the servo. Valid values are `normal` and `inversed`.
-        Setting the value to `inversed` will cause the position_sp value to be
-        inversed. i.e `-100` will correspond to `max_pulse_sp`, and `100` will
-        correspond to `min_pulse_sp`.
+        Sets the polarity of the servo. Valid values are ``normal`` and ``inversed``.
+        Setting the value to ``inversed`` will cause the position_sp value to be
+        inversed. i.e ``-100`` will correspond to ``max_pulse_sp``, and ``100`` will
+        correspond to ``min_pulse_sp``.
         """
         self._polarity, value = self.get_attr_string(self._polarity, 'polarity')
         return value
@@ -1565,8 +1565,8 @@ class ServoMotor(Device):
         """
         Reading returns the current position_sp of the servo. Writing instructs the
         servo to move to the specified position_sp. Units are percent. Valid values
-        are -100 to 100 (-100% to 100%) where `-100` corresponds to `min_pulse_sp`,
-        `0` corresponds to `mid_pulse_sp` and `100` corresponds to `max_pulse_sp`.
+        are -100 to 100 (-100% to 100%) where ``-100`` corresponds to ``min_pulse_sp``,
+        ``0`` corresponds to ``mid_pulse_sp`` and ``100`` corresponds to ``max_pulse_sp``.
         """
         self._position_sp, value = self.get_attr_int(self._position_sp, 'position_sp')
         return value
@@ -1582,7 +1582,7 @@ class ServoMotor(Device):
         range of the servo). Units are in milliseconds. Example: Setting the rate_sp
         to 1000 means that it will take a 180 degree servo 2 second to move from 0
         to 180 degrees. Note: Some servo controllers may not support this in which
-        case reading and writing will fail with `-EOPNOTSUPP`. In continuous rotation
+        case reading and writing will fail with ``-EOPNOTSUPP``. In continuous rotation
         servos, this value will affect the rate_sp at which the speed ramps up or down.
         """
         self._rate_sp, value = self.get_attr_int(self._rate_sp, 'rate_sp')
@@ -1597,28 +1597,28 @@ class ServoMotor(Device):
         """
         Returns a list of flags indicating the state of the servo.
         Possible values are:
-        * `running`: Indicates that the motor is powered.
+        * ``running``: Indicates that the motor is powered.
         """
         self._state, value = self.get_attr_set(self._state, 'state')
         return value
 
-    #: Drive servo to the position set in the `position_sp` attribute.
+    #: Drive servo to the position set in the ``position_sp`` attribute.
     COMMAND_RUN = 'run'
 
     #: Remove power from the motor.
     COMMAND_FLOAT = 'float'
 
-    #: With `normal` polarity, a positive duty cycle will
+    #: With ``normal`` polarity, a positive duty cycle will
     #: cause the motor to rotate clockwise.
     POLARITY_NORMAL = 'normal'
 
-    #: With `inversed` polarity, a positive duty cycle will
+    #: With ``inversed`` polarity, a positive duty cycle will
     #: cause the motor to rotate counter-clockwise.
     POLARITY_INVERSED = 'inversed'
 
     def run(self, **kwargs):
         """
-        Drive servo to the position set in the `position_sp` attribute.
+        Drive servo to the position set in the ``position_sp`` attribute.
         """
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -2696,7 +2696,7 @@ class MoveDifferential(MoveTank):
 
     def turn_to_angle(self, speed, angle_target_degrees, brake=True, block=True):
         """
-        Rotate in place to `angle_target_degrees` at `speed`
+        Rotate in place to ``angle_target_degrees`` at ``speed``
         """
         if not self.odometry_thread_id:
             raise ThreadNotRunning("odometry_start() must be called to track robot coordinates")
@@ -2736,7 +2736,7 @@ class MoveDifferential(MoveTank):
 
     def on_to_coordinates(self, speed, x_target_mm, y_target_mm, brake=True, block=True):
         """
-        Drive to (`x_target_mm`, `y_target_mm`) coordinates at `speed`
+        Drive to (``x_target_mm``, ``y_target_mm``) coordinates at ``speed``
         """
         if not self.odometry_thread_id:
             raise ThreadNotRunning("odometry_start() must be called to track robot coordinates")

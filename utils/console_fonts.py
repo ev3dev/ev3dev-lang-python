@@ -20,8 +20,8 @@ def show_fonts():
     """
     Iterate through all the Latin "1 & 5" fonts, and see how many rows/columns
     the EV3 LCD console can accommodate for each font.
-    Note: `Terminus` fonts are "thinner"; `TerminusBold` and `VGA` offer more contrast on the LCD console
-    and are thus more readable; the `TomThumb` font is waaaaay too small to read!
+    Note: ``Terminus`` fonts are "thinner"; ``TerminusBold`` and ``VGA`` offer more contrast on the LCD console
+    and are thus more readable; the ``TomThumb`` font is waaaaay too small to read!
     """
     console = Console()
     files = [f for f in listdir("/usr/share/consolefonts/") if f.startswith("Lat15") and f.endswith(".psf.gz")]
@@ -48,7 +48,7 @@ def show_fonts():
         console.text_at(font.split(".")[0], 1, 1, False, True)
         console.clear_to_eol()
 
-# Show the fonts; you may want to adjust the `startswith` filter to show other codesets.
+# Show the fonts; you may want to adjust the ``startswith`` filter to show other codesets.
 show_fonts()
 
 sleep(5)

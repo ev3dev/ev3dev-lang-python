@@ -403,7 +403,7 @@ class Sound(object):
         if m:
             return int(m.group(1))
         else:
-            raise Exception('Failed to parse output of `amixer get {}`'.format(channel))
+            raise Exception('Failed to parse output of ``amixer get {}``'.format(channel))
 
     def play_song(self, song, tempo=120, delay=0.05):
         """ Plays a song provided as a list of tuples containing the note name and its
@@ -424,7 +424,7 @@ class Sound(object):
 
         Shortcuts exist for common modifiers:
 
-        - ``3`` produces a triplet member note. For instance `e3` gives a triplet of eight notes,
+        - ``3`` produces a triplet member note. For instance ``e3`` gives a triplet of eight notes,
           i.e. 3 eight notes in the duration of a single quarter. You must ensure that 3 triplets
           notes are defined in sequence to match the count, otherwise the result will not be the
           expected one.

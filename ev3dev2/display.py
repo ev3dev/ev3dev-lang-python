@@ -157,9 +157,8 @@ class FbMem(object):
     def _open_fbdev(fbdev=None):
         """Return the framebuffer file descriptor.
 
-        Try to use the FRAMEBUFFER
-        environment variable if fbdev is not given. Use '/dev/fb0' by
-        default.
+        Try to use the FRAMEBUFFER environment variable if fbdev is
+        not given. Use '/dev/fb0' by default.
         """
         dev = fbdev or os.getenv('FRAMEBUFFER', '/dev/fb0')
         fbfid = os.open(dev, os.O_RDWR)
@@ -370,19 +369,19 @@ class Display(FbMem):
 
     def text_pixels(self, text, clear_screen=True, x=0, y=0, text_color='black', font=None):
         """
-        Display `text` starting at pixel (x, y).
+        Display ``text`` starting at pixel (x, y).
 
         The EV3 display is 178x128 pixels
 
         - (0, 0) would be the top left corner of the display
         - (89, 64) would be right in the middle of the display
 
-        'text_color' : PIL says it supports "common HTML color names". There
+        ``text_color`` : PIL says it supports "common HTML color names". There
         are 140 HTML color names listed here that are supported by all modern
         browsers. This is probably a good list to start with.
         https://www.w3schools.com/colors/colors_names.asp
 
-        'font' : can be any font displayed here
+        ``font`` : can be any font displayed here
             http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/ev3dev-stretch/display.html#bitmap-fonts
 
         - If font is a string, it is the name of a font to be loaded.
@@ -405,18 +404,18 @@ class Display(FbMem):
 
     def text_grid(self, text, clear_screen=True, x=0, y=0, text_color='black', font=None):
         """
-        Display 'text' starting at grid (x, y)
+        Display ``text`` starting at grid (x, y)
 
         The EV3 display can be broken down in a grid that is 22 columns wide
         and 12 rows tall. Each column is 8 pixels wide and each row is 10
         pixels tall.
 
-        'text_color' : PIL says it supports "common HTML color names". There
+        ``text_color`` : PIL says it supports "common HTML color names". There
         are 140 HTML color names listed here that are supported by all modern
         browsers. This is probably a good list to start with.
         https://www.w3schools.com/colors/colors_names.asp
 
-        'font' : can be any font displayed here
+        ``font`` : can be any font displayed here
             http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/ev3dev-stretch/display.html#bitmap-fonts
 
         - If font is a string, it is the name of a font to be loaded.
