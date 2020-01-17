@@ -313,14 +313,14 @@ class Leds(object):
 
         color_tuple = color
         if isinstance(color, str):
-            assert color in self.led_colors, \
-                "%s is an invalid LED color, valid choices are %s" % \
-                (color, ', '.join(self.led_colors.keys()))
+            if color not in self.led_colors:
+                raise ValueError("%s is an invalid LED color, valid choices are %s" % \
+                    (color, ', '.join(self.led_colors.keys())))
             color_tuple = self.led_colors[color]
 
-        assert group in self.led_groups, \
-            "%s is an invalid LED group, valid choices are %s" % \
-            (group, ', '.join(self.led_groups.keys()))
+        if group not in self.led_groups:
+            raise ValueError("%s is an invalid LED group, valid choices are %s" % \
+                (group, ', '.join(self.led_groups.keys())))
 
         for led, value in zip(self.led_groups[group], color_tuple):
             led.brightness_pct = value * pct
@@ -339,9 +339,9 @@ class Leds(object):
         if not self.leds:
             return
 
-        assert group in self.led_groups, \
-            "%s is an invalid LED group, valid choices are %s" % \
-            (group, ', '.join(self.led_groups.keys()))
+        if group not in self.led_groups:
+            raise ValueError("%s is an invalid LED group, valid choices are %s" % \
+                (group, ', '.join(self.led_groups.keys())))
 
         for led in self.led_groups[group]:
             for k in kwargs:
