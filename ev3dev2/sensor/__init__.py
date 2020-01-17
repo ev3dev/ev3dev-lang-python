@@ -274,7 +274,7 @@ class Sensor(Device):
         if fmt is None: return raw
 
         return unpack(fmt, raw)
-
+    
     def _ensure_mode(self, mode):
         if self.mode != mode:
             self.mode = mode

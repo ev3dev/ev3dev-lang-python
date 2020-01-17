@@ -378,7 +378,7 @@ class TestAPI(unittest.TestCase):
     def test_stopwatch(self):
         sw = StopWatch()
         self.assertEqual(str(sw), "StopWatch: 00:00:00.000")
-
+        
         sw = StopWatch(desc="test sw")
         self.assertEqual(str(sw), "test sw: 00:00:00.000")
         self.assertEqual(sw.is_started, False)

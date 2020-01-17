@@ -49,7 +49,7 @@ def execute_actions(actions):
         for b in c:
             for k,v in b.items():
                 setattr( device[p], k, v )
-
+ 
 device = {}
 logs = {}
 

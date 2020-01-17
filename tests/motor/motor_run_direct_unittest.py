@@ -30,7 +30,7 @@ class TestMotorRunDirect(ptc.ParameterizedTestCase):
         self._param['motor'].command = 'run-direct'
 
         for i in duty_cycles:
-            self._param['motor'].duty_cycle_sp = i
+            self._param['motor'].duty_cycle_sp = i 
             time.sleep(0.5)
 
         self._param['motor'].command = 'stop'

@@ -298,7 +298,7 @@ class TestTachoMotorRampDownSpValue(ptc.ParameterizedTestCase):
         self.assertEqual(self._param['motor'].ramp_down_sp, 100)
         self._param['motor'].command = 'reset'
         self.assertEqual(self._param['motor'].ramp_down_sp, 0)
-
+        
 class TestTachoMotorRampUpSpValue(ptc.ParameterizedTestCase):
 
     def test_ramp_up_negative_value(self):
@@ -326,7 +326,7 @@ class TestTachoMotorRampUpSpValue(ptc.ParameterizedTestCase):
         self.assertEqual(self._param['motor'].ramp_up_sp, 100)
         self._param['motor'].command = 'reset'
         self.assertEqual(self._param['motor'].ramp_up_sp, 0)
-
+        
 class TestTachoMotorSpeedValue(ptc.ParameterizedTestCase):
 
     def test_speed_value_is_read_only(self):
@@ -337,7 +337,7 @@ class TestTachoMotorSpeedValue(ptc.ParameterizedTestCase):
     def test_speed_value_after_reset(self):
         self._param['motor'].command = 'reset'
         self.assertEqual(self._param['motor'].speed, 0)
-
+        
 class TestTachoMotorSpeedSpValue(ptc.ParameterizedTestCase):
 
    def test_speed_sp_large_negative(self):
@@ -373,7 +373,7 @@ class TestTachoMotorSpeedSpValue(ptc.ParameterizedTestCase):
         self.assertEqual(self._param['motor'].speed_sp, 100)
         self._param['motor'].command = 'reset'
         self.assertEqual(self._param['motor'].speed_sp, 0)
-
+        
 class TestTachoMotorSpeedPValue(ptc.ParameterizedTestCase):
 
     def test_speed_i_negative(self):
