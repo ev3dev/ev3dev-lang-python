@@ -2050,7 +2050,8 @@ class MoveTank(MotorSet):
                 raise
         """
         if not self._cs:
-            raise DeviceNotDefined("The 'cs' variable must be defined with a ColorSensor. Example: tank.cs = ColorSensor()")
+            raise DeviceNotDefined(
+                "The 'cs' variable must be defined with a ColorSensor. Example: tank.cs = ColorSensor()")
 
         if target_light_intensity is None:
             target_light_intensity = self._cs.reflected_light_intensity
@@ -2164,7 +2165,8 @@ class MoveTank(MotorSet):
                 raise
         """
         if not self._gyro:
-            raise DeviceNotDefined("The 'gyro' variable must be defined with a GyroSensor. Example: tank.gyro = GyroSensor()")
+            raise DeviceNotDefined(
+                "The 'gyro' variable must be defined with a GyroSensor. Example: tank.gyro = GyroSensor()")
 
         integral = 0.0
         last_error = 0.0
@@ -2202,14 +2204,7 @@ class MoveTank(MotorSet):
 
         self.stop()
 
-    def turn_degrees(
-            self,
-            speed,
-            target_angle,
-            brake=True,
-            error_margin=2,
-            sleep_time=0.01
-        ):
+    def turn_degrees(self, speed, target_angle, brake=True, error_margin=2, sleep_time=0.01):
         """
         Use a GyroSensor to rotate in place for ``target_angle``
 
@@ -2254,7 +2249,8 @@ class MoveTank(MotorSet):
         # MoveTank does not have information on wheel size and distance (that is
         # MoveDifferential) so we must use a GyroSensor to control how far we rotate.
         if not self._gyro:
-            raise DeviceNotDefined("The 'gyro' variable must be defined with a GyroSensor. Example: tank.gyro = GyroSensor()")
+            raise DeviceNotDefined(
+                "The 'gyro' variable must be defined with a GyroSensor. Example: tank.gyro = GyroSensor()")
 
         speed_native_units = speed.to_native_units(self.left_motor)
         target_angle = self._gyro.angle + target_angle
@@ -2293,7 +2289,6 @@ class MoveTank(MotorSet):
         Rotate counter-clockwise ``degrees`` in place
         """
         self.turn_degrees(speed, abs(degrees) * -1, brake, error_margin, sleep_time)
-
 
 
 class MoveSteering(MoveTank):
@@ -2490,8 +2485,7 @@ class MoveDifferential(MoveTank):
         Drive in a straight line for ``distance_mm``
         """
         rotations = distance_mm / self.wheel.circumference_mm
-        log.debug("%s: on_for_rotations distance_mm %s, rotations %s, speed %s" %
-            (self, distance_mm, rotations, speed))
+        log.debug("%s: on_for_rotations distance_mm %s, rotations %s, speed %s" % (self, distance_mm, rotations, speed))
 
         MoveTank.on_for_rotations(self, speed, speed, rotations, brake, block)
 
@@ -2566,7 +2560,6 @@ class MoveDifferential(MoveTank):
         - ``use_gyro``, ``brake`` and ``block`` are all True
         - A GyroSensor has been defined via ``self.gyro = GyroSensor()``
         """
-
         def final_angle(init_angle, degrees):
             result = init_angle - degrees
 
@@ -2592,7 +2585,7 @@ class MoveDifferential(MoveTank):
         angle_target_degrees = final_angle(angle_init_degrees, degrees)
 
         log.info("%s: turn_degrees() %d degrees from %s to %s" %
-            (self, degrees, angle_init_degrees, angle_target_degrees))
+                 (self, degrees, angle_init_degrees, angle_target_degrees))
 
         # The distance each wheel needs to travel
         distance_mm = (abs(degrees) / 360) * self.circumference_mm
@@ -2630,7 +2623,7 @@ class MoveDifferential(MoveTank):
                 degrees_error = (angle_target_degrees - angle_current_degrees) * -1
 
             log.info("%s: turn_degrees() ended up at %s, error %s, error_margin %s" %
-               (self, angle_current_degrees, degrees_error, error_margin))
+                     (self, angle_current_degrees, degrees_error, error_margin))
 
             if abs(degrees_error) > error_margin:
                 self.turn_degrees(speed, degrees_error, brake, block, error_margin, use_gyro)
@@ -2677,7 +2670,7 @@ class MoveDifferential(MoveTank):
             turn_right = not turn_right
 
         log.debug("%s: turn_to_angle %s, current angle %s, delta %s, turn_right %s" %
-            (self, angle_target_degrees, angle_current_degrees, angle_delta, turn_right))
+                  (self, angle_target_degrees, angle_current_degrees, angle_delta, turn_right))
         self.odometry_coordinates_log()
 
         if turn_right:

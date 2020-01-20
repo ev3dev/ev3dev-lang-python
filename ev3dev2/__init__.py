@@ -155,6 +155,7 @@ class DeviceNotDefined(Exception):
 class ThreadNotRunning(Exception):
     pass
 
+
 # -----------------------------------------------------------------------------
 # Define the base class from which all other ev3dev classes are defined.
 
