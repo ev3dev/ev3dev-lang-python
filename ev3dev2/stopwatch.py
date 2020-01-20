@@ -9,11 +9,13 @@ if is_micropython():
 else:
     import datetime as dt
 
+
 def get_ticks_ms():
     if is_micropython():
         return utime.ticks_ms()
     else:
         return int(dt.datetime.timestamp(dt.datetime.now()) * 1000)
+
 
 class StopWatchAlreadyStartedException(Exception):
     """
@@ -21,6 +23,7 @@ class StopWatchAlreadyStartedException(Exception):
     stopped.
     """
     pass
+
 
 class StopWatch(object):
     """
@@ -136,4 +139,3 @@ class StopWatch(object):
         """
 
         return duration_secs is not None and self.value_secs >= duration_secs
-

@@ -25,17 +25,20 @@
 
 import sys
 
-if sys.version_info < (3,4):
+if sys.version_info < (3, 4):
     raise SystemError('Must be using Python 3.4 or higher')
+
 
 def is_micropython():
     return sys.implementation.name == "micropython"
+
 
 def chain_exception(exception, cause):
     if is_micropython():
         raise exception
     else:
         raise exception from cause
+
 
 try:
     # if we are in a released build, there will be an auto-generated "version"
@@ -51,6 +54,7 @@ import re
 import stat
 import errno
 from os.path import abspath
+
 
 def get_current_platform():
     """
@@ -139,17 +143,21 @@ def list_device_names(class_path, name_pattern, **kwargs):
 def library_load_warning_message(library_name, dependent_class):
     return 'Import warning: Failed to import "{}". {} will be unusable!'.format(library_name, dependent_class)
 
+
 class DeviceNotFound(Exception):
     pass
 
+
 class DeviceNotDefined(Exception):
     pass
+
 
 class ThreadNotRunning(Exception):
     pass
 
 # -----------------------------------------------------------------------------
 # Define the base class from which all other ev3dev classes are defined.
+
 
 class Device(object):
     """The ev3dev device base class"""
@@ -247,7 +255,7 @@ class Device(object):
         """Device attribute getter"""
         try:
             if attribute is None:
-                attribute = self._attribute_file_open( name )
+                attribute = self._attribute_file_open(name)
             else:
                 attribute.seek(0)
             return attribute, attribute.read().strip().decode()
@@ -258,7 +266,7 @@ class Device(object):
         """Device attribute setter"""
         try:
             if attribute is None:
-                attribute = self._attribute_file_open( name )
+                attribute = self._attribute_file_open(name)
             else:
                 attribute.seek(0)
 
@@ -281,11 +289,13 @@ class Device(object):
                 try:
                     max_speed = self.max_speed
                 except (AttributeError, Exception):
-                    chain_exception(ValueError("The given speed value {} was out of range".format(value)),
-                        driver_error)
+                    chain_exception(ValueError("The given speed value {} was out of range".format(value)), driver_error)
                 else:
-                    chain_exception(ValueError("The given speed value {} was out of range. Max speed: +/-{}".format(value, max_speed)), driver_error)
-            chain_exception(ValueError("One or more arguments were out of range or invalid, value {}".format(value)), driver_error)
+                    chain_exception(
+                        ValueError("The given speed value {} was out of range. Max speed: +/-{}".format(
+                            value, max_speed)), driver_error)
+            chain_exception(ValueError("One or more arguments were out of range or invalid, value {}".format(value)),
+                            driver_error)
         elif driver_errorno == errno.ENODEV or driver_errorno == errno.ENOENT:
             # We will assume that a file-not-found error is the result of a disconnected device
             # rather than a library error. If that isn't the case, at a minimum the underlying
@@ -375,5 +385,4 @@ def list_devices(class_name, name_pattern, **kwargs):
     """
     classpath = abspath(Device.DEVICE_ROOT_PATH + '/' + class_name)
 
-    return (Device(class_name, name, name_exact=True)
-            for name in list_device_names(classpath, name_pattern, **kwargs))
+    return (Device(class_name, name, name_exact=True) for name in list_device_names(classpath, name_pattern, **kwargs))

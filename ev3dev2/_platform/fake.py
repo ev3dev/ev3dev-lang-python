@@ -1,4 +1,3 @@
-
 OUTPUT_A = 'outA'
 OUTPUT_B = 'outB'
 OUTPUT_C = 'outC'

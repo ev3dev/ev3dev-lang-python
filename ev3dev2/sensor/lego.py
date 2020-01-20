@@ -25,7 +25,7 @@
 
 import sys
 
-if sys.version_info < (3,4):
+if sys.version_info < (3, 4):
     raise SystemError('Must be using Python 3.4 or higher')
 
 import logging
@@ -46,10 +46,14 @@ class TouchSensor(Sensor):
 
     #: Button state
     MODE_TOUCH = 'TOUCH'
-    MODES = (MODE_TOUCH,)
+    MODES = (MODE_TOUCH, )
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(TouchSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-touch', 'lego-nxt-touch'], **kwargs)
+        super(TouchSensor, self).__init__(address,
+                                          name_pattern,
+                                          name_exact,
+                                          driver_name=['lego-ev3-touch', 'lego-nxt-touch'],
+                                          **kwargs)
 
     @property
     def is_pressed(self):
@@ -68,7 +72,7 @@ class TouchSensor(Sensor):
         tic = time.time()
 
         if sleep_ms:
-            sleep_ms = float(sleep_ms/1000)
+            sleep_ms = float(sleep_ms / 1000)
 
         # The kernel does not supoort POLLPRI or POLLIN for sensors so we have
         # to drop into a loop and check often
@@ -159,23 +163,17 @@ class ColorSensor(Sensor):
     #: Brown color.
     COLOR_BROWN = 7
 
-    MODES = (
-      MODE_COL_REFLECT,
-      MODE_COL_AMBIENT,
-      MODE_COL_COLOR,
-      MODE_REF_RAW,
-      MODE_RGB_RAW
-    )
+    MODES = (MODE_COL_REFLECT, MODE_COL_AMBIENT, MODE_COL_COLOR, MODE_REF_RAW, MODE_RGB_RAW)
 
     COLORS = (
-      'NoColor',
-      'Black',
-      'Blue',
-      'Green',
-      'Yellow',
-      'Red',
-      'White',
-      'Brown',
+        'NoColor',
+        'Black',
+        'Blue',
+        'Green',
+        'Yellow',
+        'Red',
+        'White',
+        'Brown',
     )
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
@@ -268,9 +266,8 @@ class ColorSensor(Sensor):
         """
         (red, green, blue) = self.raw
 
-        return (min(int((red * 255) / self.red_max), 255),
-                min(int((green * 255) / self.green_max), 255),
-                min(int((blue * 255) / self.blue_max), 255))
+        return (min(int((red * 255) / self.red_max), 255), min(int((green * 255) / self.green_max),
+                                                               255), min(int((blue * 255) / self.blue_max), 255))
 
     @property
     def lab(self):
@@ -297,8 +294,8 @@ class ColorSensor(Sensor):
         Y = (RGB[0] * 0.2126729) + (RGB[1] * 0.7151522) + (RGB[2] * 0.0721750)
         Z = (RGB[0] * 0.0193339) + (RGB[1] * 0.1191920) + (RGB[2] * 0.9503041)
 
-        XYZ[0] = X / 95.047   # ref_X =  95.047
-        XYZ[1] = Y / 100.0    # ref_Y = 100.000
+        XYZ[0] = X / 95.047  # ref_X =  95.047
+        XYZ[1] = Y / 100.0  # ref_Y = 100.000
         XYZ[2] = Z / 108.883  # ref_Z = 108.883
 
         for (num, value) in enumerate(XYZ):
@@ -335,19 +332,19 @@ class ColorSensor(Sensor):
         if minc == maxc:
             return 0.0, 0.0, v
 
-        s = (maxc-minc) / maxc
-        rc = (maxc-r) / (maxc-minc)
-        gc = (maxc-g) / (maxc-minc)
-        bc = (maxc-b) / (maxc-minc)
+        s = (maxc - minc) / maxc
+        rc = (maxc - r) / (maxc - minc)
+        gc = (maxc - g) / (maxc - minc)
+        bc = (maxc - b) / (maxc - minc)
 
         if r == maxc:
-            h = bc-gc
+            h = bc - gc
         elif g == maxc:
-            h = 2.0+rc-bc
+            h = 2.0 + rc - bc
         else:
-            h = 4.0+gc-rc
+            h = 4.0 + gc - rc
 
-        h = (h/6.0) % 1.0
+        h = (h / 6.0) % 1.0
 
         return (h, s, v)
 
@@ -362,31 +359,31 @@ class ColorSensor(Sensor):
         (r, g, b) = self.rgb
         maxc = max(r, g, b)
         minc = min(r, g, b)
-        l = (minc+maxc)/2.0
+        l = (minc + maxc) / 2.0
 
         if minc == maxc:
             return 0.0, l, 0.0
 
         if l <= 0.5:
-            s = (maxc-minc) / (maxc+minc)
+            s = (maxc - minc) / (maxc + minc)
         else:
-            if 2.0-maxc-minc == 0:
+            if 2.0 - maxc - minc == 0:
                 s = 0
             else:
-                s = (maxc-minc) / (2.0-maxc-minc)
+                s = (maxc - minc) / (2.0 - maxc - minc)
 
-        rc = (maxc-r) / (maxc-minc)
-        gc = (maxc-g) / (maxc-minc)
-        bc = (maxc-b) / (maxc-minc)
+        rc = (maxc - r) / (maxc - minc)
+        gc = (maxc - g) / (maxc - minc)
+        bc = (maxc - b) / (maxc - minc)
 
         if r == maxc:
-            h = bc-gc
+            h = bc - gc
         elif g == maxc:
-            h = 2.0+rc-bc
+            h = 2.0 + rc - bc
         else:
-            h = 4.0+gc-rc
+            h = 4.0 + gc - rc
 
-        h = (h/6.0) % 1.0
+        h = (h / 6.0) % 1.0
 
         return (h, l, s)
 
@@ -447,7 +444,11 @@ class UltrasonicSensor(Sensor):
     )
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
-        super(UltrasonicSensor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-us', 'lego-nxt-us'], **kwargs)
+        super(UltrasonicSensor, self).__init__(address,
+                                               name_pattern,
+                                               name_exact,
+                                               driver_name=['lego-ev3-us', 'lego-nxt-us'],
+                                               **kwargs)
 
     @property
     def distance_centimeters_continuous(self):
@@ -753,32 +754,26 @@ class InfraredSensor(Sensor, ButtonBase):
     #: Calibration ???
     MODE_IR_CAL = 'IR-CAL'
 
-    MODES = (
-      MODE_IR_PROX,
-      MODE_IR_SEEK,
-      MODE_IR_REMOTE,
-      MODE_IR_REM_A,
-      MODE_IR_CAL
-    )
+    MODES = (MODE_IR_PROX, MODE_IR_SEEK, MODE_IR_REMOTE, MODE_IR_REM_A, MODE_IR_CAL)
 
     # The following are all of the various combinations of button presses for
     # the remote control.  The key/index is the number that will be written in
     # the attribute file to indicate what combination of buttons are currently
     # pressed.
     _BUTTON_VALUES = {
-            0: [],
-            1: ['top_left'],
-            2: ['bottom_left'],
-            3: ['top_right'],
-            4: ['bottom_right'],
-            5: ['top_left', 'top_right'],
-            6: ['top_left', 'bottom_right'],
-            7: ['bottom_left', 'top_right'],
-            8: ['bottom_left', 'bottom_right'],
-            9: ['beacon'],
-            10: ['top_left', 'bottom_left'],
-            11: ['top_right', 'bottom_right']
-            }
+        0: [],
+        1: ['top_left'],
+        2: ['bottom_left'],
+        3: ['top_right'],
+        4: ['bottom_right'],
+        5: ['top_left', 'top_right'],
+        6: ['top_left', 'bottom_right'],
+        7: ['bottom_left', 'top_right'],
+        8: ['bottom_left', 'bottom_right'],
+        9: ['beacon'],
+        10: ['top_left', 'bottom_left'],
+        11: ['top_right', 'bottom_right']
+    }
 
     _BUTTONS = ('top_left', 'bottom_left', 'top_right', 'bottom_right', 'beacon')
 
@@ -951,7 +946,7 @@ class InfraredSensor(Sensor, ButtonBase):
         new_state = []
         state_diff = []
 
-        for channel in range(1,5):
+        for channel in range(1, 5):
 
             for button in self.buttons_pressed(channel):
                 new_state.append((button, channel))
@@ -969,7 +964,7 @@ class InfraredSensor(Sensor, ButtonBase):
         self._state = new_state
 
         for (button, channel) in state_diff:
-            handler = getattr(self, 'on_channel' + str(channel) + '_' + button )
+            handler = getattr(self, 'on_channel' + str(channel) + '_' + button)
 
             if handler is not None:
                 handler((button, channel) in new_state)
@@ -993,8 +988,8 @@ class SoundSensor(Sensor):
     MODE_DBA = 'DBA'
 
     MODES = (
-      MODE_DB,
-      MODE_DBA,
+        MODE_DB,
+        MODE_DBA,
     )
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
@@ -1034,8 +1029,8 @@ class LightSensor(Sensor):
     MODE_AMBIENT = 'AMBIENT'
 
     MODES = (
-      MODE_REFLECT,
-      MODE_AMBIENT,
+        MODE_REFLECT,
+        MODE_AMBIENT,
     )
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):

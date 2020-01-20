@@ -16,3 +16,10 @@ install:
 
 micropython-install: ${MPYS}
 	cp -R $(OUT)/* /usr/lib/micropython/
+
+clean:
+	find . -name __pycache__ | xargs rm -rf
+	find . -name *.pyc | xargs rm -rf
+
+format:
+	yapf --style .yapf.cfg --in-place --exclude tests/fake-sys/ --recursive .

@@ -1,4 +1,3 @@
-
 """
 An assortment of classes modeling specific features of the EVB.
 """

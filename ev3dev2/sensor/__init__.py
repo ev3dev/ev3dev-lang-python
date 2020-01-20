@@ -25,14 +25,13 @@
 
 import sys
 
-if sys.version_info < (3,4):
+if sys.version_info < (3, 4):
     raise SystemError('Must be using Python 3.4 or higher')
 
 import numbers
 from os.path import abspath
 from struct import unpack
 from ev3dev2 import get_current_platform, Device, list_device_names
-
 
 # INPUT ports have platform specific values that we must import
 platform = get_current_platform()
@@ -71,20 +70,8 @@ class Sensor(Device):
     SYSTEM_CLASS_NAME = 'lego-sensor'
     SYSTEM_DEVICE_NAME_CONVENTION = 'sensor*'
     __slots__ = [
-    '_address',
-    '_command',
-    '_commands',
-    '_decimals',
-    '_driver_name',
-    '_mode',
-    '_modes',
-    '_num_values',
-    '_units',
-    '_value',
-    '_bin_data_format',
-    '_bin_data_size',
-    '_bin_data',
-    '_mode_scale'
+        '_address', '_command', '_commands', '_decimals', '_driver_name', '_mode', '_modes', '_num_values', '_units',
+        '_value', '_bin_data_format', '_bin_data_size', '_bin_data', '_mode_scale'
     ]
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
@@ -102,7 +89,7 @@ class Sensor(Device):
         self._modes = None
         self._num_values = None
         self._units = None
-        self._value = [None,None,None,None,None,None,None,None]
+        self._value = [None, None, None, None, None, None, None, None]
 
         self._bin_data_format = None
         self._bin_data_size = None
@@ -216,7 +203,7 @@ class Sensor(Device):
         """
         n = int(n)
 
-        self._value[n], value = self.get_attr_int(self._value[n], 'value'+str(n))
+        self._value[n], value = self.get_attr_int(self._value[n], 'value' + str(n))
         return value
 
     @property
@@ -256,17 +243,17 @@ class Sensor(Device):
 
         if self._bin_data_size == None:
             self._bin_data_size = {
-                    "u8":     1,
-                    "s8":     1,
-                    "u16":    2,
-                    "s16":    2,
-                    "s16_be": 2,
-                    "s32":    4,
-                    "float":  4
-                }.get(self.bin_data_format, 1) * self.num_values
+                "u8": 1,
+                "s8": 1,
+                "u16": 2,
+                "s16": 2,
+                "s16_be": 2,
+                "s32": 4,
+                "float": 4
+            }.get(self.bin_data_format, 1) * self.num_values
 
         if None == self._bin_data:
-            self._bin_data = self._attribute_file_open( 'bin_data' )
+            self._bin_data = self._attribute_file_open('bin_data')
 
         self._bin_data.seek(0)
         raw = bytearray(self._bin_data.read(self._bin_data_size))
@@ -278,6 +265,7 @@ class Sensor(Device):
     def _ensure_mode(self, mode):
         if self.mode != mode:
             self.mode = mode
+
 
 def list_sensors(name_pattern=Sensor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
     """

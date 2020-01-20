@@ -27,7 +27,6 @@ class Console():
     for cursor positioning, text color, and resetting the screen. Supports changing
     the console font using standard system fonts.
     """
-
     def __init__(self, font="Lat15-TerminusBold24x12"):
         """
         Construct the Console instance, optionally with a font name specified.

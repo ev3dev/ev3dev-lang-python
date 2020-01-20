@@ -25,7 +25,7 @@
 
 import sys
 
-if sys.version_info < (3,4):
+if sys.version_info < (3, 4):
     raise SystemError('Must be using Python 3.4 or higher')
 
 import os
@@ -49,7 +49,6 @@ except ImportError:
 
 
 class FbMem(object):
-
     """The framebuffer memory object.
 
     Made of:
@@ -83,7 +82,6 @@ class FbMem(object):
     FB_VISUAL_MONO10 = 1
 
     class FixScreenInfo(ctypes.Structure):
-
         """The fb_fix_screeninfo from fb.h."""
 
         _fields_ = [
@@ -104,9 +102,7 @@ class FbMem(object):
         ]
 
     class VarScreenInfo(ctypes.Structure):
-
         class FbBitField(ctypes.Structure):
-
             """The fb_bitfield struct from fb.h."""
 
             _fields_ = [
@@ -128,10 +124,8 @@ class FbMem(object):
             ('yres_virtual', ctypes.c_uint32),
             ('xoffset', ctypes.c_uint32),
             ('yoffset', ctypes.c_uint32),
-
             ('bits_per_pixel', ctypes.c_uint32),
             ('grayscale', ctypes.c_uint32),
-
             ('red', FbBitField),
             ('green', FbBitField),
             ('blue', FbBitField),
@@ -140,8 +134,8 @@ class FbMem(object):
 
         def __str__(self):
             return ("%sx%s at (%s,%s), bpp %s, grayscale %s, red %s, green %s, blue %s, transp %s" %
-                (self.xres, self.yres, self.xoffset, self.yoffset, self.bits_per_pixel, self.grayscale,
-                self.red, self.green, self.blue, self.transp))
+                    (self.xres, self.yres, self.xoffset, self.yoffset, self.bits_per_pixel, self.grayscale, self.red,
+                     self.green, self.blue, self.transp))
 
     def __init__(self, fbdev=None):
         """Create the FbMem framebuffer memory object."""
@@ -181,13 +175,7 @@ class FbMem(object):
     @staticmethod
     def _map_fb_memory(fbfid, fix_info):
         """Map the framebuffer memory."""
-        return mmap.mmap(
-            fbfid,
-            fix_info.smem_len,
-            mmap.MAP_SHARED,
-            mmap.PROT_READ | mmap.PROT_WRITE,
-            offset=0
-        )
+        return mmap.mmap(fbfid, fix_info.smem_len, mmap.MAP_SHARED, mmap.PROT_READ | mmap.PROT_WRITE, offset=0)
 
 
 class Display(FbMem):
@@ -217,12 +205,10 @@ class Display(FbMem):
 
         else:
             raise Exception("Not supported - platform %s with bits_per_pixel %s" %
-                (self.platform, self.var_info.bits_per_pixel))
+                            (self.platform, self.var_info.bits_per_pixel))
 
-        self._img = Image.new(
-                im_type,
-                (self.fix_info.line_length * 8 // self.var_info.bits_per_pixel, self.yres),
-                "white")
+        self._img = Image.new(im_type, (self.fix_info.line_length * 8 // self.var_info.bits_per_pixel, self.yres),
+                              "white")
 
         self._draw = ImageDraw.Draw(self._img)
         self.desc = desc
@@ -307,7 +293,7 @@ class Display(FbMem):
 
         else:
             raise Exception("Not supported - platform %s with bits_per_pixel %s" %
-                (self.platform, self.var_info.bits_per_pixel))
+                            (self.platform, self.var_info.bits_per_pixel))
 
     def image_filename(self, filename, clear_screen=True, x1=0, y1=0, x2=None, y2=None):
 
@@ -431,9 +417,7 @@ class Display(FbMem):
             "grid rows must be between 0 and %d, %d was requested" %\
             ((Display.GRID_ROWS - 1), y)
 
-        return self.text_pixels(text, clear_screen,
-                                x * Display.GRID_COLUMN_PIXELS,
-                                y * Display.GRID_ROW_PIXELS,
+        return self.text_pixels(text, clear_screen, x * Display.GRID_COLUMN_PIXELS, y * Display.GRID_ROW_PIXELS,
                                 text_color, font)
 
     def reset_screen(self):

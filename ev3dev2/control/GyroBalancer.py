@@ -81,7 +81,6 @@ class GyroBalancer(object):
 
     Robot will keep its balance.
     """
-
     def __init__(self,
                  gain_gyro_angle=1700,
                  gain_gyro_rate=120,
@@ -138,13 +137,10 @@ class GyroBalancer(object):
         # Open sensor and motor files
         self.gyro_file = open(self.gyro._path + "/value0", "rb")
         self.touch_file = open(self.touch._path + "/value0", "rb")
-        self.encoder_left_file = open(self.motor_left._path + "/position",
-                                      "rb")
-        self.encoder_right_file = open(self.motor_right._path + "/position",
-                                       "rb")
+        self.encoder_left_file = open(self.motor_left._path + "/position", "rb")
+        self.encoder_right_file = open(self.motor_right._path + "/position", "rb")
         self.dc_left_file = open(self.motor_left._path + "/duty_cycle_sp", "w")
-        self.dc_right_file = open(self.motor_right._path + "/duty_cycle_sp",
-                                  "w")
+        self.dc_right_file = open(self.motor_right._path + "/duty_cycle_sp", "w")
 
         # Drive queue
         self.drive_queue = queue.Queue()
@@ -174,7 +170,7 @@ class GyroBalancer(object):
     def _fast_read(self, infile):
         """Function for fast reading from sensor files."""
         infile.seek(0)
-        return(int(infile.read().decode().strip()))
+        return (int(infile.read().decode().strip()))
 
     def _fast_write(self, outfile, value):
         """Function for fast writing to motor files."""
@@ -182,11 +178,10 @@ class GyroBalancer(object):
         outfile.write(str(int(value)))
         outfile.flush()
 
-    def _set_duty(self, motor_duty_file, duty, friction_offset,
-                  voltage_comp):
+    def _set_duty(self, motor_duty_file, duty, friction_offset, voltage_comp):
         """Function to set the duty cycle of the motors."""
         # Compensate for nominal voltage and round the input
-        duty_int = int(round(duty*voltage_comp))
+        duty_int = int(round(duty * voltage_comp))
 
         # Add or subtract offset and clamp the value between -100 and 100
         if duty_int > 0:
@@ -298,8 +293,7 @@ class GyroBalancer(object):
             voltage_comp = self.power_voltage_nominal / voltage_idle
 
             # Offset to limit friction deadlock
-            friction_offset = int(round(self.pwr_friction_offset_nom *
-                                        voltage_comp))
+            friction_offset = int(round(self.pwr_friction_offset_nom * voltage_comp))
 
             # Timing settings for the program
             # Time of each loop, measured in seconds.
@@ -375,9 +369,8 @@ class GyroBalancer(object):
                 touch_pressed = self._fast_read(self.touch_file)
 
                 # Read the Motor Position
-                motor_angle_raw = ((self._fast_read(self.encoder_left_file) +
-                                   self._fast_read(self.encoder_right_file)) /
-                                   2.0)
+                motor_angle_raw = (
+                    (self._fast_read(self.encoder_left_file) + self._fast_read(self.encoder_right_file)) / 2.0)
                 motor_angle = motor_angle_raw * RAD_PER_RAW_MOTOR_UNIT
 
                 # Read the Gyro
@@ -385,7 +378,7 @@ class GyroBalancer(object):
 
                 # Busy wait for the loop to reach target time length
                 loop_time = 0
-                while(loop_time < loop_time_target):
+                while (loop_time < loop_time_target):
                     loop_time = time.time() - loop_start_time
                     time.sleep(0.001)
 
@@ -430,10 +423,8 @@ class GyroBalancer(object):
                      motor_angle_error_acc)
 
                 # Apply the signal to the motor, and add steering
-                self._set_duty(self.dc_right_file, motor_duty_cycle + steering,
-                               friction_offset, voltage_comp)
-                self._set_duty(self.dc_left_file, motor_duty_cycle - steering,
-                               friction_offset, voltage_comp)
+                self._set_duty(self.dc_right_file, motor_duty_cycle + steering, friction_offset, voltage_comp)
+                self._set_duty(self.dc_left_file, motor_duty_cycle - steering, friction_offset, voltage_comp)
 
                 # Update angle estimate and gyro offset estimate
                 gyro_est_angle = gyro_est_angle + gyro_rate *\

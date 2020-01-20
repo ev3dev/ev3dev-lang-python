@@ -26,7 +26,7 @@
 import sys
 from . import Device
 
-if sys.version_info < (3,4):
+if sys.version_info < (3, 4):
     raise SystemError('Must be using Python 3.4 or higher')
 
 
@@ -62,12 +62,12 @@ class LegoPort(Device):
     SYSTEM_CLASS_NAME = 'lego-port'
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
     __slots__ = [
-    '_address',
-    '_driver_name',
-    '_modes',
-    '_mode',
-    '_set_device',
-    '_status',
+        '_address',
+        '_driver_name',
+        '_modes',
+        '_mode',
+        '_set_device',
+        '_status',
     ]
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):

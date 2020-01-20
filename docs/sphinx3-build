@@ -15,4 +15,3 @@ if __name__ == '__main__':
         sys.exit(make_main(sys.argv))
     else:
         sys.exit(main(sys.argv))
-
