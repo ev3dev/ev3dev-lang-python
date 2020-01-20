@@ -24,13 +24,13 @@ class RobotWebHandler(BaseHTTPRequestHandler):
 
     # File extension to mimetype
     mimetype = {
-        'css'  : 'text/css',
-        'gif'  : 'image/gif',
-        'html' : 'text/html',
-        'ico'  : 'image/x-icon',
-        'jpg'  : 'image/jpg',
-        'js'   : 'application/javascript',
-        'png'  : 'image/png'
+        'css': 'text/css',
+        'gif': 'image/gif',
+        'html': 'text/html',
+        'ico': 'image/x-icon',
+        'jpg': 'image/jpg',
+        'js': 'application/javascript',
+        'png': 'image/png'
     }
 
     def do_GET(self):
@@ -83,8 +83,8 @@ motor_max_speed = None
 medium_motor_max_speed = None
 joystick_engaged = False
 
-class TankWebHandler(RobotWebHandler):
 
+class TankWebHandler(RobotWebHandler):
     def __str__(self):
         return "%s-TankWebHandler" % self.robot
 
@@ -108,7 +108,6 @@ class TankWebHandler(RobotWebHandler):
                 medium_motor_max_speed = self.robot.medium_motor.max_speed
             else:
                 medium_motor_max_speed = 0
-
         '''
         Sometimes we get AJAX requests out of order like this:
         2016-09-06 02:29:35,846 DEBUG: seq 65: (x, y): 0, 44 -> speed 462 462
@@ -145,8 +144,8 @@ class TankWebHandler(RobotWebHandler):
             speed_percentage = path[4]
             log.debug("seq %d: move %s" % (seq, direction))
 
-            left_speed = int(int(speed_percentage) * motor_max_speed)/100.0
-            right_speed = int(int(speed_percentage) * motor_max_speed)/100.0
+            left_speed = int(int(speed_percentage) * motor_max_speed) / 100.0
+            right_speed = int(int(speed_percentage) * motor_max_speed) / 100.0
 
             if direction == 'forward':
                 self.robot.left_motor.run_forever(speed_sp=left_speed)
@@ -186,16 +185,17 @@ class TankWebHandler(RobotWebHandler):
             motor = path[3]
             direction = path[4]
             speed_percentage = path[5]
-            log.debug("seq %d: start motor %s, direction %s, speed_percentage %s" % (seq, motor, direction, speed_percentage))
+            log.debug("seq %d: start motor %s, direction %s, speed_percentage %s" %
+                      (seq, motor, direction, speed_percentage))
 
             if motor == 'medium':
                 if hasattr(self.robot, 'medium_motor'):
                     if direction == 'clockwise':
-                        medium_speed = int(int(speed_percentage) * medium_motor_max_speed)/100.0
+                        medium_speed = int(int(speed_percentage) * medium_motor_max_speed) / 100.0
                         self.robot.medium_motor.run_forever(speed_sp=medium_speed)
 
                     elif direction == 'counter-clockwise':
-                        medium_speed = int(int(speed_percentage) * medium_motor_max_speed)/100.0
+                        medium_speed = int(int(speed_percentage) * medium_motor_max_speed) / 100.0
                         self.robot.medium_motor.run_forever(speed_sp=medium_speed * -1)
                 else:
                     log.info("we do not have a medium_motor")
@@ -213,11 +213,9 @@ class TankWebHandler(RobotWebHandler):
                     max_move_xy_seq = seq
                     log.debug("seq %d: (x, y) (%4d, %4d)" % (seq, x, y))
                 else:
-                    log.debug("seq %d: (x, y) %4d, %4d (ignore, max seq %d)" %
-                              (seq, x, y, max_move_xy_seq))
+                    log.debug("seq %d: (x, y) %4d, %4d (ignore, max seq %d)" % (seq, x, y, max_move_xy_seq))
             else:
-                log.debug("seq %d: (x, y) %4d, %4d (ignore, joystick idle)" %
-                          (seq, x, y))
+                log.debug("seq %d: (x, y) %4d, %4d (ignore, joystick idle)" % (seq, x, y))
 
         elif action == 'joystick-engaged':
             joystick_engaged = True
@@ -247,7 +245,6 @@ class RobotWebServer(object):
     """
     A Web server so that 'robot' can be controlled via 'handler_class'
     """
-
     def __init__(self, robot, handler_class, port_number=8000):
         self.content_server = None
         self.handler_class = handler_class
@@ -277,7 +274,6 @@ class WebControlledTank(MoveJoystick):
     """
     A tank that is controlled via a web browser
     """
-
     def __init__(self, left_motor, right_motor, port_number=8000, desc=None, motor_class=LargeMotor):
         MoveJoystick.__init__(self, left_motor, right_motor, desc, motor_class)
         self.www = RobotWebServer(self, TankWebHandler, port_number)

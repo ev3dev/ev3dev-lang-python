@@ -20,10 +20,9 @@
 # THE SOFTWARE.
 # -----------------------------------------------------------------------------
 
-
 import sys
 
-if sys.version_info < (3,4):
+if sys.version_info < (3, 4):
     raise SystemError('Must be using Python 3.4 or higher')
 
 CENTIMETER_MM = 10
@@ -54,7 +53,6 @@ class DistanceMillimeters(DistanceValue):
     """
     Distance in millimeters
     """
-
     def __init__(self, millimeters):
         self.millimeters = millimeters
 
@@ -74,7 +72,6 @@ class DistanceCentimeters(DistanceValue):
     """
     Distance in centimeters
     """
-
     def __init__(self, centimeters):
         self.centimeters = centimeters
 
@@ -94,7 +91,6 @@ class DistanceDecimeters(DistanceValue):
     """
     Distance in decimeters
     """
-
     def __init__(self, decimeters):
         self.decimeters = decimeters
 
@@ -114,7 +110,6 @@ class DistanceMeters(DistanceValue):
     """
     Distance in meters
     """
-
     def __init__(self, meters):
         self.meters = meters
 
@@ -134,7 +129,6 @@ class DistanceInches(DistanceValue):
     """
     Distance in inches
     """
-
     def __init__(self, inches):
         self.inches = inches
 
@@ -154,7 +148,6 @@ class DistanceFeet(DistanceValue):
     """
     Distance in feet
     """
-
     def __init__(self, feet):
         self.feet = feet
 
@@ -174,7 +167,6 @@ class DistanceYards(DistanceValue):
     """
     Distance in yards
     """
-
     def __init__(self, yards):
         self.yards = yards
 
@@ -194,7 +186,6 @@ class DistanceStuds(DistanceValue):
     """
     Distance in studs
     """
-
     def __init__(self, studs):
         self.studs = studs
 

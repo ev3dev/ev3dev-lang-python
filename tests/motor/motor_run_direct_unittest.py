@@ -12,8 +12,8 @@ import parameterizedtestcase as ptc
 
 from motor_info import motor_info
 
-class TestMotorRunDirect(ptc.ParameterizedTestCase):
 
+class TestMotorRunDirect(ptc.ParameterizedTestCase):
     @classmethod
     def setUpClass(cls):
         pass
@@ -25,30 +25,33 @@ class TestMotorRunDirect(ptc.ParameterizedTestCase):
     def initialize_motor(self):
         self._param['motor'].command = 'reset'
 
-    def run_direct_duty_cycles(self,stop_action,duty_cycles):
+    def run_direct_duty_cycles(self, stop_action, duty_cycles):
         self._param['motor'].stop_action = stop_action
         self._param['motor'].command = 'run-direct'
 
         for i in duty_cycles:
-            self._param['motor'].duty_cycle_sp = i 
+            self._param['motor'].duty_cycle_sp = i
             time.sleep(0.5)
 
         self._param['motor'].command = 'stop'
 
     def test_stop_coast_duty_cycles(self):
         self.initialize_motor()
-        self.run_direct_duty_cycles('coast',[0,20,40,60,80,100,66,33,0,-20,-40,-60,-80,-100,-66,-33,0])
+        self.run_direct_duty_cycles('coast', [0, 20, 40, 60, 80, 100, 66, 33, 0, -20, -40, -60, -80, -100, -66, -33, 0])
+
 
 # Add all the tests to the suite - some tests apply only to certain drivers!
 
-def AddTachoMotorRunDirectTestsToSuite( suite, driver_name, params ):
+
+def AddTachoMotorRunDirectTestsToSuite(suite, driver_name, params):
     suite.addTest(ptc.ParameterizedTestCase.parameterize(TestMotorRunDirect, param=params))
 
+
 if __name__ == '__main__':
-    params = { 'motor': ev3.Motor('outA'), 'port': 'outA', 'driver_name': 'lego-ev3-l-motor' }
+    params = {'motor': ev3.Motor('outA'), 'port': 'outA', 'driver_name': 'lego-ev3-l-motor'}
 
     suite = unittest.TestSuite()
 
-    AddTachoMotorRunDirectTestsToSuite( suite, 'lego-ev3-l-motor', params )
+    AddTachoMotorRunDirectTestsToSuite(suite, 'lego-ev3-l-motor', params)
 
-    unittest.TextTestRunner(verbosity=1,buffer=True ).run(suite)
+    unittest.TextTestRunner(verbosity=1, buffer=True).run(suite)

@@ -48,7 +48,6 @@ def _make_scales(notes):
     return res
 
 
-
 def get_command_processes(command):
     """
     :param string command: a string of command(s) to run that may include pipes
@@ -105,15 +104,11 @@ class Sound(object):
     channel = None
 
     # play_types
-    PLAY_WAIT_FOR_COMPLETE = 0 #: Play the sound and block until it is complete
-    PLAY_NO_WAIT_FOR_COMPLETE = 1 #: Start playing the sound but return immediately
-    PLAY_LOOP = 2 #: Never return; start the sound immediately after it completes, until the program is killed
+    PLAY_WAIT_FOR_COMPLETE = 0  #: Play the sound and block until it is complete
+    PLAY_NO_WAIT_FOR_COMPLETE = 1  #: Start playing the sound but return immediately
+    PLAY_LOOP = 2  #: Never return; start the sound immediately after it completes, until the program is killed
 
-    PLAY_TYPES = (
-        PLAY_WAIT_FOR_COMPLETE,
-        PLAY_NO_WAIT_FOR_COMPLETE,
-        PLAY_LOOP
-    )
+    PLAY_TYPES = (PLAY_WAIT_FOR_COMPLETE, PLAY_NO_WAIT_FOR_COMPLETE, PLAY_LOOP)
 
     def _validate_play_type(self, play_type):
         assert play_type in self.PLAY_TYPES, \
@@ -233,9 +228,9 @@ class Sound(object):
                 args = ''
                 if frequency is not None:
                     args += '-f %s ' % frequency
-                if duration  is not None:
+                if duration is not None:
                     args += '-l %s ' % duration
-                if delay     is not None:
+                if delay is not None:
                     args += '-D %s ' % delay
 
                 return args
@@ -249,8 +244,7 @@ class Sound(object):
         else:
             raise Exception("Unsupported number of parameters in Sound.tone(): expected 1 or 2, got " + str(len(args)))
 
-    def play_tone(self, frequency, duration, delay=0.0, volume=100,
-                  play_type=PLAY_WAIT_FOR_COMPLETE):
+    def play_tone(self, frequency, duration, delay=0.0, volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
         """ Play a single tone, specified by its frequency, duration, volume and final delay.
 
         :param int frequency: the tone frequency, in Hertz
@@ -477,7 +471,7 @@ class Sound(object):
             raise ValueError('invalid delay (%s)' % delay)
 
         delay_ms = int(delay * 1000)
-        meas_duration_ms = 60000 / tempo * 4       # we only support 4/4 bars, hence "* 4"
+        meas_duration_ms = 60000 / tempo * 4  # we only support 4/4 bars, hence "* 4"
 
         for (note, value) in song:
             value = value.lower()
@@ -496,7 +490,7 @@ class Sound(object):
 
             elif value.endswith('3'):
                 base = value[:-1]
-                factor = float(2/3)
+                factor = float(2 / 3)
 
             else:
                 base = value
@@ -523,7 +517,7 @@ class Sound(object):
         ('C0', 16.35),
         ('C#0/Db0', 17.32),
         ('D0', 18.35),
-        ('D#0/Eb0', 19.45),     # expanded in one entry per symbol by _make_scales
+        ('D#0/Eb0', 19.45),  # expanded in one entry per symbol by _make_scales
         ('E0', 20.60),
         ('F0', 21.83),
         ('F#0/Gb0', 23.12),
@@ -627,8 +621,7 @@ class Sound(object):
         ('G#8/Ab8', 6644.88),
         ('A8', 7040.00),
         ('A#8/Bb8', 7458.62),
-        ('B8', 7902.13)
-    ))
+        ('B8', 7902.13)))
 
     #: Common note values.
     #:
@@ -652,8 +645,8 @@ class Sound(object):
     #: :py:meth:`Sound.play_song` method.
     _NOTE_VALUES = {
         'w': 1.,
-        'h': 1./2,
-        'q': 1./4,
-        'e': 1./8,
-        's': 1./16,
+        'h': 1. / 2,
+        'q': 1. / 4,
+        'e': 1. / 8,
+        's': 1. / 16,
     }

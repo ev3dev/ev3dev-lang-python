@@ -25,7 +25,7 @@
 
 import sys
 
-if sys.version_info < (3,4):
+if sys.version_info < (3, 4):
     raise SystemError('Must be using Python 3.4 or higher')
 
 from ev3dev2 import Device
@@ -40,12 +40,12 @@ class PowerSupply(Device):
     SYSTEM_CLASS_NAME = 'power_supply'
     SYSTEM_DEVICE_NAME_CONVENTION = '*'
     __slots__ = [
-    '_measured_current',
-    '_measured_voltage',
-    '_max_voltage',
-    '_min_voltage',
-    '_technology',
-    '_type',
+        '_measured_current',
+        '_measured_voltage',
+        '_max_voltage',
+        '_min_voltage',
+        '_technology',
+        '_type',
     ]
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):

@@ -48,10 +48,10 @@ LEDS = OrderedDict()
 LEDS['amber_led'] = 'led1:amber:brick-status'
 
 LED_GROUPS = OrderedDict()
-LED_GROUPS['LED'] = ('amber_led',)
+LED_GROUPS['LED'] = ('amber_led', )
 
 LED_COLORS = OrderedDict()
-LED_COLORS['BLACK'] = (0,)
-LED_COLORS['AMBER'] = (1,)
+LED_COLORS['BLACK'] = (0, )
+LED_COLORS['AMBER'] = (1, )
 
 LED_DEFAULT_COLOR = 'AMBER'

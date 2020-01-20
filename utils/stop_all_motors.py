@@ -1,5 +1,4 @@
 #!/usr/bin/env micropython
-
 """
 Stop all motors
 """

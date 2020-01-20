@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """
 Used to experiment with the MoveDifferential class
 """
@@ -12,8 +11,7 @@ import logging
 import sys
 
 # logging
-logging.basicConfig(level=logging.DEBUG,
-                    format="%(asctime)s %(levelname)5s: %(message)s")
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)5s: %(message)s")
 log = logging.getLogger(__name__)
 
 STUD_MM = 8
@@ -73,14 +71,12 @@ mdiff.on_arc_left(SpeedRPM(80), ONE_FOOT_CICLE_RADIUS_MM, ONE_FOOT_CICLE_CIRCUMF
 #mdiff.on_to_coordinates(SpeedRPM(40), 0, 0)
 #mdiff.turn_to_angle(SpeedRPM(40), 90)
 
-
 # Use odometry to drive to specific coordinates
 #mdiff.on_to_coordinates(SpeedRPM(40), 600, 300)
 
 # Now go back to where we started and rotate in place to 90 degrees
 #mdiff.on_to_coordinates(SpeedRPM(40), 0, 0)
 #mdiff.turn_to_angle(SpeedRPM(40), 90)
-
 
 #mdiff.odometry_coordinates_log()
 #mdiff.odometry_stop()

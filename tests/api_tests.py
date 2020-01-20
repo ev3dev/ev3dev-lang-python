@@ -9,7 +9,7 @@ sys.path.append(FAKE_SYS)
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from populate_arena import populate_arena
-from clean_arena    import clean_arena
+from clean_arena import clean_arena
 
 import ev3dev2
 from ev3dev2.sensor.lego import InfraredSensor
@@ -19,16 +19,8 @@ from ev3dev2.motor import \
     MoveTank, MoveSteering, MoveJoystick, \
     SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits
 
-from ev3dev2.unit import (
-    DistanceMillimeters,
-    DistanceCentimeters,
-    DistanceDecimeters,
-    DistanceMeters,
-    DistanceInches,
-    DistanceFeet,
-    DistanceYards,
-    DistanceStuds
-)
+from ev3dev2.unit import (DistanceMillimeters, DistanceCentimeters, DistanceDecimeters, DistanceMeters, DistanceInches,
+                          DistanceFeet, DistanceYards, DistanceStuds)
 
 import ev3dev2.stopwatch
 from ev3dev2.stopwatch import StopWatch, StopWatchAlreadyStartedException
@@ -36,6 +28,8 @@ from ev3dev2.stopwatch import StopWatch, StopWatchAlreadyStartedException
 ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 
 _internal_set_attribute = ev3dev2.Device._set_attribute
+
+
 def _set_attribute(self, attribute, name, value):
     # Follow the text with a newline to separate new content from stuff that
     # already existed in the buffer. On the real device we're writing to sysfs
@@ -44,36 +38,49 @@ def _set_attribute(self, attribute, name, value):
     attribute = _internal_set_attribute(self, attribute, name, value)
     attribute.write(b'\n')
     return attribute
+
+
 ev3dev2.Device._set_attribute = _set_attribute
 
 _internal_get_attribute = ev3dev2.Device._get_attribute
+
+
 def _get_attribute(self, attribute, name):
     # Split on newline delimiter; see _set_attribute above
     attribute, value = _internal_get_attribute(self, attribute, name)
     return attribute, value.split('\n', 1)[0]
+
+
 ev3dev2.Device._get_attribute = _get_attribute
+
 
 def dummy_wait(self, cond, timeout=None):
     pass
+
 
 Motor.wait = dummy_wait
 
 # for StopWatch
 mock_ticks_ms = 0
+
+
 def _mock_get_ticks_ms():
     return mock_ticks_ms
+
+
 ev3dev2.stopwatch.get_ticks_ms = _mock_get_ticks_ms
+
 
 def set_mock_ticks_ms(value):
     global mock_ticks_ms
     mock_ticks_ms = value
 
-class TestAPI(unittest.TestCase):
 
+class TestAPI(unittest.TestCase):
     def setUp(self):
         # micropython does not have _testMethodName
         try:
-            print("\n\n{}\n{}".format(self._testMethodName, "=" * len(self._testMethodName,)))
+            print("\n\n{}\n{}".format(self._testMethodName, "=" * len(self._testMethodName, )))
         except AttributeError:
             pass
 
@@ -121,21 +128,22 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(m.driver_name, 'lego-ev3-m-motor')
         self.assertEqual(m.driver_name, 'lego-ev3-m-motor')
 
-        self.assertEqual(m.count_per_rot,            360)
-        self.assertEqual(m.commands,                 ['run-forever', 'run-to-abs-pos', 'run-to-rel-pos', 'run-timed', 'run-direct', 'stop', 'reset'])
-        self.assertEqual(m.duty_cycle,               0)
-        self.assertEqual(m.duty_cycle_sp,            42)
-        self.assertEqual(m.polarity,                 'normal')
-        self.assertEqual(m.address,                  'outA')
-        self.assertEqual(m.position,                 42)
-        self.assertEqual(m.position_sp,              42)
-        self.assertEqual(m.ramp_down_sp,             0)
-        self.assertEqual(m.ramp_up_sp,               0)
-        self.assertEqual(m.speed,                    0)
-        self.assertEqual(m.speed_sp,                 0)
-        self.assertEqual(m.state,                    ['running'])
-        self.assertEqual(m.stop_action,              'coast')
-        self.assertEqual(m.time_sp,                  1000)
+        self.assertEqual(m.count_per_rot, 360)
+        self.assertEqual(
+            m.commands, ['run-forever', 'run-to-abs-pos', 'run-to-rel-pos', 'run-timed', 'run-direct', 'stop', 'reset'])
+        self.assertEqual(m.duty_cycle, 0)
+        self.assertEqual(m.duty_cycle_sp, 42)
+        self.assertEqual(m.polarity, 'normal')
+        self.assertEqual(m.address, 'outA')
+        self.assertEqual(m.position, 42)
+        self.assertEqual(m.position_sp, 42)
+        self.assertEqual(m.ramp_down_sp, 0)
+        self.assertEqual(m.ramp_up_sp, 0)
+        self.assertEqual(m.speed, 0)
+        self.assertEqual(m.speed_sp, 0)
+        self.assertEqual(m.state, ['running'])
+        self.assertEqual(m.stop_action, 'coast')
+        self.assertEqual(m.time_sp, 1000)
 
         with self.assertRaises(Exception):
             c = m.command
@@ -146,24 +154,24 @@ class TestAPI(unittest.TestCase):
 
         s = InfraredSensor()
 
-        self.assertEqual(s.device_index,    0)
+        self.assertEqual(s.device_index, 0)
         self.assertEqual(s.bin_data_format, 's8')
-        self.assertEqual(s.bin_data('<b'),  (16,))
-        self.assertEqual(s.num_values,      1)
-        self.assertEqual(s.address,         'in1')
-        self.assertEqual(s.value(0),        16)
-        self.assertEqual(s.mode,            "IR-PROX")
+        self.assertEqual(s.bin_data('<b'), (16, ))
+        self.assertEqual(s.num_values, 1)
+        self.assertEqual(s.address, 'in1')
+        self.assertEqual(s.value(0), 16)
+        self.assertEqual(s.mode, "IR-PROX")
 
         s.mode = "IR-REMOTE"
-        self.assertEqual(s.mode,            "IR-REMOTE")
+        self.assertEqual(s.mode, "IR-REMOTE")
 
         val = s.proximity
         self.assertEqual(s.mode, "IR-PROX")
-        self.assertEqual(val,               16)
+        self.assertEqual(val, 16)
 
         val = s.buttons_pressed()
         self.assertEqual(s.mode, "IR-REMOTE")
-        self.assertEqual(val,               [])
+        self.assertEqual(val, [])
 
     def test_medium_motor_write(self):
         clean_arena()
@@ -378,7 +386,7 @@ class TestAPI(unittest.TestCase):
     def test_stopwatch(self):
         sw = StopWatch()
         self.assertEqual(str(sw), "StopWatch: 00:00:00.000")
-        
+
         sw = StopWatch(desc="test sw")
         self.assertEqual(str(sw), "test sw: 00:00:00.000")
         self.assertEqual(sw.is_started, False)
@@ -387,7 +395,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, True)
         self.assertEqual(sw.value_ms, 0)
         self.assertEqual(sw.value_secs, 0)
-        self.assertEqual(sw.value_hms, (0,0,0,0))
+        self.assertEqual(sw.value_hms, (0, 0, 0, 0))
         self.assertEqual(sw.hms_str, "00:00:00.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
@@ -398,7 +406,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, True)
         self.assertEqual(sw.value_ms, 1500)
         self.assertEqual(sw.value_secs, 1.5)
-        self.assertEqual(sw.value_hms, (0,0,1,500))
+        self.assertEqual(sw.value_hms, (0, 0, 1, 500))
         self.assertEqual(sw.hms_str, "00:00:01.500")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
@@ -409,18 +417,18 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, True)
         self.assertEqual(sw.value_ms, 3000)
         self.assertEqual(sw.value_secs, 3)
-        self.assertEqual(sw.value_hms, (0,0,3,0))
+        self.assertEqual(sw.value_hms, (0, 0, 3, 0))
         self.assertEqual(sw.hms_str, "00:00:03.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
         self.assertEqual(sw.is_elapsed_ms(3000), True)
         self.assertEqual(sw.is_elapsed_secs(3), True)
 
-        set_mock_ticks_ms(1000 * 60 * 75.5) #75.5 minutes
+        set_mock_ticks_ms(1000 * 60 * 75.5)  #75.5 minutes
         self.assertEqual(sw.is_started, True)
         self.assertEqual(sw.value_ms, 1000 * 60 * 75.5)
         self.assertEqual(sw.value_secs, 60 * 75.5)
-        self.assertEqual(sw.value_hms, (1,15,30,0))
+        self.assertEqual(sw.value_hms, (1, 15, 30, 0))
         self.assertEqual(sw.hms_str, "01:15:30.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
@@ -439,7 +447,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, True)
         self.assertEqual(sw.value_ms, 0)
         self.assertEqual(sw.value_secs, 0)
-        self.assertEqual(sw.value_hms, (0,0,0,0))
+        self.assertEqual(sw.value_hms, (0, 0, 0, 0))
         self.assertEqual(sw.hms_str, "00:00:00.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
@@ -450,7 +458,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, True)
         self.assertEqual(sw.value_ms, 3000)
         self.assertEqual(sw.value_secs, 3)
-        self.assertEqual(sw.value_hms, (0,0,3,0))
+        self.assertEqual(sw.value_hms, (0, 0, 3, 0))
         self.assertEqual(sw.hms_str, "00:00:03.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
@@ -463,7 +471,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, False)
         self.assertEqual(sw.value_ms, 3000)
         self.assertEqual(sw.value_secs, 3)
-        self.assertEqual(sw.value_hms, (0,0,3,0))
+        self.assertEqual(sw.value_hms, (0, 0, 3, 0))
         self.assertEqual(sw.hms_str, "00:00:03.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
@@ -475,7 +483,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, False)
         self.assertEqual(sw.value_ms, 0)
         self.assertEqual(sw.value_secs, 0)
-        self.assertEqual(sw.value_hms, (0,0,0,0))
+        self.assertEqual(sw.value_hms, (0, 0, 0, 0))
         self.assertEqual(sw.hms_str, "00:00:00.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
@@ -486,12 +494,13 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_started, False)
         self.assertEqual(sw.value_ms, 0)
         self.assertEqual(sw.value_secs, 0)
-        self.assertEqual(sw.value_hms, (0,0,0,0))
+        self.assertEqual(sw.value_hms, (0, 0, 0, 0))
         self.assertEqual(sw.hms_str, "00:00:00.000")
         self.assertEqual(sw.is_elapsed_ms(None), False)
         self.assertEqual(sw.is_elapsed_secs(None), False)
         self.assertEqual(sw.is_elapsed_ms(3000), False)
         self.assertEqual(sw.is_elapsed_secs(3), False)
+
 
 if __name__ == "__main__":
     unittest.main()
