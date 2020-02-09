@@ -24,14 +24,13 @@
 # -----------------------------------------------------------------------------
 
 import sys
-
-if sys.version_info < (3, 4):
-    raise SystemError('Must be using Python 3.4 or higher')
-
-from ev3dev2 import is_micropython
 import os
 import re
 from time import sleep
+from ev3dev2 import is_micropython
+
+if sys.version_info < (3, 4):
+    raise SystemError('Must be using Python 3.4 or higher')
 
 if not is_micropython():
     import shlex
@@ -133,7 +132,7 @@ class Sound(object):
             return None
 
         else:
-            with open(os.devnull, 'w') as n:
+            with open(os.devnull, 'w'):
 
                 if play_type == Sound.PLAY_WAIT_FOR_COMPLETE:
                     processes = get_command_processes(command)
@@ -164,7 +163,8 @@ class Sound(object):
         :param play_type: The behavior of ``beep`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE`` or  ``Sound.PLAY_NO_WAIT_FOR_COMPLETE``
 
-        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
+        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the
+            spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
 
         .. _`beep man page`: https://linux.die.net/man/1/beep
         .. _`linux beep music`: https://www.google.com/search?q=linux+beep+music
@@ -204,12 +204,15 @@ class Sound(object):
         Have also a look at :py:meth:`play_song` for a more musician-friendly way of doing, which uses
         the conventional notation for notes and durations.
 
-        :param list[tuple(float,float,float)] tone_sequence: The sequence of tones to play. The first number of each tuple is frequency in Hz, the second is duration in milliseconds, and the third is delay in milliseconds between this and the next tone in the sequence.
+        :param list[tuple(float,float,float)] tone_sequence: The sequence of tones to play. The first
+            number of each tuple is frequency in Hz, the second is duration in milliseconds, and the
+            third is delay in milliseconds between this and the next tone in the sequence.
 
         :param play_type: The behavior of ``tone`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_NO_WAIT_FOR_COMPLETE``
 
-        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
+        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the
+            spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
 
         .. rubric:: tone(frequency, duration)
 
@@ -221,7 +224,8 @@ class Sound(object):
         :param play_type: The behavior of ``tone`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_NO_WAIT_FOR_COMPLETE``
 
-        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
+        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the
+            spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
         def play_tone_sequence(tone_sequence):
             def beep_args(frequency=None, duration=None, delay=None):
@@ -255,7 +259,8 @@ class Sound(object):
         :param play_type: The behavior of ``play_tone`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
 
-        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the PID of the underlying beep command; ``None`` otherwise
+        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns
+            the PID of the underlying beep command; ``None`` otherwise
 
         :raises ValueError: if invalid parameter
         """
@@ -285,7 +290,8 @@ class Sound(object):
         :param play_type: The behavior of ``play_note`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
 
-        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the PID of the underlying beep command; ``None`` otherwise
+        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns
+            the PID of the underlying beep command; ``None`` otherwise
 
         :raises ValueError: is invalid parameter (note, duration,...)
         """
@@ -311,7 +317,8 @@ class Sound(object):
         :param play_type: The behavior of ``play_file`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
 
-        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
+        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the
+            spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
         if not 0 < volume <= 100:
             raise ValueError('invalid volume (%s)' % volume)
@@ -338,7 +345,8 @@ class Sound(object):
         :param play_type: The behavior of ``speak`` once playback has been initiated
         :type play_type: ``Sound.PLAY_WAIT_FOR_COMPLETE``, ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` or ``Sound.PLAY_LOOP``
 
-        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
+        :return: When python3 is used and ``Sound.PLAY_NO_WAIT_FOR_COMPLETE`` is specified, returns the
+            spawn subprocess from ``subprocess.Popen``; ``None`` otherwise
         """
         self._validate_play_type(play_type)
         self.set_volume(volume)

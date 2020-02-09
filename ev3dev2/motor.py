@@ -21,10 +21,6 @@
 # -----------------------------------------------------------------------------
 
 import sys
-
-if sys.version_info < (3, 4):
-    raise SystemError('Must be using Python 3.4 or higher')
-
 import math
 import select
 import time
@@ -42,38 +38,44 @@ from os.path import abspath
 from ev3dev2 import get_current_platform, Device, list_device_names
 from ev3dev2.stopwatch import StopWatch
 
+# OUTPUT ports have platform specific values that we must import
+platform = get_current_platform()
+
+if platform == 'ev3':
+    from ev3dev2._platform.ev3 import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D  # noqa: F401
+
+elif platform == 'evb':
+    from ev3dev2._platform.evb import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D  # noqa: F401
+
+elif platform == 'pistorms':
+    from ev3dev2._platform.pistorms import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D  # noqa: F401
+
+elif platform == 'brickpi':
+    from ev3dev2._platform.brickpi import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D  # noqa: F401
+
+elif platform == 'brickpi3':
+    from ev3dev2._platform.brickpi3 import (  # noqa: F401
+        OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D,
+        OUTPUT_E, OUTPUT_F, OUTPUT_G, OUTPUT_H,
+        OUTPUT_I, OUTPUT_J, OUTPUT_K, OUTPUT_L,
+        OUTPUT_M, OUTPUT_N, OUTPUT_O, OUTPUT_P
+    )
+
+elif platform == 'fake':
+    from ev3dev2._platform.fake import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D  # noqa: F401
+
+else:
+    raise Exception("Unsupported platform '%s'" % platform)
+
+
+if sys.version_info < (3, 4):
+    raise SystemError('Must be using Python 3.4 or higher')
+
 log = getLogger(__name__)
 
 # The number of milliseconds we wait for the state of a motor to
 # update to 'running' in the "on_for_XYZ" methods of the Motor class
 WAIT_RUNNING_TIMEOUT = 100
-
-# OUTPUT ports have platform specific values that we must import
-platform = get_current_platform()
-
-if platform == 'ev3':
-    from ev3dev2._platform.ev3 import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
-
-elif platform == 'evb':
-    from ev3dev2._platform.evb import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
-
-elif platform == 'pistorms':
-    from ev3dev2._platform.pistorms import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
-
-elif platform == 'brickpi':
-    from ev3dev2._platform.brickpi import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
-
-elif platform == 'brickpi3':
-    from ev3dev2._platform.brickpi3 import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D, \
-                                           OUTPUT_E, OUTPUT_F, OUTPUT_G, OUTPUT_H, \
-                                           OUTPUT_I, OUTPUT_J, OUTPUT_K, OUTPUT_L, \
-                                           OUTPUT_M, OUTPUT_N, OUTPUT_O, OUTPUT_P
-
-elif platform == 'fake':
-    from ev3dev2._platform.fake import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
-
-else:
-    raise Exception("Unsupported platform '%s'" % platform)
 
 
 class SpeedValue(object):
@@ -941,7 +943,8 @@ class Motor(Device):
         # If speed is not a SpeedValue object we treat it as a percentage
         if not isinstance(speed, SpeedValue):
             assert -100 <= speed <= 100,\
-                "{}{} is an invalid speed percentage, must be between -100 and 100 (inclusive)".format("" if label is None else (label + ": ") , speed)
+                "{}{} is an invalid speed percentage, must be between -100 and 100 (inclusive)".format(
+                    "" if label is None else (label + ": "), speed)
             speed = SpeedPercent(speed)
 
         return speed.to_native_units(self)
@@ -1123,7 +1126,8 @@ class ActuonixL1250Motor(Motor):
     """
     Actuonix L12 50 linear servo motor.
 
-    Same as :class:`Motor`, except it will only successfully initialize if it finds an Actuonix L12 50 linear servo motor
+    Same as :class:`Motor`, except it will only successfully initialize if it finds an
+    Actuonix L12 50 linear servo motor
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
@@ -1143,7 +1147,8 @@ class ActuonixL12100Motor(Motor):
     """
     Actuonix L12 100 linear servo motor.
 
-    Same as :class:`Motor`, except it will only successfully initialize if it finds an Actuonix L12 100 linear servo motor
+    Same as :class:`Motor`, except it will only successfully initialize if it finds an
+    Actuonix L12 100linear servo motor
     """
 
     SYSTEM_CLASS_NAME = Motor.SYSTEM_CLASS_NAME
@@ -1656,7 +1661,7 @@ class MotorSet(object):
                     try:
                         setattr(motor, key, kwargs[key])
                     except AttributeError as e:
-                        #log.error("%s %s cannot set %s to %s" % (self, motor, key, kwargs[key]))
+                        # log.error("%s %s cannot set %s to %s" % (self, motor, key, kwargs[key]))
                         raise e
 
     def set_polarity(self, polarity, motors=None):
@@ -1675,12 +1680,12 @@ class MotorSet(object):
         for motor in motors:
             for key in kwargs:
                 if key not in ('motors', 'commands'):
-                    #log.debug("%s: %s set %s to %s" % (self, motor, key, kwargs[key]))
+                    # log.debug("%s: %s set %s to %s" % (self, motor, key, kwargs[key]))
                     setattr(motor, key, kwargs[key])
 
         for motor in motors:
             motor.command = kwargs['command']
-            #log.debug("%s: %s command %s" % (self, motor, kwargs['command']))
+            # log.debug("%s: %s command %s" % (self, motor, kwargs['command']))
 
     def run_forever(self, **kwargs):
         kwargs['command'] = LargeMotor.COMMAND_RUN_FOREVER
@@ -2247,7 +2252,7 @@ class MoveTank(MotorSet):
         Example:
 
         .. code:: python
-        
+
             from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveTank, SpeedPercent
             from ev3dev2.sensor.lego import GyroSensor
 
@@ -2515,10 +2520,10 @@ class MoveDifferential(MoveTank):
             right_speed = speed
             left_speed = float(circle_inner_mm / circle_outer_mm) * right_speed
 
-        log.debug(
-            "%s: arc %s, radius %s, distance %s, left-speed %s, right-speed %s, circle_outer_mm %s, circle_middle_mm %s, circle_inner_mm %s"
-            % (self, "right" if arc_right else "left", radius_mm, distance_mm, left_speed, right_speed, circle_outer_mm,
-               circle_middle_mm, circle_inner_mm))
+        log.debug("%s: arc %s, radius %s, distance %s, left-speed %s, right-speed %s" %
+                  (self, "right" if arc_right else "left", radius_mm, distance_mm, left_speed, right_speed))
+        log.debug("%s: circle_outer_mm %s, circle_middle_mm %s, circle_inner_mm %s" %
+                  (self, circle_outer_mm, circle_middle_mm, circle_inner_mm))
 
         # We know we want the middle circle to be of length distance_mm so
         # calculate the percentage of circle_middle_mm we must travel for the
@@ -2532,10 +2537,10 @@ class MoveDifferential(MoveTank):
         outer_wheel_rotations = float(circle_outer_final_mm / self.wheel.circumference_mm)
         outer_wheel_degrees = outer_wheel_rotations * 360
 
-        log.debug(
-            "%s: arc %s, circle_middle_percentage %s, circle_outer_final_mm %s, outer_wheel_rotations %s, outer_wheel_degrees %s"
-            % (self, "right" if arc_right else "left", circle_middle_percentage, circle_outer_final_mm,
-               outer_wheel_rotations, outer_wheel_degrees))
+        log.debug("%s: arc %s, circle_middle_percentage %s, circle_outer_final_mm %s, " %
+                  (self, "right" if arc_right else "left", circle_middle_percentage, circle_outer_final_mm))
+        log.debug("%s: outer_wheel_rotations %s, outer_wheel_degrees %s" %
+                  (self, outer_wheel_rotations, outer_wheel_degrees))
 
         MoveTank.on_for_degrees(self, left_speed, right_speed, outer_wheel_degrees, brake, block)
 

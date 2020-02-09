@@ -24,11 +24,6 @@
 # -----------------------------------------------------------------------------
 
 import sys
-
-if sys.version_info < (3, 4):
-    raise SystemError('Must be using Python 3.4 or higher')
-
-import numbers
 from os.path import abspath
 from struct import unpack
 from ev3dev2 import get_current_platform, Device, list_device_names
@@ -37,28 +32,34 @@ from ev3dev2 import get_current_platform, Device, list_device_names
 platform = get_current_platform()
 
 if platform == 'ev3':
-    from ev3dev2._platform.ev3 import INPUT_1, INPUT_2, INPUT_3, INPUT_4
+    from ev3dev2._platform.ev3 import INPUT_1, INPUT_2, INPUT_3, INPUT_4  # noqa: F401
 
 elif platform == 'evb':
-    from ev3dev2._platform.evb import INPUT_1, INPUT_2, INPUT_3, INPUT_4
+    from ev3dev2._platform.evb import INPUT_1, INPUT_2, INPUT_3, INPUT_4  # noqa: F401
 
 elif platform == 'pistorms':
-    from ev3dev2._platform.pistorms import INPUT_1, INPUT_2, INPUT_3, INPUT_4
+    from ev3dev2._platform.pistorms import INPUT_1, INPUT_2, INPUT_3, INPUT_4  # noqa: F401
 
 elif platform == 'brickpi':
-    from ev3dev2._platform.brickpi import INPUT_1, INPUT_2, INPUT_3, INPUT_4
+    from ev3dev2._platform.brickpi import INPUT_1, INPUT_2, INPUT_3, INPUT_4  # noqa: F401
 
 elif platform == 'brickpi3':
-    from ev3dev2._platform.brickpi3 import INPUT_1, INPUT_2, INPUT_3, INPUT_4, \
-                                           INPUT_5, INPUT_6, INPUT_7, INPUT_8, \
-                                           INPUT_9, INPUT_10, INPUT_11, INPUT_12, \
-                                           INPUT_13, INPUT_14, INPUT_15, INPUT_16
+    from ev3dev2._platform.brickpi3 import (  # noqa: F401
+        INPUT_1, INPUT_2, INPUT_3, INPUT_4,
+        INPUT_5, INPUT_6, INPUT_7, INPUT_8,
+        INPUT_9, INPUT_10, INPUT_11, INPUT_12,
+        INPUT_13, INPUT_14, INPUT_15, INPUT_16
+    )
 
 elif platform == 'fake':
-    from ev3dev2._platform.fake import INPUT_1, INPUT_2, INPUT_3, INPUT_4
+    from ev3dev2._platform.fake import INPUT_1, INPUT_2, INPUT_3, INPUT_4  # noqa: F401
 
 else:
     raise Exception("Unsupported platform '%s'" % platform)
+
+
+if sys.version_info < (3, 4):
+    raise SystemError('Must be using Python 3.4 or higher')
 
 
 class Sensor(Device):
@@ -241,7 +242,7 @@ class Sensor(Device):
             (28,)
         """
 
-        if self._bin_data_size == None:
+        if self._bin_data_size is None:
             self._bin_data_size = {
                 "u8": 1,
                 "s8": 1,
@@ -252,13 +253,14 @@ class Sensor(Device):
                 "float": 4
             }.get(self.bin_data_format, 1) * self.num_values
 
-        if None == self._bin_data:
+        if self._bin_data is None:
             self._bin_data = self._attribute_file_open('bin_data')
 
         self._bin_data.seek(0)
         raw = bytearray(self._bin_data.read(self._bin_data_size))
 
-        if fmt is None: return raw
+        if fmt is None:
+            return raw
 
         return unpack(fmt, raw)
 

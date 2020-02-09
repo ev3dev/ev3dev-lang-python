@@ -7,7 +7,6 @@ where you can"t move the motor by hand.
 from ev3dev2.motor import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D, Motor
 import argparse
 import logging
-import sys
 
 # command line args
 parser = argparse.ArgumentParser(description="Used to adjust the position of a motor in an already assembled robot")

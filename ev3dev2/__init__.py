@@ -24,6 +24,21 @@
 # -----------------------------------------------------------------------------
 
 import sys
+import os
+import io
+import fnmatch
+import re
+import stat
+import errno
+from os.path import abspath
+
+try:
+    # if we are in a released build, there will be an auto-generated "version"
+    # module
+    from .version import __version__
+except ImportError:
+    __version__ = "<unknown>"
+
 
 if sys.version_info < (3, 4):
     raise SystemError('Must be using Python 3.4 or higher')
@@ -38,22 +53,6 @@ def chain_exception(exception, cause):
         raise exception
     else:
         raise exception from cause
-
-
-try:
-    # if we are in a released build, there will be an auto-generated "version"
-    # module
-    from .version import __version__
-except ImportError:
-    __version__ = "<unknown>"
-
-import os
-import io
-import fnmatch
-import re
-import stat
-import errno
-from os.path import abspath
 
 
 def get_current_platform():
@@ -125,7 +124,7 @@ def list_device_names(class_path, name_pattern, **kwargs):
         try:
             with io.FileIO(attribute) as f:
                 value = f.read().strip().decode()
-        except:
+        except Exception:
             return False
 
         if isinstance(pattern, list):

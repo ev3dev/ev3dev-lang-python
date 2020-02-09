@@ -24,10 +24,6 @@
 # -----------------------------------------------------------------------------
 
 import sys
-
-if sys.version_info < (3, 4):
-    raise SystemError('Must be using Python 3.4 or higher')
-
 import os
 import mmap
 import ctypes
@@ -36,6 +32,9 @@ from PIL import Image, ImageDraw
 from . import fonts
 from . import get_current_platform, library_load_warning_message
 from struct import pack
+
+if sys.version_info < (3, 4):
+    raise SystemError('Must be using Python 3.4 or higher')
 
 log = logging.getLogger(__name__)
 

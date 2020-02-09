@@ -1,10 +1,11 @@
 from subprocess import Popen, PIPE
-import os, sys
+import os
+import sys
 
 pyver = sys.version_info
 
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Get version string from git
 #
 # Author: Douglas Creager <dcreager@dcreager.net>
@@ -12,7 +13,7 @@ pyver = sys.version_info
 #
 # PEP 386 adaptation from
 # https://gist.github.com/ilogue/2567778/f6661ea2c12c070851b2dfb4da8840a6641914bc
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 def call_git_describe(abbrev=4):
     try:
         p = Popen(['git', 'describe', '--exclude', 'ev3dev-*', '--abbrev=%d' % abbrev], stdout=PIPE, stderr=PIPE)
@@ -20,7 +21,7 @@ def call_git_describe(abbrev=4):
         line = p.stdout.readlines()[0]
         return line.strip().decode('utf8')
 
-    except:
+    except Exception:
         return None
 
 
@@ -29,7 +30,7 @@ def read_release_version():
         with open('{}/RELEASE-VERSION'.format(os.path.dirname(__file__)), 'r') as f:
             version = f.readlines()[0]
             return version.strip()
-    except:
+    except Exception:
         return None
 
 
@@ -59,7 +60,7 @@ def git_version(abbrev=4):
     if version is None:
         version = release_version
     else:
-        #adapt to PEP 386 compatible versioning scheme
+        # adapt to PEP 386 compatible versioning scheme
         version = pep386adapt(version)
 
     # If we still don't have anything, that's an error.

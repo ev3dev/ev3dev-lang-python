@@ -24,13 +24,13 @@
 # -----------------------------------------------------------------------------
 
 import sys
-
-if sys.version_info < (3, 4):
-    raise SystemError('Must be using Python 3.4 or higher')
-
 import time
 from ev3dev2.button import ButtonBase
 from ev3dev2.sensor import Sensor
+
+
+if sys.version_info < (3, 4):
+    raise SystemError('Must be using Python 3.4 or higher')
 
 
 class TouchSensor(Sensor):
@@ -224,7 +224,7 @@ class ColorSensor(Sensor):
     def raw(self):
         """
         Red, green, and blue components of the detected color, as a tuple.
-        
+
         Officially in the range 0-1020 but the values returned will never be
         that high. We do not yet know why the values returned are low, but
         pointing the color sensor at a well lit sheet of white paper will return
@@ -353,36 +353,36 @@ class ColorSensor(Sensor):
         L: color lightness
         S: color saturation
         """
-        (r, g, b) = self.rgb
-        maxc = max(r, g, b)
-        minc = min(r, g, b)
-        l = (minc + maxc) / 2.0
+        (red, green, blue) = self.rgb
+        maxc = max(red, green, blue)
+        minc = min(red, green, blue)
+        luminance = (minc + maxc) / 2.0
 
         if minc == maxc:
-            return 0.0, l, 0.0
+            return 0.0, luminance, 0.0
 
-        if l <= 0.5:
-            s = (maxc - minc) / (maxc + minc)
+        if luminance <= 0.5:
+            saturation = (maxc - minc) / (maxc + minc)
         else:
             if 2.0 - maxc - minc == 0:
-                s = 0
+                saturation = 0
             else:
-                s = (maxc - minc) / (2.0 - maxc - minc)
+                saturation = (maxc - minc) / (2.0 - maxc - minc)
 
-        rc = (maxc - r) / (maxc - minc)
-        gc = (maxc - g) / (maxc - minc)
-        bc = (maxc - b) / (maxc - minc)
+        rc = (maxc - red) / (maxc - minc)
+        gc = (maxc - green) / (maxc - minc)
+        bc = (maxc - blue) / (maxc - minc)
 
-        if r == maxc:
-            h = bc - gc
-        elif g == maxc:
-            h = 2.0 + rc - bc
+        if red == maxc:
+            hue = bc - gc
+        elif green == maxc:
+            hue = 2.0 + rc - bc
         else:
-            h = 4.0 + gc - rc
+            hue = 4.0 + gc - rc
 
-        h = (h / 6.0) % 1.0
+        hue = (hue / 6.0) % 1.0
 
-        return (h, l, s)
+        return (hue, luminance, saturation)
 
     @property
     def red(self):
@@ -856,7 +856,7 @@ class InfraredSensor(Sensor, ButtonBase):
         old state, call the appropriate button event handlers.
 
         To use the on_channel1_top_left, etc handlers your program would do something like:
-        
+
         .. code:: python
 
             def top_left_channel_1_action(state):
@@ -872,7 +872,7 @@ class InfraredSensor(Sensor, ButtonBase):
             while True:
                 ir.process()
                 time.sleep(0.01)
-        
+
         """
         new_state = []
         state_diff = []
@@ -891,7 +891,6 @@ class InfraredSensor(Sensor, ButtonBase):
                 if (button, channel) not in new_state and (button, channel) in self._state:
                     state_diff.append((button, channel))
 
-        old_state = self._state
         self._state = new_state
 
         for (button, channel) in state_diff:

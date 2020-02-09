@@ -24,10 +24,6 @@
 # -----------------------------------------------------------------------------
 
 import sys
-
-if sys.version_info < (3, 4):
-    raise SystemError('Must be using Python 3.4 or higher')
-
 import os
 import stat
 import time
@@ -36,6 +32,10 @@ from collections import OrderedDict
 from ev3dev2 import get_current_platform, Device
 from ev3dev2.stopwatch import StopWatch
 from time import sleep
+
+if sys.version_info < (3, 4):
+    raise SystemError('Must be using Python 3.4 or higher')
+
 
 # Import the LED settings, this is platform specific
 platform = get_current_platform()

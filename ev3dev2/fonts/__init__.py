@@ -21,7 +21,6 @@ def load(name):
     try:
         font_dir = os.path.dirname(__file__)
         pil_file = os.path.join(font_dir, '{}.pil'.format(name))
-        pbm_file = os.path.join(font_dir, '{}.pbm'.format(name))
         return ImageFont.load(pil_file)
     except FileNotFoundError:
         raise Exception('Failed to load font "{}". '.format(name) +
