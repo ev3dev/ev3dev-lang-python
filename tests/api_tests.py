@@ -21,11 +21,10 @@ from ev3dev2.motor import \
     MoveTank, MoveSteering, MoveJoystick, \
     SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits   # noqa: E402
 from ev3dev2.sensor.lego import InfraredSensor  # noqa: E402
-from ev3dev2.stopwatch import StopWatch, StopWatchAlreadyStartedException   # noqa: E402
-from ev3dev2.unit import (DistanceMillimeters, DistanceCentimeters, DistanceDecimeters,  # noqa: E402
-    DistanceMeters, DistanceInches,
-    DistanceFeet, DistanceYards, DistanceStuds
-)
+from ev3dev2.stopwatch import StopWatch, StopWatchAlreadyStartedException  # noqa: E402
+from ev3dev2.unit import (  # noqa: E402
+    DistanceMillimeters, DistanceCentimeters, DistanceDecimeters, DistanceMeters, DistanceInches, DistanceFeet,
+    DistanceYards, DistanceStuds)
 
 ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 

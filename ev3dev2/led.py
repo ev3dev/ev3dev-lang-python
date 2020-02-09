@@ -36,7 +36,6 @@ from time import sleep
 if sys.version_info < (3, 4):
     raise SystemError('Must be using Python 3.4 or higher')
 
-
 # Import the LED settings, this is platform specific
 platform = get_current_platform()
 

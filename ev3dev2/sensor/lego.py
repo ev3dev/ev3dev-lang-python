@@ -28,7 +28,6 @@ import time
 from ev3dev2.button import ButtonBase
 from ev3dev2.sensor import Sensor
 
-
 if sys.version_info < (3, 4):
     raise SystemError('Must be using Python 3.4 or higher')
 

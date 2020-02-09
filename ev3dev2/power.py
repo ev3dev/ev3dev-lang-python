@@ -26,7 +26,6 @@
 import sys
 from ev3dev2 import Device
 
-
 if sys.version_info < (3, 4):
     raise SystemError('Must be using Python 3.4 or higher')
 

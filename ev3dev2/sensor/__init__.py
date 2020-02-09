@@ -45,18 +45,14 @@ elif platform == 'brickpi':
 
 elif platform == 'brickpi3':
     from ev3dev2._platform.brickpi3 import (  # noqa: F401
-        INPUT_1, INPUT_2, INPUT_3, INPUT_4,
-        INPUT_5, INPUT_6, INPUT_7, INPUT_8,
-        INPUT_9, INPUT_10, INPUT_11, INPUT_12,
-        INPUT_13, INPUT_14, INPUT_15, INPUT_16
-    )
+        INPUT_1, INPUT_2, INPUT_3, INPUT_4, INPUT_5, INPUT_6, INPUT_7, INPUT_8, INPUT_9, INPUT_10, INPUT_11, INPUT_12,
+        INPUT_13, INPUT_14, INPUT_15, INPUT_16)
 
 elif platform == 'fake':
     from ev3dev2._platform.fake import INPUT_1, INPUT_2, INPUT_3, INPUT_4  # noqa: F401
 
 else:
     raise Exception("Unsupported platform '%s'" % platform)
-
 
 if sys.version_info < (3, 4):
     raise SystemError('Must be using Python 3.4 or higher')
