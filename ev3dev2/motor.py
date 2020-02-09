@@ -1857,6 +1857,8 @@ class MoveTank(MotorSet):
         self.left_motor = self.motors[left_motor_port]
         self.right_motor = self.motors[right_motor_port]
         self.max_speed = self.left_motor.max_speed
+        self._cs = None
+        self._gyro = None
 
     # color sensor used by follow_line()
     @property
