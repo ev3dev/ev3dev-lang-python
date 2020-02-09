@@ -2575,7 +2575,10 @@ class MoveDifferential(MoveTank):
             return result
 
         # use the gyro to check that we turned the correct amount?
-        use_gyro = bool(use_gyro and block and brake and self._gyro)
+        use_gyro = bool(use_gyro and block and brake)
+        if use_gyro and not self._gyro:
+            raise DeviceNotDefined(
+                "The 'gyro' variable must be defined with a GyroSensor. Example: tank.gyro = GyroSensor()")
 
         if use_gyro:
             angle_init_degrees = self._gyro.circle_angle()
