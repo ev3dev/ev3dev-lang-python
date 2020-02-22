@@ -70,34 +70,38 @@ sudo make install
 
 To update the module, use the following commands:
 
-```shell
-cd ev3dev-lang-python
-git pull
-sudo make install
-```
+.. code-block:: bash
+
+  cd ev3dev-lang-python
+  git pull
+  sudo make install
+
 
 If you are developing micropython support, you can take a shortcut
 and use the following command to build and deploy the micropython
 files only:
 
-```shell
-cd ev3dev-lang-python
-sudo make micropython-install
-```
+
+.. code-block:: bash
+
+  cd ev3dev-lang-python
+  sudo make micropython-install
 
 To re-install the latest release, use the following command:
 
-```shell
-sudo apt-get --reinstall install python3-ev3dev2
-```
+
+.. code-block:: bash
+
+  sudo apt-get --reinstall install python3-ev3dev2
 
 Or, to update your current ev3dev2 to the latest release, use the
 following commands:
 
-```shell
-sudo apt update
-sudo apt install --only-upgrade micropython-ev3dev2
-```
+
+.. code-block:: bash
+
+  sudo apt update
+  sudo apt install --only-upgrade micropython-ev3dev2
 
 .. _ev3dev: http://ev3dev.org
 .. _FAQ: https://python-ev3dev.readthedocs.io/en/ev3dev-stretch/faq.html
