@@ -6,6 +6,7 @@ python-ev3dev2 (2.1.0) UNRELEASED; urgency=medium
   * format code via yapf
   * MoveDifferential use gyro for better accuracy. Make MoveTank and
     MoveDifferential "turn" APIs more consistent.
+  * MoveTank turn_degrees convert speed to SpeedValue object
 
   [Matěj Volf]
   * LED animation fix duration None

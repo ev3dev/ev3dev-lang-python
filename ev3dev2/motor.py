@@ -76,6 +76,10 @@ else:
     raise Exception("Unsupported platform '%s'" % platform)
 
 
+class SpeedInvalid(ValueError):
+    pass
+
+
 class SpeedValue(object):
     """
     A base class for other unit types. Don't use this directly; instead, see
@@ -108,14 +112,14 @@ class SpeedPercent(SpeedValue):
     """
     Speed as a percentage of the motor's maximum rated speed.
     """
-    def __init__(self, percent):
-        assert -100 <= percent <= 100,\
-            "{} is an invalid percentage, must be between -100 and 100 (inclusive)".format(percent)
-
+    def __init__(self, percent, desc=None):
+        if percent < -100 or percent > 100:
+            raise SpeedInvalid("invalid percentage {}, must be between -100 and 100 (inclusive)".format(percent))
         self.percent = percent
+        self.desc = desc
 
     def __str__(self):
-        return str(self.percent) + "%"
+        return "{} ".format(self.desc) if self.desc else "" + str(self.percent) + "%"
 
     def __mul__(self, other):
         assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
@@ -132,11 +136,12 @@ class SpeedNativeUnits(SpeedValue):
     """
     Speed in tacho counts per second.
     """
-    def __init__(self, native_counts):
+    def __init__(self, native_counts, desc=None):
         self.native_counts = native_counts
+        self.desc = desc
 
     def __str__(self):
-        return "{:.2f}".format(self.native_counts) + " counts/sec"
+        return "{} ".format(self.desc) if self.desc else "" + "{:.2f}".format(self.native_counts) + " counts/sec"
 
     def __mul__(self, other):
         assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
@@ -146,6 +151,9 @@ class SpeedNativeUnits(SpeedValue):
         """
         Return this SpeedNativeUnits as a number
         """
+        if self.native_counts > motor.max_speed:
+            raise SpeedInvalid("invalid native-units: {} max speed {}, {} was requested".format(
+                motor, motor.max_speed, self.native_counts))
         return self.native_counts
 
 
@@ -153,11 +161,12 @@ class SpeedRPS(SpeedValue):
     """
     Speed in rotations-per-second.
     """
-    def __init__(self, rotations_per_second):
+    def __init__(self, rotations_per_second, desc=None):
         self.rotations_per_second = rotations_per_second
+        self.desc = desc
 
     def __str__(self):
-        return str(self.rotations_per_second) + " rot/sec"
+        return "{} ".format(self.desc) if self.desc else "" + str(self.rotations_per_second) + " rot/sec"
 
     def __mul__(self, other):
         assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
@@ -167,9 +176,9 @@ class SpeedRPS(SpeedValue):
         """
         Return the native speed measurement required to achieve desired rotations-per-second
         """
-        assert abs(self.rotations_per_second) <= motor.max_rps,\
-            "invalid rotations-per-second: {} max RPS is {}, {} was requested".format(
-            motor, motor.max_rps, self.rotations_per_second)
+        if abs(self.rotations_per_second) > motor.max_rps:
+            raise SpeedInvalid("invalid rotations-per-second: {} max RPS is {}, {} was requested".format(
+                motor, motor.max_rps, self.rotations_per_second))
         return self.rotations_per_second / motor.max_rps * motor.max_speed
 
 
@@ -177,11 +186,12 @@ class SpeedRPM(SpeedValue):
     """
     Speed in rotations-per-minute.
     """
-    def __init__(self, rotations_per_minute):
+    def __init__(self, rotations_per_minute, desc=None):
         self.rotations_per_minute = rotations_per_minute
+        self.desc = desc
 
     def __str__(self):
-        return str(self.rotations_per_minute) + " rot/min"
+        return "{} ".format(self.desc) if self.desc else "" + str(self.rotations_per_minute) + " rot/min"
 
     def __mul__(self, other):
         assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
@@ -191,9 +201,9 @@ class SpeedRPM(SpeedValue):
         """
         Return the native speed measurement required to achieve desired rotations-per-minute
         """
-        assert abs(self.rotations_per_minute) <= motor.max_rpm,\
-            "invalid rotations-per-minute: {} max RPM is {}, {} was requested".format(
-            motor, motor.max_rpm, self.rotations_per_minute)
+        if abs(self.rotations_per_minute) > motor.max_rpm:
+            raise SpeedInvalid("invalid rotations-per-minute: {} max RPM is {}, {} was requested".format(
+                motor, motor.max_rpm, self.rotations_per_minute))
         return self.rotations_per_minute / motor.max_rpm * motor.max_speed
 
 
@@ -201,11 +211,12 @@ class SpeedDPS(SpeedValue):
     """
     Speed in degrees-per-second.
     """
-    def __init__(self, degrees_per_second):
+    def __init__(self, degrees_per_second, desc=None):
         self.degrees_per_second = degrees_per_second
+        self.desc = desc
 
     def __str__(self):
-        return str(self.degrees_per_second) + " deg/sec"
+        return "{} ".format(self.desc) if self.desc else "" + str(self.degrees_per_second) + " deg/sec"
 
     def __mul__(self, other):
         assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
@@ -215,9 +226,9 @@ class SpeedDPS(SpeedValue):
         """
         Return the native speed measurement required to achieve desired degrees-per-second
         """
-        assert abs(self.degrees_per_second) <= motor.max_dps,\
-            "invalid degrees-per-second: {} max DPS is {}, {} was requested".format(
-            motor, motor.max_dps, self.degrees_per_second)
+        if abs(self.degrees_per_second) > motor.max_dps:
+            raise SpeedInvalid("invalid degrees-per-second: {} max DPS is {}, {} was requested".format(
+                motor, motor.max_dps, self.degrees_per_second))
         return self.degrees_per_second / motor.max_dps * motor.max_speed
 
 
@@ -225,11 +236,12 @@ class SpeedDPM(SpeedValue):
     """
     Speed in degrees-per-minute.
     """
-    def __init__(self, degrees_per_minute):
+    def __init__(self, degrees_per_minute, desc=None):
         self.degrees_per_minute = degrees_per_minute
+        self.desc = desc
 
     def __str__(self):
-        return str(self.degrees_per_minute) + " deg/min"
+        return "{} ".format(self.desc) if self.desc else "" + str(self.degrees_per_minute) + " deg/min"
 
     def __mul__(self, other):
         assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
@@ -239,10 +251,21 @@ class SpeedDPM(SpeedValue):
         """
         Return the native speed measurement required to achieve desired degrees-per-minute
         """
-        assert abs(self.degrees_per_minute) <= motor.max_dpm,\
-            "invalid degrees-per-minute: {} max DPM is {}, {} was requested".format(
-            motor, motor.max_dpm, self.degrees_per_minute)
+        if abs(self.degrees_per_minute) > motor.max_dpm:
+            raise SpeedInvalid("invalid degrees-per-minute: {} max DPM is {}, {} was requested".format(
+                motor, motor.max_dpm, self.degrees_per_minute))
         return self.degrees_per_minute / motor.max_dpm * motor.max_speed
+
+
+def speed_to_speedvalue(speed, desc=None):
+    """
+    If ``speed`` is not a ``SpeedValue`` object, treat it as a percentage.
+    Returns a ``SpeedValue`` object.
+    """
+    if isinstance(speed, SpeedValue):
+        return speed
+    else:
+        return SpeedPercent(speed, desc)
 
 
 class Motor(Device):
@@ -937,13 +960,7 @@ class Motor(Device):
         return self.wait(lambda state: s not in state, timeout)
 
     def _speed_native_units(self, speed, label=None):
-
-        # If speed is not a SpeedValue object we treat it as a percentage
-        if not isinstance(speed, SpeedValue):
-            assert -100 <= speed <= 100,\
-                "{}{} is an invalid speed percentage, must be between -100 and 100 (inclusive)".format("" if label is None else (label + ": ") , speed)
-            speed = SpeedPercent(speed)
-
+        speed = speed_to_speedvalue(speed, label)
         return speed.to_native_units(self)
 
     def _set_rel_position_degrees_and_speed_sp(self, degrees, speed):
@@ -2047,7 +2064,7 @@ class MoveTank(MotorSet):
                     follow_for=follow_for_ms,
                     ms=4500
                 )
-            except Exception:
+            except LineFollowErrorTooFast:
                 tank.stop()
                 raise
         """
@@ -2062,8 +2079,8 @@ class MoveTank(MotorSet):
         last_error = 0.0
         derivative = 0.0
         off_line_count = 0
+        speed = speed_to_speedvalue(speed)
         speed_native_units = speed.to_native_units(self.left_motor)
-        MAX_SPEED = SpeedNativeUnits(self.max_speed)
 
         while follow_for(self, **kwargs):
             reflected_light_intensity = self._cs.reflected_light_intensity
@@ -2079,16 +2096,6 @@ class MoveTank(MotorSet):
             left_speed = SpeedNativeUnits(speed_native_units - turn_native_units)
             right_speed = SpeedNativeUnits(speed_native_units + turn_native_units)
 
-            if left_speed > MAX_SPEED:
-                log.info("%s: left_speed %s is greater than MAX_SPEED %s" % (self, left_speed, MAX_SPEED))
-                self.stop()
-                raise LineFollowErrorTooFast("The robot is moving too fast to follow the line")
-
-            if right_speed > MAX_SPEED:
-                log.info("%s: right_speed %s is greater than MAX_SPEED %s" % (self, right_speed, MAX_SPEED))
-                self.stop()
-                raise LineFollowErrorTooFast("The robot is moving too fast to follow the line")
-
             # Have we lost the line?
             if reflected_light_intensity >= white:
                 off_line_count += 1
@@ -2102,7 +2109,12 @@ class MoveTank(MotorSet):
             if sleep_time:
                 time.sleep(sleep_time)
 
-            self.on(left_speed, right_speed)
+            try:
+                self.on(left_speed, right_speed)
+            except SpeedInvalid as e:
+                log.exception(e)
+                self.stop()
+                raise LineFollowErrorTooFast("The robot is moving too fast to follow the line")
 
         self.stop()
 
@@ -2150,15 +2162,16 @@ class MoveTank(MotorSet):
             # Initialize the tank's gyro sensor
             tank.gyro = GyroSensor()
 
-            try:
-                # Calibrate the gyro to eliminate drift, and to initialize the current angle as 0
-                tank.gyro.calibrate()
+            # Calibrate the gyro to eliminate drift, and to initialize the current angle as 0
+            tank.gyro.calibrate()
 
-                # Follow the line for 4500ms
+            try:
+
+                # Follow the target_angle for 4500ms
                 tank.follow_gyro_angle(
                     kp=11.3, ki=0.05, kd=3.2,
                     speed=SpeedPercent(30),
-                    target_angle=0
+                    target_angle=0,
                     follow_for=follow_for_ms,
                     ms=4500
                 )
@@ -2173,10 +2186,8 @@ class MoveTank(MotorSet):
         integral = 0.0
         last_error = 0.0
         derivative = 0.0
+        speed = speed_to_speedvalue(speed)
         speed_native_units = speed.to_native_units(self.left_motor)
-        MAX_SPEED = SpeedNativeUnits(self.max_speed)
-
-        assert speed_native_units <= MAX_SPEED, "Speed exceeds the max speed of the motors"
 
         while follow_for(self, **kwargs):
             current_angle = self._gyro.angle
@@ -2189,20 +2200,15 @@ class MoveTank(MotorSet):
             left_speed = SpeedNativeUnits(speed_native_units - turn_native_units)
             right_speed = SpeedNativeUnits(speed_native_units + turn_native_units)
 
-            if abs(left_speed) > MAX_SPEED:
-                log.info("%s: left_speed %s is greater than MAX_SPEED %s" % (self, left_speed, MAX_SPEED))
-                self.stop()
-                raise FollowGyroAngleErrorTooFast("The robot is moving too fast to follow the angle")
-
-            if abs(right_speed) > MAX_SPEED:
-                log.info("%s: right_speed %s is greater than MAX_SPEED %s" % (self, right_speed, MAX_SPEED))
-                self.stop()
-                raise FollowGyroAngleErrorTooFast("The robot is moving too fast to follow the angle")
-
             if sleep_time:
                 time.sleep(sleep_time)
 
-            self.on(left_speed, right_speed)
+            try:
+                self.on(left_speed, right_speed)
+            except SpeedInvalid as e:
+                log.exception(e)
+                self.stop()
+                raise FollowGyroAngleErrorTooFast("The robot is moving too fast to follow the angle")
 
         self.stop()
 
@@ -2254,6 +2260,7 @@ class MoveTank(MotorSet):
             raise DeviceNotDefined(
                 "The 'gyro' variable must be defined with a GyroSensor. Example: tank.gyro = GyroSensor()")
 
+        speed = speed_to_speedvalue(speed)
         speed_native_units = speed.to_native_units(self.left_motor)
         target_angle = self._gyro.angle + target_angle
 
