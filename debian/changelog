@@ -1,4 +1,4 @@
-python-ev3dev2 (2.1.0) UNRELEASED; urgency=medium
+python-ev3dev2 (2.1.0) stretch; urgency=medium
 
   [Daniel Walton]
   * RPyC update docs and make it easier to use
@@ -21,7 +21,7 @@ python-ev3dev2 (2.1.0) UNRELEASED; urgency=medium
   [Nithin Shenoy]
   * Add Gyro-based driving support to MoveTank
 
- -- UNRELEASED
+ -- Kaelin Laundry <wasabifan@outlook.com>  Sun, 22 Mar 2020 19:14:35 -0700
 
 python-ev3dev2 (2.0.0) stretch; urgency=medium
 
