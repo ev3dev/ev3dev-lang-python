@@ -3,6 +3,11 @@ Sensor classes
 
 .. contents:: :local:
 
+*Note:* If you are using a BrickPi rather than an EV3, you will need to manually
+configure the ports before interacting with your sensors. See the example
+`here <https://github.com/ev3dev/ev3dev-lang-python-demo/blob/stretch/platform/brickpi3-motor-and-sensor.py>`_.
+
+
 Dedicated sensor classes
 ------------------------
 

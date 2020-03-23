@@ -38,6 +38,9 @@ class LegoPort(Device):
     the LEGO MINDSTORMS EV3 Intelligent Brick, the LEGO WeDo USB hub and
     various sensor multiplexers from 3rd party manufacturers.
 
+    See the following example for using this class to configure sensors:
+    https://github.com/ev3dev/ev3dev-lang-python-demo/blob/stretch/platform/brickpi3-motor-and-sensor.py
+
     Some types of ports may have multiple modes of operation. For example, the
     input ports on the EV3 brick can communicate with sensors using UART, I2C
     or analog validate signals - but not all at the same time. Therefore there
