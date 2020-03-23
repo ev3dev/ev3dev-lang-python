@@ -23,11 +23,6 @@ from recommonmark.transform import AutoStructify
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from git_version import git_version  # noqa: E402
 
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-
-if on_rtd:
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'sphinx_bootstrap_theme', 'recommonmark', 'evdev'])
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
