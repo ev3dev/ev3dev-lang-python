@@ -124,6 +124,7 @@ doesn't actually cause release issues, but does mark the CI builds as "failed"
 because it tried to publish the same release again.
 
 **Check all of the following after release is complete:**
+
 - Emails from package server don't include any errors
 - All Travis CI builds succeeded
 - New release is available on PyPi
