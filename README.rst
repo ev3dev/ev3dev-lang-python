@@ -114,6 +114,8 @@ If you'd like to use a sensor on a specific port, specify the port like this:
 
   ts = TouchSensor(INPUT_1)
 
+*Heads-up:* If you are using a BrickPi instead of an EV3, you will need to manually configure the sensor. See the example here: https://github.com/ev3dev/ev3dev-lang-python-demo/blob/stretch/platform/brickpi3-motor-and-sensor.py
+
 Running a single motor
 ~~~~~~~~~~~~~~~~~~~~~~
 
