@@ -24,15 +24,9 @@
 # -----------------------------------------------------------------------------
 
 import sys
-
-if sys.version_info < (3, 4):
-    raise SystemError('Must be using Python 3.4 or higher')
-
 from ev3dev2.stopwatch import StopWatch
 from ev3dev2 import get_current_platform, is_micropython, library_load_warning_message
 from logging import getLogger
-
-log = getLogger(__name__)
 
 # Import the button filenames, this is platform specific
 platform = get_current_platform()
@@ -57,6 +51,11 @@ elif platform == 'fake':
 
 else:
     raise Exception("Unsupported platform '%s'" % platform)
+
+if sys.version_info < (3, 4):
+    raise SystemError('Must be using Python 3.4 or higher')
+
+log = getLogger(__name__)
 
 
 class MissingButton(Exception):
@@ -199,7 +198,7 @@ class EV3ButtonCommon(object):
 
 
 # micropython implementation
-if is_micropython():
+if is_micropython():  # noqa: C901
 
     try:
         # This is a linux-specific module.

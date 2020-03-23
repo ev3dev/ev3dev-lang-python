@@ -23,3 +23,4 @@ clean:
 
 format:
 	yapf --style .yapf.cfg --in-place --exclude tests/fake-sys/ --recursive .
+	python3 -m flake8 --config=.flake8.cfg .

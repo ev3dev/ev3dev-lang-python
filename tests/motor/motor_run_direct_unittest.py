@@ -7,10 +7,7 @@
 import unittest
 import time
 import ev3dev.ev3 as ev3
-
 import parameterizedtestcase as ptc
-
-from motor_info import motor_info
 
 
 class TestMotorRunDirect(ptc.ParameterizedTestCase):

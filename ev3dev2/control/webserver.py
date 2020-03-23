@@ -222,7 +222,7 @@ class TankWebHandler(RobotWebHandler):
 
         elif action == 'log':
             msg = ''.join(path[3:])
-            re_msg = re.search('^(.*)\?', msg)
+            re_msg = re.search(r'^(.*)\?', msg)
 
             if re_msg:
                 msg = re_msg.group(1)

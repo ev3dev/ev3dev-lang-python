@@ -5,10 +5,7 @@
 # http://eli.thegreenplace.net/2011/08/02/python-unit-testing-parametrized-test-cases
 
 import unittest
-import time
-import sys
 import ev3dev.ev3 as ev3
-
 import parameterizedtestcase as ptc
 
 from motor_info import motor_info
@@ -607,8 +604,8 @@ suite.addTest(ptc.ParameterizedTestCase.parameterize(TestTachoMotorSpeedPValue, 
 suite.addTest(ptc.ParameterizedTestCase.parameterize(TestTachoMotorSpeedIValue, param=paramsA))
 suite.addTest(ptc.ParameterizedTestCase.parameterize(TestTachoMotorSpeedDValue, param=paramsA))
 suite.addTest(ptc.ParameterizedTestCase.parameterize(TestTachoMotorStateValue, param=paramsA))
-suite.addTest(ptc.ParameterizedTestCase.parameterize(TestTachoMotorStopCommandValue, param=paramsA))
-suite.addTest(ptc.ParameterizedTestCase.parameterize(TestTachoMotorStopCommandsValue, param=paramsA))
+suite.addTest(ptc.ParameterizedTestCase.parameterize(TestTachoMotorStopActionValue, param=paramsA))
+suite.addTest(ptc.ParameterizedTestCase.parameterize(TestTachoMotorStopActionsValue, param=paramsA))
 suite.addTest(ptc.ParameterizedTestCase.parameterize(TestTachoMotorTimeSpValue, param=paramsA))
 
 if __name__ == '__main__':

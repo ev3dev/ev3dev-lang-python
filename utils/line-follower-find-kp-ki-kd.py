@@ -15,9 +15,7 @@ http://robotsquare.com/2012/11/28/line-following/
 
 from ev3dev2.motor import OUTPUT_A, OUTPUT_B, MoveTank, SpeedPercent, LineFollowError, follow_for_ms
 from ev3dev2.sensor.lego import ColorSensor
-from time import sleep
 import logging
-import sys
 
 
 def frange(start, end, increment):
@@ -86,7 +84,7 @@ def find_kp_ki_kd(tank, start, end, increment, speed, kx_to_tweak, kp, ki, kd):
         except LineFollowError:
             continue
 
-        except:
+        except Exception:
             tank.stop()
             raise
 

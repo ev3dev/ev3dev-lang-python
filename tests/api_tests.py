@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-import unittest, sys, os.path
+import unittest
+import sys
+import os.path
 import os
 
 FAKE_SYS = os.path.join(os.path.dirname(__file__), 'fake-sys')
@@ -8,22 +10,21 @@ os.environ["FAKE_SYS"] = "1"
 sys.path.append(FAKE_SYS)
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from populate_arena import populate_arena
-from clean_arena import clean_arena
+from populate_arena import populate_arena  # noqa: E402
+from clean_arena import clean_arena  # noqa: E402
 
-import ev3dev2
-from ev3dev2.sensor.lego import InfraredSensor
+import ev3dev2  # noqa: E402
+import ev3dev2.stopwatch  # noqa: E402
 from ev3dev2.motor import \
     OUTPUT_A, OUTPUT_B, \
     Motor, MediumMotor, LargeMotor, \
     MoveTank, MoveSteering, MoveJoystick, \
-    SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits
-
-from ev3dev2.unit import (DistanceMillimeters, DistanceCentimeters, DistanceDecimeters, DistanceMeters, DistanceInches,
-                          DistanceFeet, DistanceYards, DistanceStuds)
-
-import ev3dev2.stopwatch
-from ev3dev2.stopwatch import StopWatch, StopWatchAlreadyStartedException
+    SpeedPercent, SpeedDPM, SpeedDPS, SpeedRPM, SpeedRPS, SpeedNativeUnits   # noqa: E402
+from ev3dev2.sensor.lego import InfraredSensor  # noqa: E402
+from ev3dev2.stopwatch import StopWatch, StopWatchAlreadyStartedException  # noqa: E402
+from ev3dev2.unit import (  # noqa: E402
+    DistanceMillimeters, DistanceCentimeters, DistanceDecimeters, DistanceMeters, DistanceInches, DistanceFeet,
+    DistanceYards, DistanceStuds)
 
 ev3dev2.Device.DEVICE_ROOT_PATH = os.path.join(FAKE_SYS, 'arena')
 
@@ -91,24 +92,24 @@ class TestAPI(unittest.TestCase):
         clean_arena()
         populate_arena([('medium_motor', 0, 'outA'), ('infrared_sensor', 0, 'in1')])
 
-        d = ev3dev2.Device('tacho-motor', 'motor*')
+        ev3dev2.Device('tacho-motor', 'motor*')
 
-        d = ev3dev2.Device('tacho-motor', 'motor0')
+        ev3dev2.Device('tacho-motor', 'motor0')
 
-        d = ev3dev2.Device('tacho-motor', 'motor*', driver_name='lego-ev3-m-motor')
+        ev3dev2.Device('tacho-motor', 'motor*', driver_name='lego-ev3-m-motor')
 
-        d = ev3dev2.Device('tacho-motor', 'motor*', address='outA')
-
-        with self.assertRaises(ev3dev2.DeviceNotFound):
-            d = ev3dev2.Device('tacho-motor', 'motor*', address='outA', driver_name='not-valid')
+        ev3dev2.Device('tacho-motor', 'motor*', address='outA')
 
         with self.assertRaises(ev3dev2.DeviceNotFound):
-            d = ev3dev2.Device('tacho-motor', 'motor*', address='this-does-not-exist')
-
-        d = ev3dev2.Device('lego-sensor', 'sensor*')
+            ev3dev2.Device('tacho-motor', 'motor*', address='outA', driver_name='not-valid')
 
         with self.assertRaises(ev3dev2.DeviceNotFound):
-            d = ev3dev2.Device('this-does-not-exist')
+            ev3dev2.Device('tacho-motor', 'motor*', address='this-does-not-exist')
+
+        ev3dev2.Device('lego-sensor', 'sensor*')
+
+        with self.assertRaises(ev3dev2.DeviceNotFound):
+            ev3dev2.Device('this-does-not-exist')
 
     def test_medium_motor(self):
         def dummy(self):
@@ -146,7 +147,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(m.time_sp, 1000)
 
         with self.assertRaises(Exception):
-            c = m.command
+            m.command
 
     def test_infrared_sensor(self):
         clean_arena()
@@ -424,7 +425,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(sw.is_elapsed_ms(3000), True)
         self.assertEqual(sw.is_elapsed_secs(3), True)
 
-        set_mock_ticks_ms(1000 * 60 * 75.5)  #75.5 minutes
+        set_mock_ticks_ms(1000 * 60 * 75.5)  # 75.5 minutes
         self.assertEqual(sw.is_started, True)
         self.assertEqual(sw.value_ms, 1000 * 60 * 75.5)
         self.assertEqual(sw.value_secs, 60 * 75.5)
