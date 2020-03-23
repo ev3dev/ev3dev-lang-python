@@ -1,1 +1,4 @@
 docutils==0.14
+sphinx_bootstrap_theme
+recommonmark
+evdev
