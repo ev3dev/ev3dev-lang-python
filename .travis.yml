@@ -3,7 +3,7 @@ env:
   - USE_MICROPYTHON=false
   - USE_MICROPYTHON=true
 python:
-- 3.4
+- 3.8
 cache:
   pip: true
   directories:
