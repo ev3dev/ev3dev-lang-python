@@ -130,6 +130,7 @@ because it tried to publish the same release again.
 - New release is available on PyPi
 - Release tags are up on GitHub
 - ReadTheDocs is updated
+
   - ReadTheDocs "stable" version points to latest release
   - There is an explicit version tag for the last-released version (exeption: ``2.1.0``)
   - There is an explicit version tag for this version (you will likely need to manually activate it)
