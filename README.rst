@@ -70,7 +70,7 @@ If you encounter an error such as
 ``/usr/bin/env: 'python3\r': No such file or directory``,
 you must switch your editor's "line endings" setting for the file from
 "CRLF" to just "LF". This is usually in the status bar at the bottom.
-For help, see `our FAQ page`_.
+For help, see our `Common Issues page`_.
 
 Important: Make your script executable (non-Visual Studio Code only)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -202,7 +202,8 @@ Frequently-Asked Questions
 --------------------------
 
 Experiencing an odd error or unsure of how to do something that seems
-simple? Check our our `FAQ`_ to see if there's an existing answer.
+simple? Check our our `FAQ`_ and `Common Issues page`_ to see if there's an
+existing answer.
 
 
 .. _ev3dev: http://ev3dev.org
@@ -218,6 +219,7 @@ simple? Check our our `FAQ`_ to see if there's an existing answer.
 .. _ev3python.com: http://ev3python.com/
 .. _FAQ: http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/faq.html
 .. _our FAQ page: FAQ_
+.. _Common Issues page: http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/common-issues.html
 .. _our Issues tracker: https://github.com/ev3dev/ev3dev-lang-python/issues
 .. _EXPLOR3R: demo-robot_
 .. _demo-robot: http://robotsquare.com/2015/10/06/explor3r-building-instructions/

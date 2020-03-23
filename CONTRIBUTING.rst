@@ -6,10 +6,10 @@ This repository holds the Python bindings for ev3dev_, ev3dev-lang-python.
 Opening issues
 --------------
 
-Please make sure you have read the FAQ_. If you are still encountering your
-problem, open an issue, and ensure that the questions asked by the issue
-template are completely answered with correct info. This will make it much
-easier for us to help you!
+Please make sure you have read the FAQ_ and `Common Issues`_. If you are still
+encountering your problem, open an issue, and ensure that the questions asked
+by the issue template are completely answered with correct info. This will make
+it much easier for us to help you!
 
 Submitting Pull Requests
 ------------------------
@@ -105,3 +105,4 @@ following commands:
 
 .. _ev3dev: http://ev3dev.org
 .. _FAQ: https://python-ev3dev.readthedocs.io/en/ev3dev-stretch/faq.html
+.. _Common Issues: http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/common-issues.html
