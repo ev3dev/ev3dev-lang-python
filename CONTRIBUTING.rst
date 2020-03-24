@@ -103,5 +103,38 @@ following commands:
   sudo apt update
   sudo apt install --only-upgrade micropython-ev3dev2
 
+Publishing releases
+-------------------
+
+#. Update the changelog, including a correct release date. Use ``date -R`` to get correctly-formatted date.
+#. Commit the changelog. By convention, use message like ``Update changelog for 2.1.0 release``.
+#. Build/update pbuilder base images: ``OS=debian DIST=stretch ARCH=amd64 pbuilder-ev3dev base`` and ``OS=raspbian DIST=stretch ARCH=armhf pbuilder-ev3dev base``.
+#. ``./debian/release.sh`` and enter passwords/key passphrases as needed
+#. ``git push``
+#. ``git push --tags``
+#. ``git tag -d stable``
+#. ``git tag stable``
+#. ``git push --tags --force``
+#. ``git tag -a 2.1.0 -m "python-ev3dev2 PyPi release 2.1.0"``
+#. ``git push --tags``
+
+Note that push order is important; the CI server will get confused if you push
+other tags pointing to the same commit after you push the PyPi release tag. This
+doesn't actually cause release issues, but does mark the CI builds as "failed"
+because it tried to publish the same release again.
+
+**Check all of the following after release is complete:**
+
+- Emails from package server don't include any errors
+- All Travis CI builds succeeded
+- New release is available on PyPi
+- Release tags are up on GitHub
+- ReadTheDocs is updated
+
+  - ReadTheDocs "stable" version points to latest release
+  - There is an explicit version tag for the last-released version (exeption: ``2.1.0``)
+  - There is an explicit version tag for this version (you will likely need to manually activate it)
+  - All ReadTheDocs builds succeeded
+
 .. _ev3dev: http://ev3dev.org
 .. _FAQ: https://python-ev3dev.readthedocs.io/en/ev3dev-stretch/faq.html
