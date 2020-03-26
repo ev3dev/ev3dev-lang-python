@@ -1,6 +1,13 @@
 Common Issues with ev3dev-lang-python
 =====================================
 
+``ImportError: No module named ev3dev2``
+----------------------------------------
+
+This likely means you are running the script on your computer rather than on the
+EV3 (or other ev3dev platform). You can do so using our `Visual Studio Code extension`_
+by connecting to a device in the 
+
 ``/usr/bin/env: 'python3\r': No such file or directory``
 --------------------------------------------------------
 
@@ -29,3 +36,4 @@ status bar at the bottom of the window or in the menu bar at the top.
 You probably forgot to `update config.txt`_.
 
 .. _update config.txt: https://www.ev3dev.org/docs/getting-started/#step-3a-raspberry-pi-only-update-options-in-configtxt
+.. _Visual Studio Code extension: https://github.com/ev3dev/vscode-ev3dev-browser
