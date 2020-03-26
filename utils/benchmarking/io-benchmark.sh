@@ -15,6 +15,9 @@ do_benchmark() {
     
     echo "Motor read speed_sp:"
     $PYTHON -m timeit -s "from ev3dev2.motor import Motor; m = Motor()" "m.speed_sp"
+
+    echo "Motor read count_per_rot (cached):"
+    $PYTHON -m timeit -s "from ev3dev2.motor import Motor; m = Motor()" "m.count_per_rot"
     
     echo "Motor write speed_sp:"
     $PYTHON -m timeit -s "from ev3dev2.motor import Motor; m = Motor()" "m.speed_sp = 5"
