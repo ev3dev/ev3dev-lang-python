@@ -6,7 +6,7 @@ do_benchmark() {
     PYTHON=$1
 
     VERSION=$($PYTHON -c "import ev3dev2; print(ev3dev2.__version__)")
-    MODULE_PATH=$($PYTHON -c "import ev3dev2; print(ev3dev2.__path__)")
+    MODULE_PATH=$($PYTHON -c "import ev3dev2; print(ev3dev2.__path__[0] if isinstance(ev3dev2.__path__, list) else ev3dev2.__path__)")
 
     echo "Using interpreter $PYTHON; found ev3dev2 version $VERSION from $MODULE_PATH"
 
