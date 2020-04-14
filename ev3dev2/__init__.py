@@ -163,6 +163,7 @@ class Device(object):
 
     __slots__ = [
         '_path',
+        '_name',
         '_device_index',
         '_attr_cache',
         'kwargs',
@@ -214,9 +215,11 @@ class Device(object):
         else:
             try:
                 name = next(list_device_names(classpath, name_pattern, **kwargs))
+                self._name = name
                 self._path = classpath + '/' + name
                 self._device_index = get_index(name)
             except StopIteration:
+                self._name = None
                 self._path = None
                 self._device_index = None
 

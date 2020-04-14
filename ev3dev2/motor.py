@@ -177,6 +177,8 @@ class SpeedRPS(SpeedValue):
         if abs(self.rotations_per_second) > motor.max_rps:
             raise SpeedInvalid("invalid rotations-per-second: {} max RPS is {}, {} was requested".format(
                 motor, motor.max_rps, self.rotations_per_second))
+        if motor._motor_type != 'rotational':
+            raise SpeedInvalid("{} units can only be used for rotational motors".format(type(self).__name__))
         return self.rotations_per_second / motor.max_rps * motor.max_speed
 
 
@@ -202,6 +204,8 @@ class SpeedRPM(SpeedValue):
         if abs(self.rotations_per_minute) > motor.max_rpm:
             raise SpeedInvalid("invalid rotations-per-minute: {} max RPM is {}, {} was requested".format(
                 motor, motor.max_rpm, self.rotations_per_minute))
+        if motor._motor_type != 'rotational':
+            raise SpeedInvalid("{} units can only be used for rotational motors".format(type(self).__name__))
         return self.rotations_per_minute / motor.max_rpm * motor.max_speed
 
 
@@ -227,6 +231,8 @@ class SpeedDPS(SpeedValue):
         if abs(self.degrees_per_second) > motor.max_dps:
             raise SpeedInvalid("invalid degrees-per-second: {} max DPS is {}, {} was requested".format(
                 motor, motor.max_dps, self.degrees_per_second))
+        if motor._motor_type != 'rotational':
+            raise SpeedInvalid("{} units can only be used for rotational motors".format(type(self).__name__))
         return self.degrees_per_second / motor.max_dps * motor.max_speed
 
 
@@ -252,6 +258,8 @@ class SpeedDPM(SpeedValue):
         if abs(self.degrees_per_minute) > motor.max_dpm:
             raise SpeedInvalid("invalid degrees-per-minute: {} max DPM is {}, {} was requested".format(
                 motor, motor.max_dpm, self.degrees_per_minute))
+        if motor._motor_type != 'rotational':
+            raise SpeedInvalid("{} units can only be used for rotational motors".format(type(self).__name__))
         return self.degrees_per_minute / motor.max_dpm * motor.max_speed
 
 
@@ -310,6 +318,7 @@ class Motor(Device):
         'max_rpm',
         'max_dps',
         'max_dpm',
+        '_motor_type',
     ]
 
     #: Run the motor until another command is sent.
@@ -394,6 +403,13 @@ class Motor(Device):
             kwargs['address'] = address
         super(Motor, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
+        if self._name and self._name.startswith('motor'):
+            self._motor_type = 'rotational'
+        elif self._name and self._name.startswith('linear'):
+            self._motor_type = 'linear'
+        else:
+            self._motor_type = None
+
         self._address = None
         self._command = None
         self._commands = None
@@ -422,10 +438,12 @@ class Motor(Device):
         self._stop_actions = None
         self._time_sp = None
         self._poll = None
-        self.max_rps = float(self.max_speed / self.count_per_rot)
-        self.max_rpm = self.max_rps * 60
-        self.max_dps = self.max_rps * 360
-        self.max_dpm = self.max_rpm * 360
+        
+        if self._motor_type == 'rotational':
+            self.max_rps = float(self.max_speed / self.count_per_rot)
+            self.max_rpm = self.max_rps * 60
+            self.max_dps = self.max_rps * 360
+            self.max_dpm = self.max_rpm * 360
 
     @property
     def address(self):
