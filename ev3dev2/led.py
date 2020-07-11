@@ -491,7 +491,7 @@ class Leds(object):
 
             from ev3dev2.led import Leds
             leds = Leds()
-            leds.animate_cyle(('RED', 'GREEN', 'AMBER'))
+            leds.animate_cycle(('RED', 'GREEN', 'AMBER'))
         """
         def _animate_cycle():
             index = 0
