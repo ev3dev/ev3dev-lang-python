@@ -309,7 +309,8 @@ class Sound(object):
         return self.play_tone(freq, duration=duration, volume=volume, play_type=play_type)
 
     def play_file(self, wav_file, volume=100, play_type=PLAY_WAIT_FOR_COMPLETE):
-        """ Play a sound file (wav format) at a given volume.
+        """ Play a sound file (wav format) at a given volume. The EV3 audio subsystem will work best if
+        the file is encoded as 16-bit, mono, 22050Hz.
 
         :param string wav_file: The sound file path
         :param int volume: The play volume, in percent of maximum volume
