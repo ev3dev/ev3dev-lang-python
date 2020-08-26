@@ -2695,7 +2695,7 @@ class MoveDifferential(MoveTank):
     def odometry_coordinates_log(self):
         log.debug("%s: odometry angle %s at (%d, %d)" % (self, math.degrees(self.theta), self.x_pos_mm, self.y_pos_mm))
 
-    def odometry_start(self, theta_degrees_start=90.0, x_pos_start=0.0, y_pos_start=0.0, sleep_time=0.005):  # 5ms
+    def odometry_start(self, theta_degrees_start=90.0, x_pos_start=0.0, y_pos_start=0.0, sleep_time=0.005, reset_position=False):  # 5ms
         """
         Ported from:
         http://seattlerobotics.org/encoder/200610/Article3/IMU%20Odometry,%20by%20David%20Anderson.htm
@@ -2704,6 +2704,9 @@ class MoveDifferential(MoveTank):
         which will set odometry_thread_run to False
         """
         def _odometry_monitor():
+            if (reset_postion == True): # resets the positions of the motors for a clena slate
+                self.left_motor.position = 0
+                self.right_motor.position = 0
             left_previous = 0
             right_previous = 0
             self.theta = math.radians(theta_degrees_start)  # robot heading
