@@ -1,5 +1,5 @@
-Python language bindings for ev3dev
-===================================
+Python language bindings for everydev
+=====================================
 
 .. image:: https://travis-ci.org/ev3dev/ev3dev-lang-python.svg?branch=ev3dev-stretch
     :target: https://travis-ci.org/ev3dev/ev3dev-lang-python
