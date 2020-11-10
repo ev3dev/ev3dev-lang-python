@@ -10,3 +10,4 @@
    spec
    rpyc
    faq
+   common-issues

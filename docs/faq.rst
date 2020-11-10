@@ -1,23 +1,7 @@
 Frequently-Asked Questions
 ==========================
 
-Q: Why does my Python program exit quickly or immediately throw an error?
-    A: This may occur if your file includes Windows-style line endings
-    (CRLF--carriage-return line-feed), which are often inserted by editors on
-    Windows. To resolve this issue, open an SSH session and run the following
-    command, replacing ``<file>`` with the name of the Python file you're
-    using:
-
-    .. code:: shell
-
-        sed -i 's/\r//g' <file>
-
-    This will fix it for the copy of the file on the brick, but if you plan to edit
-    it again from Windows, you should configure your editor to use Unix-style
-    line endings (LF--line-feed). For PyCharm, you can find a guide on doing this
-    `here <https://www.jetbrains.com/help/pycharm/2016.2/configuring-line-separators.html>`_.
-    Most other editors have similar options; there may be an option for it in the
-    status bar at the bottom of the window or in the menu bar at the top.
+See also `Common Issues`_.
 
 Q: Where can I learn more about the ev3dev operating system?
     A: `ev3dev.org`_ is a great resource for finding guides and tutorials on
@@ -63,6 +47,7 @@ Q: What compatibility issues are there with the different versions of Python?
 .. _ev3python.com: http://ev3python.com/
 .. _FAQ: http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/faq.html
 .. _our FAQ page: FAQ_
+.. _Common Issues: http://python-ev3dev.readthedocs.io/en/ev3dev-stretch/common-issues.html
 .. _our Issues tracker: https://github.com/ev3dev/ev3dev-lang-python/issues
 .. _EXPLOR3R: demo-robot_
 .. _demo-robot: http://robotsquare.com/2015/10/06/explor3r-building-instructions/
