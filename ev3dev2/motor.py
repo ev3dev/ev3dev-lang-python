@@ -84,6 +84,7 @@ class SpeedValue(object):
     :class:`SpeedPercent`, :class:`SpeedRPS`, :class:`SpeedRPM`,
     :class:`SpeedDPS`, and :class:`SpeedDPM`.
     """
+
     def __eq__(self, other):
         return self.to_native_units() == other.to_native_units()
 
@@ -110,9 +111,11 @@ class SpeedPercent(SpeedValue):
     """
     Speed as a percentage of the motor's maximum rated speed.
     """
+
     def __init__(self, percent, desc=None):
         if percent < -100 or percent > 100:
-            raise SpeedInvalid("invalid percentage {}, must be between -100 and 100 (inclusive)".format(percent))
+            raise SpeedInvalid(
+                "invalid percentage {}, must be between -100 and 100 (inclusive)".format(percent))
         self.percent = percent
         self.desc = desc
 
@@ -120,7 +123,8 @@ class SpeedPercent(SpeedValue):
         return "{} ".format(self.desc) if self.desc else "" + str(self.percent) + "%"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        assert isinstance(
+            other, (float, int)), "{} can only be multiplied by an int or float".format(self)
         return SpeedPercent(self.percent * other)
 
     def to_native_units(self, motor):
@@ -134,6 +138,7 @@ class SpeedNativeUnits(SpeedValue):
     """
     Speed in tacho counts per second.
     """
+
     def __init__(self, native_counts, desc=None):
         self.native_counts = native_counts
         self.desc = desc
@@ -142,7 +147,8 @@ class SpeedNativeUnits(SpeedValue):
         return "{} ".format(self.desc) if self.desc else "" + "{:.2f}".format(self.native_counts) + " counts/sec"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        assert isinstance(
+            other, (float, int)), "{} can only be multiplied by an int or float".format(self)
         return SpeedNativeUnits(self.native_counts * other)
 
     def to_native_units(self, motor=None):
@@ -159,6 +165,7 @@ class SpeedRPS(SpeedValue):
     """
     Speed in rotations-per-second.
     """
+
     def __init__(self, rotations_per_second, desc=None):
         self.rotations_per_second = rotations_per_second
         self.desc = desc
@@ -167,7 +174,8 @@ class SpeedRPS(SpeedValue):
         return "{} ".format(self.desc) if self.desc else "" + str(self.rotations_per_second) + " rot/sec"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        assert isinstance(
+            other, (float, int)), "{} can only be multiplied by an int or float".format(self)
         return SpeedRPS(self.rotations_per_second * other)
 
     def to_native_units(self, motor):
@@ -184,6 +192,7 @@ class SpeedRPM(SpeedValue):
     """
     Speed in rotations-per-minute.
     """
+
     def __init__(self, rotations_per_minute, desc=None):
         self.rotations_per_minute = rotations_per_minute
         self.desc = desc
@@ -192,7 +201,8 @@ class SpeedRPM(SpeedValue):
         return "{} ".format(self.desc) if self.desc else "" + str(self.rotations_per_minute) + " rot/min"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        assert isinstance(
+            other, (float, int)), "{} can only be multiplied by an int or float".format(self)
         return SpeedRPM(self.rotations_per_minute * other)
 
     def to_native_units(self, motor):
@@ -209,6 +219,7 @@ class SpeedDPS(SpeedValue):
     """
     Speed in degrees-per-second.
     """
+
     def __init__(self, degrees_per_second, desc=None):
         self.degrees_per_second = degrees_per_second
         self.desc = desc
@@ -217,7 +228,8 @@ class SpeedDPS(SpeedValue):
         return "{} ".format(self.desc) if self.desc else "" + str(self.degrees_per_second) + " deg/sec"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        assert isinstance(
+            other, (float, int)), "{} can only be multiplied by an int or float".format(self)
         return SpeedDPS(self.degrees_per_second * other)
 
     def to_native_units(self, motor):
@@ -234,6 +246,7 @@ class SpeedDPM(SpeedValue):
     """
     Speed in degrees-per-minute.
     """
+
     def __init__(self, degrees_per_minute, desc=None):
         self.degrees_per_minute = degrees_per_minute
         self.desc = desc
@@ -242,7 +255,8 @@ class SpeedDPM(SpeedValue):
         return "{} ".format(self.desc) if self.desc else "" + str(self.degrees_per_minute) + " deg/min"
 
     def __mul__(self, other):
-        assert isinstance(other, (float, int)), "{} can only be multiplied by an int or float".format(self)
+        assert isinstance(
+            other, (float, int)), "{} can only be multiplied by an int or float".format(self)
         return SpeedDPM(self.degrees_per_minute * other)
 
     def to_native_units(self, motor):
@@ -388,11 +402,13 @@ class Motor(Device):
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
         if platform in ('brickpi', 'brickpi3') and type(self).__name__ != 'Motor' and not isinstance(self, LargeMotor):
-            raise Exception("{} is unaware of different motor types, use LargeMotor instead".format(platform))
+            raise Exception(
+                "{} is unaware of different motor types, use LargeMotor instead".format(platform))
 
         if address is not None:
             kwargs['address'] = address
-        super(Motor, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
+        super(Motor, self).__init__(self.SYSTEM_CLASS_NAME,
+                                    name_pattern, name_exact, **kwargs)
 
         self._address = None
         self._command = None
@@ -470,7 +486,8 @@ class Motor(Device):
         - ``reset`` will reset all of the motor parameter attributes to their default value.
           This will also have the effect of stopping the motor.
         """
-        (self._commands, value) = self.get_cached_attr_set(self._commands, 'commands')
+        (self._commands, value) = self.get_cached_attr_set(
+            self._commands, 'commands')
         return value
 
     @property
@@ -480,7 +497,8 @@ class Motor(Device):
         are used by the position and speed attributes, so you can use this value
         to convert rotations or degrees to tacho counts. (rotation motors only)
         """
-        (self._count_per_rot, value) = self.get_cached_attr_int(self._count_per_rot, 'count_per_rot')
+        (self._count_per_rot, value) = self.get_cached_attr_int(
+            self._count_per_rot, 'count_per_rot')
         return value
 
     @property
@@ -490,7 +508,8 @@ class Motor(Device):
         counts are used by the position and speed attributes, so you can use this
         value to convert from distance to tacho counts. (linear motors only)
         """
-        (self._count_per_m, value) = self.get_cached_attr_int(self._count_per_m, 'count_per_m')
+        (self._count_per_m, value) = self.get_cached_attr_int(
+            self._count_per_m, 'count_per_m')
         return value
 
     @property
@@ -498,7 +517,8 @@ class Motor(Device):
         """
         Returns the name of the driver that provides this tacho motor device.
         """
-        (self._driver_name, value) = self.get_cached_attr_string(self._driver_name, 'driver_name')
+        (self._driver_name, value) = self.get_cached_attr_string(
+            self._driver_name, 'driver_name')
         return value
 
     @property
@@ -507,7 +527,8 @@ class Motor(Device):
         Returns the current duty cycle of the motor. Units are percent. Values
         are -100 to 100.
         """
-        self._duty_cycle, value = self.get_attr_int(self._duty_cycle, 'duty_cycle')
+        self._duty_cycle, value = self.get_attr_int(
+            self._duty_cycle, 'duty_cycle')
         return value
 
     @property
@@ -517,12 +538,14 @@ class Motor(Device):
         Units are in percent. Valid values are -100 to 100. A negative value causes
         the motor to rotate in reverse.
         """
-        self._duty_cycle_sp, value = self.get_attr_int(self._duty_cycle_sp, 'duty_cycle_sp')
+        self._duty_cycle_sp, value = self.get_attr_int(
+            self._duty_cycle_sp, 'duty_cycle_sp')
         return value
 
     @duty_cycle_sp.setter
     def duty_cycle_sp(self, value):
-        self._duty_cycle_sp = self.set_attr_int(self._duty_cycle_sp, 'duty_cycle_sp', value)
+        self._duty_cycle_sp = self.set_attr_int(
+            self._duty_cycle_sp, 'duty_cycle_sp', value)
 
     @property
     def full_travel_count(self):
@@ -531,7 +554,8 @@ class Motor(Device):
         combined with the ``count_per_m`` atribute, you can use this value to
         calculate the maximum travel distance of the motor. (linear motors only)
         """
-        (self._full_travel_count, value) = self.get_cached_attr_int(self._full_travel_count, 'full_travel_count')
+        (self._full_travel_count, value) = self.get_cached_attr_int(
+            self._full_travel_count, 'full_travel_count')
         return value
 
     @property
@@ -542,12 +566,14 @@ class Motor(Device):
         a positive duty cycle will cause the motor to rotate counter-clockwise.
         Valid values are ``normal`` and ``inversed``.
         """
-        self._polarity, value = self.get_attr_string(self._polarity, 'polarity')
+        self._polarity, value = self.get_attr_string(
+            self._polarity, 'polarity')
         return value
 
     @polarity.setter
     def polarity(self, value):
-        self._polarity = self.set_attr_string(self._polarity, 'polarity', value)
+        self._polarity = self.set_attr_string(
+            self._polarity, 'polarity', value)
 
     @property
     def position(self):
@@ -569,36 +595,42 @@ class Motor(Device):
         """
         The proportional constant for the position PID.
         """
-        self._position_p, value = self.get_attr_int(self._position_p, 'hold_pid/Kp')
+        self._position_p, value = self.get_attr_int(
+            self._position_p, 'hold_pid/Kp')
         return value
 
     @position_p.setter
     def position_p(self, value):
-        self._position_p = self.set_attr_int(self._position_p, 'hold_pid/Kp', value)
+        self._position_p = self.set_attr_int(
+            self._position_p, 'hold_pid/Kp', value)
 
     @property
     def position_i(self):
         """
         The integral constant for the position PID.
         """
-        self._position_i, value = self.get_attr_int(self._position_i, 'hold_pid/Ki')
+        self._position_i, value = self.get_attr_int(
+            self._position_i, 'hold_pid/Ki')
         return value
 
     @position_i.setter
     def position_i(self, value):
-        self._position_i = self.set_attr_int(self._position_i, 'hold_pid/Ki', value)
+        self._position_i = self.set_attr_int(
+            self._position_i, 'hold_pid/Ki', value)
 
     @property
     def position_d(self):
         """
         The derivative constant for the position PID.
         """
-        self._position_d, value = self.get_attr_int(self._position_d, 'hold_pid/Kd')
+        self._position_d, value = self.get_attr_int(
+            self._position_d, 'hold_pid/Kd')
         return value
 
     @position_d.setter
     def position_d(self, value):
-        self._position_d = self.set_attr_int(self._position_d, 'hold_pid/Kd', value)
+        self._position_d = self.set_attr_int(
+            self._position_d, 'hold_pid/Kd', value)
 
     @property
     def position_sp(self):
@@ -608,12 +640,14 @@ class Motor(Device):
         can use the value returned by ``count_per_rot`` to convert tacho counts to/from
         rotations or degrees.
         """
-        self._position_sp, value = self.get_attr_int(self._position_sp, 'position_sp')
+        self._position_sp, value = self.get_attr_int(
+            self._position_sp, 'position_sp')
         return value
 
     @position_sp.setter
     def position_sp(self, value):
-        self._position_sp = self.set_attr_int(self._position_sp, 'position_sp', value)
+        self._position_sp = self.set_attr_int(
+            self._position_sp, 'position_sp', value)
 
     @property
     def max_speed(self):
@@ -622,7 +656,8 @@ class Motor(Device):
         may be slightly different than the maximum speed that a particular motor can
         reach - it's the maximum theoretical speed.
         """
-        (self._max_speed, value) = self.get_cached_attr_int(self._max_speed, 'max_speed')
+        (self._max_speed, value) = self.get_cached_attr_int(
+            self._max_speed, 'max_speed')
         return value
 
     @property
@@ -661,12 +696,14 @@ class Motor(Device):
         setpoint. The actual ramp time is the ratio of the difference between the
         ``speed_sp`` and the current ``speed`` and max_speed multiplied by ``ramp_up_sp``.
         """
-        self._ramp_up_sp, value = self.get_attr_int(self._ramp_up_sp, 'ramp_up_sp')
+        self._ramp_up_sp, value = self.get_attr_int(
+            self._ramp_up_sp, 'ramp_up_sp')
         return value
 
     @ramp_up_sp.setter
     def ramp_up_sp(self, value):
-        self._ramp_up_sp = self.set_attr_int(self._ramp_up_sp, 'ramp_up_sp', value)
+        self._ramp_up_sp = self.set_attr_int(
+            self._ramp_up_sp, 'ramp_up_sp', value)
 
     @property
     def ramp_down_sp(self):
@@ -677,12 +714,14 @@ class Motor(Device):
         setpoint. The actual ramp time is the ratio of the difference between the
         ``speed_sp`` and the current ``speed`` and max_speed multiplied by ``ramp_down_sp``.
         """
-        self._ramp_down_sp, value = self.get_attr_int(self._ramp_down_sp, 'ramp_down_sp')
+        self._ramp_down_sp, value = self.get_attr_int(
+            self._ramp_down_sp, 'ramp_down_sp')
         return value
 
     @ramp_down_sp.setter
     def ramp_down_sp(self, value):
-        self._ramp_down_sp = self.set_attr_int(self._ramp_down_sp, 'ramp_down_sp', value)
+        self._ramp_down_sp = self.set_attr_int(
+            self._ramp_down_sp, 'ramp_down_sp', value)
 
     @property
     def speed_p(self):
@@ -737,12 +776,14 @@ class Motor(Device):
         Also, it determines the motors behavior when a run command completes. See
         ``stop_actions`` for a list of possible values.
         """
-        self._stop_action, value = self.get_attr_string(self._stop_action, 'stop_action')
+        self._stop_action, value = self.get_attr_string(
+            self._stop_action, 'stop_action')
         return value
 
     @stop_action.setter
     def stop_action(self, value):
-        self._stop_action = self.set_attr_string(self._stop_action, 'stop_action', value)
+        self._stop_action = self.set_attr_string(
+            self._stop_action, 'stop_action', value)
 
     @property
     def stop_actions(self):
@@ -758,7 +799,8 @@ class Motor(Device):
         position. If an external force tries to turn the motor, the motor will 'push
         back' to maintain its position.
         """
-        (self._stop_actions, value) = self.get_cached_attr_set(self._stop_actions, 'stop_actions')
+        (self._stop_actions, value) = self.get_cached_attr_set(
+            self._stop_actions, 'stop_actions')
         return value
 
     @property
@@ -1093,7 +1135,8 @@ def list_motors(name_pattern=Motor.SYSTEM_DEVICE_NAME_CONVENTION, **kwargs):
             is a list, then a match against any entry of the list is
             enough.
     """
-    class_path = abspath(Device.DEVICE_ROOT_PATH + '/' + Motor.SYSTEM_CLASS_NAME)
+    class_path = abspath(Device.DEVICE_ROOT_PATH +
+                         '/' + Motor.SYSTEM_CLASS_NAME)
 
     return (Motor(name_pattern=name, name_exact=True) for name in list_device_names(class_path, name_pattern, **kwargs))
 
@@ -1114,7 +1157,8 @@ class LargeMotor(Motor):
         super(LargeMotor, self).__init__(address,
                                          name_pattern,
                                          name_exact,
-                                         driver_name=['lego-ev3-l-motor', 'lego-nxt-motor'],
+                                         driver_name=[
+                                             'lego-ev3-l-motor', 'lego-nxt-motor'],
                                          **kwargs)
 
 
@@ -1131,7 +1175,8 @@ class MediumMotor(Motor):
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
 
-        super(MediumMotor, self).__init__(address, name_pattern, name_exact, driver_name=['lego-ev3-m-motor'], **kwargs)
+        super(MediumMotor, self).__init__(address, name_pattern,
+                                          name_exact, driver_name=['lego-ev3-m-motor'], **kwargs)
 
 
 class ActuonixL1250Motor(Motor):
@@ -1151,7 +1196,8 @@ class ActuonixL1250Motor(Motor):
         super(ActuonixL1250Motor, self).__init__(address,
                                                  name_pattern,
                                                  name_exact,
-                                                 driver_name=['act-l12-ev3-50'],
+                                                 driver_name=[
+                                                     'act-l12-ev3-50'],
                                                  **kwargs)
 
 
@@ -1172,7 +1218,8 @@ class ActuonixL12100Motor(Motor):
         super(ActuonixL12100Motor, self).__init__(address,
                                                   name_pattern,
                                                   name_exact,
-                                                  driver_name=['act-l12-ev3-100'],
+                                                  driver_name=[
+                                                      'act-l12-ev3-100'],
                                                   **kwargs)
 
 
@@ -1205,7 +1252,8 @@ class DcMotor(Device):
 
         if address is not None:
             kwargs['address'] = address
-        super(DcMotor, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
+        super(DcMotor, self).__init__(self.SYSTEM_CLASS_NAME,
+                                      name_pattern, name_exact, **kwargs)
 
         self._address = None
         self._command = None
@@ -1257,7 +1305,8 @@ class DcMotor(Device):
         Returns the name of the motor driver that loaded this device. See the list
         of [supported devices] for a list of drivers.
         """
-        self._driver_name, value = self.get_attr_string(self._driver_name, 'driver_name')
+        self._driver_name, value = self.get_attr_string(
+            self._driver_name, 'driver_name')
         return value
 
     @property
@@ -1266,7 +1315,8 @@ class DcMotor(Device):
         Shows the current duty cycle of the PWM signal sent to the motor. Values
         are -100 to 100 (-100% to 100%).
         """
-        self._duty_cycle, value = self.get_attr_int(self._duty_cycle, 'duty_cycle')
+        self._duty_cycle, value = self.get_attr_int(
+            self._duty_cycle, 'duty_cycle')
         return value
 
     @property
@@ -1276,24 +1326,28 @@ class DcMotor(Device):
         Valid values are -100 to 100 (-100% to 100%). Reading returns the current
         setpoint.
         """
-        self._duty_cycle_sp, value = self.get_attr_int(self._duty_cycle_sp, 'duty_cycle_sp')
+        self._duty_cycle_sp, value = self.get_attr_int(
+            self._duty_cycle_sp, 'duty_cycle_sp')
         return value
 
     @duty_cycle_sp.setter
     def duty_cycle_sp(self, value):
-        self._duty_cycle_sp = self.set_attr_int(self._duty_cycle_sp, 'duty_cycle_sp', value)
+        self._duty_cycle_sp = self.set_attr_int(
+            self._duty_cycle_sp, 'duty_cycle_sp', value)
 
     @property
     def polarity(self):
         """
         Sets the polarity of the motor. Valid values are ``normal`` and ``inversed``.
         """
-        self._polarity, value = self.get_attr_string(self._polarity, 'polarity')
+        self._polarity, value = self.get_attr_string(
+            self._polarity, 'polarity')
         return value
 
     @polarity.setter
     def polarity(self, value):
-        self._polarity = self.set_attr_string(self._polarity, 'polarity', value)
+        self._polarity = self.set_attr_string(
+            self._polarity, 'polarity', value)
 
     @property
     def ramp_down_sp(self):
@@ -1301,12 +1355,14 @@ class DcMotor(Device):
         Sets the time in milliseconds that it take the motor to ramp down from 100%
         to 0%. Valid values are 0 to 10000 (10 seconds). Default is 0.
         """
-        self._ramp_down_sp, value = self.get_attr_int(self._ramp_down_sp, 'ramp_down_sp')
+        self._ramp_down_sp, value = self.get_attr_int(
+            self._ramp_down_sp, 'ramp_down_sp')
         return value
 
     @ramp_down_sp.setter
     def ramp_down_sp(self, value):
-        self._ramp_down_sp = self.set_attr_int(self._ramp_down_sp, 'ramp_down_sp', value)
+        self._ramp_down_sp = self.set_attr_int(
+            self._ramp_down_sp, 'ramp_down_sp', value)
 
     @property
     def ramp_up_sp(self):
@@ -1314,12 +1370,14 @@ class DcMotor(Device):
         Sets the time in milliseconds that it take the motor to up ramp from 0% to
         100%. Valid values are 0 to 10000 (10 seconds). Default is 0.
         """
-        self._ramp_up_sp, value = self.get_attr_int(self._ramp_up_sp, 'ramp_up_sp')
+        self._ramp_up_sp, value = self.get_attr_int(
+            self._ramp_up_sp, 'ramp_up_sp')
         return value
 
     @ramp_up_sp.setter
     def ramp_up_sp(self, value):
-        self._ramp_up_sp = self.set_attr_int(self._ramp_up_sp, 'ramp_up_sp', value)
+        self._ramp_up_sp = self.set_attr_int(
+            self._ramp_up_sp, 'ramp_up_sp', value)
 
     @property
     def state(self):
@@ -1342,7 +1400,8 @@ class DcMotor(Device):
 
     @stop_action.setter
     def stop_action(self, value):
-        self._stop_action = self.set_attr_string(self._stop_action, 'stop_action', value)
+        self._stop_action = self.set_attr_string(
+            self._stop_action, 'stop_action', value)
 
     @property
     def stop_actions(self):
@@ -1350,7 +1409,8 @@ class DcMotor(Device):
         Gets a list of stop actions. Valid values are ``coast``
         and ``brake``.
         """
-        self._stop_actions, value = self.get_attr_set(self._stop_actions, 'stop_actions')
+        self._stop_actions, value = self.get_attr_set(
+            self._stop_actions, 'stop_actions')
         return value
 
     @property
@@ -1462,7 +1522,8 @@ class ServoMotor(Device):
 
         if address is not None:
             kwargs['address'] = address
-        super(ServoMotor, self).__init__(self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
+        super(ServoMotor, self).__init__(
+            self.SYSTEM_CLASS_NAME, name_pattern, name_exact, **kwargs)
 
         self._address = None
         self._command = None
@@ -1502,7 +1563,8 @@ class ServoMotor(Device):
         Returns the name of the motor driver that loaded this device. See the list
         of [supported devices] for a list of drivers.
         """
-        self._driver_name, value = self.get_attr_string(self._driver_name, 'driver_name')
+        self._driver_name, value = self.get_attr_string(
+            self._driver_name, 'driver_name')
         return value
 
     @property
@@ -1513,12 +1575,14 @@ class ServoMotor(Device):
         Valid values are 2300 to 2700. You must write to the position_sp attribute for
         changes to this attribute to take effect.
         """
-        self._max_pulse_sp, value = self.get_attr_int(self._max_pulse_sp, 'max_pulse_sp')
+        self._max_pulse_sp, value = self.get_attr_int(
+            self._max_pulse_sp, 'max_pulse_sp')
         return value
 
     @max_pulse_sp.setter
     def max_pulse_sp(self, value):
-        self._max_pulse_sp = self.set_attr_int(self._max_pulse_sp, 'max_pulse_sp', value)
+        self._max_pulse_sp = self.set_attr_int(
+            self._max_pulse_sp, 'max_pulse_sp', value)
 
     @property
     def mid_pulse_sp(self):
@@ -1530,12 +1594,14 @@ class ServoMotor(Device):
         where the motor does not turn. You must write to the position_sp attribute for
         changes to this attribute to take effect.
         """
-        self._mid_pulse_sp, value = self.get_attr_int(self._mid_pulse_sp, 'mid_pulse_sp')
+        self._mid_pulse_sp, value = self.get_attr_int(
+            self._mid_pulse_sp, 'mid_pulse_sp')
         return value
 
     @mid_pulse_sp.setter
     def mid_pulse_sp(self, value):
-        self._mid_pulse_sp = self.set_attr_int(self._mid_pulse_sp, 'mid_pulse_sp', value)
+        self._mid_pulse_sp = self.set_attr_int(
+            self._mid_pulse_sp, 'mid_pulse_sp', value)
 
     @property
     def min_pulse_sp(self):
@@ -1545,12 +1611,14 @@ class ServoMotor(Device):
         is 600. Valid values are 300 to 700. You must write to the position_sp
         attribute for changes to this attribute to take effect.
         """
-        self._min_pulse_sp, value = self.get_attr_int(self._min_pulse_sp, 'min_pulse_sp')
+        self._min_pulse_sp, value = self.get_attr_int(
+            self._min_pulse_sp, 'min_pulse_sp')
         return value
 
     @min_pulse_sp.setter
     def min_pulse_sp(self, value):
-        self._min_pulse_sp = self.set_attr_int(self._min_pulse_sp, 'min_pulse_sp', value)
+        self._min_pulse_sp = self.set_attr_int(
+            self._min_pulse_sp, 'min_pulse_sp', value)
 
     @property
     def polarity(self):
@@ -1560,12 +1628,14 @@ class ServoMotor(Device):
         inversed. i.e ``-100`` will correspond to ``max_pulse_sp``, and ``100`` will
         correspond to ``min_pulse_sp``.
         """
-        self._polarity, value = self.get_attr_string(self._polarity, 'polarity')
+        self._polarity, value = self.get_attr_string(
+            self._polarity, 'polarity')
         return value
 
     @polarity.setter
     def polarity(self, value):
-        self._polarity = self.set_attr_string(self._polarity, 'polarity', value)
+        self._polarity = self.set_attr_string(
+            self._polarity, 'polarity', value)
 
     @property
     def position_sp(self):
@@ -1575,12 +1645,14 @@ class ServoMotor(Device):
         are -100 to 100 (-100% to 100%) where ``-100`` corresponds to ``min_pulse_sp``,
         ``0`` corresponds to ``mid_pulse_sp`` and ``100`` corresponds to ``max_pulse_sp``.
         """
-        self._position_sp, value = self.get_attr_int(self._position_sp, 'position_sp')
+        self._position_sp, value = self.get_attr_int(
+            self._position_sp, 'position_sp')
         return value
 
     @position_sp.setter
     def position_sp(self, value):
-        self._position_sp = self.set_attr_int(self._position_sp, 'position_sp', value)
+        self._position_sp = self.set_attr_int(
+            self._position_sp, 'position_sp', value)
 
     @property
     def rate_sp(self):
@@ -1677,10 +1749,12 @@ class MotorSet(object):
                         raise e
 
     def set_polarity(self, polarity, motors=None):
-        valid_choices = (LargeMotor.POLARITY_NORMAL, LargeMotor.POLARITY_INVERSED)
+        valid_choices = (LargeMotor.POLARITY_NORMAL,
+                         LargeMotor.POLARITY_INVERSED)
 
         assert polarity in valid_choices,\
-            "%s is an invalid polarity choice, must be %s" % (polarity, ', '.join(valid_choices))
+            "%s is an invalid polarity choice, must be %s" % (
+                polarity, ', '.join(valid_choices))
         motors = motors if motors is not None else self.motors.values()
 
         for motor in motors:
@@ -1852,6 +1926,23 @@ def follow_for_ms(tank, ms):
         return True
 
 
+def follow_for_ultrasonic(tank, ultrasonic, distance, forward=True):
+    '''
+    ``tank``: the MoveTank object that is following a line
+    ``ultrasonic`` : the Ultrasonic Object that is detecting target distance
+                    Mode should be 'US-DIST-CM'.
+    ``distance``: Target Distance at which point the tank motors should stop. 
+                  Should be in centimeters
+    ``forward`` : If the Ultrasonic Sensor is approaching from Greater or Lesser Values
+    Forward is True if approaching from the lesser values 
+    '''
+
+    if forward:
+        return ultrasonic.distance_centimeters() < distance
+    else:
+        return ultrasonic.distance_centimeters() > distance
+
+
 class MoveTank(MotorSet):
     """
     Controls a pair of motors simultaneously, via individual speed setpoints for each motor.
@@ -1864,6 +1955,7 @@ class MoveTank(MotorSet):
         # drive in a turn for 10 rotations of the outer motor
         tank_drive.on_for_rotations(50, 75, 10)
     """
+
     def __init__(self, left_motor_port, right_motor_port, desc=None, motor_class=LargeMotor):
         motor_specs = {
             left_motor_port: motor_class,
@@ -1896,8 +1988,10 @@ class MoveTank(MotorSet):
         self._gyro = gyro
 
     def _unpack_speeds_to_native_units(self, left_speed, right_speed):
-        left_speed = self.left_motor._speed_native_units(left_speed, "left_speed")
-        right_speed = self.right_motor._speed_native_units(right_speed, "right_speed")
+        left_speed = self.left_motor._speed_native_units(
+            left_speed, "left_speed")
+        right_speed = self.right_motor._speed_native_units(
+            right_speed, "right_speed")
 
         return (left_speed, right_speed)
 
@@ -1925,16 +2019,20 @@ class MoveTank(MotorSet):
         # larger speed by magnitude is the "outer" wheel, and rotates the full "degrees"
         elif abs(left_speed_native_units) > abs(right_speed_native_units):
             left_degrees = degrees
-            right_degrees = abs(right_speed_native_units / left_speed_native_units) * degrees
+            right_degrees = abs(right_speed_native_units /
+                                left_speed_native_units) * degrees
 
         else:
-            left_degrees = abs(left_speed_native_units / right_speed_native_units) * degrees
+            left_degrees = abs(left_speed_native_units /
+                               right_speed_native_units) * degrees
             right_degrees = degrees
 
         # Set all parameters
-        self.left_motor._set_rel_position_degrees_and_speed_sp(left_degrees, left_speed_native_units)
+        self.left_motor._set_rel_position_degrees_and_speed_sp(
+            left_degrees, left_speed_native_units)
         self.left_motor._set_brake(brake)
-        self.right_motor._set_rel_position_degrees_and_speed_sp(right_degrees, right_speed_native_units)
+        self.right_motor._set_rel_position_degrees_and_speed_sp(
+            right_degrees, right_speed_native_units)
         self.right_motor._set_brake(brake)
 
         # Start the motors
@@ -1954,7 +2052,8 @@ class MoveTank(MotorSet):
         ``rotations`` while the motor on the inside will have its requested
         distance calculated according to the expected turn.
         """
-        MoveTank.on_for_degrees(self, left_speed, right_speed, rotations * 360, brake, block)
+        MoveTank.on_for_degrees(
+            self, left_speed, right_speed, rotations * 360, brake, block)
 
     def on_for_seconds(self, left_speed, right_speed, seconds, brake=True, block=True):
         """
@@ -1976,7 +2075,8 @@ class MoveTank(MotorSet):
         self.right_motor.time_sp = int(seconds * 1000)
         self.right_motor._set_brake(brake)
 
-        log.debug("%s: on_for_seconds %ss at left-speed %s, right-speed %s" % (self, seconds, left_speed, right_speed))
+        log.debug("%s: on_for_seconds %ss at left-speed %s, right-speed %s" %
+                  (self, seconds, left_speed, right_speed))
 
         # Start the motors
         self.left_motor.run_timed()
@@ -2088,13 +2188,16 @@ class MoveTank(MotorSet):
             integral = integral + error
             derivative = error - last_error
             last_error = error
-            turn_native_units = (kp * error) + (ki * integral) + (kd * derivative)
+            turn_native_units = (kp * error) + \
+                (ki * integral) + (kd * derivative)
 
             if not follow_left_edge:
                 turn_native_units *= -1
 
-            left_speed = SpeedNativeUnits(speed_native_units - turn_native_units)
-            right_speed = SpeedNativeUnits(speed_native_units + turn_native_units)
+            left_speed = SpeedNativeUnits(
+                speed_native_units - turn_native_units)
+            right_speed = SpeedNativeUnits(
+                speed_native_units + turn_native_units)
 
             # Have we lost the line?
             if reflected_light_intensity >= white:
@@ -2114,7 +2217,8 @@ class MoveTank(MotorSet):
             except SpeedInvalid as e:
                 log.exception(e)
                 self.stop()
-                raise LineFollowErrorTooFast("The robot is moving too fast to follow the line")
+                raise LineFollowErrorTooFast(
+                    "The robot is moving too fast to follow the line")
 
         self.stop()
 
@@ -2195,10 +2299,13 @@ class MoveTank(MotorSet):
             integral = integral + error
             derivative = error - last_error
             last_error = error
-            turn_native_units = (kp * error) + (ki * integral) + (kd * derivative)
+            turn_native_units = (kp * error) + \
+                (ki * integral) + (kd * derivative)
 
-            left_speed = SpeedNativeUnits(speed_native_units - turn_native_units)
-            right_speed = SpeedNativeUnits(speed_native_units + turn_native_units)
+            left_speed = SpeedNativeUnits(
+                speed_native_units - turn_native_units)
+            right_speed = SpeedNativeUnits(
+                speed_native_units + turn_native_units)
 
             if sleep_time:
                 time.sleep(sleep_time)
@@ -2208,7 +2315,8 @@ class MoveTank(MotorSet):
             except SpeedInvalid as e:
                 log.exception(e)
                 self.stop()
-                raise FollowGyroAngleErrorTooFast("The robot is moving too fast to follow the angle")
+                raise FollowGyroAngleErrorTooFast(
+                    "The robot is moving too fast to follow the angle")
 
         self.stop()
 
@@ -2297,7 +2405,8 @@ class MoveTank(MotorSet):
         """
         Rotate counter-clockwise ``degrees`` in place
         """
-        self.turn_degrees(speed, abs(degrees) * -1, brake, error_margin, sleep_time)
+        self.turn_degrees(speed, abs(degrees) * -1,
+                          brake, error_margin, sleep_time)
 
 
 class MoveSteering(MoveTank):
@@ -2319,6 +2428,7 @@ class MoveSteering(MoveTank):
         # drive in a turn for 10 rotations of the outer motor
         steering_drive.on_for_rotations(-20, SpeedPercent(75), 10)
     """
+
     def on_for_rotations(self, steering, speed, rotations, brake=True, block=True):
         """
         Rotate the motors according to the provided ``steering``.
@@ -2353,7 +2463,8 @@ class MoveSteering(MoveTank):
         ``speed`` forever.
         """
         (left_speed, right_speed) = self.get_speed_steering(steering, speed)
-        MoveTank.on(self, SpeedNativeUnits(left_speed), SpeedNativeUnits(right_speed))
+        MoveTank.on(self, SpeedNativeUnits(left_speed),
+                    SpeedNativeUnits(right_speed))
 
     def get_speed_steering(self, steering, speed):
         """
@@ -2374,7 +2485,8 @@ class MoveSteering(MoveTank):
         """
 
         assert steering >= -100 and steering <= 100,\
-            "{} is an invalid steering, must be between -100 and 100 (inclusive)".format(steering)
+            "{} is an invalid steering, must be between -100 and 100 (inclusive)".format(
+                steering)
 
         # We don't have a good way to make this generic for the pair... so we
         # assume that the left motor's speed stats are the same as the right
@@ -2466,6 +2578,7 @@ class MoveDifferential(MoveTank):
         # Disable odometry
         mdiff.odometry_stop()
     """
+
     def __init__(self,
                  left_motor_port,
                  right_motor_port,
@@ -2474,7 +2587,8 @@ class MoveDifferential(MoveTank):
                  desc=None,
                  motor_class=LargeMotor):
 
-        MoveTank.__init__(self, left_motor_port, right_motor_port, desc, motor_class)
+        MoveTank.__init__(self, left_motor_port,
+                          right_motor_port, desc, motor_class)
         self.wheel = wheel_class()
         self.wheel_distance_mm = wheel_distance_mm
 
@@ -2494,7 +2608,8 @@ class MoveDifferential(MoveTank):
         Drive in a straight line for ``distance_mm``
         """
         rotations = distance_mm / self.wheel.circumference_mm
-        log.debug("%s: on_for_rotations distance_mm %s, rotations %s, speed %s" % (self, distance_mm, rotations, speed))
+        log.debug("%s: on_for_rotations distance_mm %s, rotations %s, speed %s" % (
+            self, distance_mm, rotations, speed))
 
         MoveTank.on_for_rotations(self, speed, speed, rotations, brake, block)
 
@@ -2509,9 +2624,11 @@ class MoveDifferential(MoveTank):
 
         # The circle formed at the halfway point between the two wheels is the
         # circle that must have a radius of radius_mm
-        circle_outer_mm = 2 * math.pi * (radius_mm + (self.wheel_distance_mm / 2))
+        circle_outer_mm = 2 * math.pi * \
+            (radius_mm + (self.wheel_distance_mm / 2))
         circle_middle_mm = 2 * math.pi * radius_mm
-        circle_inner_mm = 2 * math.pi * (radius_mm - (self.wheel_distance_mm / 2))
+        circle_inner_mm = 2 * math.pi * \
+            (radius_mm - (self.wheel_distance_mm / 2))
 
         if arc_right:
             # The left wheel is making the larger circle and will move at 'speed'
@@ -2539,7 +2656,8 @@ class MoveDifferential(MoveTank):
         # many mm the outer wheel should travel.
         circle_outer_final_mm = circle_middle_percentage * circle_outer_mm
 
-        outer_wheel_rotations = float(circle_outer_final_mm / self.wheel.circumference_mm)
+        outer_wheel_rotations = float(
+            circle_outer_final_mm / self.wheel.circumference_mm)
         outer_wheel_degrees = outer_wheel_rotations * 360
 
         log.debug("%s: arc %s, circle_middle_percentage %s, circle_outer_final_mm %s, " %
@@ -2547,7 +2665,8 @@ class MoveDifferential(MoveTank):
         log.debug("%s: outer_wheel_rotations %s, outer_wheel_degrees %s" %
                   (self, outer_wheel_rotations, outer_wheel_degrees))
 
-        MoveTank.on_for_degrees(self, left_speed, right_speed, outer_wheel_degrees, brake, block)
+        MoveTank.on_for_degrees(
+            self, left_speed, right_speed, outer_wheel_degrees, brake, block)
 
     def on_arc_right(self, speed, radius_mm, distance_mm, brake=True, block=True):
         """
@@ -2607,11 +2726,13 @@ class MoveDifferential(MoveTank):
 
         # If degrees is positive rotate clockwise
         if degrees > 0:
-            MoveTank.on_for_rotations(self, speed, speed * -1, rotations, brake, block)
+            MoveTank.on_for_rotations(
+                self, speed, speed * -1, rotations, brake, block)
 
         # If degrees is negative rotate counter-clockwise
         else:
-            MoveTank.on_for_rotations(self, speed * -1, speed, rotations, brake, block)
+            MoveTank.on_for_rotations(
+                self, speed * -1, speed, rotations, brake, block)
 
         if use_gyro:
             angle_current_degrees = self._gyro.circle_angle()
@@ -2619,12 +2740,14 @@ class MoveDifferential(MoveTank):
             # This can happen if we are aiming for 2 degrees and overrotate to 358 degrees
             # We need to rotate counter-clockwise
             if 90 >= angle_target_degrees >= 0 and 270 <= angle_current_degrees <= 360:
-                degrees_error = (angle_target_degrees + (360 - angle_current_degrees)) * -1
+                degrees_error = (angle_target_degrees +
+                                 (360 - angle_current_degrees)) * -1
 
             # This can happen if we are aiming for 358 degrees and overrotate to 2 degrees
             # We need to rotate clockwise
             elif 360 >= angle_target_degrees >= 270 and 0 <= angle_current_degrees <= 90:
-                degrees_error = angle_current_degrees + (360 - angle_target_degrees)
+                degrees_error = angle_current_degrees + \
+                    (360 - angle_target_degrees)
 
             # We need to rotate clockwise
             elif angle_current_degrees > angle_target_degrees:
@@ -2632,32 +2755,37 @@ class MoveDifferential(MoveTank):
 
             # We need to rotate counter-clockwise
             else:
-                degrees_error = (angle_target_degrees - angle_current_degrees) * -1
+                degrees_error = (angle_target_degrees -
+                                 angle_current_degrees) * -1
 
             log.info("%s: turn_degrees() ended up at %s, error %s, error_margin %s" %
                      (self, angle_current_degrees, degrees_error, error_margin))
 
             if abs(degrees_error) > error_margin:
-                self.turn_degrees(speed, degrees_error, brake, block, error_margin, use_gyro)
+                self.turn_degrees(speed, degrees_error, brake,
+                                  block, error_margin, use_gyro)
 
     def turn_right(self, speed, degrees, brake=True, block=True, error_margin=2, use_gyro=False):
         """
         Rotate clockwise ``degrees`` in place
         """
-        self.turn_degrees(speed, abs(degrees), brake, block, error_margin, use_gyro)
+        self.turn_degrees(speed, abs(degrees), brake,
+                          block, error_margin, use_gyro)
 
     def turn_left(self, speed, degrees, brake=True, block=True, error_margin=2, use_gyro=False):
         """
         Rotate counter-clockwise ``degrees`` in place
         """
-        self.turn_degrees(speed, abs(degrees) * -1, brake, block, error_margin, use_gyro)
+        self.turn_degrees(speed, abs(degrees) * -1, brake,
+                          block, error_margin, use_gyro)
 
     def turn_to_angle(self, speed, angle_target_degrees, brake=True, block=True, error_margin=2, use_gyro=False):
         """
         Rotate in place to ``angle_target_degrees`` at ``speed``
         """
         if not self.odometry_thread_run:
-            raise ThreadNotRunning("odometry_start() must be called to track robot coordinates")
+            raise ThreadNotRunning(
+                "odometry_start() must be called to track robot coordinates")
 
         # Make both target and current angles positive numbers between 0 and 360
         while angle_target_degrees < 0:
@@ -2686,14 +2814,17 @@ class MoveDifferential(MoveTank):
         self.odometry_coordinates_log()
 
         if turn_right:
-            self.turn_degrees(speed, abs(angle_delta), brake, block, error_margin, use_gyro)
+            self.turn_degrees(speed, abs(angle_delta), brake,
+                              block, error_margin, use_gyro)
         else:
-            self.turn_degrees(speed, abs(angle_delta) * -1, brake, block, error_margin, use_gyro)
+            self.turn_degrees(speed, abs(angle_delta) * -1,
+                              brake, block, error_margin, use_gyro)
 
         self.odometry_coordinates_log()
 
     def odometry_coordinates_log(self):
-        log.debug("%s: odometry angle %s at (%d, %d)" % (self, math.degrees(self.theta), self.x_pos_mm, self.y_pos_mm))
+        log.debug("%s: odometry angle %s at (%d, %d)" %
+                  (self, math.degrees(self.theta), self.x_pos_mm, self.y_pos_mm))
 
     def odometry_start(self, theta_degrees_start=90.0, x_pos_start=0.0, y_pos_start=0.0, sleep_time=0.005):  # 5ms
         """
@@ -2734,8 +2865,10 @@ class MoveDifferential(MoveTank):
                 right_previous = right_current
 
                 # rotations = distance_mm/self.wheel.circumference_mm
-                left_rotations = float(left_ticks / self.left_motor.count_per_rot)
-                right_rotations = float(right_ticks / self.right_motor.count_per_rot)
+                left_rotations = float(
+                    left_ticks / self.left_motor.count_per_rot)
+                right_rotations = float(
+                    right_ticks / self.right_motor.count_per_rot)
 
                 # convert longs to floats and ticks to mm
                 left_mm = float(left_rotations * self.wheel.circumference_mm)
@@ -2776,7 +2909,8 @@ class MoveDifferential(MoveTank):
         Drive to (``x_target_mm``, ``y_target_mm``) coordinates at ``speed``
         """
         if not self.odometry_thread_run:
-            raise ThreadNotRunning("odometry_start() must be called to track robot coordinates")
+            raise ThreadNotRunning(
+                "odometry_start() must be called to track robot coordinates")
 
         # stop moving
         self.off(brake='hold')
@@ -2789,7 +2923,8 @@ class MoveDifferential(MoveTank):
         self.turn_to_angle(speed, angle_target_degrees, brake=True, block=True)
 
         # drive in a straight line to the target coordinates
-        distance_mm = math.sqrt(pow(self.x_pos_mm - x_target_mm, 2) + pow(self.y_pos_mm - y_target_mm, 2))
+        distance_mm = math.sqrt(
+            pow(self.x_pos_mm - x_target_mm, 2) + pow(self.y_pos_mm - y_target_mm, 2))
         self.on_for_distance(speed, distance_mm, brake, block)
 
 
@@ -2797,6 +2932,7 @@ class MoveJoystick(MoveTank):
     """
     Used to control a pair of motors via a single joystick vector.
     """
+
     def on(self, x, y, radius=100.0):
         """
         Convert ``x``,``y`` joystick coordinates to left/right motor speed percentages
@@ -2832,11 +2968,14 @@ class MoveJoystick(MoveTank):
         if vector_length > radius:
             vector_length = radius
 
-        (init_left_speed_percentage, init_right_speed_percentage) = MoveJoystick.angle_to_speed_percentage(angle)
+        (init_left_speed_percentage,
+         init_right_speed_percentage) = MoveJoystick.angle_to_speed_percentage(angle)
 
         # scale the speed percentages based on vector_length vs. radius
-        left_speed_percentage = (init_left_speed_percentage * vector_length) / radius
-        right_speed_percentage = (init_right_speed_percentage * vector_length) / radius
+        left_speed_percentage = (
+            init_left_speed_percentage * vector_length) / radius
+        right_speed_percentage = (
+            init_right_speed_percentage * vector_length) / radius
 
         #     log.debug("""
         # x, y                         : %s, %s
@@ -2851,7 +2990,8 @@ class MoveJoystick(MoveTank):
         #         init_left_speed_percentage, init_right_speed_percentage,
         #         left_speed_percentage, right_speed_percentage))
 
-        MoveTank.on(self, SpeedPercent(left_speed_percentage), SpeedPercent(right_speed_percentage))
+        MoveTank.on(self, SpeedPercent(left_speed_percentage),
+                    SpeedPercent(right_speed_percentage))
 
     @staticmethod
     def angle_to_speed_percentage(angle):
