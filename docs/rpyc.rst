@@ -40,11 +40,12 @@ Install
       After=multi-user.target
 
       [Service]
+      User=robot
       Type=simple
       ExecStart=/usr/bin/rpyc_classic.py
 
       [Install]
-      WantedBy=multi-user.target" > rpyc-classic.service
+      WantedBy=multi-user.target" > rpyc-classic.service --host=0.0.0.0
 
       sudo cp rpyc-classic.service /lib/systemd/system/
       sudo systemctl daemon-reload
@@ -106,6 +107,11 @@ Cons
 ====
 * Latency will be introduced by the network connection.  This may be a show stopper for robots where reaction speed is essential.
 * RPyC is only supported by python, it is *NOT* supported by micropython
+* The version included with ev3dev is 3.3.0; if using a RPyC client on a desktop chances are there is a major difference, so it is
+  advisable to upgrade it:
+ - sudo apt-get install python3-pip
+ - sudo pip3 install rpyc
+ - sudo reboot
 
 References
 ==========
