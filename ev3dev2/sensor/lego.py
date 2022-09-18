@@ -412,30 +412,33 @@ class ColorSensor(Sensor):
 
 
 class HiTechColorSensor(Sensor):
+    """
+    HT NXT color sensor V2.
+    """
 
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
-    #: Reflected light. Red LED on.
+    # Color values 0 - 15.
     MODE_COLOR = 'COLOR'
 
-    #: Ambient light. Blue LEDs on.
+    # RGB Color components.
     MODE_RGB = 'RGB'
 
-    #: Color. All LEDs rapidly cycling, appears white.
+    # Normal value of the reflected light.
     MODE_NORM = 'NORM'
 
-    #: Raw reflected. Red LED on
+    # Passive value of the reflected light.
     MODE_PASSIVE = 'PASSIVE'
 
-    #: Raw Color Components. All LEDs rapidly cycling, appears white.
+    # Raw Color Components.
     MODE_RAW = 'RAW'
 
     MODES = (MODE_COLOR, MODE_RGB, MODE_NORM, MODE_PASSIVE, MODE_RAW)
 
     def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
         super(HiTechColorSensor, self)\
-            .__init__(address, name_pattern, name_exact, driver_name='lego-ev3-color', **kwargs)
+            .__init__(address, name_pattern, name_exact, driver_name='ht-nxt-color-v2', **kwargs)
 
     @property
     def color(self):
