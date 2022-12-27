@@ -411,6 +411,151 @@ class ColorSensor(Sensor):
         return self.value(2)
 
 
+class HiTechColorSensor(Sensor):
+    """
+    HT NXT color sensor V2.
+    """
+
+    SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
+    SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
+
+    #: Color values 0 - 17.
+    MODE_COLOR = 'COLOR'
+
+    #: RGB Color components.
+    MODE_RGB = 'RGB'
+
+    #: Normal value of the reflected light.
+    MODE_NORM = 'NORM'
+
+    #: Passive value of the reflected light.
+    MODE_PASSIVE = 'PASSIVE'
+
+    #: Raw Color Components.
+    MODE_RAW = 'RAW'
+
+    #: Black color.
+    COLOR_BLACK = 0
+
+    #: Purple color.
+    COLOR_PURPLE = 1
+
+    #: Purple Blue color.
+    COLOR_PURPLE_BLUE = 2
+
+    #: Blue Green color.
+    COLOR_BLUE_GREEN = 3
+
+    #: Green color.
+    COLOR_GREEN = 4
+
+    #: Green Yellow color.
+    COLOR_GREEN_YELLOW = 5
+
+    #: Yellow color.
+    COLOR_YELLOW = 6
+
+    #: Orange color.
+    COLOR_ORANGE = 7
+
+    #: Red color.
+    COLOR_RED = 8
+
+    #: Red Pink color.
+    COLOR_RED_PINK = 9
+
+    #: Pink color.
+    COLOR_PINK = 10
+
+    #: Light Purple color.
+    COLOR_LIGHT_PURPLE = 11
+
+    #: Light Green color.
+    COLOR_LIGHT_GREEN = 12
+
+    #: Light Yellow color.
+    COLOR_LIGHT_YELLOW = 13
+
+    #: Light Yellow Red color.
+    COLOR_LIGHT_YELLOW_RED = 14
+
+    #: Red color.
+    COLOR_LIGHT_RED = 15
+
+    #: Light Pink color.
+    COLOR_LIGHT_PINK = 16
+
+    #: White color.
+    COLOR_WHITE = 17
+
+    MODES = (MODE_COLOR, MODE_RGB, MODE_NORM, MODE_PASSIVE, MODE_RAW)
+
+    COLORS = (
+        'Black',
+        'Purple',
+        'PurpleBlue',
+        'BlueGreen',
+        'Green',
+        'GreenYellow',
+        'Yellow',
+        'Orange',
+        'Red',
+        'RedPink',
+        'Pink',
+        'LightPurple',
+        'LightGreen',
+        'LightYellow',
+        'LightYellowRed',
+        'LightRed',
+        'LightPink',
+        'LightWhite',
+    )
+
+    def __init__(self, address=None, name_pattern=SYSTEM_DEVICE_NAME_CONVENTION, name_exact=False, **kwargs):
+        super(HiTechColorSensor, self)\
+            .__init__(address, name_pattern, name_exact, driver_name='ht-nxt-color-v2', **kwargs)
+
+    @property
+    def color(self):
+        self._ensure_mode(self.MODE_COLOR)
+        return self.value(0)
+
+    @property
+    def rgb(self):
+        self._ensure_mode(self.MODE_RGB)
+        return self.value(0), self.value(1), self.value(2)
+
+    @property
+    def red(self):
+        self._ensure_mode(self.MODE_RGB)
+        return self.value(0)
+
+    @property
+    def green(self):
+        self._ensure_mode(self.MODE_RGB)
+        return self.value(1)
+
+    @property
+    def blue(self):
+        self._ensure_mode(self.MODE_RGB)
+        return self.value(2)
+
+    @property
+    def norm(self):
+        self._ensure_mode(self.MODE_NORM)
+        return self.value(0)
+
+    @property
+    def passive(self):
+        self._ensure_mode(self.MODE_PASSIVE)
+        return self.value(0)
+
+    @property
+    def raw(self):
+        self._ensure_mode(self.MODE_RAW)
+        return self.value(0)
+
+
 class UltrasonicSensor(Sensor):
     """
     LEGO EV3 ultrasonic sensor.
