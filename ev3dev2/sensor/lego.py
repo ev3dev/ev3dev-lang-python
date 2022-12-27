@@ -419,7 +419,7 @@ class HiTechColorSensor(Sensor):
     SYSTEM_CLASS_NAME = Sensor.SYSTEM_CLASS_NAME
     SYSTEM_DEVICE_NAME_CONVENTION = Sensor.SYSTEM_DEVICE_NAME_CONVENTION
 
-    #: Color values 0 - 15.
+    #: Color values 0 - 17.
     MODE_COLOR = 'COLOR'
 
     #: RGB Color components.
