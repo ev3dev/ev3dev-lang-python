@@ -277,6 +277,7 @@ class ColorSensor(Sensor):
         XYZ = [0, 0, 0]
 
         for (num, value) in enumerate(self.rgb):
+            value /= 255 # scale rgb input to [0,1]
             if value > 0.04045:
                 value = pow(((value + 0.055) / 1.055), 2.4)
             else:
